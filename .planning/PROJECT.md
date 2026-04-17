@@ -16,14 +16,17 @@ A Georgian with a skill to trade can find another Georgian with a matching need,
 
 ### Active
 
-- [ ] SSO signup with Google, Apple, and magic-link email (no password)
+- [ ] SSO signup with Google + magic-link email (no password); Apple deferred to Capacitor wrap milestone
 - [ ] Email verification required before appearing in directory
-- [ ] Member profile: skills offered, skills wanted, bio, photo, county, availability (free text), contact preference
+- [ ] Member profile: skills offered, skills wanted, bio, photo, county, availability (free text), contact preference, optional TikTok handle
 - [ ] Directory: browse + search with category, county, and keyword filters
+- [ ] 10-category Georgia taxonomy seeded at launch (Food, Farm & Garden, Skilled Trades, Beauty & Hair, Wellness, Crafts, Childcare/Tutoring, Tech, Home/Cleaning, Transportation)
 - [ ] Platform-relayed contact: sender fills a short form, recipient gets an email from platform (Reply-To: sender); replies go direct after first touch
-- [ ] Georgia-only soft gate: county selector required at signup (honor system, no ZIP allowlist)
+- [ ] Rate limits + CAPTCHA + report + block as day-one trust floor (launches with contact relay, not after)
+- [ ] Georgia-only soft gate: county selector required at signup (honor system, no ZIP allowlist); all 159 counties available
 - [ ] Landing page in sage/forest/clay palette + Lora/Inter, warm community aesthetic
 - [ ] PWA-installable; wrapped later with Capacitor when App Store presence is needed
+- [ ] Pre-launch seeding: migrate the 11 existing `index.html` listings as "founding members" with consent; reach ≥30 seeded profiles before public launch
 
 ### Out of Scope
 
@@ -31,7 +34,9 @@ A Georgian with a skill to trade can find another Georgian with a matching need,
 - In-app messaging / chat threads — platform-relayed email is the only MVP contact mechanism; chat reconsidered post-MVP based on usage signals
 - Ratings, reviews, disputes — no trust-layer infra until directory has demonstrated pull
 - Phone verification — deferred to v1.1 as a trust badge
-- Radius search / availability calendar / curated Georgia category taxonomy — v1.1+
+- Apple Sign-In — deferred to Capacitor wrap milestone (Apple Developer $99/yr + 6-month key rotation + private-relay email complexity isn't worth it until the App Store build needs it)
+- Radius search / availability calendar / finer sub-category taxonomy — v1.1+ (top-level 10-category taxonomy ships in MVP)
+- Admin review queue UI — MVP uses SQL + `banned=true` flag; build a UI once report volume demands it
 - County community boards, group barters, events, referral credits — later milestones
 - Native iOS/Android codebases — Capacitor wrapper only when stores matter; no SwiftUI/Kotlin work
 - Custom auth code — Supabase Auth is the managed provider; we don't roll our own
@@ -48,7 +53,8 @@ A Georgian with a skill to trade can find another Georgian with a matching need,
 
 ## Constraints
 
-- **Tech stack**: Next.js 15 (App Router) + Supabase (Auth + Postgres + Storage) + Vercel hosting — chosen for RLS-native data model, OOTB social+magic-link auth, and free-tier headroom.
+- **Tech stack**: Next.js 16.2.x (App Router, React 19.2) + Supabase (Auth + Postgres + Storage) + Vercel hosting — "Next.js 15" in original brief read as "modern App-Router Next.js"; 16.2 is current stable as of 2026-04 and what `create-next-app` scaffolds. Chosen for RLS-native data model, OOTB social+magic-link auth, and free-tier headroom.
+- **Moderation**: Report-after model. Admin actions via SQL (`banned=true` flag) at MVP; no admin UI until report volume demands one.
 - **App wrapper**: PWA first; Capacitor added only when App Store / iOS push is required — keeps one codebase, no native-code maintenance.
 - **Hosting**: Must deploy on Vercel or Netlify free tier — Vercel for the Next.js app, Netlify keeps serving the legacy `index.html` until the new landing page replaces it.
 - **Auth**: No custom auth code — Supabase Auth is the only managed provider; rejected Clerk + Convex (pricing caps + reactive-data overkill for a directory).
@@ -57,7 +63,7 @@ A Georgian with a skill to trade can find another Georgian with a matching need,
 - **Privacy**: Member email/phone never exposed in the directory UI — always routed through the relay.
 - **Brand**: Dedicated Georgia Barter domain (to be procured); standalone brand separate from biznomad.io.
 - **Accounts**: Fresh Supabase + Vercel projects — no reuse of existing infrastructure.
-- **Moderation**: Report-after model with an admin review queue (queue itself deferred to v1.1); no pre-approval for listings.
+- **Deliverability**: SPF + DKIM + DMARC must be configured at DNS setup (Phase 1), not pre-launch — propagation takes 24-48h. Resend is plugged into Supabase Studio SMTP so auth emails come from branded domain too.
 
 ## Key Decisions
 
@@ -72,6 +78,14 @@ A Georgian with a skill to trade can find another Georgian with a matching need,
 | Success metric = initiated contacts (Contact button hits) | Behavioral signal that directory is matching supply with demand; profile count would mislead. | — Pending |
 | Dedicated domain, standalone brand | Georgia Barter is a distinct product from biznomad.io; cleaner long-term identity and future transferability. | — Pending |
 | Fresh Supabase + Vercel accounts | Keep project infra isolated from any existing work; simplifies billing and access. | — Pending |
+| SSO v1 = Google + magic-link only; Apple deferred | Apple Dev $99/yr, 6-month JWT client-secret rotation, private-relay email complexity. Not worth the MVP drag; add when Capacitor wrap needs it (App Store requires Apple Sign-In anyway). | — Pending |
+| 10-category Georgia taxonomy ships in MVP (not v1.1) | The category filter is broken without a day-1 taxonomy. Top-level 10 categories are light enough to seed immediately; finer sub-taxonomy stays v1.1. | — Pending |
+| Optional TikTok handle field on profile | Existing community is TikTok-native (1,400+ interested via @kerryscountrylife); preserving that audience through the rebuild is zero-cost. | — Pending |
+| Contact Relay + Trust ship together (joined phase) | Launching contact relay without rate limits + CAPTCHA + report + block = day-one spam cannon. Cannot split. | — Pending |
+| Pre-launch seeding to ≥30 founding-member profiles | Empty directory = instant bounce. Migrating 11 existing index.html listings (with consent) + manually onboarding ~20 more is the single highest-leverage cold-start lever. | — Pending |
+| Next.js 16.2.x (not 15) — current stable | Next.js 16.2 is the current stable as of 2026-04; create-next-app scaffolds 16.x. Reading original "Next.js 15" constraint as "modern App Router Next.js". | — Pending |
+| Separate skills_offered / skills_wanted tables (not single table with type enum) | Better composite filter plans with category+county+FTS, cleaner per-skill history for future Barter Tools ledger, avoids JSON-containment awkwardness. | — Pending |
+| Contact relay in Supabase Edge Function (not Server Action) | Keeps service-role key out of Next.js bundle surface area, co-locates rate-limit logic with the DB, clean path to add per-IP limiting. | — Pending |
 
 ## Evolution
 
