@@ -177,17 +177,109 @@ Every requirement below maps to exactly one phase in ROADMAP.md. Requirement IDs
 
 ## Traceability
 
-Populated during roadmap creation — each requirement maps to exactly one phase.
+Every v1 requirement maps to exactly one phase in ROADMAP.md.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (empty — roadmapper fills this in) | | |
+| FOUND-01 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-02 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-03 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-04 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-05 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-06 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-07 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-08 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-09 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-10 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-11 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-12 | Phase 1: Foundation & Infrastructure | Pending |
+| AUTH-01 | Phase 2: Authentication & Legal | Pending |
+| AUTH-02 | Phase 2: Authentication & Legal | Pending |
+| AUTH-03 | Phase 2: Authentication & Legal | Pending |
+| AUTH-04 | Phase 2: Authentication & Legal | Pending |
+| AUTH-05 | Phase 2: Authentication & Legal | Pending |
+| AUTH-06 | Phase 2: Authentication & Legal | Pending |
+| AUTH-07 | Phase 2: Authentication & Legal | Pending |
+| AUTH-08 | Phase 2: Authentication & Legal | Pending |
+| AUTH-09 | Phase 2: Authentication & Legal | Pending |
+| AUTH-10 | Phase 2: Authentication & Legal | Pending |
+| GEO-04 | Phase 2: Authentication & Legal | Pending |
+| PROF-01 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-02 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-03 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-04 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-05 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-06 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-07 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-08 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-09 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-10 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-11 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-12 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-13 | Phase 3: Profile & Georgia Gate | Pending |
+| PROF-14 | Phase 3: Profile & Georgia Gate | Pending |
+| GEO-01 | Phase 3: Profile & Georgia Gate | Pending |
+| GEO-02 | Phase 3: Profile & Georgia Gate | Pending |
+| DIR-01 | Phase 4: Directory | Pending |
+| DIR-02 | Phase 4: Directory | Pending |
+| DIR-03 | Phase 4: Directory | Pending |
+| DIR-04 | Phase 4: Directory | Pending |
+| DIR-05 | Phase 4: Directory | Pending |
+| DIR-06 | Phase 4: Directory | Pending |
+| DIR-07 | Phase 4: Directory | Pending |
+| DIR-08 | Phase 4: Directory | Pending |
+| DIR-09 | Phase 4: Directory | Pending |
+| DIR-10 | Phase 4: Directory | Pending |
+| CONT-01 | Phase 5: Contact Relay + Trust | Pending |
+| CONT-02 | Phase 5: Contact Relay + Trust | Pending |
+| CONT-03 | Phase 5: Contact Relay + Trust | Pending |
+| CONT-04 | Phase 5: Contact Relay + Trust | Pending |
+| CONT-05 | Phase 5: Contact Relay + Trust | Pending |
+| CONT-06 | Phase 5: Contact Relay + Trust | Pending |
+| CONT-07 | Phase 5: Contact Relay + Trust | Pending |
+| CONT-08 | Phase 5: Contact Relay + Trust | Pending |
+| CONT-09 | Phase 5: Contact Relay + Trust | Pending |
+| CONT-10 | Phase 5: Contact Relay + Trust | Pending |
+| CONT-11 | Phase 5: Contact Relay + Trust | Pending |
+| TRUST-01 | Phase 5: Contact Relay + Trust | Pending |
+| TRUST-02 | Phase 5: Contact Relay + Trust | Pending |
+| TRUST-03 | Phase 5: Contact Relay + Trust | Pending |
+| TRUST-04 | Phase 5: Contact Relay + Trust | Pending |
+| TRUST-05 | Phase 5: Contact Relay + Trust | Pending |
+| TRUST-06 | Phase 5: Contact Relay + Trust | Pending |
+| TRUST-07 | Phase 5: Contact Relay + Trust | Pending |
+| LAND-01 | Phase 6: Landing Page & PWA Polish | Pending |
+| LAND-02 | Phase 6: Landing Page & PWA Polish | Pending |
+| LAND-03 | Phase 6: Landing Page & PWA Polish | Pending |
+| LAND-04 | Phase 6: Landing Page & PWA Polish | Pending |
+| GEO-03 | Phase 6: Landing Page & PWA Polish | Pending |
+| SEED-01 | Phase 7: Pre-Launch Seeding | Pending |
+| SEED-02 | Phase 7: Pre-Launch Seeding | Pending |
+| SEED-03 | Phase 7: Pre-Launch Seeding | Pending |
+| SEED-04 | Phase 7: Pre-Launch Seeding | Pending |
+| SEED-05 | Phase 7: Pre-Launch Seeding | Pending |
+| SEED-06 | Phase 7: Pre-Launch Seeding | Pending |
 
 **Coverage:**
-- v1 requirements: 70 total (to be confirmed by traceability fill)
-- Mapped to phases: 0 (pre-roadmap)
-- Unmapped: 70 ⚠️ (expected — roadmap step resolves)
+- v1 requirements: 78 total (12 FOUND + 10 AUTH + 14 PROF + 10 DIR + 11 CONT + 7 TRUST + 4 GEO + 4 LAND + 6 SEED)
+- Mapped to phases: 78 ✓
+- Unmapped: 0 ✓
+- Duplicates: 0 ✓
+
+**Phase distribution:**
+- Phase 1 (Foundation & Infrastructure): 12 requirements
+- Phase 2 (Authentication & Legal): 11 requirements (AUTH x10 + GEO-04)
+- Phase 3 (Profile & Georgia Gate): 16 requirements (PROF x14 + GEO-01 + GEO-02)
+- Phase 4 (Directory): 10 requirements
+- Phase 5 (Contact Relay + Trust, joined): 18 requirements (CONT x11 + TRUST x7)
+- Phase 6 (Landing Page & PWA Polish): 5 requirements (LAND x4 + GEO-03)
+- Phase 7 (Pre-Launch Seeding): 6 requirements
+
+**Cross-category splits explained:**
+- GEO-01, GEO-02 → Phase 3 (county selector + 159-county typeahead are profile fields; PROF-05 depends on them)
+- GEO-03 → Phase 6 (landing page honor-system copy)
+- GEO-04 → Phase 2 (ToS non-residency clause ships with AUTH-10 ToS creation)
 
 ---
 *Requirements defined: 2026-04-17*
-*Last updated: 2026-04-17 after initial definition*
+*Last updated: 2026-04-17 after roadmap creation — traceability populated, coverage verified 78/78*
