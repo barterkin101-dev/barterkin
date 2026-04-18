@@ -15,8 +15,8 @@ Every requirement below maps to exactly one phase in ROADMAP.md. Requirement IDs
 - [ ] **FOUND-02**: Sage/forest/clay palette (`--sage-bg #eef3e8`, `--sage-light #dfe8d5`, `--sage-pale #f4f7f0`, `--forest #2d5a27`, `--forest-deep #1e4420`, `--forest-mid #3a7032`, `--clay #c4956a`) wired as Tailwind v4 `@theme` tokens
 - [ ] **FOUND-03**: Dedicated domain procured and DNS-controlled
 - [ ] **FOUND-04**: SPF + DKIM + DMARC records set at DNS and verified (≥24h before launch)
-- [ ] **FOUND-05**: Fresh Supabase project provisioned; RLS enabled on all public tables by default
-- [ ] **FOUND-06**: Fresh Vercel project provisioned with separate preview and production environments; env vars set per environment
+- [x] **FOUND-05**: Fresh Supabase project provisioned; RLS enabled on all public tables by default
+- [x] **FOUND-06**: Fresh Vercel project provisioned with separate preview and production environments; env vars set per environment
 - [ ] **FOUND-07**: Resend account + domain verified; plugged into Supabase Studio SMTP so auth emails come from branded domain
 - [ ] **FOUND-08**: Database migrations versioned under `supabase/migrations/`, committed to git, and reproducible locally via `supabase db reset`
 - [ ] **FOUND-09**: Serwist PWA with `app/manifest.ts`, service worker, and installable web manifest including icons derived from existing identity
@@ -185,8 +185,8 @@ Every v1 requirement maps to exactly one phase in ROADMAP.md.
 | FOUND-02 | Phase 1: Foundation & Infrastructure | Pending |
 | FOUND-03 | Phase 1: Foundation & Infrastructure | Pending |
 | FOUND-04 | Phase 1: Foundation & Infrastructure | Pending |
-| FOUND-05 | Phase 1: Foundation & Infrastructure | Pending |
-| FOUND-06 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-05 | Phase 1: Foundation & Infrastructure | Complete |
+| FOUND-06 | Phase 1: Foundation & Infrastructure | Complete |
 | FOUND-07 | Phase 1: Foundation & Infrastructure | Pending |
 | FOUND-08 | Phase 1: Foundation & Infrastructure | Pending |
 | FOUND-09 | Phase 1: Foundation & Infrastructure | Pending |

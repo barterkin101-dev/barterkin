@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-18T23:30:00.000Z"
+last_updated: "2026-04-18T23:28:50.040Z"
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 10
-  completed_plans: 1
-  percent: 1
+  completed_plans: 3
+  percent: 30
 ---
 
 # State: Georgia Barter
@@ -54,20 +54,22 @@ progress:
 
 ## Current Position
 
+Phase: 01 — EXECUTING
+Plan: 3 of 10
 **Phase:** Phase 1 — Foundation & Infrastructure (executing)
-**Plan:** 01-01 repo-init → complete (bf21f03); 01-02 nextjs-scaffold next
-**Status:** Executing Wave 0
-**Progress:** 1/10 plans complete (0/7 phases complete)
+**Plan:** 01-01 repo-init → complete (bf21f03); 01-02 nextjs-scaffold → complete (466fba6); 01-03 supabase-ssr → complete (bc1e942); 01-04 pwa-serwist next
+**Status:** Executing Phase 01
+**Progress:** [███░░░░░░░] 30%
 
 ```
-[▰▱▱▱▱▱▱] 1%  Phase 1: Foundation & Infrastructure (in progress — 1/10 plans)
+[▰▰▰▱▱▱▱] 30%  Phase 1: Foundation & Infrastructure (in progress — 3/10 plans)
 ```
 
 ### Phase Status Grid
 
 | # | Phase | Status |
 |---|-------|--------|
-| 1 | Foundation & Infrastructure | In progress (1/10 plans) |
+| 1 | Foundation & Infrastructure | In progress (3/10 plans) |
 | 2 | Authentication & Legal | Not started |
 | 3 | Profile & Georgia Gate | Not started |
 | 4 | Directory | Not started |
@@ -84,12 +86,13 @@ progress:
 | v1 requirements mapped | 78/78 | 78/78 ✓ |
 | Orphaned requirements | 0 | 0 ✓ |
 | Phases complete | 7 | 0 |
-| Plans complete | 10 (Phase 1) | 1 |
+| Plans complete | 10 (Phase 1) | 3 |
 | Initiated contacts (post-launch) | ≥1 per 10 profiles per week | — (pre-launch) |
 | Seeded profiles at launch | ≥30 (≥2 counties × ≥3 categories) | 0 (pre-seeding) |
 | Mail-tester deliverability score | ≥9/10 | — (pre-DNS) |
 
 ---
+| Phase 01 P03 | 2min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -109,6 +112,12 @@ progress:
 - Pre-launch seeding to ≥30 founding-member profiles
 - Separate `skills_offered` / `skills_wanted` tables (not single table with type enum)
 - Contact relay in Supabase Edge Function (not Server Action — keeps service-role key out of Next.js bundle)
+
+### Key Decisions (accumulated during execution)
+
+- **Plan 01-03:** Chose `supabase.auth.getClaims()` over `getUser()` fallback — install-time probe returned `HAS_GETCLAIMS` on `@supabase/ssr@0.10.2`. JWKS-verified, no Auth-server round-trip (saves ~50ms/req). `getSession()` remains banned from all server paths (PITFALLS Pitfall 1).
+- **Plan 01-03:** `server.ts` carries `import 'server-only'` on line 1 in addition to admin.ts (defense-in-depth per PLAN Step 4 spec).
+- **Plan 01-03:** Middleware matcher excludes `_next/static`, `_next/image`, `favicon.ico`, `robots.txt`, `sitemap.xml`, `api/webhooks`, and image/PWA extensions (`.webmanifest` explicitly — leaves PWA paths unclogged for Plan 04 Serwist).
 
 ### Research Flags (from SUMMARY.md)
 
@@ -133,13 +142,14 @@ None currently — roadmap complete, awaiting phase-1 planning.
 ### Last Session
 
 - **Date:** 2026-04-18
-- **Action:** Executed Plan 01-01 repo-init (Wave 0)
-- **Outcome:** Folder renamed `~/georgia-barter` → `~/barterkin`; public repo `Biznomad/barterkin` created with 7 topics; `legacy/index.html` preserved; bootstrap files (`.gitignore`, `README.md`, `.env.local.example`) committed and pushed (commit `bf21f03`). Memory file renamed `barterkin.md`. FOUND-01, FOUND-11, FOUND-12 requirements covered.
+- **Action:** Executed Plan 01-03 supabase-ssr (Wave 2)
+- **Outcome:** Installed `@supabase/ssr@0.10.2` + `@supabase/supabase-js@2.103.3`; scaffolded four-client factory at `lib/supabase/{client,server,middleware,admin}.ts`; root `middleware.ts` with matcher excluding static + webhooks + PWA assets; `lib/database.types.ts` placeholder. Probed HAS_GETCLAIMS → middleware uses `supabase.auth.getClaims()` primary path (JWKS-verified, no round-trip). admin.ts `import 'server-only'` guards service-role key. `pnpm typecheck && pnpm build` exit 0 (17s). Commit `bc1e942` pushed to `origin/main`. FOUND-05, FOUND-06 covered.
+- **Stopped at:** Completed 01-03-supabase-ssr-PLAN.md
 
 ### Next Session Should
 
-1. Execute Plan 01-02 nextjs-scaffold (Wave 1 kickoff) — `create-next-app` with Next.js 16.2 + pnpm, palette + fonts wire-up, initial scaffold commit
-2. Then fan out to Wave 2+ plans per the phase dependency graph (supabase-ssr, supabase-migrations, pwa-serwist, etc.)
+1. Execute Plan 01-04 pwa-serwist (Wave 2 continuation) — Serwist service worker + manifest + install prompt. Middleware matcher already excludes `.webmanifest` so Serwist drops in without rework.
+2. Then fan out to remaining Wave 2+ plans per the phase dependency graph (01-05 posthog-resend, 01-06 supabase-migrations, 01-07 testing-infra, 01-08 ci-gitleaks, 01-09 cloudflare-dns, 01-10 vercel-link-deploy).
 3. Pre-phase procurement already complete per memory file: Supabase `hfdcsickergdcdvejbcw` (us-east-1), Cloudflare zone + domain + DNS records, Resend + 10/10 mail-tester, Vercel team ready
 
 ### Context Budget
@@ -160,4 +170,4 @@ This document updates on:
 
 ---
 *State initialized: 2026-04-17 at roadmap creation*
-*Last updated: 2026-04-17*
+*Last updated: 2026-04-18 (Plan 01-03 complete)*

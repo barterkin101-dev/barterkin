@@ -36,9 +36,9 @@
   5. A `posthog.capture('test_event', ...)` call from the Next.js app appears in the PostHog dashboard within 60 seconds
 **Plans:** 10 plans
 Plans:
-- [ ] 01-01-repo-init-PLAN.md — Folder rename (georgia-barter → barterkin), public GitHub repo, legacy/index.html move, bootstrap .gitignore/README/.env.local.example
-- [ ] 01-02-nextjs-scaffold-PLAN.md — Next.js 16.2 App Router + Tailwind v4 + shadcn new-york + Lora/Inter fonts + sage/forest/clay palette in @theme
-- [ ] 01-03-supabase-ssr-PLAN.md — @supabase/ssr three-client factory + server-only admin + root middleware (getClaims pattern)
+- [x] 01-01-repo-init-PLAN.md — Folder rename (georgia-barter → barterkin), public GitHub repo, legacy/index.html move, bootstrap .gitignore/README/.env.local.example
+- [x] 01-02-nextjs-scaffold-PLAN.md — Next.js 16.2 App Router + Tailwind v4 + shadcn new-york + Lora/Inter fonts + sage/forest/clay palette in @theme
+- [x] 01-03-supabase-ssr-PLAN.md — @supabase/ssr three-client factory + server-only admin + root middleware (getClaims pattern)
 - [ ] 01-04-pwa-serwist-PLAN.md — Serwist PWA shell (sw.ts + manifest.ts + /~offline + 3 placeholder icons)
 - [ ] 01-05-posthog-resend-PLAN.md — PostHog provider + Fire-test-event button + Resend test route + contact_initiated event schema
 - [ ] 01-06-supabase-migrations-PLAN.md — Supabase CLI dev-dep + supabase/ scaffold linked to us-east-1; migrations workflow in README; D-21 retirement path
