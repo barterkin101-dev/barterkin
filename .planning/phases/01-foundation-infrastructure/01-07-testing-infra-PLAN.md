@@ -22,9 +22,9 @@ must_haves:
   truths:
     - "vitest@3, @vitest/ui, @testing-library/react, @testing-library/jest-dom, jsdom, @playwright/test@1 all installed as devDependencies"
     - "vitest.config.ts + vitest.setup.ts exist; package.json has `test` and `test:watch` scripts"
-    - "playwright.config.ts exists with webServer booting `pnpm dev`; package.json has `e2e` script"
+    - "playwright.config.ts exists with webServer booting `pnpm start` (CI path; local dev may reuse `pnpm dev` via `reuseExistingServer: !process.env.CI`); package.json has `e2e` script"
     - "tests/unit/smoke.test.ts passes under `pnpm test --run`"
-    - "tests/e2e/smoke.spec.ts passes under `pnpm e2e` (loads localhost:3000 and asserts 'Barterkin foundation' is rendered)"
+    - "tests/e2e/smoke.spec.ts passes under `pnpm e2e` against `pnpm start` (production build on localhost:3000), asserting 'Barterkin foundation' is rendered"
     - "No watch flags (`--watch`, `-w`) in CI-facing scripts (VALIDATION.md Sign-Off item)"
     - "tsconfig.json excludes test files from the build + includes vitest/globals types"
   artifacts:
@@ -49,8 +49,8 @@ must_haves:
       via: "\"test\": \"vitest run\" — no --watch in CI mode"
       pattern: "\"test\": \"vitest run\""
     - from: "playwright.config.ts webServer"
-      to: "pnpm dev on 3000"
-      via: "webServer.command starts the dev server"
+      to: "pnpm start (post-build) on 3000"
+      via: "webServer.command starts the production server (pnpm start); reuseExistingServer is !process.env.CI so local dev can reuse a running pnpm dev"
       pattern: "webServer"
 ---
 
@@ -59,7 +59,7 @@ Install and configure Vitest (unit/component) and Playwright (e2e). Write one tr
 
 Purpose: The VALIDATION.md gate says "Wave 0 must create `tests/smoke.test.ts` first" before any task relies on `pnpm test`. Plan 07 is the concrete materialisation of that gate — after it, Plan 08 can legitimately put `pnpm test` in `.github/workflows/ci.yml` and later phases can add real tests against a known-working framework.
 
-Output: `pnpm test --run` passes; `pnpm e2e` passes against a locally-running `pnpm dev`; scripts exist in package.json; tsconfig includes test-friendly types.
+Output: `pnpm test --run` passes; `pnpm e2e` passes against `pnpm start` (production build in CI; local dev may reuse `pnpm dev` via `reuseExistingServer: !process.env.CI`); scripts exist in package.json; tsconfig includes test-friendly types.
 </objective>
 
 <execution_context>
@@ -379,7 +379,7 @@ Covers FOUND-11 (test substrate for CI). Real tests land in Phases 2+."
   <verify>
     <automated>cd /Users/ashleyakbar/barterkin && pnpm typecheck && pnpm test --run && pnpm e2e && jq -r '.scripts.test' package.json | grep -q "vitest run" && jq -r '.scripts.e2e' package.json | grep -q "^playwright test$"</automated>
   </verify>
-  <done>Playwright installed with chromium; e2e smoke tests pass against `pnpm dev`; all four testing scripts exist; tests + configs committed.</done>
+  <done>Playwright installed with chromium; e2e smoke tests pass against `pnpm start` (production build; locally may reuse `pnpm dev` via `reuseExistingServer: !process.env.CI`); all four testing scripts exist; tests + configs committed.</done>
 </task>
 
 </tasks>
