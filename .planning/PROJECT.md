@@ -61,7 +61,7 @@ A Georgian with a skill to trade can find another Georgian with a matching need,
 - **Budget**: Solo-builder, near-zero-cost — free tiers for as long as possible.
 - **Email delivery**: Platform-relayed contact requires a transactional email provider (Resend or equivalent via Supabase Edge Function). Must stay within free-tier sending limits.
 - **Privacy**: Member email/phone never exposed in the directory UI — always routed through the relay.
-- **Brand**: Dedicated Georgia Barter domain (to be procured); standalone brand separate from biznomad.io.
+- **Brand**: **Barterkin** is the umbrella brand; **Georgia Barter Network** is the v1 product (regional descriptor). Domain: `barterkin.com` (to be procured at Cloudflare Registrar). Standalone from biznomad.io.
 - **Accounts**: Fresh Supabase + Vercel projects — no reuse of existing infrastructure.
 - **Deliverability**: SPF + DKIM + DMARC must be configured at DNS setup (Phase 1), not pre-launch — propagation takes 24-48h. Resend is plugged into Supabase Studio SMTP so auth emails come from branded domain too.
 
@@ -77,6 +77,8 @@ A Georgian with a skill to trade can find another Georgian with a matching need,
 | Email verify required; phone verify deferred to v1.1 badge | Email verify is the minimum trust floor directory listings need to feel real. Phone verify is a v1.1 trust escalator, not MVP table stakes. | — Pending |
 | Success metric = initiated contacts (Contact button hits) | Behavioral signal that directory is matching supply with demand; profile count would mislead. | — Pending |
 | Dedicated domain, standalone brand | Georgia Barter is a distinct product from biznomad.io; cleaner long-term identity and future transferability. | — Pending |
+| Brand = Barterkin (umbrella); v1 product = Georgia Barter Network; domain = barterkin.com | Umbrella brand gives room to expand beyond Georgia later without rebranding, while the v1 product descriptor keeps the Georgia-first positioning in landing copy. Matches the `barterkin101@gmail.com` business Google account. | — Pending |
+| Cloudflare Registrar for domain + DNS + Turnstile | At-cost domain pricing (~$10/yr), free WHOIS privacy, fast DNS propagation, and Cloudflare Turnstile is already in scope for AUTH-08. Consolidates domain+DNS+CAPTCHA on one vendor. | — Pending |
 | Fresh Supabase + Vercel accounts | Keep project infra isolated from any existing work; simplifies billing and access. | — Pending |
 | SSO v1 = Google + magic-link only; Apple deferred | Apple Dev $99/yr, 6-month JWT client-secret rotation, private-relay email complexity. Not worth the MVP drag; add when Capacitor wrap needs it (App Store requires Apple Sign-In anyway). | — Pending |
 | 10-category Georgia taxonomy ships in MVP (not v1.1) | The category filter is broken without a day-1 taxonomy. Top-level 10 categories are light enough to seed immediately; finer sub-taxonomy stays v1.1. | — Pending |
