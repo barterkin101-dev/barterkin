@@ -517,12 +517,12 @@ See Section 4. Key: no cash, no fees, no forums, no events, no cross-state, no g
 **Georgia context:**
 - [Rural Georgia Initiatives — georgia.org](https://georgia.org/rural)
 - [Georgia's Rural Center](https://www.ruralga.org/)
-- Existing `/Users/ashleyakbar/georgia-barter/index.html` — seeded community listings with strong TikTok presence, Dallas/Carrollton/South Fulton cluster, food + homestead + beauty + wellness categories dominating
+- Existing `/Users/ashleyakbar/barterkin/index.html` — seeded community listings with strong TikTok presence, Dallas/Carrollton/South Fulton cluster, food + homestead + beauty + wellness categories dominating
 
 **Internal:**
-- `/Users/ashleyakbar/georgia-barter/.planning/PROJECT.md` — scope, locked decisions, out-of-scope list
-- `/Users/ashleyakbar/georgia-barter/EXPLORE.md` — pre-project brief, rejected alternatives, Barter Tools deferred-milestone scope
-- `/Users/ashleyakbar/georgia-barter/index.html` — existing marketing page, design tokens, seeded listings
+- `/Users/ashleyakbar/barterkin/.planning/PROJECT.md` — scope, locked decisions, out-of-scope list
+- `/Users/ashleyakbar/barterkin/EXPLORE.md` — pre-project brief, rejected alternatives, Barter Tools deferred-milestone scope
+- `/Users/ashleyakbar/barterkin/index.html` — existing marketing page, design tokens, seeded listings
 
 ---
 

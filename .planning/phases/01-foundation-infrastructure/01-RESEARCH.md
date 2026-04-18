@@ -978,7 +978,7 @@ All pitfalls below are either from `.planning/research/PITFALLS.md` (project-wid
 - Grep for `georgia-barter` in all project files; replace with `barterkin` where path-relevant (not content-relevant — project history still says "Georgia Barter" the brand; the folder rename is the specific fix).
 - Update memory file name AND contents: `georgia-barter.md` → `barterkin.md`.
 - Smoke test: run `/gsd-state` from new path; verify STATE.md loads clean.
-**Warning signs:** `ENOENT /Users/ashleyakbar/georgia-barter/...` in logs after rename.
+**Warning signs:** `ENOENT /Users/ashleyakbar/barterkin/...` in logs after rename.
 
 ### Pitfall 7: Supabase `db push` against unlinked project errors silently on first run
 
@@ -1256,7 +1256,7 @@ Fired from the `send-contact` Supabase Edge Function (Phase 5) on a successful p
 
 ### Project Constraints (from CLAUDE.md)
 
-Extracted from `/Users/ashleyakbar/georgia-barter/CLAUDE.md` — treat with same authority as CONTEXT.md locked decisions:
+Extracted from `/Users/ashleyakbar/barterkin/CLAUDE.md` — treat with same authority as CONTEXT.md locked decisions:
 
 - **Tech stack locked:** Next.js 16.2.x App Router + React 19.2, Supabase (Auth/Postgres/Storage), Vercel hosting. Do NOT propose alternatives.
 - **No custom auth code:** Supabase Auth is the only provider.
@@ -1278,8 +1278,8 @@ Extracted from `/Users/ashleyakbar/georgia-barter/CLAUDE.md` — treat with same
 - **`.planning/research/PITFALLS.md`** (2026-04-17) §Technical pitfalls 1-22, §Pre-launch — `@supabase/auth-helpers-nextjs` deprecated, Serwist+Turbopack quirks, service-role leak, cookie round-trip, SPF/DKIM/DMARC, empty-directory cold start.
 - **`.planning/research/SUMMARY.md`** + **`.planning/research/FEATURES.md`** — cross-cutting insights, phase-split rationale.
 - **`.planning/PROJECT.md`**, **`.planning/REQUIREMENTS.md`**, **`.planning/ROADMAP.md`** — project-level constraints and Phase 1 requirement/success-criterion definitions.
-- **`/Users/ashleyakbar/georgia-barter/CLAUDE.md`** — Project instructions (tech stack, constraints, GSD workflow).
-- **`/Users/ashleyakbar/georgia-barter/.planning/phases/01-foundation-infrastructure/01-CONTEXT.md`** — User decisions from `/gsd-discuss-phase`, locked.
+- **`/Users/ashleyakbar/barterkin/CLAUDE.md`** — Project instructions (tech stack, constraints, GSD workflow).
+- **`/Users/ashleyakbar/barterkin/.planning/phases/01-foundation-infrastructure/01-CONTEXT.md`** — User decisions from `/gsd-discuss-phase`, locked.
 - [Next.js 16 Release Notes](https://nextjs.org/blog/next-16) — GA Oct 2025.
 - [Next.js Upgrading to v16](https://nextjs.org/docs/app/guides/upgrading/version-16) — Turbopack default, React 19.2.
 - [Next.js PWA Guide](https://nextjs.org/docs/app/guides/progressive-web-apps) — recommends Serwist.

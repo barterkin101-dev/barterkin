@@ -34,7 +34,18 @@
   3. A PR triggers `pnpm lint`, `pnpm typecheck`, `pnpm test`, and a Vercel preview deploy — all green before merge
   4. The existing Netlify `index.html` stays reachable at its current URL (no service gap) while the new app is built on the new domain
   5. A `posthog.capture('test_event', ...)` call from the Next.js app appears in the PostHog dashboard within 60 seconds
-**Plans**: TBD
+**Plans:** 10 plans
+Plans:
+- [ ] 01-01-repo-init-PLAN.md — Folder rename (georgia-barter → barterkin), public GitHub repo, legacy/index.html move, bootstrap .gitignore/README/.env.local.example
+- [ ] 01-02-nextjs-scaffold-PLAN.md — Next.js 16.2 App Router + Tailwind v4 + shadcn new-york + Lora/Inter fonts + sage/forest/clay palette in @theme
+- [ ] 01-03-supabase-ssr-PLAN.md — @supabase/ssr three-client factory + server-only admin + root middleware (getClaims pattern)
+- [ ] 01-04-pwa-serwist-PLAN.md — Serwist PWA shell (sw.ts + manifest.ts + /~offline + 3 placeholder icons)
+- [ ] 01-05-posthog-resend-PLAN.md — PostHog provider + Fire-test-event button + Resend test route + contact_initiated event schema
+- [ ] 01-06-supabase-migrations-PLAN.md — Supabase CLI dev-dep + supabase/ scaffold linked to us-east-1; migrations workflow in README; D-21 retirement path
+- [ ] 01-07-testing-infra-PLAN.md — Vitest + Playwright + smoke tests (tests/unit + tests/e2e) — VALIDATION.md Wave 0 requirement
+- [ ] 01-08-ci-gitleaks-PLAN.md — GitHub Actions CI (6 jobs) + pre-commit gitleaks + .gitleaks.toml allowlist
+- [ ] 01-09-cloudflare-dns-PLAN.md — Cloudflare DNS → Netlify (D-14) + idempotent script + Phase 6 cutover runbook
+- [ ] 01-10-vercel-link-deploy-PLAN.md — Vercel project link + 7 env vars × 3 scopes + first production deploy + end-to-end smoke (PostHog/Resend/Supabase SMTP/us-east-2 retirement)
 
 ### Phase 2: Authentication & Legal
 **Goal**: Users can sign up with Google OAuth or magic-link email, must verify their email before appearing in the directory (enforced in both RLS and middleware), and are protected from bot waves by CAPTCHA, per-IP rate limits, and disposable-email blocking — with ToS/Privacy/Community Guidelines pages (including the Georgia non-residency clause) linked from signup and footer.
@@ -143,7 +154,7 @@ Phase 1 (Foundation & Infrastructure)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Infrastructure | 0/? | Not started | - |
+| 1. Foundation & Infrastructure | 0/10 | Planned | - |
 | 2. Authentication & Legal | 0/? | Not started | - |
 | 3. Profile & Georgia Gate | 0/? | Not started | - |
 | 4. Directory | 0/? | Not started | - |
@@ -153,4 +164,5 @@ Phase 1 (Foundation & Infrastructure)
 
 ---
 *Roadmap created: 2026-04-17 from REQUIREMENTS.md + research synthesis*
-*Next: `/gsd-plan-phase 1`*
+*Phase 1 planned: 2026-04-18 — 10 plans across 9 waves*
+*Next: `/gsd-execute-phase 1`*

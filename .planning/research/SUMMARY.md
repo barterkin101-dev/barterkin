@@ -217,13 +217,13 @@ Based on combined research, the build order is **strictly dependency-ordered**; 
 
 ### Internal
 
-- `/Users/ashleyakbar/georgia-barter/.planning/PROJECT.md`
-- `/Users/ashleyakbar/georgia-barter/EXPLORE.md`
-- `/Users/ashleyakbar/georgia-barter/index.html`
-- `/Users/ashleyakbar/georgia-barter/.planning/research/STACK.md`
-- `/Users/ashleyakbar/georgia-barter/.planning/research/FEATURES.md`
-- `/Users/ashleyakbar/georgia-barter/.planning/research/ARCHITECTURE.md`
-- `/Users/ashleyakbar/georgia-barter/.planning/research/PITFALLS.md`
+- `/Users/ashleyakbar/barterkin/.planning/PROJECT.md`
+- `/Users/ashleyakbar/barterkin/EXPLORE.md`
+- `/Users/ashleyakbar/barterkin/index.html`
+- `/Users/ashleyakbar/barterkin/.planning/research/STACK.md`
+- `/Users/ashleyakbar/barterkin/.planning/research/FEATURES.md`
+- `/Users/ashleyakbar/barterkin/.planning/research/ARCHITECTURE.md`
+- `/Users/ashleyakbar/barterkin/.planning/research/PITFALLS.md`
 
 ---
 *Research completed: 2026-04-17*

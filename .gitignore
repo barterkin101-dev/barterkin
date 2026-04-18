@@ -1,0 +1,53 @@
+# Node / Next.js
+node_modules
+.next
+out
+build
+dist
+*.tsbuildinfo
+next-env.d.ts
+
+# Env files (NEVER commit secrets — D-06, D-07)
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.production.local
+
+# Vercel CLI
+.vercel
+
+# Supabase CLI
+supabase/.branches
+supabase/.temp
+supabase/.env
+
+# Netlify CLI (legacy — retained until Phase 6 cutover)
+.netlify
+
+# Testing
+coverage
+.nyc_output
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Build-generated service worker (Serwist emits these)
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map

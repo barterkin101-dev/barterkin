@@ -71,12 +71,12 @@ Output: Renamed local folder `~/barterkin`, empty git-initialised repo with lega
 </execution_context>
 
 <context>
-@/Users/ashleyakbar/georgia-barter/.planning/STATE.md
-@/Users/ashleyakbar/georgia-barter/.planning/ROADMAP.md
-@/Users/ashleyakbar/georgia-barter/.planning/REQUIREMENTS.md
-@/Users/ashleyakbar/georgia-barter/.planning/phases/01-foundation-infrastructure/01-CONTEXT.md
-@/Users/ashleyakbar/georgia-barter/.planning/phases/01-foundation-infrastructure/01-RESEARCH.md
-@/Users/ashleyakbar/georgia-barter/.planning/research/PITFALLS.md
+@/Users/ashleyakbar/barterkin/.planning/STATE.md
+@/Users/ashleyakbar/barterkin/.planning/ROADMAP.md
+@/Users/ashleyakbar/barterkin/.planning/REQUIREMENTS.md
+@/Users/ashleyakbar/barterkin/.planning/phases/01-foundation-infrastructure/01-CONTEXT.md
+@/Users/ashleyakbar/barterkin/.planning/phases/01-foundation-infrastructure/01-RESEARCH.md
+@/Users/ashleyakbar/barterkin/.planning/research/PITFALLS.md
 
 <interfaces>
 Live identifiers (from CONTEXT §canonical_refs, memory file):
@@ -100,33 +100,33 @@ D-08 env-var boundary (locked):
 <task type="checkpoint:human-action" gate="blocking">
   <name>Task 1: Rename local folder and create public GitHub repo</name>
   <files>
-    - /Users/ashleyakbar/georgia-barter → /Users/ashleyakbar/barterkin (rename)
+    - /Users/ashleyakbar/barterkin → /Users/ashleyakbar/barterkin (rename)
     - GitHub: Biznomad/barterkin (create)
   </files>
   <read_first>
-    - /Users/ashleyakbar/georgia-barter/.planning/phases/01-foundation-infrastructure/01-CONTEXT.md (D-01, D-02, D-22)
+    - /Users/ashleyakbar/barterkin/.planning/phases/01-foundation-infrastructure/01-CONTEXT.md (D-01, D-02, D-22)
     - /Users/ashleyakbar/.claude/projects/-Users-ashleyakbar/memory/georgia-barter.md (for operational identifiers; the planner notes this file will be renamed at the end of this task — read it before any rename)
   </read_first>
   <action>
   Step 1 — Pre-rename verification (from `/Users/ashleyakbar`):
   ```bash
-  ls -la /Users/ashleyakbar/georgia-barter         # confirm source exists
+  ls -la /Users/ashleyakbar/barterkin         # confirm source exists
   ls -la /Users/ashleyakbar/barterkin 2>/dev/null  # MUST be empty/nonexistent
-  git -C /Users/ashleyakbar/georgia-barter status  # ensure no uncommitted planning changes
+  git -C /Users/ashleyakbar/barterkin status  # ensure no uncommitted planning changes
   ```
   If `/Users/ashleyakbar/barterkin` already exists, STOP and ask user (do not overwrite).
 
   Step 2 — Perform the rename:
   ```bash
-  mv /Users/ashleyakbar/georgia-barter /Users/ashleyakbar/barterkin
+  mv /Users/ashleyakbar/barterkin /Users/ashleyakbar/barterkin
   cd /Users/ashleyakbar/barterkin
   pwd   # expect: /Users/ashleyakbar/barterkin
   ```
 
   Step 3 — Update path references in planning artefacts (grep-replace absolute paths ONLY; do NOT replace brand references to "Georgia Barter"):
   ```bash
-  grep -rl "/Users/ashleyakbar/georgia-barter" /Users/ashleyakbar/barterkin/.planning /Users/ashleyakbar/barterkin/CLAUDE.md 2>/dev/null
-  # For each match, replace '/Users/ashleyakbar/georgia-barter' with '/Users/ashleyakbar/barterkin'
+  grep -rl "/Users/ashleyakbar/barterkin" /Users/ashleyakbar/barterkin/.planning /Users/ashleyakbar/barterkin/CLAUDE.md 2>/dev/null
+  # For each match, replace '/Users/ashleyakbar/barterkin' with '/Users/ashleyakbar/barterkin'
   ```
   Use sed via Edit tool per file — do NOT blanket-replace the string "georgia-barter" (it appears in planning prose referencing the old brand, which is a separate concern).
 
@@ -161,11 +161,11 @@ D-08 env-var boundary (locked):
   This task is `checkpoint:human-action` because `gh repo create` may prompt for re-auth or TOTP and `gh auth status` must already show an authenticated session. If the checkpoint stalls, user completes interactive auth then signals `resume`.
   </action>
   <acceptance_criteria>
-    - `pwd` in shell returns `/Users/ashleyakbar/barterkin` (old `/Users/ashleyakbar/georgia-barter` yields `No such file or directory`).
+    - `pwd` in shell returns `/Users/ashleyakbar/barterkin` (old `/Users/ashleyakbar/barterkin` yields `No such file or directory`).
     - `~/bin/gh repo view Biznomad/barterkin --json name,visibility,isPrivate,repositoryTopics` returns `{"name":"barterkin","visibility":"PUBLIC","isPrivate":false,...}` with all 7 topics present.
     - `git -C /Users/ashleyakbar/barterkin remote -v` shows `origin` pointing at `Biznomad/barterkin` (either SSH or HTTPS form).
     - `ls /Users/ashleyakbar/.claude/projects/-Users-ashleyakbar/memory/barterkin.md` exists; `ls /Users/ashleyakbar/.claude/projects/-Users-ashleyakbar/memory/georgia-barter.md` does NOT exist.
-    - `grep -l "/Users/ashleyakbar/georgia-barter" /Users/ashleyakbar/barterkin/.planning/**/*.md /Users/ashleyakbar/barterkin/CLAUDE.md 2>/dev/null | wc -l` returns `0` (no path-stale references).
+    - `grep -l "/Users/ashleyakbar/barterkin" /Users/ashleyakbar/barterkin/.planning/**/*.md /Users/ashleyakbar/barterkin/CLAUDE.md 2>/dev/null | wc -l` returns `0` (no path-stale references).
   </acceptance_criteria>
   <verify>
     <automated>test "$(pwd)" = "/Users/ashleyakbar/barterkin" && ~/bin/gh repo view Biznomad/barterkin --json visibility -q .visibility | grep -q PUBLIC && git -C /Users/ashleyakbar/barterkin remote -v | grep -q barterkin.git</automated>
@@ -400,7 +400,7 @@ D-08 env-var boundary (locked):
 |-----------|----------|-----------|-------------|-----------------|
 | T-01-01 | Information Disclosure | `.env.local.example` | mitigate | File contains empty `KEY=` placeholders — no real values; later plans enforce with gitleaks pre-commit (Plan 08) |
 | T-01-02 | Information Disclosure | Initial commit to public repo | mitigate | `.gitignore` added BEFORE first commit; `.env.local` pattern excludes any accidental secret file at commit time |
-| T-01-03 | Tampering | Folder rename leaves stale absolute paths in `.planning/` / `CLAUDE.md` | mitigate | Grep-replace step in Task 1 targets only `/Users/ashleyakbar/georgia-barter` absolute-path strings; brand-name references preserved |
+| T-01-03 | Tampering | Folder rename leaves stale absolute paths in `.planning/` / `CLAUDE.md` | mitigate | Grep-replace step in Task 1 targets only `/Users/ashleyakbar/barterkin` absolute-path strings; brand-name references preserved |
 | T-01-04 | Repudiation | Unsigned commit from a fresh git config | accept | Solo builder; GPG signing is out of scope for MVP (D-15 skips branch protection entirely). Revisit at Phase 2+ if collaborators join. |
 | T-01-05 | Elevation of Privilege | `gh repo create` may prompt for OAuth scope grant | mitigate | Task 1 is `checkpoint:human-action` so user can approve OAuth scopes interactively |
 | T-01-06 | Information Disclosure | Stale `georgia-barter.md` memory file contains brand-name references to old folder | mitigate | Task 1 Step 4 renames the file and updates the MEMORY.md index in the same step |

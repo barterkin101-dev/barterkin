@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Georgia Barter Network | Trade, Share, Grow Together</title>
+  <meta name="description" content="Georgia's community barter network. Trade goods and services with your neighbors. No money needed.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --sage-bg: #eef3e8;
+      --sage-light: #dfe8d5;
+      --sage-pale: #f4f7f0;
+      --white: #ffffff;
+      --forest: #2d5a27;
+      --forest-deep: #1e4420;
+      --forest-mid: #3a7032;
+      --teal: #2a9d8f;
+      --teal-light: #40c4b0;
+      --warm-brown: #6b5342;
+      --clay: #c4956a;
+      --sand: #e8dcc8;
+      --text: #2c2c22;
+      --text-mid: #5a5a4a;
+      --text-light: #8a8a78;
+      --text-muted: #aaa99a;
+      --border: #ddd8cc;
+      --border-sage: #d0dbc4;
+      --card-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      --card-hover: 0 8px 32px rgba(0,0,0,0.08);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--sage-bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 { font-family: 'Lora', serif; font-weight: 400; }
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+    /* ========== NAV ========== */
+    nav {
+      background: var(--forest-deep);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    nav .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 64px;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: white;
+    }
+    .nav-brand-icon { font-size: 24px; }
+    .nav-brand-text { font-family: 'Lora', serif; font-size: 18px; color: #fff; font-weight: 600; }
+    .nav-links { display: flex; gap: 8px; align-items: center; }
+    .nav-links a {
+      font-size: 14px;
+      color: rgba(255,255,255,0.75);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+    .nav-cta {
+      background: var(--teal) !important;
+      color: #fff !important;
+      font-weight: 600 !important;
+      border-radius: 8px !important;
+    }
+    .nav-cta:hover { background: var(--teal-light) !important; }
+
+    /* ========== HERO ========== */
+    .hero {
+      background:
+        linear-gradient(170deg, rgba(30,68,32,0.85) 0%, rgba(45,90,39,0.75) 40%, rgba(42,157,143,0.6) 100%),
+        linear-gradient(to bottom, #3a5c25, #2a6040);
+      padding: 100px 0 110px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Nature texture overlay */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 80%, rgba(255,255,255,0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(255,255,255,0.03) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 68px);
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: 20px;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--teal-light);
+    }
+    .hero-sub {
+      font-size: 18px;
+      color: rgba(255,255,255,0.8);
+      max-width: 520px;
+      margin: 0 auto 44px;
+      line-height: 1.8;
+    }
+    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-hero-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--teal);
+      color: #fff;
+      padding: 16px 36px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-hero-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(42,157,143,0.35);
+    }
+    .btn-hero-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      padding: 16px 36px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-hero-secondary:hover { background: rgba(255,255,255,0.2); }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 56px;
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+    .hero-stat-number { font-family: 'Lora', serif; font-size: 36px; color: #fff; }
+    .hero-stat-label { font-size: 13px; color: rgba(255,255,255,0.6); font-weight: 500; }
+
+    /* ========== PATH SELECTOR ========== */
+    .paths {
+      background: var(--white);
+      padding: 80px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .paths-header { text-align: center; margin-bottom: 40px; }
+    .paths-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .path-card {
+      background: var(--sage-pale);
+      border: 2px solid var(--border-sage);
+      border-radius: 20px;
+      padding: 40px 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-decoration: none;
+      color: var(--text);
+      display: block;
+    }
+    .path-card:hover {
+      border-color: var(--forest);
+      transform: translateY(-4px);
+      box-shadow: var(--card-hover);
+    }
+    .path-icon {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px;
+    }
+    .path-icon.green { background: var(--sage-light); }
+    .path-icon.brown { background: var(--sand); }
+    .path-card h3 { font-size: 22px; margin-bottom: 8px; }
+    .path-card p { font-size: 14px; color: var(--text-mid); line-height: 1.6; }
+
+    /* ========== SECTIONS ========== */
+    section { padding: 90px 0; }
+    .section-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--teal);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .section-title { font-size: clamp(28px, 3.5vw, 40px); line-height: 1.2; margin-bottom: 14px; }
+    .section-sub { font-size: 16px; color: var(--text-mid); max-width: 480px; line-height: 1.8; }
+
+    /* ========== HOW ========== */
+    .how { background: var(--sage-bg); }
+    .how-header { text-align: center; margin-bottom: 56px; }
+    .how-header .section-sub { margin: 0 auto; }
+    .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .how-card {
+      background: var(--white);
+      border: 1px solid var(--border-sage);
+      border-radius: 16px;
+      padding: 36px 28px;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .how-card:hover { transform: translateY(-4px); box-shadow: var(--card-hover); }
+    .how-step {
+      width: 52px; height: 52px;
+      background: var(--forest);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Lora', serif;
+      font-size: 22px;
+      margin: 0 auto 20px;
+    }
+    .how-card h3 { font-size: 20px; margin-bottom: 10px; }
+    .how-card p { font-size: 14px; color: var(--text-mid); line-height: 1.7; }
+
+    /* ========== DIRECTORY ========== */
+    .directory { background: var(--white); border-top: 1px solid var(--border); }
+    .directory-top { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; margin-bottom: 28px; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .filter-btn {
+      background: var(--sage-pale);
+      border: 1px solid var(--border-sage);
+      color: var(--text-mid);
+      padding: 9px 18px;
+      border-radius: 50px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover { border-color: var(--forest); color: var(--forest); }
+    .filter-btn.active { background: var(--forest); color: #fff; border-color: var(--forest); }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--sage-pale);
+      border: 1px solid var(--border-sage);
+      border-radius: 12px;
+      padding: 0 16px;
+      width: 300px;
+      transition: border-color 0.2s;
+    }
+    .search-box:focus-within { border-color: var(--teal); }
+    .search-box input {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      padding: 12px 4px;
+      width: 100%;
+      outline: none;
+    }
+    .search-box input::placeholder { color: var(--text-muted); }
+
+    #listingsGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 20px; }
+    .listing-card {
+      background: var(--sage-pale);
+      border: 1px solid var(--border-sage);
+      border-radius: 16px;
+      padding: 28px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .listing-card:hover { transform: translateY(-3px); box-shadow: var(--card-hover); }
+    .listing-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .listing-category {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 12px;
+      border-radius: 6px;
+    }
+    .cat-food { background: #fdf0dc; color: #a06b20; }
+    .cat-services { background: #dcf0f5; color: #2a7d90; }
+    .cat-crafts { background: #f8e0ea; color: #a0446a; }
+    .cat-agriculture { background: #dde8d2; color: var(--forest); }
+    .cat-beauty { background: #ece0f4; color: #7a4a9a; }
+    .cat-wellness { background: #fde8dc; color: #a06040; }
+    .listing-location { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .listing-name { font-family: 'Lora', serif; font-size: 20px; margin-bottom: 8px; }
+    .listing-desc { font-size: 14px; color: var(--text-mid); line-height: 1.7; margin-bottom: 16px; }
+    .listing-contact { display: flex; gap: 8px; flex-wrap: wrap; }
+    .contact-tag {
+      font-size: 12px;
+      color: var(--text-light);
+      background: var(--white);
+      padding: 5px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-weight: 500;
+    }
+    #noResults { text-align: center; padding: 60px 0; color: var(--text-muted); display: none; }
+    #noResults a { color: var(--teal); font-weight: 600; text-decoration: none; }
+
+    /* ========== REGISTER ========== */
+    .register { background: var(--sage-bg); border-top: 1px solid var(--border-sage); }
+    .register-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 72px; align-items: start; }
+    .register-perks { margin-top: 32px; }
+    .perk {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border-sage);
+    }
+    .perk-icon {
+      width: 44px; height: 44px;
+      background: var(--white);
+      border: 1px solid var(--border-sage);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .perk h4 { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+    .perk p { font-size: 13px; color: var(--text-mid); line-height: 1.5; }
+
+    .form-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: var(--card-shadow);
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-mid);
+      margin-bottom: 6px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      background: var(--sage-pale);
+      border: 1px solid var(--border-sage);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      padding: 13px 16px;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(42,157,143,0.1);
+    }
+    .form-group select { cursor: pointer; }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+    .form-section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--teal);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .form-submit {
+      width: 100%;
+      background: var(--teal);
+      color: #fff;
+      border: none;
+      padding: 16px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .form-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(42,157,143,0.25);
+    }
+    #formSuccess { display: none; text-align: center; padding: 48px 20px; }
+    #formSuccess h3 { font-size: 28px; color: var(--forest); margin-bottom: 12px; }
+    #formSuccess p { color: var(--text-mid); font-size: 16px; }
+
+    /* ========== FOOTER ========== */
+    footer {
+      background: var(--forest-deep);
+      padding: 48px 0;
+      text-align: center;
+      color: rgba(255,255,255,0.6);
+    }
+    .footer-brand {
+      font-family: 'Lora', serif;
+      font-size: 20px;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    footer p { font-size: 13px; line-height: 1.8; }
+    footer a { color: var(--teal-light); text-decoration: none; }
+
+    @media (max-width: 768px) {
+      .hero { padding: 70px 0 90px; }
+      section { padding: 60px 0; }
+      .how-grid, .register-layout, .paths-grid { grid-template-columns: 1fr; }
+      .register-layout { gap: 36px; }
+      .directory-top { flex-direction: column; align-items: stretch; }
+      .search-box { width: 100%; }
+      .hero-stats { flex-direction: column; gap: 20px; }
+      .form-row { grid-template-columns: 1fr; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      #listingsGrid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="#" class="nav-brand">
+        <span class="nav-brand-icon">&#127807;</span>
+        <span class="nav-brand-text">Georgia Barter Network</span>
+      </a>
+      <div class="nav-links">
+        <a href="#how">How It Works</a>
+        <a href="#directory">Browse</a>
+        <a href="#register" class="nav-cta">&#127793; Join</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge">&#127793; Community Trade Network</div>
+      <h1>Connecting Georgians Who<br>Grow, Make & <em>Trade</em></h1>
+      <p class="hero-sub">No money needed. Just neighbors exchanging goods, services, and skills the way communities were always meant to work.</p>
+      <div class="hero-actions">
+        <a href="#register" class="btn-hero-primary">&#127807; Join the Network</a>
+        <a href="#directory" class="btn-hero-secondary">&#128269; Browse Listings</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-number">1,400+</div>
+          <div class="hero-stat-label">People interested</div>
+        </div>
+        <div>
+          <div class="hero-stat-number">25+</div>
+          <div class="hero-stat-label">Georgia cities</div>
+        </div>
+        <div>
+          <div class="hero-stat-number">6</div>
+          <div class="hero-stat-label">Trade categories</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PATH SELECTOR (SharedEarth-style binary choice) -->
+  <section class="paths">
+    <div class="container">
+      <div class="paths-header">
+        <span class="section-eyebrow">Get Started</span>
+        <h2 class="section-title" style="text-align:center;">What brings you here?</h2>
+      </div>
+      <div class="paths-grid">
+        <a href="#register" class="path-card">
+          <div class="path-icon green">&#127793;</div>
+          <h3>I Have Something to Offer</h3>
+          <p>Goods, food, skills, services -- list what you bring to the table and let your neighbors find you.</p>
+        </a>
+        <a href="#directory" class="path-card">
+          <div class="path-icon brown">&#128269;</div>
+          <h3>I'm Looking to Trade</h3>
+          <p>Browse what your neighbors offer and reach out directly. Find the eggs, the plumber, or the nail tech near you.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="how" id="how">
+    <div class="container">
+      <div class="how-header">
+        <span class="section-eyebrow">How It Works</span>
+        <h2 class="section-title">Three Steps to Your First Trade</h2>
+        <p class="section-sub">No fees. No middlemen. No apps to download. Just people helping people.</p>
+      </div>
+      <div class="how-grid">
+        <div class="how-card">
+          <div class="how-step">1</div>
+          <h3>List What You Offer</h3>
+          <p>Your city, what you make or do, and how to reach you. Brownies, plumbing, eggs, nail art -- if you have it, someone nearby needs it.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-step">2</div>
+          <h3>Browse Your Neighbors</h3>
+          <p>Search by city or category. Find the beekeeper in Dallas, the cook in Carrollton, the artist in South Fulton.</p>
+        </div>
+        <div class="how-card">
+          <div class="how-step">3</div>
+          <h3>Reach Out & Trade</h3>
+          <p>Contact each other via email, phone, or TikTok. Your sourdough for their pressure washing? That is community.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="directory" id="directory">
+    <div class="container">
+      <div class="directory-top">
+        <div>
+          <span class="section-eyebrow">The Network</span>
+          <h2 class="section-title">Browse Listings</h2>
+        </div>
+        <div class="search-box">
+          <span>&#128269;</span>
+          <input type="text" id="searchInput" placeholder="Search city, name, or skill...">
+        </div>
+      </div>
+      <div class="filters" id="filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="food">&#127838; Food</button>
+        <button class="filter-btn" data-filter="agriculture">&#127793; Agriculture</button>
+        <button class="filter-btn" data-filter="services">&#128295; Services</button>
+        <button class="filter-btn" data-filter="crafts">&#127912; Crafts</button>
+        <button class="filter-btn" data-filter="beauty">&#128133; Beauty</button>
+        <button class="filter-btn" data-filter="wellness">&#128156; Wellness</button>
+      </div>
+      <div id="listingsGrid"></div>
+      <div id="noResults">No listings match your search. <a href="#register">Be the first in your area.</a></div>
+    </div>
+  </section>
+
+  <section class="register" id="register">
+    <div class="container">
+      <div class="register-layout">
+        <div>
+          <span class="section-eyebrow">Join the Network</span>
+          <h2 class="section-title">Add Your Listing</h2>
+          <p class="section-sub">It started in a TikTok comment section with 1,400 people saying "I'm in." Now it's becoming something real.</p>
+          <div class="register-perks">
+            <div class="perk">
+              <div class="perk-icon">&#127793;</div>
+              <div>
+                <h4>Always Free</h4>
+                <p>No fees, no subscriptions, no fine print.</p>
+              </div>
+            </div>
+            <div class="perk">
+              <div class="perk-icon">&#128241;</div>
+              <div>
+                <h4>Your Choice of Contact</h4>
+                <p>Share your email, phone, TikTok, or all three.</p>
+              </div>
+            </div>
+            <div class="perk">
+              <div class="perk-icon">&#129309;</div>
+              <div>
+                <h4>Real Community</h4>
+                <p>Inspired by @kerryscountrylife and built for Georgia neighbors.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-card">
+          <form name="barter-listing" method="POST" data-netlify="true" id="barterForm">
+            <input type="hidden" name="form-name" value="barter-listing">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name">Your Name / Business</label>
+                <input type="text" id="name" name="name" placeholder="e.g. GG's Goodies Galore" required>
+              </div>
+              <div class="form-group">
+                <label for="city">City in Georgia</label>
+                <input type="text" id="city" name="city" placeholder="e.g. Douglasville" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select id="category" name="category" required>
+                <option value="" disabled selected>Select a category</option>
+                <option value="food">Food &amp; Baked Goods</option>
+                <option value="agriculture">Agriculture &amp; Farming</option>
+                <option value="services">Services &amp; Trades</option>
+                <option value="crafts">Crafts &amp; Art</option>
+                <option value="beauty">Beauty &amp; Hair</option>
+                <option value="wellness">Wellness &amp; Healing</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="offering">What do you offer?</label>
+              <textarea id="offering" name="offering" placeholder="Describe what you make, grow, or do..." required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="looking_for">What are you looking for? (optional)</label>
+              <input type="text" id="looking_for" name="looking_for" placeholder="e.g. herbs, car detailing, baked goods">
+            </div>
+            <p class="form-section-label">How should people reach you?</p>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="you@email.com">
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone</label>
+                <input type="tel" id="phone" name="phone" placeholder="(678) 555-0123">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="tiktok">TikTok Handle</label>
+              <input type="text" id="tiktok" name="tiktok" placeholder="@yourhandle">
+              <p class="form-hint">At least one contact method is required.</p>
+            </div>
+            <button type="submit" class="form-submit">&#127807; Submit My Listing</button>
+          </form>
+          <div id="formSuccess">
+            <h3>&#127807; Welcome to the Network!</h3>
+            <p>Your listing is live. Your neighbors can now find you.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p class="footer-brand">&#127807; Georgia Barter Network</p>
+      <p>Born from a TikTok comment section. Built for community.<br>Inspired by <a href="#">@kerryscountrylife</a> and the 1,400+ Georgians who said "I'm in."</p>
+      <p style="margin-top:14px;font-size:12px;">No money. No middlemen. Just neighbors.</p>
+    </div>
+  </footer>
+
+  <script>
+    var listings = [
+      { name: "GG's Goodies Galore", city: "Douglasville", category: "food", desc: "Homemade brownies and baked goods. Everything made from scratch with love.", contact: { tiktok: "@ggs_goodies" } },
+      { name: "Kerry's Country Life", city: "Dallas", category: "agriculture", desc: "Herbal syrups, tinctures, and country living knowledge. Growing community one trade at a time.", contact: { tiktok: "@kerryscountrylife" } },
+      { name: "Local Homesteader", city: "Dallas", category: "agriculture", desc: "Eggs, garden seeds, sourdough starter, and more. My FYP is getting super local and I love it.", contact: { tiktok: "@llaaddyybugg" } },
+      { name: "Tamathaca's Homestead", city: "Dallas", category: "agriculture", desc: "Bees and honey (coming by fall), chickens, sourdough bread, sewing, and handmade crafts of all kinds.", contact: { tiktok: "@tamathacal" } },
+      { name: "FEYOUG Plumbing", city: "Georgia", category: "services", desc: "Licensed plumber by trade. Open to barter with anyone who has goods or services to exchange.", contact: { tiktok: "@feyoug" } },
+      { name: "Ashley's Nail Studio", city: "Dallas", category: "beauty", desc: "Private nail tech. Also enjoy crafting, painting, baking, and maintaining a tiny garden.", contact: { tiktok: "@ashley" } },
+      { name: "Lovelylocs", city: "Georgia", category: "wellness", desc: "A good listener for anyone who needs to de-stress and decompress. Not a therapist, just an old soul with a kind heart.", contact: { tiktok: "@lovelylocs" } },
+      { name: "Kelly's Kitchen", city: "Dallas", category: "food", desc: "I cook for people. Meals, something homemade, whatever you need. Tired of DoorDash -- let's trade.", contact: { tiktok: "@kellymystic119" } },
+      { name: "Yellow Butterfly Farm", city: "Carrollton", category: "agriculture", desc: "Eggs, produce, salves, pressure washing, personalized t-shirts, and a growing herb garden. Also small engine repair.", contact: { tiktok: "@yellow_butterfly_farm" } },
+      { name: "SiR Arts & Etc", city: "South Fulton", category: "crafts", desc: "Creator, visual artist, set designer, FX makeup, art on clothing, hair locs, natural styles, braids.", contact: { tiktok: "@sir_arts" } },
+      { name: "Donna Marie", city: "Georgia", category: "wellness", desc: "Community builder and positive energy spreader. I like how we just wake up and decide to do something.", contact: { tiktok: "@donnamarie" } }
+    ];
+
+    var catClasses = { food:'cat-food', services:'cat-services', crafts:'cat-crafts', agriculture:'cat-agriculture', beauty:'cat-beauty', wellness:'cat-wellness' };
+    var catLabels = { food:'Food', services:'Services', crafts:'Crafts & Art', agriculture:'Agriculture', beauty:'Beauty', wellness:'Wellness' };
+    var grid = document.getElementById('listingsGrid');
+    var noResults = document.getElementById('noResults');
+    var searchInput = document.getElementById('searchInput');
+
+    function renderListings(filter, search) {
+      filter = filter || 'all';
+      search = (search || '').toLowerCase();
+      var filtered = listings.filter(function(l) {
+        var mf = filter === 'all' || l.category === filter;
+        var ms = !search || l.name.toLowerCase().indexOf(search) >= 0 || l.city.toLowerCase().indexOf(search) >= 0 || l.desc.toLowerCase().indexOf(search) >= 0;
+        return mf && ms;
+      });
+      while (grid.firstChild) grid.removeChild(grid.firstChild);
+      if (filtered.length === 0) { noResults.style.display = 'block'; return; }
+      noResults.style.display = 'none';
+      filtered.forEach(function(l) {
+        var card = document.createElement('div');
+        card.className = 'listing-card';
+        var header = document.createElement('div');
+        header.className = 'listing-header';
+        var cat = document.createElement('span');
+        cat.className = 'listing-category ' + catClasses[l.category];
+        cat.textContent = catLabels[l.category];
+        header.appendChild(cat);
+        var loc = document.createElement('span');
+        loc.className = 'listing-location';
+        loc.textContent = '\uD83D\uDCCD ' + l.city + ', GA';
+        header.appendChild(loc);
+        card.appendChild(header);
+        var name = document.createElement('h3');
+        name.className = 'listing-name';
+        name.textContent = l.name;
+        card.appendChild(name);
+        var desc = document.createElement('p');
+        desc.className = 'listing-desc';
+        desc.textContent = l.desc;
+        card.appendChild(desc);
+        var contacts = document.createElement('div');
+        contacts.className = 'listing-contact';
+        if (l.contact.email) { var t = document.createElement('span'); t.className = 'contact-tag'; t.textContent = '\u2709 ' + l.contact.email; contacts.appendChild(t); }
+        if (l.contact.phone) { var t2 = document.createElement('span'); t2.className = 'contact-tag'; t2.textContent = '\u260E ' + l.contact.phone; contacts.appendChild(t2); }
+        if (l.contact.tiktok) { var t3 = document.createElement('span'); t3.className = 'contact-tag'; t3.textContent = '\u266A TikTok: ' + l.contact.tiktok; contacts.appendChild(t3); }
+        card.appendChild(contacts);
+        grid.appendChild(card);
+      });
+    }
+    renderListings();
+
+    var activeFilter = 'all';
+    document.getElementById('filters').addEventListener('click', function(e) {
+      if (!e.target.classList.contains('filter-btn')) return;
+      document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      e.target.classList.add('active');
+      activeFilter = e.target.getAttribute('data-filter');
+      renderListings(activeFilter, searchInput.value);
+    });
+    searchInput.addEventListener('input', function() { renderListings(activeFilter, searchInput.value); });
+
+    document.getElementById('barterForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var form = e.target;
+      var data = new FormData(form);
+      if (!data.get('email') && !data.get('phone') && !data.get('tiktok')) { alert('Please provide at least one contact method.'); return; }
+      fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data).toString() })
+        .then(function() { form.style.display = 'none'; document.getElementById('formSuccess').style.display = 'block'; })
+        .catch(function() { alert('Something went wrong. Please try again.'); });
+    });
+  </script>
+</body>
+</html>
