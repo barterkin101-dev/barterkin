@@ -7,7 +7,7 @@ depends_on: [1]
 autonomous: true
 requirements:
   - AUTH-03
-  - AUTH-04
+  - AUTH-04  # PARTIAL in Phase 2: middleware gate + current_user_is_verified() helper installed here; RLS policy itself applies in Phase 3 when profiles table is created
   - AUTH-05
   - AUTH-06
   - AUTH-07
@@ -26,7 +26,7 @@ files_modified:
 must_haves:
   truths:
     - "Postgres has a signup_attempts counter table + check_signup_ip() function enforcing 5/IP/day"
-    - "Postgres has a current_user_is_verified() helper Phase 3 RLS will consume"
+    - "Postgres has current_user_is_verified() helper function; Phase 3 RLS policy on profiles table will consume it"
     - "Postgres has a disposable-email trigger on auth.users blocking known-bad domains at the DB layer (defense-in-depth)"
     - "isDisposableEmail() returns true for mailinator.com and false for gmail.com"
     - "checkSignupRateLimit() decrements a per-IP daily counter and returns allowed=false at the 6th attempt"
@@ -193,6 +193,15 @@ grant execute on function public.check_signup_ip(text) to anon, authenticated;
 
 ----------------------------------------------------------------------
 -- 3. current_user_is_verified — AUTH-04 helper for Phase 3 RLS
+--
+-- NOTE: The RLS POLICY that uses current_user_is_verified() will be
+-- applied to the profiles table in Phase 3 — the profiles table does
+-- not exist yet in Phase 2. Phase 2 installs this helper function here
+-- so Phase 3 can reference it without adding a migration dependency
+-- between the auth-helper migration and the profiles-schema migration.
+-- Phase 2 enforces AUTH-04 at the middleware layer (lib/supabase/
+-- middleware.ts VERIFIED_REQUIRED_PREFIXES gate); the RLS-layer gate
+-- completes in Phase 3.
 ----------------------------------------------------------------------
 create or replace function public.current_user_is_verified()
 returns boolean

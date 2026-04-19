@@ -908,34 +908,30 @@ export function TurnstileWidget({
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Does `signInWithOtp` enforce Supabase's server-side CAPTCHA verification when a `captchaToken` is passed?**
+All five open questions are now resolved — either by the Wave 0 probe task in Plan 02-01, by the plan's architectural choice, or by existing Research citations. Phase 2 execution does NOT wait on any of these; the resolution gate is either the probe (Q1, Q2, Q3) or the plan choice (Q4, Q5).
+
+1. **Does `signInWithOtp` enforce Supabase's server-side CAPTCHA verification when a `captchaToken` is passed?** [RESOLVED by Wave 0 probe]
    - What we know: `signUp` explicitly accepts and verifies `captchaToken`. `signInWithOtp` API reference lists `captchaToken` in the options type [CITED: supabase.com/docs/reference/javascript/auth-signinwithotp], but the public docs example for CAPTCHA integration uses `signUp`.
    - What's unclear: Whether Supabase Auth server rejects a bad `captchaToken` when sent with `signInWithOtp` (we want this — it's the gate).
-   - Recommendation: First planning task adds a Vitest/Playwright integration probe — call `signInWithOtp` with an invalid `captchaToken` and assert the response is a rejection. If it isn't (edge case), fall back to a server-side `/siteverify` call before the Supabase call.
+   - **Resolution:** Plan 02-01 Task 1.5 (Wave 0 probe) IS the resolution gate. The probe sends `signInWithOtp` with an invalid `captchaToken` and asserts rejection. If the probe succeeds → AUTH-08 is enforced natively by Supabase and Plan 02-02's `sendMagicLink` relies on that (current plan assumption). If the probe fails → Plan 02-02 MUST add a custom middleware/server-side `/siteverify` check BEFORE the `signInWithOtp` call; `lib/utils/turnstile-verify.ts` would be added to `lib/actions/auth.ts`'s pipeline between rate-limit check and Supabase call. The probe outcome is recorded in `02-A4-PROBE.md` (extended to cover Q1 as well — Wave 0 task action updated to probe BOTH A4 export shape AND A1 captchaToken enforcement).
 
-2. **How does the per-IP rate limit apply to OAuth signups?**
+2. **How does the per-IP rate limit apply to OAuth signups?** [RESOLVED — deferred to Phase 3+ with documented rationale]
    - What we know: OAuth flows don't run through our server action; the first server-side code that executes is `/auth/callback/route.ts`, which fires AFTER Supabase has already created the `auth.users` row.
-   - What's unclear: Should we count Google signups against the per-IP limit? If yes, where do we check?
-   - Recommendation: Implement a second counter inside the `/auth/callback` route handler that increments `signup_attempts` and deletes the newly-created user if the limit is exceeded. This is racy but acceptable for bot mitigation. Alternative: move the IP check into a Postgres trigger on `auth.users` that reads `auth.jwt() ->> 'request.headers.x-forwarded-for'` — NOT sure this claim is populated; needs probe.
+   - **Resolution:** For Phase 2 MVP, per-IP rate limit applies ONLY to magic-link (which flows through `sendMagicLink` server action). Google OAuth is gated by Turnstile (AUTH-08) client-side before the `signInWithOAuth` call; server-side, the `auth.users` trigger (`reject_disposable_email`) catches disposable domains. If bot abuse of the OAuth path becomes observable in staging/prod, add a second counter in `/auth/callback` route handler (increment + delete-if-over-limit pattern) — this is a 20-line follow-up plan, not a blocker for Phase 2.
 
-3. **Where does the disposable-email seed data come from at migration time?**
-   - What we know: `disposable-email-domains-js@1.24.0` ships a JSON list inside `node_modules`.
-   - What's unclear: Should the Postgres seed pull from `node_modules` at migration time (coupling migration to a dev dep), or export a flat file into `supabase/seed.sql` that's regenerated quarterly?
-   - Recommendation: Build a `scripts/sync-disposable-domains.mjs` that reads from `disposable-email-domains-js` and writes to `supabase/migrations/{timestamp}_disposable_seed.sql` as a one-time migration; refresh quarterly via a separate migration. This keeps the migration deterministic and does NOT couple migrations to npm dev deps at deploy time.
+3. **Where does the disposable-email seed data come from at migration time?** [RESOLVED by plan choice]
+   - **Resolution:** Plan 02-02 Task 2.1 hardcodes a conservative 15-domain starter list inline in the migration SQL (see `002_auth_tables.sql`). A separate quarterly refresh script (`scripts/sync-disposable-domains.mjs`) is deferred to a follow-up as documented in the migration's inline comments. Rationale: the primary disposable-email gate is the server action's `isDisposableEmail()` call which uses the full `disposable-email-domains-js` library (1000+ domains, quarterly-updated via npm); the Postgres seed is defense-in-depth ONLY for OAuth signups which bypass the server action. A 15-domain starter catches the most common offenders (mailinator, tempmail, guerrillamail, etc.); broader coverage is handled at the application layer.
 
-4. **Should logout be a server action or a POST route handler?**
-   - What we know: UI-SPEC locks the button UI. `supabase.auth.signOut()` can be called from either.
-   - What's unclear: Minor pattern choice with identical outcome.
-   - Recommendation: POST route handler (`app/auth/signout/route.ts`). Reason: cleaner to add to the footer layout component without pulling a server action through a client boundary, and avoids prefetch-triggered logout (Pitfall 8).
+4. **Should logout be a server action or a POST route handler?** [RESOLVED by plan choice]
+   - **Resolution:** Plan 02-02 Task 2.5 uses a POST route handler (`app/auth/signout/route.ts`). Reason: cleaner to add to the footer layout component without pulling a server action through a client boundary, and avoids prefetch-triggered logout (RESEARCH Pitfall 8). Verified by Plan 02-04 Task 4.4 test `/auth/signout GET returns 405 (POST-only)` which asserts the route-handler semantics.
 
-5. **Is there a risk that the `@theme inline` brand override (`--color-primary: var(--color-clay)`) breaks shadcn components installed in Phase 1 (Button, Card)?**
-   - What we know: UI-SPEC specifies the override is safe.
-   - What's unclear: Whether any Phase 1 surfaces currently rely on the default stone primary color (probably not — Phase 1 is mostly infrastructure).
-   - Recommendation: Run `pnpm build` + Playwright smoke after adding the override; visually inspect the fire-test-event button which currently uses `Button` default.
+5. **Is there a risk that the `@theme inline` brand override (`--color-primary: var(--color-clay)`) breaks shadcn components installed in Phase 1 (Button, Card)?** [RESOLVED by plan choice + verification step]
+   - **Resolution:** Plan 02-03a Task 3.1 adds the override and verifies via `pnpm typecheck && pnpm build`. Plan 02-04 Task 4.7 (Vercel preview smoke checkpoint) includes a manual visual check that the existing Phase 1 fire-test-event button renders clay-on-sage correctly. If visual regression is observed on any Phase 1 surface, a scoped override using `data-slot` selectors (per shadcn v4 refactor) is a 1-line CSS fix — not a blocker for Phase 2.
 
 ---
+
 
 ## Environment Availability
 

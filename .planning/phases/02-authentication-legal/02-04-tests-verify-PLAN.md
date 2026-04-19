@@ -3,7 +3,7 @@ plan: 4
 phase: 2
 name: tests-verify
 wave: 3
-depends_on: [2, 3]
+depends_on: [2, "03a", "03b"]
 autonomous: false
 requirements:
   - AUTH-01
@@ -591,16 +591,57 @@ test.describe('auth-group redirect (AUTH-09)', () => {
 
 **File: `tests/e2e/session-persistence.spec.ts`**
 
-Requires authed state from a real Supabase session. Hard to do without real auth; mark as fixme with a note.
+Real automated test: inject a session cookie via Playwright BrowserContext.addCookies(), reload the page, assert the cookie survives. We do NOT need a live Supabase session for this — the goal is to verify the cookie adapter (lib/supabase/middleware.ts) does not strip or rewrite the cookie on a read-only request. The 30-day duration assertion is documented as manual-only verification (would require a Playwright clock fast-forward that bypasses the Supabase Auth server's server-side JWT expiry).
 
 ```ts
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 
 test.describe('session persistence (AUTH-03)', () => {
-  test.fixme('authed session survives full page reload', async () => {
-    // Covered manually: sign in, reload, verify session intact.
-    // Automated version requires magic-link capture or service-role token injection.
+  test('session cookie survives a page reload (cookie adapter round-trip)', async ({ browser, baseURL }) => {
+    // Create a fresh context — no shared cookie state with other tests.
+    const context = await browser.newContext()
+    const page = await context.newPage()
+
+    // Seed a synthetic Supabase auth cookie BEFORE any navigation.
+    // The exact name Supabase uses is 'sb-<project-ref>-auth-token'. We use a
+    // placeholder JWT-shaped value: the middleware only needs to PROPAGATE the
+    // cookie on a read-only request — it does NOT need to be a valid JWT for
+    // this test. Valid-JWT cases are covered by manual QA.
+    const origin = new URL(baseURL || 'http://localhost:3000')
+    const projectRef = 'hfdcsickergdcdvejbcw'
+    const cookieName = `sb-${projectRef}-auth-token`
+    const cookieValue = 'session-persistence-probe-' + Date.now()
+    await context.addCookies([
+      {
+        name: cookieName,
+        value: cookieValue,
+        domain: origin.hostname,
+        path: '/',
+        httpOnly: false, // @supabase/ssr reads/writes this via the cookies adapter; not HttpOnly
+        secure: origin.protocol === 'https:',
+        sameSite: 'Lax',
+      },
+    ])
+
+    // Load a public page (home) — middleware runs, calls the cookie adapter, should NOT strip the cookie.
+    await page.goto('/')
+    await page.reload() // the reload is the actual persistence test
+
+    // Assert the cookie is still present after the round-trip through middleware.
+    const cookies = await context.cookies(origin.origin)
+    const authCookie = cookies.find((cookie) => cookie.name === cookieName)
+    expect(authCookie).toBeDefined()
+    expect(authCookie?.value).toBe(cookieValue)
+
+    await context.close()
   })
+
+  // The 30-day cookie-max-age is set server-side by @supabase/ssr when a real
+  // session is created. Unit-level: Phase 1 SUMMARY records the cookie options
+  // (maxAge = 30d). E2E-level: requires a live signInWithOtp round-trip, which
+  // this Phase 2 test suite does NOT automate (see captcha-required.spec.ts
+  // for why Turnstile bypass is out of scope). Manual QA verifies 30-day
+  // persistence by inspecting the cookie's Expires attribute in DevTools.
   test.fixme('authed session age ≥ 30 days supported by cookie config', async () => {})
 })
 ```
@@ -732,7 +773,7 @@ pnpm e2e
 Must exit 0. `.fixme` tests are skipped without failure. All other tests must pass.
   </action>
   <acceptance_criteria>
-    - All 9 E2E files have ≥1 non-fixme test (real `test(` with async body)
+    - All 9 E2E files have ≥1 non-fixme test (real `test(` with async body), including session-persistence.spec.ts (AUTH-03 cookie round-trip test)
     - `tests/e2e/legal-pages.spec.ts` contains literal "Barterkin is intended for people who live in Georgia, USA" (GEO-04 verification)
     - `pnpm e2e` exits 0
     - Total test count across unit + E2E ≥ 30 (counted manually or via reporter output)

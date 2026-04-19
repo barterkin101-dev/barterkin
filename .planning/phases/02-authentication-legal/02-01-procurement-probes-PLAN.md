@@ -20,6 +20,7 @@ files_modified:
   - tests/unit/disposable-email.test.ts
   - tests/unit/rate-limit.test.ts
   - tests/unit/magic-link-schema.test.ts
+  - tests/unit/rls-email-verify.test.ts
   - tests/e2e/login-magic-link.spec.ts
   - tests/e2e/login-google-oauth.spec.ts
   - tests/e2e/verify-pending-gate.spec.ts
@@ -31,10 +32,12 @@ files_modified:
   - tests/e2e/footer-links.spec.ts
 must_haves:
   truths:
-    - "Google OAuth client exists in Google Cloud Console and is wired into Supabase Studio"
-    - "Cloudflare Turnstile site exists; site key is in env, secret key is in Supabase Studio"
-    - "All npm packages needed for Phase 2 are installed and their exports probed"
-    - "All Wave 0+ tests exist as fail-able stubs so CI discovers them"
+    - "All npm packages needed for Phase 2 are installed and present in package.json"
+    - "disposable-email-domains-js export shape probed and recorded in 02-A4-PROBE.md"
+    - "signInWithOtp captchaToken enforcement probed and recorded in 02-A4-PROBE.md (resolves Open Question 1)"
+    - "shadcn Form, Alert, Separator primitives exist in components/ui/"
+    - "All Wave 0+ test files exist as fail-able stubs so CI discovers them"
+    - "NEXT_PUBLIC_TURNSTILE_SITE_KEY exists in .env.local.example as a documented placeholder"
   artifacts:
     - path: "package.json"
       provides: "Phase 2 dependencies (@marsidev/react-turnstile, disposable-email-domains-js, react-hook-form, @hookform/resolvers, zod)"
@@ -277,7 +280,7 @@ All three greps must return matches.
 </task>
 
 <task id="2-1-5" type="auto">
-  <title>Task 1.5: Probe disposable-email-domains-js export shape (Research Assumption A4)</title>
+  <title>Task 1.5: Probe disposable-email-domains-js export shape (A4) + signInWithOtp captchaToken enforcement (Open Question 1)</title>
   <read_first>
     - `.planning/phases/02-authentication-legal/02-RESEARCH.md` (Assumption A4, line 900; Pattern 7, lines 698–709)
     - `node_modules/disposable-email-domains-js/package.json` (after install — check `main` / `module` / `exports` fields)
@@ -318,15 +321,53 @@ import('disposable-email-domains-js').then(mod => {
 Record the resolved shape.
 
 Write a short note (1 paragraph) to `.planning/phases/02-authentication-legal/02-A4-PROBE.md` summarizing which outcome occurred and the exact import line Wave 1 must use. This file is consumed by Wave 1 plan 02-02 task 2-2-2.
+
+---
+
+**Step 2: Probe signInWithOtp captchaToken enforcement (Open Question 1 from 02-RESEARCH.md)**
+
+Open Question 1 asks: does `signInWithOtp` enforce Supabase's server-side CAPTCHA verification when an invalid `captchaToken` is passed? Task 2.4 (Plan 02-02) depends on the answer — if Supabase rejects invalid captchaTokens, we rely on it. If it does NOT, we must add a server-side `/siteverify` check in lib/actions/auth.ts BEFORE the signInWithOtp call.
+
+Run, from repo root (requires Cloudflare Turnstile wired per Task 1.2 + `NEXT_PUBLIC_SUPABASE_URL` + `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in .env.local):
+```bash
+node -e "
+import('@supabase/supabase-js').then(async ({ createClient }) => {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  )
+  const { data, error } = await supabase.auth.signInWithOtp({
+    email: 'probe-noreply-delete@example.com',
+    options: { captchaToken: 'deliberately-invalid-token-probe' },
+  })
+  console.log('error:', error?.message ?? 'none')
+  console.log('error code:', error?.code ?? 'none')
+  console.log('status:', error?.status ?? 'none')
+  console.log('data:', JSON.stringify(data))
+})
+"
+```
+
+Three outcomes for Q1:
+
+**Outcome Q1-A (Supabase REJECTS the invalid token — RESEARCH A1 confirmed):** error includes `captcha` or `bot` or `verification` in message/code. Record in `02-A4-PROBE.md`: "Q1 confirmed — Supabase enforces captchaToken on signInWithOtp. Plan 02-02 Task 2.4 relies on this; no extra /siteverify call needed."
+
+**Outcome Q1-B (Supabase ACCEPTS the invalid token — RESEARCH A1 rejected):** error is null, or error is about something else (e.g., rate limit). Record in `02-A4-PROBE.md`: "Q1 REJECTED — Supabase does NOT enforce captchaToken on signInWithOtp. Plan 02-02 Task 2.4 MUST add a server-side /siteverify call in lib/actions/auth.ts between the rate-limit check and the signInWithOtp call. Add a new file lib/utils/turnstile-verify.ts that POSTs to https://challenges.cloudflare.com/turnstile/v0/siteverify with secret + token; reject the sendMagicLink server action if verification fails." This is a 1-file additive change to 02-02 Task 2.4 — the planner and executor should NOT treat this as a blocker.
+
+**Outcome Q1-C (probe errors before reaching Supabase, e.g., env vars missing):** record that the probe was not runnable in this environment; defer to first real E2E test in Wave 3 (Plan 02-04 Task 4.4 captcha-required.spec.ts) as the de facto resolution gate.
+
+Append the Q1 outcome to the SAME `02-A4-PROBE.md` file. The file is now the resolution-of-record for BOTH A4 (export shape) and Q1 (captchaToken enforcement).
   </action>
   <acceptance_criteria>
     - File `.planning/phases/02-authentication-legal/02-A4-PROBE.md` exists with an explicit "Wave 1 must use: `import ... from 'disposable-email-domains-js'`" line
-    - The probe command prints "mailinator.com disposable? true" and "gmail.com disposable? false" (or the Outcome B/C equivalents)
+    - The disposable-email probe command prints "mailinator.com disposable? true" and "gmail.com disposable? false" (or the Outcome B/C equivalents)
+    - The same `02-A4-PROBE.md` file records the Q1 (captchaToken enforcement) probe outcome with one of Q1-A, Q1-B, or Q1-C
+    - If Outcome Q1-B: the file includes a TODO pointer instructing Plan 02-02 Task 2.4 to add `lib/utils/turnstile-verify.ts` before the signInWithOtp call
   </acceptance_criteria>
 </task>
 
 <task id="2-1-6" type="auto">
-  <title>Task 1.6: Create all 12 Wave 0 test stubs (empty-but-discovered)</title>
+  <title>Task 1.6: Create all 13 Wave 0 test stubs (empty-but-discovered)</title>
   <read_first>
     - `tests/unit/smoke.test.ts` (Vitest stub pattern — describe + it.todo)
     - `tests/e2e/smoke.spec.ts` (Playwright stub pattern — test.describe + test.fixme)
@@ -334,9 +375,9 @@ Write a short note (1 paragraph) to `.planning/phases/02-authentication-legal/02
     - `playwright.config.ts` (confirm `testDir: 'tests/e2e'`)
   </read_first>
   <action>
-Create 12 test stub files so CI (`pnpm test && pnpm e2e`) discovers them in Wave 1/2/3 and reports them as pending. Using `it.todo` (Vitest) and `test.fixme` (Playwright) per 02-PATTERNS.md — neither fails CI; both surface the pending test in the reporter.
+Create 13 test stub files so CI (`pnpm test && pnpm e2e`) discovers them in Wave 1/2/3 and reports them as pending. Using `it.todo` (Vitest) and `test.fixme` (Playwright) per 02-PATTERNS.md — neither fails CI; both surface the pending test in the reporter.
 
-**3 unit test stubs** in `tests/unit/`:
+**4 unit test stubs** in `tests/unit/`:
 
 `tests/unit/disposable-email.test.ts`:
 ```ts
@@ -383,6 +424,30 @@ describe('MagicLinkSchema (AUTH-02)', () => {
   it.todo('rejects empty captcha token')
   it.todo('lowercases email')
   it.todo('trims whitespace')
+})
+```
+
+`tests/unit/rls-email-verify.test.ts` (AUTH-04 RLS coverage — requires local supabase start):
+```ts
+import { describe, it } from 'vitest'
+
+/**
+ * AUTH-04 RLS coverage stub. The actual RLS policy on the profiles table is
+ * not installed until Phase 3 (the profiles table itself is Phase 3 work).
+ * Phase 2 installs the `current_user_is_verified()` helper function that
+ * Phase 3's RLS policy will consume.
+ *
+ * These tests run against a local Supabase instance (`supabase start`) and
+ * use a service-role seeded authed session to assert the RLS policy blocks
+ * unverified users. Until Phase 3 creates the profiles table + policy, every
+ * case is test.skip with the marker RLS_REQUIRES_LOCAL_SUPABASE so CI
+ * surfaces them as pending.
+ */
+describe('RLS email-verify gate (AUTH-04)', () => {
+  it.todo('RLS_REQUIRES_LOCAL_SUPABASE: current_user_is_verified() returns false when email_confirmed_at is null')
+  it.todo('RLS_REQUIRES_LOCAL_SUPABASE: current_user_is_verified() returns true when email_confirmed_at is set')
+  it.todo('RLS_REQUIRES_LOCAL_SUPABASE: profiles SELECT policy (Phase 3) denies unverified user')
+  it.todo('RLS_REQUIRES_LOCAL_SUPABASE: profiles SELECT policy (Phase 3) allows verified user')
 })
 ```
 
@@ -490,9 +555,9 @@ test.describe('footer links (AUTH-10 + UI-SPEC)', () => {
 After writing all 12 files, run `pnpm test` (should exit 0 with 3 test files found, all `todo`) and `pnpm e2e` (should exit 0 with 9 spec files found, all `fixme`). If either framework reports "no tests found," the include path is wrong — check vitest.config.ts and playwright.config.ts.
   </action>
   <acceptance_criteria>
-    - `ls tests/unit/*.test.ts | wc -l` ≥ 4 (3 new + existing smoke.test.ts)
+    - `ls tests/unit/*.test.ts | wc -l` ≥ 5 (4 new + existing smoke.test.ts)
     - `ls tests/e2e/*.spec.ts | wc -l` ≥ 10 (9 new + existing smoke.spec.ts)
-    - `pnpm test` exits 0 with the 3 new files discovered and showing "todo" markers
+    - `pnpm test` exits 0 with the 4 new files discovered and showing "todo" markers
     - `pnpm e2e` exits 0 with the 9 new files discovered; `test.fixme` tests do not fail the suite
   </acceptance_criteria>
 </task>
@@ -509,7 +574,7 @@ grep -E '"(react-hook-form|@hookform/resolvers|zod|@marsidev/react-turnstile|dis
 ls components/ui/{form,alert,separator}.tsx
 
 # Test discovery
-pnpm test     # 3 new unit files found, all todo
+pnpm test     # 4 new unit files found, all todo
 pnpm e2e      # 9 new e2e files found, all fixme
 
 # Type + lint still green (no regressions from installs)
@@ -533,7 +598,7 @@ Manually verify with human:
 - [ ] `package.json` has all 5 Phase 2 npm deps pinned to the Research-verified minimum versions
 - [ ] `components/ui/{form,alert,separator}.tsx` all present and compile
 - [ ] `.planning/phases/02-authentication-legal/02-A4-PROBE.md` records the confirmed disposable-email-domains-js export shape
-- [ ] 12 test stub files present; `pnpm test && pnpm e2e` both exit 0
+- [ ] 13 test stub files present; `pnpm test && pnpm e2e` both exit 0
 - [ ] No secret appears in any committed file (grep `git ls-files | xargs grep -l TURNSTILE_SECRET` returns empty)
 
 ## output
