@@ -56,18 +56,20 @@ All values in multiples of 4 (Tailwind v4 default 4px baseline — `1 = 4px`, `2
 
 ## Typography
 
-Exactly 3 weights used in Phase 2: 400 (regular) for body + labels, 500 (medium) for button text + field labels, 700 (bold) for display/page headings. Lora (serif) renders headings only; Inter (sans) renders everything else.
+Exactly 2 weights used: 400 (regular) and 700 (bold). Lora (serif) renders headings only; Inter (sans) renders everything else.
 
 | Role | Size | Weight | Line Height | Font | Surfaces |
 |------|------|--------|-------------|------|----------|
-| Body | 16px (`text-base`) | 400 | 1.5 (`leading-[1.5]`) | Inter | All paragraphs, help text, legal-page body copy, verify-pending explanation |
-| Label | 14px (`text-sm`) | 500 (`font-medium`) | 1.4 (`leading-[1.4]`) | Inter | Form field labels ("Email address"), button labels, footer links |
+| Body | 16px (`text-base`) | 400 (`font-normal`) | 1.5 (`leading-[1.5]`) | Inter | All paragraphs, help text, legal-page body copy, verify-pending explanation |
+| Label | 14px (`text-sm`) | 400 (`font-normal`) | 1.4 (`leading-[1.4]`) | Inter | Form field labels ("Email address"), button labels, footer links |
 | Heading | 24px (`text-2xl`) | 700 (`font-bold`) | 1.2 (`leading-[1.2]`) | Lora (`font-serif`) | Auth card heading ("Welcome to Barterkin"), verify-pending heading, legal-page H2 section titles |
 | Display | 32px desktop / 28px mobile (`text-3xl md:text-[32px]`) | 700 (`font-bold`) | 1.15 (`leading-[1.15]`) | Lora (`font-serif`) | Legal-page H1 ("Terms of Service", "Privacy Policy", "Community Guidelines") |
 
+**Labels are distinguished from body by size (14px vs 16px), not weight.**
+
 **Responsive behavior:** Display drops from 32px → 28px below `md` (768px). Heading stays 24px at all widths. Body never drops below 16px (iOS auto-zoom trigger floor).
 
-**Weight discipline:** No 300/light (weak on sage background at body size), no 600 or 800 (adds a fourth tier). If emphasis is needed inside body copy, use `font-medium` (500) not italic.
+**Weight discipline:** Exactly 2 weights used: 400 (regular) and 700 (bold). No 300/light (weak on sage background at body size), no 500/medium, no 600/semibold, no 800/extra-bold. If emphasis is needed inside body copy, use italics or bold (700) sparingly — never `font-medium`.
 
 ---
 
@@ -103,6 +105,16 @@ Uses the existing sage/forest/clay palette defined in Phase 1. 60/30/10 split ap
 ```
 
 This makes `<Button>` (default variant) render clay-on-sage automatically, so the executor doesn't sprinkle `className="bg-clay"` overrides everywhere.
+
+---
+
+## Visuals
+
+**Focal point declaration.** The primary visual anchor on `/login` and `/signup` is the clay-background "Continue with Google" button at the top of the auth card — eye path: card heading (Lora 24px bold) → Google OAuth button (clay bg) → divider → magic-link form.
+
+On `/verify-pending`, the primary focal point is the Lora 32px bold "One more step" display heading, followed by the clay "Resend verification link" button as the secondary anchor. On `/legal/*` pages, the focal point is the Lora 32px/28px bold H1 page title, with the sage-bg page background providing a calm reading surface and no competing accent colors above the fold.
+
+The clay accent appears in exactly one location per auth surface (the primary CTA), preserving its role as the eye's first destination. The forest-green footer band sits visually below the auth card to avoid competing with the card for attention.
 
 ---
 
@@ -172,11 +184,11 @@ Links open `https://www.cloudflare.com/privacypolicy/` and `https://www.cloudfla
 
 ### Logout Button (in footer)
 
-| State | Copy | Variant |
-|-------|------|---------|
-| Authed user visible in footer | `Log out` | `variant="ghost"`, 14px, with `LogOut` lucide icon 14px inline-left |
-| Unauthed | (not rendered) | — |
-| During logout (optimistic) | `Logging out…` | disabled, same ghost variant |
+| State | Copy | ARIA | Variant |
+|-------|------|------|---------|
+| Authed user visible in footer | `Log out` | `aria-label="Log out of Barterkin"` | `variant="ghost"`, 14px, with `LogOut` lucide icon 14px inline-left |
+| Unauthed | (not rendered) | — | — |
+| During logout (optimistic) | `Logging out…` | `aria-label="Log out of Barterkin"` | disabled, same ghost variant |
 
 **No confirmation dialog.** Logout is reversible (re-login in 10 seconds). A confirm-modal on logout is friction-for-no-reason.
 
