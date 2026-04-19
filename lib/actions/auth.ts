@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { isDisposableEmail } from '@/lib/utils/disposable-email'
 import { checkSignupRateLimit } from '@/lib/utils/rate-limit'
 
-const MagicLinkSchema = z.object({
+export const MagicLinkSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   captchaToken: z.string().min(1),
 })
