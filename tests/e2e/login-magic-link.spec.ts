@@ -19,11 +19,11 @@ test.describe('login — magic link (AUTH-02)', () => {
 
   // Full end-to-end "Check your email" state requires Turnstile to actually pass;
   // marking as fixme — needs a Turnstile test mode or widget bypass in test env.
-  test.fixme('after valid submit, shows "Check your email" confirmation', async ({ page }) => {
+  test.fixme('after valid submit, shows "Check your email" confirmation', async () => {
     // Needs: Turnstile test mode + mocked sendMagicLink response
   })
 
-  test.fixme('submitting @mailinator.com shows disposable-email error copy', async ({ page }) => {
+  test.fixme('submitting @mailinator.com shows disposable-email error copy', async () => {
     // Needs: Turnstile bypass in test env to actually trigger server action
   })
 })

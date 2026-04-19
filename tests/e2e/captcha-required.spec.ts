@@ -5,12 +5,13 @@ test.describe('CAPTCHA required (AUTH-08)', () => {
     await page.goto('/login')
     // The widget iframe loads from challenges.cloudflare.com; verify the container renders
     // even if Cloudflare doesn't actually serve the iframe in test env.
-    await expect(page.getByText(/protected by cloudflare turnstile/i)).toBeVisible()
+    // Two Turnstile widgets appear (GoogleAuthBlock + LoginForm); match the first.
+    await expect(page.getByText(/protected by cloudflare turnstile/i).first()).toBeVisible()
   })
 
   test('Turnstile widget area is present on /signup', async ({ page }) => {
     await page.goto('/signup')
-    await expect(page.getByText(/protected by cloudflare turnstile/i)).toBeVisible()
+    await expect(page.getByText(/protected by cloudflare turnstile/i).first()).toBeVisible()
   })
 
   test('magic-link submit is disabled without CAPTCHA', async ({ page }) => {
