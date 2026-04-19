@@ -69,6 +69,9 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "supabase"
-    ]
+    ],
+    "overrides": {
+      "zod": "^4.3.6"
+    }
   }
 }
