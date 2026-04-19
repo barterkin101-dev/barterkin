@@ -54,6 +54,11 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  /* Phase 2 brand override — makes shadcn primary render clay-on-sage */
+  --color-primary: var(--color-clay);
+  --color-primary-foreground: var(--color-sage-bg);
+  --color-ring: var(--color-clay);
+  --color-muted-foreground: var(--color-forest-mid);
 }
 
 /* shadcn new-york base layer — stone palette populated by `shadcn init`.
