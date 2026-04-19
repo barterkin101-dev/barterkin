@@ -55,23 +55,27 @@ progress:
 
 ## Current Position
 
-Phase: 01 — EXECUTING
-Plan: 5 of 10 (01-04 pwa-serwist complete; 01-05 is next per wave plan)
-**Phase:** Phase 1 — Foundation & Infrastructure (executing)
-**Plan:** 01-01 repo-init → complete (bf21f03); 01-02 nextjs-scaffold → complete (466fba6); 01-03 supabase-ssr → complete (bc1e942); 01-06 supabase-migrations → complete (dd01417); 01-04 pwa-serwist → complete (76c74a5, fix ced33a5)
-**Status:** Executing Phase 01
-**Progress:** [█████░░░░░] 50%
+Phase: 02 — READY TO START
+**Phase:** Phase 1 — Foundation & Infrastructure — COMPLETE (5bc75c1)
+**Status:** Phase 1 done. Phase 2 (Authentication & Legal) needs planning → `/gsd-plan-phase 2`
+**Progress:** [██░░░░░] Phase 1 complete, Phase 2 not yet planned
 
 ```
-[▰▰▰▰▱▱▱] 50%  Phase 1: Foundation & Infrastructure (in progress — 5/10 plans)
+[▰▰▱▱▱▱▱] Phase 1 complete. Next: plan + execute Phase 2 (Auth & Legal)
 ```
+
+### CI fixes discovered in Phase 1 (apply to all future phases)
+- pnpm lockfileVersion 9.0 requires pnpm@10 (CI now uses npm install -g pnpm@10)
+- `next lint` removed in Next.js 16 — lint script is now `eslint .`
+- NEXT_PUBLIC_* vars must be in GitHub Actions repo variables for E2E builds
+- Serwist sw bundles excluded from ESLint globalIgnores
 
 ### Phase Status Grid
 
 | # | Phase | Status |
 |---|-------|--------|
-| 1 | Foundation & Infrastructure | In progress (5/10 plans) |
-| 2 | Authentication & Legal | Not started |
+| 1 | Foundation & Infrastructure | ✅ complete (5bc75c1, 2026-04-19) |
+| 2 | Authentication & Legal | Not started — plan with `/gsd-plan-phase 2` |
 | 3 | Profile & Georgia Gate | Not started |
 | 4 | Directory | Not started |
 | 5 | Contact Relay + Trust (joined) | Not started |
