@@ -58,6 +58,7 @@
     "supabase": "^2.92.1",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vercel": "^51.7.0",
     "vitest": "^4.1.4"
   },
   "pnpm": {
