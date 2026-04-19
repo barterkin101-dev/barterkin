@@ -3,7 +3,7 @@ phase: 1
 slug: foundation-infrastructure
 status: planned
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-04-18
 updated: 2026-04-18  # revised for checker issues (ISSUE-01..08)
 ---
