@@ -20,7 +20,7 @@
 ## Local setup
 
 ```bash
-git clone git@github.com:Biznomad/barterkin.git
+git clone git@github.com:barterkin101-dev/barterkin.git
 cd barterkin
 cp .env.local.example .env.local   # fill in values — DO NOT COMMIT .env.local
 pnpm install
@@ -31,6 +31,32 @@ pnpm dev                            # http://localhost:3000
 ## Environment variables
 
 See `.env.local.example` for the full list, grouped by client-safe (`NEXT_PUBLIC_*`) vs. server-only. Never add `NEXT_PUBLIC_` to `SUPABASE_SERVICE_ROLE_KEY` or `RESEND_API_KEY` — the repo is public and those keys are inlined into the client chunk if you do.
+
+## Vercel deploys
+
+- **Production:** `main` branch pushes auto-deploy to `https://barterkin.vercel.app` via Vercel GitHub integration (team: `barterkin101-devs-projects`, team ID: `team_lgW6L6OTcKom1vrTkNwdsGJ4`).
+- **Preview:** Every PR gets a unique `*.vercel.app` URL posted by the Vercel bot.
+- **Development:** `pnpm dev` at `http://localhost:3000` with `.env.local`.
+
+### Env-var manifest
+
+All 7 Phase-1 variables are set in Vercel for **production**, **preview**, and **development** scopes. Sync locally with:
+
+```bash
+pnpm vercel env pull .env.local   # pulls the development scope into .env.local
+```
+
+| Var | Scope | Sensitive | Source |
+|-----|-------|-----------|--------|
+| `NEXT_PUBLIC_SUPABASE_URL` | all 3 | no | `https://hfdcsickergdcdvejbcw.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | all 3 | no | Supabase Studio → API |
+| `SUPABASE_SERVICE_ROLE_KEY` | all 3 | **yes** | Supabase Studio → API |
+| `RESEND_API_KEY` | all 3 | **yes** | Resend dashboard |
+| `NEXT_PUBLIC_POSTHOG_KEY` | all 3 | no | PostHog project 387571 |
+| `NEXT_PUBLIC_POSTHOG_HOST` | all 3 | no | `https://us.i.posthog.com` |
+| `NEXT_PUBLIC_SITE_URL` | per scope | no | `http://localhost:3000` / `https://${VERCEL_URL}` / `https://barterkin.vercel.app` |
+
+Server-only vars (`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`) are marked **Sensitive** in Vercel so build logs mask them. Never add `NEXT_PUBLIC_` to them — this public repo means inlined secrets are world-readable.
 
 ## Supabase migrations
 
