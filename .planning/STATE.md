@@ -3,13 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-18T23:28:50.040Z"
+stopped_at: Completed 01-04-pwa-serwist-PLAN.md
+last_updated: "2026-04-19T15:33:14.063Z"
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 10
-  completed_plans: 3
-  percent: 30
+  completed_plans: 5
+  percent: 50
 ---
 
 # State: Georgia Barter
@@ -55,21 +56,21 @@ progress:
 ## Current Position
 
 Phase: 01 — EXECUTING
-Plan: 3 of 10
+Plan: 5 of 10 (01-04 pwa-serwist complete; 01-05 is next per wave plan)
 **Phase:** Phase 1 — Foundation & Infrastructure (executing)
-**Plan:** 01-01 repo-init → complete (bf21f03); 01-02 nextjs-scaffold → complete (466fba6); 01-03 supabase-ssr → complete (bc1e942); 01-04 pwa-serwist next
+**Plan:** 01-01 repo-init → complete (bf21f03); 01-02 nextjs-scaffold → complete (466fba6); 01-03 supabase-ssr → complete (bc1e942); 01-06 supabase-migrations → complete (dd01417); 01-04 pwa-serwist → complete (76c74a5, fix ced33a5)
 **Status:** Executing Phase 01
-**Progress:** [███░░░░░░░] 30%
+**Progress:** [█████░░░░░] 50%
 
 ```
-[▰▰▰▱▱▱▱] 30%  Phase 1: Foundation & Infrastructure (in progress — 3/10 plans)
+[▰▰▰▰▱▱▱] 50%  Phase 1: Foundation & Infrastructure (in progress — 5/10 plans)
 ```
 
 ### Phase Status Grid
 
 | # | Phase | Status |
 |---|-------|--------|
-| 1 | Foundation & Infrastructure | In progress (3/10 plans) |
+| 1 | Foundation & Infrastructure | In progress (5/10 plans) |
 | 2 | Authentication & Legal | Not started |
 | 3 | Profile & Georgia Gate | Not started |
 | 4 | Directory | Not started |
@@ -86,13 +87,14 @@ Plan: 3 of 10
 | v1 requirements mapped | 78/78 | 78/78 ✓ |
 | Orphaned requirements | 0 | 0 ✓ |
 | Phases complete | 7 | 0 |
-| Plans complete | 10 (Phase 1) | 3 |
+| Plans complete | 10 (Phase 1) | 5 |
 | Initiated contacts (post-launch) | ≥1 per 10 profiles per week | — (pre-launch) |
 | Seeded profiles at launch | ≥30 (≥2 counties × ≥3 categories) | 0 (pre-seeding) |
 | Mail-tester deliverability score | ≥9/10 | — (pre-DNS) |
 
 ---
 | Phase 01 P03 | 2min | 2 tasks | 8 files |
+| Phase 01-foundation-infrastructure P04 | 12min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -118,6 +120,11 @@ Plan: 3 of 10
 - **Plan 01-03:** Chose `supabase.auth.getClaims()` over `getUser()` fallback — install-time probe returned `HAS_GETCLAIMS` on `@supabase/ssr@0.10.2`. JWKS-verified, no Auth-server round-trip (saves ~50ms/req). `getSession()` remains banned from all server paths (PITFALLS Pitfall 1).
 - **Plan 01-03:** `server.ts` carries `import 'server-only'` on line 1 in addition to admin.ts (defense-in-depth per PLAN Step 4 spec).
 - **Plan 01-03:** Middleware matcher excludes `_next/static`, `_next/image`, `favicon.ico`, `robots.txt`, `sitemap.xml`, `api/webhooks`, and image/PWA extensions (`.webmanifest` explicitly — leaves PWA paths unclogged for Plan 04 Serwist).
+- **Plan 01-04:** Serwist 9.5.7 wired with `disable: process.env.NODE_ENV === 'development'` — keeps Turbopack dev speed; production build uses webpack (Plan 02 pin) to emit `public/sw.js`.
+- **Plan 01-04:** Added `turbopack: {}` to `next.config.ts` to silence Next 16's "webpack config with no turbopack config" error that fires because `withSerwist` injects a webpack config at config-eval time even when PWA is disabled in dev. Future webpack-wrapping plugins will need the same silencer.
+- **Plan 01-04:** `tsconfig.json` lib extended with `"webworker"` to expose `ServiceWorkerGlobalScope` for `app/sw.ts` (global project-wide, not per-file triple-slash).
+- **Plan 01-04:** `sharp@0.34.5` kept as devDep and `scripts/generate-icons.cjs` committed so Phase 6 can regenerate branded icons via `node scripts/generate-icons.cjs` after dropping in a new SVG template.
+- **Plan 01-04:** `public/swe-worker-*.js` added to `.gitignore` alongside `sw.js` + `workbox-*.js` — Serwist emits a second per-build chunk beyond the main service worker.
 
 ### Research Flags (from SUMMARY.md)
 
@@ -144,7 +151,7 @@ None currently — roadmap complete, awaiting phase-1 planning.
 - **Date:** 2026-04-18
 - **Action:** Executed Plan 01-03 supabase-ssr (Wave 2)
 - **Outcome:** Installed `@supabase/ssr@0.10.2` + `@supabase/supabase-js@2.103.3`; scaffolded four-client factory at `lib/supabase/{client,server,middleware,admin}.ts`; root `middleware.ts` with matcher excluding static + webhooks + PWA assets; `lib/database.types.ts` placeholder. Probed HAS_GETCLAIMS → middleware uses `supabase.auth.getClaims()` primary path (JWKS-verified, no round-trip). admin.ts `import 'server-only'` guards service-role key. `pnpm typecheck && pnpm build` exit 0 (17s). Commit `bc1e942` pushed to `origin/main`. FOUND-05, FOUND-06 covered.
-- **Stopped at:** Completed 01-03-supabase-ssr-PLAN.md
+- **Stopped at:** Completed 01-04-pwa-serwist-PLAN.md
 
 ### Next Session Should
 

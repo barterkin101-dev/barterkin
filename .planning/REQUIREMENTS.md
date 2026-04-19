@@ -19,7 +19,7 @@ Every requirement below maps to exactly one phase in ROADMAP.md. Requirement IDs
 - [x] **FOUND-06**: Fresh Vercel project provisioned with separate preview and production environments; env vars set per environment
 - [ ] **FOUND-07**: Resend account + domain verified; plugged into Supabase Studio SMTP so auth emails come from branded domain
 - [ ] **FOUND-08**: Database migrations versioned under `supabase/migrations/`, committed to git, and reproducible locally via `supabase db reset`
-- [ ] **FOUND-09**: Serwist PWA with `app/manifest.ts`, service worker, and installable web manifest including icons derived from existing identity
+- [x] **FOUND-09**: Serwist PWA with `app/manifest.ts`, service worker, and installable web manifest including icons derived from existing identity
 - [ ] **FOUND-10**: PostHog integrated with `posthog-js` + `@posthog/next`; `initiated_contact` event schema defined as KPI source of truth
 - [ ] **FOUND-11**: GitHub Actions CI: `pnpm lint`, `pnpm typecheck`, `pnpm test` on every PR; Vercel preview on every branch
 - [ ] **FOUND-12**: Legacy `index.html` kept live on Netlify until new landing page replaces it (no service gap at cutover)
@@ -189,7 +189,7 @@ Every v1 requirement maps to exactly one phase in ROADMAP.md.
 | FOUND-06 | Phase 1: Foundation & Infrastructure | Complete |
 | FOUND-07 | Phase 1: Foundation & Infrastructure | Pending |
 | FOUND-08 | Phase 1: Foundation & Infrastructure | Pending |
-| FOUND-09 | Phase 1: Foundation & Infrastructure | Pending |
+| FOUND-09 | Phase 1: Foundation & Infrastructure | Complete |
 | FOUND-10 | Phase 1: Foundation & Infrastructure | Pending |
 | FOUND-11 | Phase 1: Foundation & Infrastructure | Pending |
 | FOUND-12 | Phase 1: Foundation & Infrastructure | Pending |
