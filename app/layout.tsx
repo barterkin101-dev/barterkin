@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter, Lora } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { PostHogProvider } from './providers'
+import { Footer } from '@/components/layout/Footer'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' })
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans bg-sage-bg text-forest-deep min-h-screen antialiased">
         <PostHogProvider>
           {children}
+          <Footer />
         </PostHogProvider>
         <Analytics />
       </body>
