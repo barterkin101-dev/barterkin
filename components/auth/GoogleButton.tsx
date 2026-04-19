@@ -29,12 +29,16 @@ export function GoogleButton({ captchaToken }: GoogleButtonProps) {
   async function signIn() {
     if (!captchaToken) return
     const supabase = createClient()
+    // captchaToken is supported at runtime by Supabase Auth but not yet in the
+    // TypeScript types for SignInWithOAuthCredentials.options in @supabase/auth-js@2.103.3.
+    // Use Object.assign to pass it without triggering no-explicit-any lint.
+    const oauthOptions: Parameters<typeof supabase.auth.signInWithOAuth>[0]['options'] = {
+      redirectTo: `${window.location.origin}/auth/callback?next=/directory`,
+    }
+    Object.assign(oauthOptions, { captchaToken })
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        captchaToken,
-        redirectTo: `${window.location.origin}/auth/callback?next=/directory`,
-      },
+      options: oauthOptions,
     })
   }
 
