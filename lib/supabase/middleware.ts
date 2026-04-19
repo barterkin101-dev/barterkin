@@ -2,6 +2,24 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/lib/database.types'
 
+// AUTH-09: authed users bounced away from these paths
+const AUTH_GROUP_PATHS = ['/login', '/signup']
+
+// AUTH-04: unverified users bounced to /verify-pending from these prefixes.
+// Phase 2 installs this list in advance of /directory, /m/, /profile existing
+// (Phase 3/4). Check is a no-op until those paths exist.
+const VERIFIED_REQUIRED_PREFIXES = ['/directory', '/m/', '/profile']
+
+// Paths always accessible (even to unverified users) so they don't redirect-loop
+const ALWAYS_ALLOWED = [
+  '/verify-pending',
+  '/auth/callback',
+  '/auth/confirm',
+  '/auth/signout',
+  '/auth/error',
+  '/legal/',
+]
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
 
@@ -22,11 +40,37 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
-  // Next 16 pattern: getClaims() revalidates the JWT signature against Supabase's
-  // published JWKS without a round-trip to the Auth server (probed available at
-  // install time — see 01-03-SUMMARY.md). getSession() is spoofable and BANNED
-  // from all server paths (PITFALLS Pitfall 1).
-  await supabase.auth.getClaims()
+  // Primary auth check — JWKS-verified, no round-trip (CLAUDE.md: getClaims preferred).
+  // NEVER use getSession() on server paths (banned).
+  const { data } = await supabase.auth.getClaims()
+  const claims = data?.claims
+  const isAuthed = !!claims?.sub
+  // Trust the top-level email_verified claim (comes from auth.users.email_confirmed_at).
+  // NEVER trust user_metadata.email_verified (writable by user — T-2-08).
+  const isVerified = !!claims?.email_verified
+
+  const pathname = request.nextUrl.pathname
+
+  // AUTH-09: authed users should not see /login or /signup
+  if (isAuthed && AUTH_GROUP_PATHS.some((p) => pathname.startsWith(p))) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/directory'
+    url.search = ''
+    return NextResponse.redirect(url)
+  }
+
+  // AUTH-04: unverified users are gated out of verified-only prefixes
+  if (
+    isAuthed
+    && !isVerified
+    && VERIFIED_REQUIRED_PREFIXES.some((p) => pathname.startsWith(p))
+    && !ALWAYS_ALLOWED.some((p) => pathname.startsWith(p))
+  ) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/verify-pending'
+    url.search = ''
+    return NextResponse.redirect(url)
+  }
 
   return response
 }
