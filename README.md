@@ -30,14 +30,49 @@ See `.env.local.example` for the full list, grouped by client-safe (`NEXT_PUBLIC
 
 ## Supabase migrations
 
+**Project:** `hfdcsickergdcdvejbcw` (us-east-1), linked via `supabase/config.toml`.
+
+Migrations live at `supabase/migrations/*.sql` and are the source of truth for the schema. Run them locally against a Dockerised Postgres via `supabase start`, then push to remote with `supabase db push`.
+
+### Local workflow
+
 ```bash
-pnpm supabase start          # starts local Postgres on 54321-54327 (requires Docker Desktop)
-pnpm supabase db reset       # applies all migrations on the local DB
-pnpm supabase migration new <slug>
-pnpm supabase db push        # applies new migrations to the remote us-east-1 project
+pnpm supabase start          # boots local Postgres + Auth + Storage (requires Docker Desktop)
+pnpm supabase db reset       # wipes local DB + re-applies every migration in order
+pnpm supabase migration new <slug>   # scaffolds supabase/migrations/<ts>_<slug>.sql
+# ... edit the generated .sql file ...
+pnpm supabase db reset       # re-apply locally + verify
+pnpm supabase db push        # apply to remote (us-east-1). Prompts for DB password.
 ```
 
-CI does NOT auto-apply migrations on merge (D-20) — `db push` is a manual developer step.
+### Regenerate Database types after every migration
+
+```bash
+pnpm supabase gen types typescript --local > lib/database.types.ts
+# Then `pnpm typecheck` — any breakage signals RLS / column drift.
+```
+
+### Rules (ABSOLUTE — documented in migrations/README and in supabase/seed.sql)
+
+1. Every `public.*` table MUST include `alter table <name> enable row level security` **in the same migration** that creates the table.
+2. Every RLS-enabled table MUST have explicit policies for `SELECT`, `INSERT`, `UPDATE`, `DELETE` (missing command = fully locked; see `.planning/research/PITFALLS.md` Pitfall 6).
+3. Every policy MUST specify `to authenticated` or `to anon` — never an empty `TO` clause.
+4. `auth.uid()` in policies MUST be wrapped as `(select auth.uid())` for initPlan caching (performance at scale).
+5. Never `alter table ... disable row level security` in a migration. If you need to debug, use `set local role authenticated` in `psql`.
+
+### CI behaviour
+
+GitHub Actions runs `supabase db reset` against an ephemeral local Postgres for integration tests (per D-20). CI does **not** apply migrations to production — `db push` is a manual developer step. Revisit this policy when a second engineer joins.
+
+## Starter-project housekeeping (one-time)
+
+The `vlrioprefvwkahryuuap` (us-east-2) project was auto-created when the Supabase account was set up. It's not used. Delete it once the scaffold has confirmed connectivity to `hfdcsickergdcdvejbcw`:
+
+1. Visit https://supabase.com/dashboard/project/vlrioprefvwkahryuuap/settings/general
+2. Scroll to the "Danger Zone" → Delete project.
+3. Confirm by typing the project name.
+
+After deletion, `pnpm supabase projects list` shows only `hfdcsickergdcdvejbcw`.
 
 ## Phase 6 DNS cutover procedure (reference)
 

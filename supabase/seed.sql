@@ -1,0 +1,7 @@
+-- seed.sql
+-- Phase 1 placeholder. Phase 3 (profile-georgia-gate) will populate:
+--   - counties: the 159 Georgia counties
+--   - categories: the 10-category Georgia taxonomy (skills_offered / skills_wanted)
+--
+-- Regenerate local DB with seed applied:
+--   pnpm supabase db reset
