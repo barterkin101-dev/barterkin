@@ -57,7 +57,12 @@ Plans:
   3. A user who has not clicked their email-verify link is blocked from the directory by a middleware redirect to `/verify-pending` — and even if the UI is bypassed, RLS prevents their profile from appearing in any directory query
   4. A user can log out from any page and the session is cleared on both client and server
   5. A bot attempting to create 6 accounts from the same IP in a day is blocked, and signups from disposable-email domains (e.g. `@mailinator.com`) are rejected with a clear error
-**Plans**: TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 02-01-procurement-probes-PLAN.md — Wave 0: Google OAuth + Turnstile procurement, package installs, shadcn primitives, A4 probe, 12 test stubs
+- [ ] 02-02-migrations-backend-PLAN.md — Wave 1: 002_auth_tables.sql (signup_attempts + helpers + disposable trigger), disposable-email + rate-limit utilities, sendMagicLink server action, 4 route handlers, middleware route-gating
+- [ ] 02-03-ui-pages-PLAN.md — Wave 2: @theme inline clay brand override, auth components (Turnstile/Google/LoginForm/Logout), /login + /signup + /verify-pending, three legal pages with locked GEO-04 clause, Footer wired into root layout
+- [ ] 02-04-tests-verify-PLAN.md — Wave 3: supabase db push, type regen, fill 3 unit + 9 E2E test bodies, run full suite, push CI (6 jobs), Vercel preview smoke
 
 ### Phase 3: Profile & Georgia Gate
 **Goal**: Email-verified users can build a complete member profile (display name, bio, avatar, up to 5 skills offered, up to 5 skills wanted, exactly one of 159 Georgia counties, primary category from the 10-category taxonomy, availability free-text, contact preference, optional TikTok handle) and publish it — with RLS enforcing that only published + email-verified + not-banned profiles are directory-visible.
