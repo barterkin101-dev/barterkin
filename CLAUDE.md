@@ -263,3 +263,42 @@ Do not make direct repo edits outside a GSD workflow unless the user explicitly 
 > Profile not yet configured. Run `/gsd-profile-user` to generate your developer profile.
 > This section is managed by `generate-claude-profile` -- do not edit manually.
 <!-- GSD:profile-end -->
+
+# gstack
+
+Use the `/browse` skill from gstack for all web browsing. Never use `mcp__claude-in-chrome__*` tools.
+
+Available gstack skills:
+- `/office-hours` — structured async Q&A with experts
+- `/plan-ceo-review` — CEO-level plan review
+- `/plan-eng-review` — engineering plan review
+- `/plan-design-review` — design plan review
+- `/design-consultation` — design consultation session
+- `/design-shotgun` — rapid multi-concept design generation
+- `/design-html` — generate HTML/CSS designs
+- `/review` — code review
+- `/ship` — ship a feature end-to-end
+- `/land-and-deploy` — land and deploy changes
+- `/canary` — canary deploy
+- `/benchmark` — benchmark performance
+- `/browse` — web browsing (use this, not mcp__claude-in-chrome__)
+- `/connect-chrome` — connect to Chrome browser
+- `/qa` — QA testing
+- `/qa-only` — QA only (no code changes)
+- `/design-review` — review designs
+- `/setup-browser-cookies` — set up browser cookies
+- `/setup-deploy` — set up deployment
+- `/retro` — retrospective
+- `/investigate` — investigate an issue
+- `/document-release` — document a release
+- `/codex` — Codex integration
+- `/cso` — chief security officer review
+- `/autoplan` — auto-generate a plan
+- `/plan-devex-review` — developer experience plan review
+- `/devex-review` — developer experience review
+- `/careful` — careful/cautious mode for risky changes
+- `/freeze` — freeze a file or feature
+- `/guard` — guard against regressions
+- `/unfreeze` — unfreeze a file or feature
+- `/gstack-upgrade` — upgrade gstack
+- `/learn` — learn from the codebase
