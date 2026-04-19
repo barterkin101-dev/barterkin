@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get('type') as EmailOtpType | null
   const _next = searchParams.get('next')
   // T-2-01 open-redirect guard
-  const next = _next?.startsWith('/') ? _next : '/directory'
+  const next = (_next?.startsWith('/') && !_next?.startsWith('//')) ? _next : '/directory'
 
   if (token_hash && type) {
     const supabase = await createClient()

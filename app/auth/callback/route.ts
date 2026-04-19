@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code')
   const nextParam = searchParams.get('next') ?? '/directory'
   // T-2-01 open-redirect guard: only allow relative paths starting with '/'
-  const next = nextParam.startsWith('/') ? nextParam : '/directory'
+  const next = (nextParam.startsWith('/') && !nextParam.startsWith('//')) ? nextParam : '/directory'
 
   if (code) {
     const supabase = await createClient()
