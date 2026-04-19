@@ -4,13 +4,13 @@
   "private": true,
   "engines": {
     "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
+    "pnpm": ">=10.0.0"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -58,6 +58,7 @@
     "supabase": "^2.92.1",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vercel": "^51.7.0",
     "vitest": "^4.1.4"
   },
   "pnpm": {
