@@ -59,8 +59,8 @@ Plans:
   5. A bot attempting to create 6 accounts from the same IP in a day is blocked, and signups from disposable-email domains (e.g. `@mailinator.com`) are rejected with a clear error
 **Plans:** 4 plans
 Plans:
-- [ ] 02-01-procurement-probes-PLAN.md — Wave 0: Google OAuth + Turnstile procurement, package installs, shadcn primitives, A4 probe, 12 test stubs
-- [ ] 02-02-migrations-backend-PLAN.md — Wave 1: 002_auth_tables.sql (signup_attempts + helpers + disposable trigger), disposable-email + rate-limit utilities, sendMagicLink server action, 4 route handlers, middleware route-gating
+- [x] 02-01-procurement-probes-PLAN.md — Wave 0: Google OAuth + Turnstile procurement, package installs, shadcn primitives, A4 probe, 12 test stubs
+- [x] 02-02-migrations-backend-PLAN.md — Wave 1: 002_auth_tables.sql (signup_attempts + helpers + disposable trigger), disposable-email + rate-limit utilities, sendMagicLink server action, 4 route handlers, middleware route-gating
 - [ ] 02-03-ui-pages-PLAN.md — Wave 2: @theme inline clay brand override, auth components (Turnstile/Google/LoginForm/Logout), /login + /signup + /verify-pending, three legal pages with locked GEO-04 clause, Footer wired into root layout
 - [ ] 02-04-tests-verify-PLAN.md — Wave 3: supabase db push, type regen, fill 3 unit + 9 E2E test bodies, run full suite, push CI (6 jobs), Vercel preview smoke
 
