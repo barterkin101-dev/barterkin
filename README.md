@@ -84,6 +84,36 @@ During Phases 1–5 the domain `barterkin.com` points at Netlify (legacy). When 
 
 No canary, ~10 min cutover.
 
+## Verifying Phase 1 wiring
+
+After `pnpm dev` is running with a populated `.env.local`:
+
+**PostHog** (FOUND-10 / ROADMAP success criterion #5):
+1. Visit http://localhost:3000
+2. Click "Fire test event"
+3. In https://us.posthog.com (project 387571) → Activity, confirm `test_event` appears within 60s.
+
+**Resend** (FOUND-04, FOUND-07):
+```bash
+curl -X POST http://localhost:3000/api/test-email \
+  -H "Content-Type: application/json" \
+  -d '{"to":"your-inbox@example.com"}'
+# Expect: {"ok":true,"id":"..."}
+# Check the inbox — email arrives from hello@barterkin.com.
+```
+
+The `/api/test-email` route returns 404 in production (safe to ship as-is; Phase 5 replaces it with a Supabase Edge Function).
+
+**Supabase Studio SMTP** (FOUND-07 — one-time manual step):
+In https://supabase.com/dashboard/project/hfdcsickergdcdvejbcw → Authentication → SMTP Settings, plug in the Resend credentials:
+- Host: `smtp.resend.com`
+- Port: `465` (SSL)
+- User: `resend`
+- Pass: your RESEND_API_KEY
+- Sender: `Barterkin <hello@barterkin.com>`
+
+Then click "Send test email" in Studio — confirm delivery. Full validation lands in Phase 2 with the first magic-link signup.
+
 ## Contributing
 
 Solo builder for now. Conventional-commits scoped to the phase domain (e.g. `feat(foundation): scaffold Next.js 16.2`). No branch protection rules — self-review PRs to `main`.
