@@ -22,7 +22,6 @@ export async function checkSignupRateLimit(ip: string): Promise<RateLimitResult>
   const cleanIp = (ip && typeof ip === 'string' ? ip.trim() : '') || 'unknown'
 
   const supabase = await createClient()
-  // @ts-expect-error - types regenerated in Wave 3 after migration push (Task 4.2)
   const { data, error } = await supabase.rpc('check_signup_ip', { p_ip: cleanIp })
 
   if (error) {
