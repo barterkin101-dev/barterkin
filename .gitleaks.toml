@@ -1,0 +1,19 @@
+title = "barterkin gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Paths to exclude from scanning"
+paths = [
+  '''\.planning/''',
+  '''legacy/''',
+  '''\.env\.local\.example$''',
+  '''pnpm-lock\.yaml$''',
+  '''\.github/workflows/.+\.yml$''',
+]
+
+regexes = [
+  '''secrets\.GITHUB_TOKEN''',
+  '''hfdcsickergdcdvejbcw''',
+]

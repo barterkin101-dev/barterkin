@@ -11,7 +11,11 @@
 - Node 20 LTS (repo verified on Node 22 too).
 - `pnpm@9` (install via `corepack enable pnpm` or `npm i -g pnpm@9`).
 - Supabase CLI (installed as a dev-dep; `pnpm supabase --help`).
-- `pre-commit` framework for the gitleaks secret-scan hook: `pip install pre-commit && pre-commit install` (or `brew install pre-commit` on macOS).
+- **Pre-commit framework + gitleaks (non-negotiable for this public repo):**
+  - macOS: `brew install pre-commit` (or `pip install pre-commit` if no Homebrew).
+  - `cd barterkin && pre-commit install` — wires the gitleaks hook to `.git/hooks/pre-commit`.
+  - Every commit now runs gitleaks against staged files; commits with secrets are blocked locally.
+  - CI re-runs gitleaks on every PR as a second-line defence (see `.github/workflows/ci.yml`).
 
 ## Local setup
 

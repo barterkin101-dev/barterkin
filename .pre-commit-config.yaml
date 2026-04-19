@@ -1,0 +1,7 @@
+# Public-repo secret-scanning. Run `pip install pre-commit && pre-commit install` once after clone.
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+        args: ['--config=.gitleaks.toml', '--verbose']
