@@ -22,7 +22,12 @@ export async function GET(request: NextRequest) {
     if (!error) {
       redirect(next)
     }
-    redirect(`/auth/error?reason=${encodeURIComponent(error?.message ?? 'verify_failed')}`)
+    console.error('[auth/confirm] verifyOtp failed', {
+      code: error?.code,
+      status: error?.status,
+      // deliberately NOT logging error.message — may contain PII
+    })
+    redirect(`/auth/error?reason=verify_failed`)
   }
 
   redirect(`/auth/error?reason=missing_token`)
