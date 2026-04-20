@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect, useState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -29,8 +29,6 @@ export function LoginForm({ captchaToken }: { captchaToken: string | null }) {
     sendMagicLink,
     null,
   )
-  const [submittedEmail, setSubmittedEmail] = useState<string>('')
-
   const form = useForm<LoginValues>({
     resolver: zodResolver(LoginSchema),
     defaultValues: { email: '' },
@@ -44,11 +42,12 @@ export function LoginForm({ captchaToken }: { captchaToken: string | null }) {
 
   // Success confirmation state — inline replacement of the form.
   if (state?.ok) {
+    const displayEmail = form.getValues('email') || 'your inbox'
     return (
       <div className="space-y-4" role="status">
         <h2 className="font-serif text-2xl font-bold leading-[1.2]">Check your email</h2>
         <p className="text-base leading-[1.5]">
-          We sent a magic link to {submittedEmail || 'your inbox'}. Click the link to sign in — it expires in 1 hour.
+          We sent a magic link to {displayEmail}. Click the link to sign in — it expires in 1 hour.
         </p>
         <p className="text-sm text-muted-foreground">
           Don&apos;t see it? Check your spam folder or refresh the page to send another link.
@@ -61,7 +60,6 @@ export function LoginForm({ captchaToken }: { captchaToken: string | null }) {
     <Form {...form}>
       <form
         action={(formData: FormData) => {
-          setSubmittedEmail(String(formData.get('email') ?? ''))
           formAction(formData)
         }}
         className="space-y-4"
