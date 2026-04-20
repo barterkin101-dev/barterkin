@@ -1,8 +1,6 @@
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { LoginForm } from '@/components/auth/LoginForm'
-import { GoogleAuthBlock } from '@/components/auth/GoogleAuthBlock'
+import { LoginAuthCard } from '../login/LoginAuthCard'
 
 export const metadata = { title: 'Create an account' }
 
@@ -18,23 +16,13 @@ export default function SignupPage() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <GoogleAuthBlock />
-
-        <div className="flex items-center gap-3">
-          <Separator className="flex-1" />
-          <span className="text-sm text-muted-foreground">or</span>
-          <Separator className="flex-1" />
-        </div>
-
-        <LoginForm />
-
+        <LoginAuthCard mode="signup" />
         <p className="text-sm text-muted-foreground text-center">
           By continuing, you agree to our{' '}
           <Link href="/legal/tos" className="underline">Terms of Service</Link>,{' '}
           <Link href="/legal/privacy" className="underline">Privacy Policy</Link>, and{' '}
           <Link href="/legal/guidelines" className="underline">Community Guidelines</Link>.
         </p>
-
         <p className="text-sm text-center">
           Already have an account?{' '}
           <Link href="/login" className="underline">Sign in</Link>
