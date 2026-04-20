@@ -17,7 +17,6 @@ import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import { sendMagicLink, type SendMagicLinkResult } from '@/lib/actions/auth'
-import { TurnstileWidget } from './TurnstileWidget'
 
 const LoginSchema = z.object({
   email: z.string().trim().toLowerCase().email('Please enter a valid email.'),
@@ -25,12 +24,11 @@ const LoginSchema = z.object({
 
 type LoginValues = z.infer<typeof LoginSchema>
 
-export function LoginForm() {
+export function LoginForm({ captchaToken }: { captchaToken: string | null }) {
   const [state, formAction, pending] = useActionState<SendMagicLinkResult | null, FormData>(
     sendMagicLink,
     null,
   )
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [submittedEmail, setSubmittedEmail] = useState<string>('')
 
   const form = useForm<LoginValues>({
@@ -95,11 +93,6 @@ export function LoginForm() {
           )}
         />
 
-        <TurnstileWidget
-          onVerify={(token) => setCaptchaToken(token)}
-          onExpire={() => setCaptchaToken(null)}
-          onError={() => setCaptchaToken(null)}
-        />
         <input type="hidden" name="cf-turnstile-response" value={captchaToken ?? ''} />
 
         <Button
