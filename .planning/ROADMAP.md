@@ -76,8 +76,8 @@ Plans:
   5. Avatar upload rejects files over 2MB or non-image MIME types client-side, and Storage RLS rejects path traversal attempts (a user cannot overwrite another user's avatar)
 **Plans:** 5 plans
 Plans:
-- [ ] 03-01-PLAN.md — Wave 1 TDD: ProfileFormSchema + 159-county JSON + 10-category constant + slug/avatar pure functions with Vitest unit tests
-- [ ] 03-02-PLAN.md — Wave 1: 003_profile_tables migration (profiles, skills_offered, skills_wanted, counties, categories, RLS, FTS column) + 003_profile_storage migration (avatars bucket RLS) + [BLOCKING] supabase db push + type regen
+- [x] 03-01-PLAN.md — Wave 1 TDD: ProfileFormSchema + 159-county JSON + 10-category constant + slug/avatar pure functions with Vitest unit tests
+- [x] 03-02-PLAN.md — Wave 1: 003_profile_tables migration (profiles, skills_offered, skills_wanted, counties, categories, RLS, FTS column) + 003_profile_storage migration (avatars bucket RLS) + [BLOCKING] supabase db push + type regen
 - [ ] 03-03-PLAN.md — Wave 2: saveProfile + setPublished server actions with slug collision retry + completeness gate + unit tests
 - [ ] 03-04-PLAN.md — Wave 3: /profile/edit editor UI (10 shadcn blocks, (app) route group, AvatarUploader, SkillRowList, CountyCombobox, CategoryPicker, ProfileEditForm) + 2 Playwright specs
 - [ ] 03-05-PLAN.md — Wave 4: /profile own view + /m/[username] member view + PublishToggle + ProfileCard + visibility E2E
