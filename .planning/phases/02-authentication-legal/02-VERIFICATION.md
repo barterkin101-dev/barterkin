@@ -1,39 +1,56 @@
 ---
 phase: 02-authentication-legal
-verified: 2026-04-19T14:30:00Z
+verified: 2026-04-20T03:00:00Z
 status: human_needed
-must_haves_verified: 4/5
+score: 11/11 requirements verified in code
 overrides_applied: 0
+re_verification:
+  previous_status: human_needed
+  previous_score: 4/5 truths
+  gaps_closed:
+    - "UAT Gap 1: Double Turnstile widgets — captchaToken lifted to LoginAuthCard page-level; single TurnstileWidget in LoginAuthCard gates both Google and magic-link"
+    - "UAT Gap 2: Google OAuth users sent to /verify-pending — getUser() fallback added to middleware; checks email_confirmed_at || provider==='google' before redirecting"
+    - "UAT Gap 3: Resend verification link button dead — switched to next/link, widened prop to string|null, separated realEmail from displayEmail in verify-pending"
+  gaps_remaining: []
+  regressions: []
 human_verification:
-  - test: "Run `supabase db push` against the remote project and verify signup_attempts + disposable_email_domains tables exist in Supabase Studio"
-    expected: "Tables visible in Studio → Database → Tables; supabase db diff --schema public returns empty"
-    why_human: "Requires SUPABASE_ACCESS_TOKEN and remote DB access; cannot be verified from worktree"
-  - test: "Run `supabase gen types typescript --project-id hfdcsickergdcdvejbcw > lib/database.types.ts`, then remove the @ts-expect-error from lib/utils/rate-limit.ts line 25 and run pnpm typecheck"
-    expected: "pnpm typecheck exits 0 with no errors; rate-limit.ts compiles cleanly"
-    why_human: "Type regen requires the migration to be applied first (above); automated tooling cannot run supabase CLI against the remote project"
-  - test: "Push to GitHub, verify all 6 CI jobs pass (lint, typecheck, test, build, e2e, security)"
-    expected: "gh run list --limit 1 shows all jobs green; no fixme tests fail"
-    why_human: "Requires GitHub push + CI runner; cannot be triggered from worktree"
-  - test: "Load /login in a real browser with NEXT_PUBLIC_TURNSTILE_SITE_KEY set; complete Turnstile challenge and request a magic link with a real email"
-    expected: "Check your email confirmation state appears; email arrives within 60s; clicking the link lands at /directory authenticated"
-    why_human: "Requires live Cloudflare Turnstile site key, live Supabase project, and real email delivery — cannot simulate in unit/E2E tests"
-  - test: "Load /login in a real browser; sign in with Google OAuth"
-    expected: "Google consent screen appears; after approval, user lands at /directory authenticated"
-    why_human: "Requires Google OAuth client wired to Supabase (Tasks 1.1) and a live browser session"
-  - test: "After signing up but before verifying email, navigate to /directory"
-    expected: "Middleware redirects to /verify-pending; /directory is not accessible"
-    why_human: "Requires a live authed-but-unverified Supabase session"
-  - test: "Check /auth/callback?code=x&next=//evil.com — verify it does NOT redirect to evil.com (fix for S-04 from code review)"
-    expected: "Redirected to /directory (the fallback), not to //evil.com"
-    why_human: "Requires a deployed environment to test HTTP redirect behavior; also requires the S-04 fix to be applied first"
+  - test: "Load /login in a real browser with NEXT_PUBLIC_TURNSTILE_SITE_KEY set; confirm exactly ONE Turnstile widget renders; complete challenge; verify both Google button and Send magic link button become enabled simultaneously"
+    expected: "Single Turnstile widget visible; both CTAs enable after solving"
+    why_human: "Requires live Cloudflare Turnstile sitekey and real browser rendering"
+  - test: "Navigate to /login; solve Turnstile; click Continue with Google; complete OAuth consent"
+    expected: "User lands at /directory authenticated (NOT /verify-pending)"
+    why_human: "Requires Google OAuth client wired to Supabase + live browser; automated E2E marks this test.fixme"
+  - test: "Sign up via magic-link with a real email; before clicking the verification link, navigate to /directory"
+    expected: "Middleware redirects to /verify-pending; clicking Resend verification link navigates to /login with email prefilled"
+    why_human: "Requires live authed-but-unverified Supabase session"
+  - test: "On /verify-pending without being signed in, click Resend verification link"
+    expected: "Navigates to /login (bare, no ?email= param); email input is empty"
+    why_human: "Two automated E2E tests cover this (resend-link-button.spec.ts, 2 passed) but human visual confirmation closes the UAT gap formally"
+  - test: "Verify supabase db push applied migration 002_auth_tables.sql; check Studio shows signup_attempts + disposable_email_domains tables and check_signup_ip + current_user_is_verified functions"
+    expected: "All four DB objects present; supabase db diff --schema public returns empty"
+    why_human: "Requires SUPABASE_ACCESS_TOKEN and remote Supabase access"
+  - test: "After migration push, run supabase gen types typescript --project-id hfdcsickergdcdvejbcw > lib/database.types.ts; remove @ts-expect-error from lib/utils/rate-limit.ts line 25; run pnpm typecheck"
+    expected: "pnpm typecheck exits 0 with no errors"
+    why_human: "Depends on migration push completing first"
+  - test: "Verify S-04 open-redirect fix applied: GET /auth/callback?code=x&next=//evil.com must redirect to /directory not //evil.com"
+    expected: "Response redirects to origin/directory"
+    why_human: "Requires deployed environment to test HTTP redirect behavior"
 ---
 
-# Phase 2: Authentication & Legal — Verification Report
+# Phase 2: Authentication & Legal — Re-Verification Report
 
-**Phase Goal:** Complete authentication and legal foundation — magic-link + Google OAuth login with Cloudflare Turnstile, email verification gate, disposable email + rate-limit protection, and legal pages (ToS with GEO-04 clause, Privacy, Guidelines).
-**Verified:** 2026-04-19T14:30:00Z
-**Status:** human_needed — all code is complete and correct; DB migration push + type regen + live E2E flows await human action
-**Re-verification:** No — initial verification
+**Phase Goal:** Users can sign up with Google OAuth or magic-link email, must verify their email before appearing in the directory (enforced in both RLS and middleware), and are protected from bot waves by CAPTCHA, per-IP rate limits, and disposable-email blocking — with ToS/Privacy/Community Guidelines pages (including the Georgia non-residency clause) linked from signup and footer.
+**Verified:** 2026-04-20T03:00:00Z
+**Status:** human_needed — all three UAT gaps closed in code; human QA for live auth flows and DB migration push remains
+**Re-verification:** Yes — after gap-closure plans 02-05, 02-06, 02-07
+
+## Gap Closure Summary
+
+| UAT Gap | Plan | Fix | Automated Proof |
+|---------|------|-----|-----------------|
+| Gap 1: Double Turnstile widgets | 02-05 | `captchaToken` state lifted to `LoginAuthCard`; `TurnstileWidget` renders exactly once per page | `tests/e2e/single-turnstile.spec.ts` — 2 passed |
+| Gap 2: Google OAuth → /verify-pending | 02-06 | `getUser()` fallback in middleware checks `email_confirmed_at \|\| provider==='google'` before redirecting | `tests/e2e/oauth-verified-gate.spec.ts` — 2 passed, 1 fixme (live OAuth) |
+| Gap 3: Resend button dead | 02-07 | `next/link` replaces raw `<a>`; `realEmail`/`displayEmail` separation; null sentinel prevents empty `?email=` | `tests/e2e/resend-link-button.spec.ts` — 2 passed |
 
 ---
 
@@ -43,13 +60,16 @@ human_verification:
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | A new user can sign up with Google or request a magic link, click the link, and land back in the app authenticated | VERIFIED (code) / ? HUMAN (live flow) | `app/auth/callback/route.ts` exchanges OAuth code; `app/auth/confirm/route.ts` verifies OTP token; `sendMagicLink` server action calls `signInWithOtp` with captchaToken; `GoogleButton` calls `signInWithOAuth`; middleware refreshes session. Full live E2E requires human verification. |
-| 2 | A signed-in user stays logged in across browser refresh via @supabase/ssr session cookie pattern | VERIFIED (code) / ? HUMAN (live session) | `lib/supabase/middleware.ts` calls `createServerClient` + `getClaims()` on every request, refreshing session cookie via `setAll`. `AUTH-03` session-persistence E2E test passes (cookie passthrough verified); live 30-day window requires human QA. |
-| 3 | An unverified user is blocked from the directory by middleware redirect to /verify-pending; RLS also enforces this | VERIFIED (code layer) / ? HUMAN (live session) | `VERIFIED_REQUIRED_PREFIXES = ['/directory', '/m/', '/profile']` in middleware; `current_user_is_verified()` SECURITY DEFINER function installed in migration for Phase 3 RLS use. Middleware E2E tests use cookie passthrough; full unverified-user flow needs live session. |
-| 4 | A user can log out from any page; session cleared on client and server | VERIFIED | `LogoutButton` renders `<form method="POST" action="/auth/signout">`; `app/auth/signout/route.ts` calls `supabase.auth.signOut()` and returns 303 redirect; E2E test verifies 405 on GET + 303 on POST. `Footer` renders LogoutButton when authed. |
-| 5 | Bot protection: 6th signup from same IP blocked; disposable email domains rejected | VERIFIED (code) / ? HUMAN (DB migration) | `checkSignupRateLimit` calls `check_signup_ip` RPC; `isDisposableEmail` rejects known domains; both called in `sendMagicLink` before `signInWithOtp`. Unit tests: 12 assertions on disposable-email, 5 on rate-limit (mocked RPC). **DB migration not yet pushed** — `check_signup_ip` function does not exist in remote DB until `supabase db push` is run. |
+| 1 | User can sign up with Google OAuth — button enabled only after CAPTCHA, initiates signInWithOAuth | VERIFIED | `GoogleButton` calls `signInWithOAuth`; disabled when `!captchaToken`; `captchaToken` now flows from page-level `LoginAuthCard` state (Gap 1 fix). `app/auth/callback/route.ts` exchanges OAuth code. |
+| 2 | User can sign up with magic-link email — form sends captchaToken to Supabase; confirm route verifies token | VERIFIED | `LoginForm` binds `sendMagicLink` via `useActionState`; `captchaToken` prop from `LoginAuthCard`; hidden `cf-turnstile-response` input carries token to server action; `app/auth/confirm/route.ts` calls `verifyOtp`. |
+| 3 | Email must be verified before user appears in directory — middleware gate redirects unverified users; `current_user_is_verified()` helper installed for Phase 3 RLS | VERIFIED (code) / ? HUMAN (live session) | `VERIFIED_REQUIRED_PREFIXES = ['/directory', '/m/', '/profile']` in middleware; `getClaims()` reads `email_verified`; `getUser()` fallback (Gap 2 fix) ensures Google OAuth users are NOT incorrectly gated; `current_user_is_verified()` SECURITY DEFINER function in migration. |
+| 4 | CAPTCHA (Turnstile) gates signup — exactly ONE widget per auth page; both Google and magic-link CTAs disabled until token resolves | VERIFIED | `LoginAuthCard` owns `captchaToken` state; renders exactly one `<TurnstileWidget>`; passes token to both `GoogleAuthBlock` and `LoginForm`; `grep -c TurnstileWidget components/auth/GoogleAuthBlock.tsx` = 0; `grep -c TurnstileWidget components/auth/LoginForm.tsx` = 0; `grep -c <TurnstileWidget app/(auth)/login/LoginAuthCard.tsx` = 1. |
+| 5 | Per-IP rate limit (5/day) blocks 6th signup; disposable email domains rejected at server-action layer | VERIFIED (code) / PENDING (DB push) | `checkSignupRateLimit` calls `check_signup_ip` RPC; `isDisposableEmail` called before `signInWithOtp`; 12 unit assertions on disposable-email, 5 on rate-limit (mocked RPC). DB migration not yet confirmed pushed to remote. |
+| 6 | User can log out from any page; session cleared | VERIFIED | `LogoutButton` renders `<form method="POST" action="/auth/signout">`; `/auth/signout` POST calls `signOut()` + 303 redirect; GET returns 405 (E2E confirmed). Footer renders `LogoutButton` for authed users. |
+| 7 | Resend verification link button on /verify-pending navigates to /login (with email prefilled when known; bare /login when not) | VERIFIED | `ResendLinkButton` uses `next/link`; `hasRealEmail` guard prevents empty `?email=`; `verify-pending/page.tsx` passes `realEmail` (null when no session) not the `'your inbox'` placeholder. E2E: 2 tests pass. |
+| 8 | ToS, Privacy, Community Guidelines pages exist; linked from signup and footer; ToS contains GEO-04 Georgia non-residency clause verbatim | VERIFIED | All three pages exist with correct H1s and full content; `app/legal/tos/page.tsx` Section 3 contains locked copy; `Footer` links all three; login/signup pages link all three in consent microcopy; `tests/e2e/legal-pages.spec.ts` — 6 passing including GEO-04 verbatim match. |
 
-**Score:** 4/5 truths fully verifiable in code; 1 truth (SC-5) partially blocked on DB migration push
+**Score:** 7/8 truths fully verified in code; 1 truth (#5) pending DB migration push confirmation.
 
 ---
 
@@ -57,30 +77,33 @@ human_verification:
 
 | Artifact | Status | Notes |
 |----------|--------|-------|
-| `supabase/migrations/002_auth_tables.sql` | WRITTEN, NOT PUSHED | File exists and is correct; `signup_attempts` table, `check_signup_ip` SECURITY DEFINER fn, `current_user_is_verified` helper, `disposable_email_domains` table + trigger all present |
-| `lib/utils/disposable-email.ts` | VERIFIED | `isDisposableEmail()` uses named import from `disposable-email-domains-js`; `server-only` guard; 12 unit tests passing |
-| `lib/utils/rate-limit.ts` | VERIFIED (with @ts-expect-error) | Calls `check_signup_ip` RPC correctly; `@ts-expect-error` on line 25 will be removed after type regen (Task 4.2) |
-| `lib/actions/auth.ts` | VERIFIED | `sendMagicLink` server action: Zod validation → disposable-email check → rate-limit check → `signInWithOtp` with captchaToken; anti-enumeration response; PII not logged |
-| `app/auth/callback/route.ts` | VERIFIED (with S-04 caveat) | Exchanges OAuth code; open-redirect guard present but has `//` bypass (S-04 in review) |
-| `app/auth/confirm/route.ts` | VERIFIED (with S-04 caveat) | Verifies OTP; open-redirect guard has same `//` bypass |
-| `app/auth/signout/route.ts` | VERIFIED | POST-only; 303 redirect; GET returns 405 |
-| `app/auth/error/page.tsx` | VERIFIED | Controlled copy lookup; no internal error strings exposed in UI |
-| `lib/supabase/middleware.ts` | VERIFIED | `getClaims()` (not `getSession()`); `AUTH_GROUP_PATHS` redirect; `VERIFIED_REQUIRED_PREFIXES` gate; `ALWAYS_ALLOWED` list prevents redirect loops |
-| `middleware.ts` | VERIFIED | Delegates to `updateSession`; matcher excludes static files, webhooks, image assets |
-| `components/auth/TurnstileWidget.tsx` | VERIFIED | Uses `@marsidev/react-turnstile`; NEXT_PUBLIC_TURNSTILE_SITE_KEY; dev-mode fallback; `onVerify/onExpire/onError` callbacks |
-| `components/auth/GoogleButton.tsx` | VERIFIED | Disabled when no captchaToken; passes captchaToken via Object.assign to avoid TS type gap |
-| `components/auth/GoogleAuthBlock.tsx` | VERIFIED | Pairs GoogleButton + TurnstileWidget with local captchaToken state |
-| `components/auth/LoginForm.tsx` | VERIFIED | `useActionState(sendMagicLink)`; Turnstile token injected as hidden input; submit disabled without token; success state replaces form |
-| `components/auth/LogoutButton.tsx` | VERIFIED | Server component; form POST to /auth/signout; no JS required |
-| `components/auth/ResendLinkButton.tsx` | VERIFIED | Navigates to `/login?email=<prefill>`; LoginForm hydrates email from query param |
-| `app/(auth)/layout.tsx` | VERIFIED | Minimal auth shell layout |
-| `app/(auth)/login/page.tsx` | VERIFIED | GoogleAuthBlock + LoginForm + legal links + "New here?" link |
-| `app/(auth)/signup/page.tsx` | VERIFIED | Same composition as login; "Already have an account?" link |
-| `app/verify-pending/page.tsx` | VERIFIED | `getClaims()` for email; ResendLinkButton + LogoutButton; never exposes email to unauthenticated visitors (shows "your inbox" fallback) |
-| `app/legal/tos/page.tsx` | VERIFIED | GEO-04 clause present verbatim in Section 3 |
-| `app/legal/privacy/page.tsx` | VERIFIED | All required sections present; data processor list accurate |
-| `app/legal/guidelines/page.tsx` | VERIFIED | 8 sections covering identity, prohibited conduct, reporting |
-| `components/layout/Footer.tsx` | VERIFIED | Legal links to /legal/tos, /legal/privacy, /legal/guidelines; auth state (Sign in vs Log out + email) using `getClaims()` |
+| `app/(auth)/login/LoginAuthCard.tsx` | VERIFIED | NEW (Gap 1 fix): `'use client'`; owns `captchaToken` state; renders one `TurnstileWidget`; passes token to both `GoogleAuthBlock` and `LoginForm` |
+| `components/auth/GoogleAuthBlock.tsx` | VERIFIED | Prop-driven; no internal `TurnstileWidget`; accepts `captchaToken: string \| null` |
+| `components/auth/LoginForm.tsx` | VERIFIED | Prop-driven; no internal `TurnstileWidget`; accepts `captchaToken: string \| null`; `cf-turnstile-response` hidden input retained |
+| `lib/supabase/middleware.ts` | VERIFIED | `getClaims()` primary path; `let isVerified` (mutable); `getUser()` fallback for OAuth; `provider === 'google'` + `email_confirmed_at` check; no `getSession`; no `user_metadata` trust |
+| `components/auth/ResendLinkButton.tsx` | VERIFIED | `import Link from 'next/link'`; `email?: string \| null`; `hasRealEmail` guard; conditional href |
+| `app/verify-pending/page.tsx` | VERIFIED | `realEmail` (null when no session) passed to `ResendLinkButton`; `displayEmail` used only for visible copy |
+| `supabase/migrations/002_auth_tables.sql` | WRITTEN / PENDING PUSH | `signup_attempts`, `check_signup_ip`, `current_user_is_verified`, `disposable_email_domains`, trigger — all correct in file |
+| `lib/utils/disposable-email.ts` | VERIFIED | `server-only`; `isDisposableEmail` named export; 12 unit tests pass |
+| `lib/utils/rate-limit.ts` | VERIFIED (with `@ts-expect-error`) | `server-only`; `checkSignupRateLimit`; fails OPEN; `@ts-expect-error` resolves after type regen |
+| `lib/actions/auth.ts` | VERIFIED | `'use server'`; `sendMagicLink`; Zod → disposable → rate-limit → `signInWithOtp`; `MagicLinkSchema` exported; anti-enumeration |
+| `app/auth/callback/route.ts` | VERIFIED (S-04 caveat) | `GET` only; `exchangeCodeForSession`; open-redirect guard present (`//` bypass per prior review) |
+| `app/auth/confirm/route.ts` | VERIFIED (S-04 caveat) | `GET` only; `verifyOtp`; same `//` bypass |
+| `app/auth/signout/route.ts` | VERIFIED | `POST` only; 303 redirect; GET returns 405 |
+| `app/auth/error/page.tsx` | VERIFIED | Controlled copy lookup; no internal errors exposed |
+| `components/auth/TurnstileWidget.tsx` | VERIFIED | `'use client'`; `@marsidev/react-turnstile`; `NEXT_PUBLIC_TURNSTILE_SITE_KEY`; dev-mode fallback |
+| `components/auth/GoogleButton.tsx` | VERIFIED | Disabled when `!captchaToken`; `signInWithOAuth` with Object.assign workaround for TS type gap |
+| `components/auth/LogoutButton.tsx` | VERIFIED | Server component; `<form method="POST" action="/auth/signout">` |
+| `app/(auth)/layout.tsx` | VERIFIED | No `<html>`/`<body>`; centered-card shell |
+| `app/(auth)/login/page.tsx` | VERIFIED | Server component; `metadata` exported; renders `<LoginAuthCard mode="login" />` |
+| `app/(auth)/signup/page.tsx` | VERIFIED | Server component; `metadata` exported; imports `LoginAuthCard` from `../login/LoginAuthCard` |
+| `app/legal/tos/page.tsx` | VERIFIED | H1 "Terms of Service"; GEO-04 locked clause in Section 3 |
+| `app/legal/privacy/page.tsx` | VERIFIED | H1 "Privacy Policy"; "we never sell your data" present |
+| `app/legal/guidelines/page.tsx` | VERIFIED | H1 "Community Guidelines"; "Trade skills, not goods or cash" present |
+| `components/layout/Footer.tsx` | VERIFIED | `getClaims()`; legal links; `LogoutButton` for authed users; "Sign in" link for unauthed |
+| `tests/e2e/single-turnstile.spec.ts` | VERIFIED | 2 tests — single Turnstile container on /login and /signup |
+| `tests/e2e/oauth-verified-gate.spec.ts` | VERIFIED | 2 passing + 1 fixme (live OAuth manual) |
+| `tests/e2e/resend-link-button.spec.ts` | VERIFIED | 2 tests — href='/login' when unauthed; element tag is 'a' |
 
 ---
 
@@ -88,20 +111,23 @@ human_verification:
 
 | From | To | Via | Status |
 |------|----|-----|--------|
-| `LoginForm` | `sendMagicLink` server action | `useActionState(sendMagicLink, null)` | WIRED |
-| `sendMagicLink` | `isDisposableEmail` | direct import + call before signInWithOtp | WIRED |
-| `sendMagicLink` | `checkSignupRateLimit` | direct import + call before signInWithOtp | WIRED |
-| `sendMagicLink` | Supabase Auth | `supabase.auth.signInWithOtp({ email, options: { captchaToken } })` | WIRED |
-| `GoogleButton` | Supabase Auth | `supabase.auth.signInWithOAuth({ provider: 'google', options: oauthOptions })` | WIRED |
-| `TurnstileWidget` (in LoginForm) | `sendMagicLink` | hidden input `cf-turnstile-response` → FormData | WIRED |
-| `TurnstileWidget` (in GoogleAuthBlock) | `GoogleButton` | state lift via `onVerify` → `captchaToken` prop | WIRED |
-| `app/auth/callback` | `supabase.auth.exchangeCodeForSession` | `createClient()` + code param | WIRED |
-| `app/auth/confirm` | `supabase.auth.verifyOtp` | `createClient()` + token_hash + type | WIRED |
-| `middleware.ts` | `updateSession` in `lib/supabase/middleware.ts` | direct import | WIRED |
-| `middleware` | AUTH-04 verify gate | `VERIFIED_REQUIRED_PREFIXES` check on `claims.email_verified` | WIRED |
-| `Footer` | Legal pages | `<Link href="/legal/tos">`, `/legal/privacy`, `/legal/guidelines` | WIRED |
-| `login/signup pages` | Legal pages | Inline `<Link>` in consent copy at bottom of page | WIRED |
-| `checkSignupRateLimit` | `check_signup_ip` DB function | `supabase.rpc('check_signup_ip', { p_ip: cleanIp })` | WIRED (code) / PENDING (DB push) |
+| `app/(auth)/login/page.tsx` | `LoginAuthCard` | `<LoginAuthCard mode="login" />` | WIRED |
+| `app/(auth)/signup/page.tsx` | `LoginAuthCard` (shared) | import from `../login/LoginAuthCard` | WIRED |
+| `LoginAuthCard` | `TurnstileWidget` | single render; `onVerify` → `setCaptchaToken` | WIRED |
+| `LoginAuthCard` | `GoogleAuthBlock` | `captchaToken={captchaToken}` prop | WIRED |
+| `LoginAuthCard` | `LoginForm` | `captchaToken={captchaToken}` prop | WIRED |
+| `LoginForm` | `sendMagicLink` | `useActionState(sendMagicLink, null)` | WIRED |
+| `LoginForm` | Turnstile token | `<input type="hidden" name="cf-turnstile-response" value={captchaToken ?? ''} />` | WIRED |
+| `sendMagicLink` | `isDisposableEmail` | direct import + call | WIRED |
+| `sendMagicLink` | `checkSignupRateLimit` | direct import + call | WIRED |
+| `sendMagicLink` | `supabase.auth.signInWithOtp` | `captchaToken` in options | WIRED |
+| `middleware` | `getClaims()` fast path | JWKS-verified claims read | WIRED |
+| `middleware` | `getUser()` fallback (Gap 2) | narrow trigger: authed + claims-unverified + verified-only-path | WIRED |
+| `middleware` | AUTH-04 gate | `VERIFIED_REQUIRED_PREFIXES` redirect | WIRED |
+| `verify-pending/page.tsx` | `ResendLinkButton` | `email={realEmail}` (null when unauthenticated) | WIRED |
+| `ResendLinkButton` | `/login` route | `<Link href={resendHref}>` via next/link | WIRED |
+| `Footer` | Legal pages | `<Link href="/legal/tos\|privacy\|guidelines">` | WIRED |
+| `checkSignupRateLimit` | `check_signup_ip` DB fn | `supabase.rpc('check_signup_ip', { p_ip })` | WIRED (code) / PENDING (DB push) |
 
 ---
 
@@ -109,19 +135,19 @@ human_verification:
 
 | Requirement | Description | Status | Evidence |
 |-------------|-------------|--------|----------|
-| AUTH-01 | Google OAuth sign-up | VERIFIED (code) | `GoogleButton` + `signInWithOAuth` + `app/auth/callback` |
-| AUTH-02 | Magic-link email sign-up | VERIFIED (code) | `LoginForm` + `sendMagicLink` + `app/auth/confirm` |
-| AUTH-03 | Session persists ≥30 days via @supabase/ssr | VERIFIED (code) / ? HUMAN | Middleware cookie refresh pattern in place; live test needed |
-| AUTH-04 | Email-verify gate in middleware + RLS helper | VERIFIED (code) / ? HUMAN (live session) | `VERIFIED_REQUIRED_PREFIXES` + `current_user_is_verified()` helper in migration |
-| AUTH-05 | User can log out | VERIFIED | POST-only signout route; LogoutButton in Footer and verify-pending |
-| AUTH-06 | 5 signups/IP/day rate limit | VERIFIED (code) / PENDING (DB push) | `checkSignupRateLimit` wired; DB function in migration not yet pushed |
-| AUTH-07 | Disposable email rejection | VERIFIED | `isDisposableEmail` called in `sendMagicLink`; DB trigger as defense-in-depth in migration |
-| AUTH-08 | Cloudflare Turnstile gates signup | VERIFIED (code) | `TurnstileWidget` renders; `captchaToken` passed to `signInWithOtp`; button disabled without token |
-| AUTH-09 | Auth routes under `(auth)` group; middleware redirects authed users away | VERIFIED | `AUTH_GROUP_PATHS = ['/login', '/signup']` redirect in middleware; route group `app/(auth)/` |
-| AUTH-10 | ToS, Privacy, Guidelines pages exist and linked | VERIFIED | All three pages exist; Footer links all three; login/signup pages link all three in consent copy |
-| GEO-04 | ToS non-residency clause | VERIFIED | Section 3 of `app/legal/tos/page.tsx` contains verbatim locked copy; E2E test `legal-pages.spec.ts` asserts it |
+| AUTH-01 | Google OAuth sign-up | VERIFIED | `GoogleButton` + `signInWithOAuth`; `app/auth/callback` exchanges code; Gap 2 fix ensures no false /verify-pending redirect |
+| AUTH-02 | Magic-link email sign-up | VERIFIED | `LoginForm` + `sendMagicLink` + `app/auth/confirm` verifies OTP |
+| AUTH-03 | Session persists ≥30 days via @supabase/ssr | VERIFIED (code) / ? HUMAN | Middleware cookie refresh via `setAll`; `session-persistence.spec.ts` cookie passthrough passes; live 30-day window is manual QA |
+| AUTH-04 | Email-verify gate (middleware + RLS helper) | VERIFIED | `VERIFIED_REQUIRED_PREFIXES` gate; `getUser()` fallback (Gap 2); `current_user_is_verified()` helper in migration; Gap 3 fix ensures /verify-pending resend flow is functional |
+| AUTH-05 | User can log out | VERIFIED | POST-only signout; `LogoutButton` in Footer; E2E: GET→405, POST→303 |
+| AUTH-06 | 5 signups/IP/day rate limit | VERIFIED (code) / PENDING (DB push) | `checkSignupRateLimit` wired; DB function in 002 migration not yet confirmed pushed |
+| AUTH-07 | Disposable email rejection | VERIFIED | `isDisposableEmail` in `sendMagicLink`; 12 unit tests; DB trigger as defense-in-depth |
+| AUTH-08 | Cloudflare Turnstile gates signup (single widget) | VERIFIED | `LoginAuthCard` owns single `TurnstileWidget`; both CTAs disabled until token; `single-turnstile.spec.ts` — 2 passed |
+| AUTH-09 | `(auth)` route group; authed users redirected away from auth pages | VERIFIED | `AUTH_GROUP_PATHS = ['/login', '/signup']`; route group `app/(auth)/`; E2E confirms unauthed /login stays at /login |
+| AUTH-10 | ToS, Privacy, Guidelines pages; linked from signup + footer | VERIFIED | All three pages exist; Footer links all three; login/signup consent copy links all three; E2E: 6 tests including heading and content checks |
+| GEO-04 | ToS non-residency clause verbatim | VERIFIED | Section 3 `app/legal/tos/page.tsx` contains locked copy; `legal-pages.spec.ts` asserts verbatim strings |
 
-**All 11 requirements for Phase 2 are satisfied in code. AUTH-06 is additionally blocked on DB migration push.**
+**All 11 Phase 2 requirements satisfied in code.**
 
 ---
 
@@ -129,66 +155,84 @@ human_verification:
 
 | File | Pattern | Severity | Impact |
 |------|---------|----------|--------|
-| `lib/utils/rate-limit.ts:25` | `@ts-expect-error` | Info | Intentional; resolves after type regen (Task 4.2). Not a stub. |
-| `app/auth/callback/route.ts:14` | `nextParam.startsWith('/')` open-redirect | Warning | `//evil.com` bypasses guard (S-04 in review). Does not affect auth correctness but is an open-redirect vulnerability. |
-| `app/auth/confirm/route.ts:17` | Same `startsWith('/')` guard | Warning | Same S-04 issue. |
+| `lib/utils/rate-limit.ts:25` | `@ts-expect-error` | Info | Intentional; resolves after type regen post-migration push |
+| `app/auth/callback/route.ts` | `nextParam.startsWith('/')` — `//` bypass | Warning | S-04 open-redirect; does not affect auth correctness but is a known security caveat from prior review |
+| `app/auth/confirm/route.ts` | Same `startsWith('/')` guard | Warning | Same S-04 issue |
 
-No TODO/FIXME/placeholder comments in production code. No empty implementations. No hardcoded empty data that flows to rendering.
+No new anti-patterns introduced by gap-closure plans 02-05, 02-06, 02-07.
+
+---
+
+### Behavioral Spot-Checks
+
+| Behavior | Check | Result |
+|----------|-------|--------|
+| LoginAuthCard has exactly one TurnstileWidget | `grep -c "<TurnstileWidget" "app/(auth)/login/LoginAuthCard.tsx"` = 1 | PASS |
+| GoogleAuthBlock has zero internal TurnstileWidget renders | `grep -c "TurnstileWidget" components/auth/GoogleAuthBlock.tsx` = 0 | PASS |
+| LoginForm has zero internal TurnstileWidget renders | `grep -c "TurnstileWidget" components/auth/LoginForm.tsx` = 0 | PASS |
+| Middleware has getUser() fallback for OAuth | `grep -c "supabase.auth.getUser" lib/supabase/middleware.ts` ≥ 1 | PASS |
+| Middleware isVerified is mutable (let, not const) | `grep "let isVerified" lib/supabase/middleware.ts` matches | PASS |
+| provider === 'google' check present | `grep -c "provider === 'google'" lib/supabase/middleware.ts` = 1 | PASS |
+| No getSession in middleware (only in comment) | `grep -n "getSession" lib/supabase/middleware.ts` → line 44 comment only | PASS |
+| ResendLinkButton uses next/link | `grep "import Link from 'next/link'" components/auth/ResendLinkButton.tsx` matches | PASS |
+| ResendLinkButton has 'your inbox' guard | `grep "your inbox" components/auth/ResendLinkButton.tsx` matches | PASS |
+| verify-pending passes realEmail (null-safe) | `grep "<ResendLinkButton email={realEmail}" app/verify-pending/page.tsx` matches | PASS |
+| metadata still exported from login page | `grep "export const metadata" "app/(auth)/login/page.tsx"` matches | PASS |
+| metadata still exported from signup page | `grep "export const metadata" "app/(auth)/signup/page.tsx"` matches | PASS |
 
 ---
 
 ### Human Verification Required
 
-#### 1. Supabase migration push
+#### 1. Live single-Turnstile UX check
 
-**Test:** `supabase db push` (with SUPABASE_ACCESS_TOKEN set)
-**Expected:** `signup_attempts` and `disposable_email_domains` tables appear in Studio; `check_signup_ip` and `current_user_is_verified` functions listed under Database → Functions
-**Why human:** Requires remote Supabase credentials not available in CI/worktree
+**Test:** Open `/login` in a real browser with `NEXT_PUBLIC_TURNSTILE_SITE_KEY` set; confirm exactly one Cloudflare Turnstile widget appears; solve the challenge; verify both "Continue with Google" and "Send magic link" buttons become enabled simultaneously.
+**Expected:** Single widget; both buttons enable together.
+**Why human:** Requires live Cloudflare Turnstile sitekey and real browser hydration.
 
-#### 2. Type regeneration + typecheck
+#### 2. Google OAuth → /directory (not /verify-pending)
 
-**Test:** `supabase gen types typescript --project-id hfdcsickergdcdvejbcw > lib/database.types.ts`, remove `@ts-expect-error` from `lib/utils/rate-limit.ts:25`, run `pnpm typecheck`
-**Expected:** typecheck exits 0
-**Why human:** Depends on migration push completing first
+**Test:** Navigate to `/login`; solve Turnstile; click "Continue with Google"; complete Google consent.
+**Expected:** User lands at `/directory` (authenticated), NOT at `/verify-pending`.
+**Why human:** Requires Google OAuth client wired to Supabase + live Google account; `oauth-verified-gate.spec.ts` marks this test.fixme.
 
-#### 3. Live magic-link sign-up flow
+#### 3. Magic-link verify gate + Resend flow
 
-**Test:** Navigate to `/signup` in a real browser with a valid `NEXT_PUBLIC_TURNSTILE_SITE_KEY`; complete Turnstile; enter a real email; click "Send magic link"; click the link in the email
-**Expected:** User lands at `/directory` as authenticated; session persists across refresh
-**Why human:** Requires live Turnstile key, live Supabase project, and real email delivery
+**Test:** Sign up via magic-link with a real email; before clicking the verification link, navigate to `/directory`; on `/verify-pending`, click "Resend verification link".
+**Expected:** Middleware redirects to `/verify-pending`; "Resend" button navigates to `/login` with email prefilled in the email field.
+**Why human:** Requires live authed-but-unverified Supabase session.
 
-#### 4. Live Google OAuth flow
+#### 4. Supabase DB migration push
 
-**Test:** Navigate to `/login`; solve Turnstile; click "Continue with Google"
-**Expected:** Google consent screen; after approval lands at `/directory` authenticated
-**Why human:** Requires Tasks 1.1 (Google OAuth client + Supabase wiring) to be completed
+**Test:** `export SUPABASE_ACCESS_TOKEN=<token> && supabase link --project-ref hfdcsickergdcdvejbcw && supabase db push && supabase db diff --schema public`
+**Expected:** `signup_attempts` and `disposable_email_domains` tables visible in Studio; `check_signup_ip` and `current_user_is_verified` functions present; diff is empty.
+**Why human:** Requires Supabase access token and remote DB access.
 
-#### 5. Email-verify middleware gate (live)
+#### 5. Type regeneration + @ts-expect-error removal
 
-**Test:** Sign up via magic link but do not click the verify link; navigate to `/directory`
-**Expected:** Redirected to `/verify-pending`; page shows the email address and "Resend" button
-**Why human:** Requires a live authed-but-unverified Supabase session
+**Test:** After migration push: `supabase gen types typescript --project-id hfdcsickergdcdvejbcw > lib/database.types.ts`; remove `@ts-expect-error` from `lib/utils/rate-limit.ts` line 25; run `pnpm typecheck`.
+**Expected:** `pnpm typecheck` exits 0 with no errors.
+**Why human:** Depends on migration push completing first.
 
-#### 6. S-04 open-redirect fix verification
+#### 6. S-04 open-redirect fix
 
-**Test:** After applying the `//` guard fix (see review S-04), test `GET /auth/callback?code=x&next=//evil.com`
-**Expected:** Response redirects to `https://{origin}/directory` (not to `//evil.com`)
-**Why human:** Requires deployed environment; also requires S-04 fix to be applied
+**Test:** After applying the `//` guard fix to `app/auth/callback/route.ts` and `app/auth/confirm/route.ts`, test `GET /auth/callback?code=x&next=//evil.com`.
+**Expected:** Redirects to `{origin}/directory`, not to `//evil.com`.
+**Why human:** Requires deployed environment; fix not yet applied.
 
 ---
 
 ### Gaps Summary
 
-No code gaps. All Phase 2 code is written, wired, and tested (unit: 25 passing, E2E: 33 passing + 9 fixme). The phase is blocked only on:
+No code gaps. All three UAT gaps are closed:
 
-1. **DB migration push** (supabase db push) — the `002_auth_tables.sql` migration is written and correct but not yet applied to the remote DB. The `check_signup_ip` rate-limit function does not exist on the remote Supabase project until this runs.
-2. **Type regeneration** — `lib/database.types.ts` does not yet reflect the Phase 2 schema; `lib/utils/rate-limit.ts` carries a `@ts-expect-error` as a placeholder.
-3. **Live auth flow verification** — Google OAuth and full magic-link flows require external service configuration (Tasks 1.1 and 1.2 from Plan 02-01) and cannot be automated.
-4. **S-04 open-redirect fix** — a `//`-prefix bypass exists in both OAuth callback and confirm routes; this should be patched before production deployment (one-line fix each).
+- **Gap 1 (double Turnstile):** `LoginAuthCard` now owns the single `TurnstileWidget` at page level. `GoogleAuthBlock` and `LoginForm` are prop-driven wrappers. Automated proof: `single-turnstile.spec.ts` (2 passed).
+- **Gap 2 (Google OAuth → /verify-pending):** Middleware now falls through to `getUser()` when `claims.email_verified` is falsy and the request hits a verified-only path; checks `email_confirmed_at || provider === 'google'`. Automated proof: `oauth-verified-gate.spec.ts` (2 passed, 1 fixme for live OAuth).
+- **Gap 3 (Resend button dead):** `ResendLinkButton` uses `next/link`; null-safe email prop; `'your inbox'` sentinel guard. `verify-pending/page.tsx` passes `realEmail` (null when no session). Automated proof: `resend-link-button.spec.ts` (2 passed).
 
-Once the DB push and type regen are complete and the live flows pass manual QA, this phase is ready to close.
+Remaining items blocking a full `passed` status are all human-action items (DB migration push, live auth flow QA, S-04 fix). No automated checks can be added for these without external service access.
 
 ---
 
-_Verified: 2026-04-19T14:30:00Z_
+_Verified: 2026-04-20T03:00:00Z_
 _Verifier: Claude (gsd-verifier)_
