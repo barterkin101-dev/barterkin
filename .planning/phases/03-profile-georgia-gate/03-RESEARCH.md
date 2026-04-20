@@ -16,7 +16,7 @@ The profile completeness check (PROF-12) must be enforced in two places: the UI 
 
 Phase 4 FTS depends on a `tsvector` generated column seeded in this phase's migration. That column must be defined now even though Phase 4 uses it. The migration for Phase 3 is `003_profile_tables.sql`.
 
-**Primary recommendation:** Use the three-table schema (`profiles`, `skills_offered`, `skills_wanted`) with a `counties` reference table. Client-side `browser-image-compression` before Supabase Storage upload. shadcn Combobox (Command + Popover) with a bundled static JSON of 159 Georgia FIPS counties. Completeness gate enforced in both server action and RLS. Auto-slug on first save, locked after that.
+**Primary recommendation:** Use the three-table schema (`profiles`, `skills_offered`, `skills_wanted`) with a `counties` reference table **where `counties.id` IS the FIPS code** (no separate serial — id = FIPS; explicit primary key values seeded 13001..13321 — resolves planner revision iter-1 Blocker 1). Client-side `browser-image-compression` before Supabase Storage upload. shadcn Combobox (Command + Popover) with a bundled static JSON of 159 Georgia FIPS counties. Completeness gate enforced in both server action and RLS. Auto-slug on first save, locked after that.
 
 ---
 
@@ -61,7 +61,7 @@ Phase 4 FTS depends on a `tsvector` generated column seeded in this phase's migr
 | PROF-02 | Avatar upload ≤2MB, jpg/png/webp only, client-side resize before upload | `browser-image-compression@2.0.2` + Supabase Storage `avatars` bucket. Client validates MIME and size before compress+upload. Storage RLS prevents path traversal. |
 | PROF-03 | Up to 5 "skills offered" (free-text, 1–60 chars each) | Dynamic row component. Stored in separate `skills_offered` table. Min 1 row required for publish gate. |
 | PROF-04 | Up to 5 "skills wanted" (free-text, 1–60 chars each) | Same pattern as PROF-03. Stored in `skills_wanted` table. 0 allowed (optional). |
-| PROF-05 | Exactly one of 159 Georgia counties via typeahead | Static JSON bundled client-side. shadcn Combobox (Command + Popover). County FK references `counties` reference table seeded in migration. Required for publish gate. |
+| PROF-05 | Exactly one of 159 Georgia counties via typeahead | Static JSON bundled client-side. shadcn Combobox (Command + Popover). County FK references `counties` reference table seeded in migration; **`counties.id` = FIPS code** (explicit PK values 13001..13321 — no serial; JSON `fips` field and `profiles.county_id` use identical integers end-to-end). |
 | PROF-06 | Primary category from 10 seeded categories | shadcn Select or Combobox. Categories seeded in a `categories` table (or enum). Required for publish gate. |
 | PROF-07 | Free-text availability (max 200 chars) | Zod field: `availability: z.string().max(200).optional()`. Rendered as Textarea. Not required for publish gate. |
 | PROF-08 | `accepting_contact` preference (bool, default true) | shadcn Switch or Checkbox. Stored as `boolean` column on `profiles`. Default `true`. |
@@ -72,7 +72,7 @@ Phase 4 FTS depends on a `tsvector` generated column seeded in this phase's migr
 | PROF-13 | Published + email-verified + not-banned profiles visible in directory; all others hidden by RLS | `is_published = true AND current_user_is_verified() AND NOT banned` in RLS SELECT policy. |
 | PROF-14 | Member can view another member's profile at `/m/[username]` | Dynamic route `app/(app)/m/[username]/page.tsx`. Auth-gated per D-09. Queries profiles via `username` column. |
 | GEO-01 | County selection required before publish (enforced in completeness check) | County is one of the 5 required fields in the completeness gate. Same `counties` table FK. |
-| GEO-02 | All 159 Georgia counties available in typeahead, seeded from FIPS codes in `counties` reference table | `counties` table seeded in `003_profile_tables.sql`. Static JSON bundled from the same FIPS data for the client. |
+| GEO-02 | All 159 Georgia counties available in typeahead, seeded from FIPS codes in `counties` reference table | `counties` table seeded in `003_profile_tables.sql` with `id = FIPS`. Static JSON bundled from the same FIPS data for the client; `counties.id` and JSON `fips` are identical integers — Combobox can pass `county.fips` as the `county_id` FK value with zero translation. |
 </phase_requirements>
 
 ---
@@ -326,11 +326,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import georgiaCounties from '@/lib/data/georgia-counties.json'
 
 // georgia-counties.json shape: [{ fips: 13001, name: "Appling County" }, ...]
-// 159 entries, FIPS-ordered, bundled statically — no DB round-trip (Claude's Discretion)
+// 159 entries, FIPS-ordered, bundled statically — no DB round-trip (Claude's Discretion).
+// Critical: counties.id (Postgres PK) = county.fips (JSON field) — identical integers.
+// The value passed to onChange IS the profiles.county_id FK value — no translation.
 
 export function CountyCombobox({
   value, onChange,
-}: { value: number | null; onChange: (fips: number) => void }) {
+}: { value: number | null; onChange: (countyId: number) => void }) {
   const [open, setOpen] = React.useState(false)
   const selected = georgiaCounties.find(c => c.fips === value)
 
@@ -527,6 +529,7 @@ using (bucket_id = 'avatars');
 - **Deleting the old avatar before uploading the new one:** `upsert: true` handles overwrite atomically. A delete-then-upload creates a window where the avatar is missing.
 - **Running the county typeahead against Postgres on every keystroke:** The 159-county list is static and tiny (~8KB JSON). Bundle it client-side and filter in memory with `CommandInput` filtering.
 - **Blocking publish if `skills_wanted` is empty:** PROF-04 says 0–5 wanted skills (optional). Only `skills_offered` (≥1) is required for publish (PROF-12).
+- **Using `serial`/auto-assigned primary key on `counties`:** Would create a second integer space (1..159) parallel to FIPS (13001..13321). Client JSON carries FIPS, so the Combobox would pass a FIPS value into `profiles.county_id` and hit FK violations or associate the wrong county. Resolution: `id` IS the FIPS code (explicit PK, seeded with FIPS values), no separate `fips` column on the counties table.
 
 ---
 
@@ -548,16 +551,20 @@ using (bucket_id = 'avatars');
 The following tables must be created in this phase. All tables enable RLS immediately on creation (default-deny pattern from Phase 2).
 
 ### `counties` reference table (GEO-02)
+
+**Schema decision (revision iter-1 Blocker 1 fix):** `counties.id` IS the FIPS code. No separate `fips` column. Explicit primary key values seeded 13001..13321. This guarantees JSON `fips` field and `profiles.county_id` are the same integer across client + DB boundary.
+
 ```sql
 create table public.counties (
-  id     serial primary key,
-  fips   int unique not null,   -- FIPS code e.g. 13001 for Appling
-  name   text not null          -- e.g. "Appling County"
+  id    int primary key,      -- FIPS code, e.g. 13001 for Appling. Explicitly assigned, not serial.
+  name  text not null          -- e.g. "Appling County"
 );
 alter table public.counties enable row level security;
 -- Public read (reference data, no PII)
 create policy "Counties are publicly readable" on public.counties for select to authenticated using (true);
--- Seed all 159 Georgia counties in the migration
+-- Seed all 159 Georgia counties in the migration. INSERT provides both id (= FIPS) and name explicitly.
+-- Seed block generated by scripts/seed-georgia-counties.mjs from lib/data/georgia-counties.json.
+-- Example row: INSERT INTO public.counties (id, name) VALUES (13001, 'Appling County');
 ```
 
 ### `categories` table (PROF-06)
@@ -583,7 +590,7 @@ create table public.profiles (
   display_name      text,                     -- required for publish (PROF-01)
   bio               text,                     -- optional, max 500
   avatar_url        text,                     -- required for publish (PROF-02)
-  county_id         int references public.counties(id),   -- required for publish (PROF-05, GEO-01)
+  county_id         int references public.counties(id),   -- FIPS code (= counties.id); required for publish (PROF-05, GEO-01)
   category_id       int references public.categories(id), -- required for publish (PROF-06)
   availability      text,                     -- optional, max 200 (PROF-07)
   accepting_contact boolean not null default true,        -- PROF-08
@@ -691,6 +698,12 @@ alter table public.skills_wanted enable row level security;
 **How to avoid:** Append a cache-busting query param to the avatar URL when storing it: `avatar_url = publicUrl + '?t=' + Date.now()`. Or set `Cache-Control: no-cache` on the storage object. The `cacheControl: '3600'` in the upload options sets the CDN TTL — set it lower or add a query param.
 **Warning signs:** Avatar shows the old image after successful upload with no error.
 
+### Pitfall 8: County FK Space Mismatch (resolved in iter-1)
+**What goes wrong:** `counties` table uses `serial` for `id` (auto-assigned 1..159) with `fips` as a separate column. The client JSON ships `{ fips, name }` only — no serial id. The Combobox passes `county.fips` (e.g. 13001) into `profiles.county_id`, but the FK references `counties.id` (e.g. 1..159). Every profile save produces either a FK violation or a wrong association.
+**Why it happens:** Natural instinct to use `serial` for synthetic PKs, paired with `fips` as a "business key" column — two integer spaces pretending to be one.
+**How to avoid:** Use the FIPS code AS the primary key. `id int primary key`, seeded explicitly per row (`INSERT INTO public.counties (id, name) VALUES (13001, 'Appling County'), ...`). Drop the separate `fips` column — `counties.id` carries the same semantics. The client JSON `fips` field is now directly usable as `counties.id`.
+**Warning signs:** Postgres 23503 FK violation on profile save with a valid-looking county_id; or profiles pointing at wrong-county rows if the serial id happens to land within FIPS bounds.
+
 ---
 
 ## Code Examples
@@ -791,6 +804,7 @@ toast('Profile saved.')   // D-04: plain copy, no emoji
 | Custom county `<select>` with all options | shadcn Combobox (Command + Popover) with search | shadcn 2023+ | 159-item list is searchable; accessible keyboard navigation |
 | Slug from UUID | Slug from display name + suffix collision | Community standard | Human-readable URLs; much better for sharing |
 | Signed URLs for avatar display | Public bucket + public URL | Always valid for non-sensitive content | Signed URLs expire and break profile cards; public URL is permanent |
+| `counties` table with synthetic serial PK + separate FIPS column | `counties.id` = FIPS code (explicit PK) | Revision iter-1 Blocker 1 fix | One integer space end-to-end (JSON ↔ DB ↔ FK); Combobox passes `county.fips` directly as `county_id` with no translation |
 
 **Deprecated/outdated:**
 - `@supabase/auth-helpers-nextjs`: deprecated (Phase 2 established); never use.
@@ -811,22 +825,24 @@ toast('Profile saved.')   // D-04: plain copy, no emoji
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+All three questions below were resolved during planning and baked into Plans 01–05. Each carries its final answer inline.
 
 1. **How does Phase 4 FTS handle skills text that lives in child tables?**
-   - What we know: `search_vector` generated column on `profiles` includes `display_name + bio`; Phase 4 requires skills in FTS.
-   - What's unclear: Generated columns in Postgres cannot reference other tables. Either (a) add a trigger that updates `search_vector` on skills insert/update, or (b) Phase 4 uses a `UNION` / join in the query.
-   - Recommendation: Phase 3 defines the column for name+bio only. Add a Phase 3 note for Phase 4 planner: "Skills FTS requires a trigger-based tsvector update pattern."
+   - What we know: `search_vector` generated column on `profiles` includes `display_name + bio + tiktok_handle`; Phase 4 requires skills in FTS.
+   - What's unclear (historical): Generated columns in Postgres cannot reference other tables. Either (a) add a trigger that updates `search_vector` on skills insert/update, or (b) Phase 4 uses a `UNION` / join in the query.
+   - **RESOLVED (2026-04-20):** Phase 3 defines the column for `display_name + bio + tiktok_handle` only (see Database Schema section — `profiles.search_vector`). Skills text is **deliberately not** in the Phase 3 generated column. Phase 4 planner inherits a forward-compatible GIN index over that column and owns the decision between (a) a trigger-based tsvector update that includes skills, or (b) a function-based query that joins skills at search time. This is documented as a carry-over note for the Phase 4 planner; Phase 3 Plan 02's migration matches the schema shown here.
 
 2. **Does the `authenticated` role require `email_confirmed_at` to be non-null?**
    - What we know: Supabase Auth sets a user as `authenticated` role regardless of email verification. The `current_user_is_verified()` function checks `email_confirmed_at IS NOT NULL`.
-   - What's unclear: Can a user with an unverified email call `supabase.from('profiles').insert()` and bypass the email-verify gate?
-   - Recommendation: RLS SELECT policy gates visibility on `current_user_is_verified()` for *viewer*. Profile INSERT/UPDATE should also check `current_user_is_verified()` — otherwise unverified users can create profiles that are invisible. Add this check to the INSERT/UPDATE policies.
+   - What's unclear (historical): Can a user with an unverified email call `supabase.from('profiles').insert()` and bypass the email-verify gate?
+   - **RESOLVED (2026-04-20):** No — the `authenticated` role alone is not sufficient; the INSERT policy must also call `current_user_is_verified()`. Plan 02 implements this explicitly: the `profiles` INSERT policy uses `with check (owner_id = auth.uid() AND public.current_user_is_verified())` (see Plan 02 Task 1 §"6. profiles RLS" block). Unverified users get blocked at INSERT, not just at SELECT. RLS SELECT policy for others also requires `current_user_is_verified()`, so even if an unverified user somehow inserted, the row would be invisible to all other users and themselves wouldn't see anyone else's profile.
 
 3. **What happens to `profiles.username` if `display_name` is null on first save?**
    - What we know: Slug is generated from `display_name` on first profile save. But what if someone submits the form with an empty display name on the first save?
-   - What's unclear: Zod validation requires `displayName: z.string().min(1)` — so it should never be null. But the schema `display_name text` is nullable for the DB column.
-   - Recommendation: Add a DB `CHECK` constraint `check (is_published = false or display_name is not null)` for defense in depth. Don't rely solely on the application layer.
+   - What's unclear (historical): Zod validation requires `displayName: z.string().min(1)` — so it should never be null. But the schema `display_name text` is nullable for the DB column.
+   - **RESOLVED (2026-04-20):** Defense-in-depth at three layers. (1) Zod schema `ProfileFormSchema.displayName = z.string().trim().min(1).max(60)` rejects empty at the server action parse step (Plan 01 + Plan 03). (2) Plan 03 `saveProfile` guards the slug generation: `if (!finalSlug && values.displayName) { ... }` — so when display_name is somehow empty, no slug is written. (3) DB CHECK constraint `profiles_publish_requires_identity check (is_published = false OR (display_name is not null AND username is not null))` in Plan 02's migration (see the `create table public.profiles` block) enforces that a published profile has both display_name and username, so a null-display-name row can exist as draft but can never be published.
 
 ---
 
@@ -970,11 +986,12 @@ toast('Profile saved.')   // D-04: plain copy, no emoji
 
 **Confidence breakdown:**
 - Standard stack: HIGH — all libraries already installed and version-verified
-- Schema design: HIGH — follows Supabase RLS patterns verified from docs
+- Schema design: HIGH — follows Supabase RLS patterns verified from docs; counties PK = FIPS locked in iter-1 revision
 - Storage RLS pattern: HIGH — verified against Supabase docs (foldername function)
 - Architecture: HIGH — extends proven Phase 2 patterns (server actions, route groups, three-client factory)
-- Pitfalls: MEDIUM/HIGH — most from pattern knowledge + one verified (storage RLS)
-- tsvector + FTS column design: MEDIUM — Phase 4 dependency not fully designed; note left in Open Questions
+- Pitfalls: MEDIUM/HIGH — most from pattern knowledge + one verified (storage RLS) + Pitfall 8 (county FK space) added in iter-1
+- tsvector + FTS column design: MEDIUM — Phase 4 dependency resolved as deferred-to-Phase-4-planner in Open Questions
 
 **Research date:** 2026-04-20
+**Last revised:** 2026-04-20 (iter-1: counties PK = FIPS; Open Questions resolved)
 **Valid until:** 2026-05-20 (stable stack; Supabase Storage patterns rarely change)
