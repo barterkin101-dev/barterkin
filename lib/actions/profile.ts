@@ -10,25 +10,21 @@ import type {
 } from '@/lib/actions/profile.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/database.types'
+// Pure helpers live in a non-server file so Next.js 'use server' constraint
+// (all exports must be async) does not apply to them.
+import {
+  parseSkillArray as _parseSkillArray,
+  coerceFormDataToProfileInput as _coerceFormDataToProfileInput,
+} from '@/lib/actions/profile-helpers'
 
-// ---------- Pure helpers (exported for unit testing) ----------
-
-export function parseSkillArray(raw: FormDataEntryValue | null | undefined): string[] {
-  if (raw == null || typeof raw !== 'string') return []
-  try {
-    const parsed = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return []
-    return parsed
-      .filter((s): s is string => typeof s === 'string')
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0)
-      .slice(0, 5) // PROF-03/PROF-04 cap
-  } catch {
-    return []
-  }
+// ---------- Re-export pure helpers (exported for unit testing) ----------
+// Wrapped as async so this 'use server' file can legally export them.
+// Tests import from this file; wrapping preserves the import path.
+export async function parseSkillArray(raw: FormDataEntryValue | null | undefined): Promise<string[]> {
+  return _parseSkillArray(raw)
 }
 
-export function coerceFormDataToProfileInput(formData: FormData): {
+export async function coerceFormDataToProfileInput(formData: FormData): Promise<{
   displayName: string
   bio: string
   avatarUrl: string
@@ -39,25 +35,8 @@ export function coerceFormDataToProfileInput(formData: FormData): {
   availability: string
   acceptingContact: boolean
   tiktokHandle: string
-} {
-  const intOrNull = (v: FormDataEntryValue | null) => {
-    const s = typeof v === 'string' ? v.trim() : ''
-    if (s === '') return null
-    const n = Number.parseInt(s, 10)
-    return Number.isFinite(n) && n > 0 ? n : null
-  }
-  return {
-    displayName: String(formData.get('displayName') ?? '').trim(),
-    bio: String(formData.get('bio') ?? ''),
-    avatarUrl: String(formData.get('avatarUrl') ?? ''),
-    skillsOffered: parseSkillArray(formData.get('skillsOffered')),
-    skillsWanted: parseSkillArray(formData.get('skillsWanted')),
-    countyId: intOrNull(formData.get('countyId')),
-    categoryId: intOrNull(formData.get('categoryId')),
-    availability: String(formData.get('availability') ?? ''),
-    acceptingContact: formData.get('acceptingContact') === 'true',
-    tiktokHandle: String(formData.get('tiktokHandle') ?? ''),
-  }
+}> {
+  return _coerceFormDataToProfileInput(formData)
 }
 
 // ---------- Slug resolver (RESEARCH Pitfall 5) ----------
@@ -104,7 +83,7 @@ export async function saveProfile(
   } = await supabase.auth.getUser()
   if (authError || !user) return { ok: false, error: 'Not authenticated.' }
 
-  const input = coerceFormDataToProfileInput(formData)
+  const input = _coerceFormDataToProfileInput(formData)
   const parsed = ProfileFormSchema.safeParse(input)
   if (!parsed.success) {
     // Never log field values (PII). Return flattened errors to UI.

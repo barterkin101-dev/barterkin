@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
-// These two pure helpers must be exported from lib/actions/profile.ts:
-import { parseSkillArray, coerceFormDataToProfileInput } from '@/lib/actions/profile'
+// Pure helpers live in profile-helpers.ts (not 'use server') so they can be sync-tested.
+// profile.ts re-exports them as async wrappers to satisfy Next.js 'use server' constraint.
+import { parseSkillArray, coerceFormDataToProfileInput } from '@/lib/actions/profile-helpers'
 
 describe('parseSkillArray (PROF-03, PROF-04)', () => {
   it('parses a JSON array of strings', () => {
