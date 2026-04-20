@@ -8,7 +8,7 @@ import { checkSignupRateLimit } from '@/lib/utils/rate-limit'
 
 export const MagicLinkSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
-  captchaToken: z.string().min(1),
+  captchaToken: z.string().min(1).max(2048),
 })
 
 export interface SendMagicLinkResult {
