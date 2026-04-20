@@ -84,6 +84,14 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // AUTH-01: unauthenticated users are gated out of verified-only prefixes
+  if (!isAuthed && isVerifiedOnlyPath) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    url.search = ''
+    return NextResponse.redirect(url)
+  }
+
   // AUTH-04: unverified users are gated out of verified-only prefixes
   if (isAuthed && !isVerified && isVerifiedOnlyPath) {
     const url = request.nextUrl.clone()
