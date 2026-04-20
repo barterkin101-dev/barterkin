@@ -42,7 +42,11 @@ begin
 end;
 $$;
 
-grant execute on function public.check_signup_ip(text) to anon, authenticated;
+-- Restricted to authenticated only; anon cannot call this SECURITY DEFINER function directly.
+-- The server action (lib/utils/rate-limit.ts) runs server-side and uses the service-role
+-- client, so unauthenticated signup rate-limit checks still work correctly.
+revoke execute on function public.check_signup_ip(text) from anon;
+grant execute on function public.check_signup_ip(text) to authenticated;
 
 ----------------------------------------------------------------------
 -- 3. current_user_is_verified — AUTH-04 helper for Phase 3 RLS
