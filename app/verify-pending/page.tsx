@@ -13,7 +13,8 @@ export const metadata = { title: 'Verify your email — Barterkin' }
 export default async function VerifyPendingPage() {
   const supabase = await createClient()
   const { data } = await supabase.auth.getClaims()
-  const email = (data?.claims?.email as string | undefined) ?? 'your inbox'
+  const realEmail = (data?.claims?.email as string | undefined) ?? null
+  const displayEmail = realEmail ?? 'your inbox'
 
   return (
     <main className="min-h-screen flex items-center justify-center py-16 px-6 bg-sage-bg">
@@ -28,14 +29,14 @@ export default async function VerifyPendingPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-base leading-[1.5]">
-            We sent a verification link to {email}. Click it to confirm you own this address — this keeps Barterkin a real-community space and protects members from bots and duplicate accounts.
+            We sent a verification link to {displayEmail}. Click it to confirm you own this address — this keeps Barterkin a real-community space and protects members from bots and duplicate accounts.
           </p>
           <p className="text-base leading-[1.5]">
             Until you verify, your profile won&apos;t appear in the directory and you can&apos;t contact other members.
           </p>
 
           <div className="pt-2">
-            <ResendLinkButton email={email} />
+            <ResendLinkButton email={realEmail} />
           </div>
 
           <div className="text-sm pt-2">
