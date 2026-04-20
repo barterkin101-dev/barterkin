@@ -47,7 +47,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthed = !!claims?.sub
   // Trust the top-level email_verified claim (comes from auth.users.email_confirmed_at).
   // NEVER trust user_metadata.email_verified (writable by user — T-2-08).
-  const isVerified = !!claims?.email_verified
+  let isVerified = !!claims?.email_verified
 
   const pathname = request.nextUrl.pathname
 
@@ -59,13 +59,33 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // AUTH-04: unverified users are gated out of verified-only prefixes
-  if (
-    isAuthed
-    && !isVerified
-    && VERIFIED_REQUIRED_PREFIXES.some((p) => pathname.startsWith(p))
+  // AUTH-04 + AUTH-01 (UAT Gap 2 fix): if claims-based fast path says "unverified"
+  // BUT this is an OAuth user (Google), the email_verified claim may be missing
+  // even though the provider verifies email. Fall through to one getUser() round-trip
+  // ONLY when (a) authed, (b) fast path says unverified, (c) request actually matches
+  // a verified-only path. Cost: ~50ms once per affected request, never on the hot path.
+  const isVerifiedOnlyPath =
+    VERIFIED_REQUIRED_PREFIXES.some((p) => pathname.startsWith(p))
     && !ALWAYS_ALLOWED.some((p) => pathname.startsWith(p))
-  ) {
+
+  if (isAuthed && !isVerified && isVerifiedOnlyPath) {
+    // RESEARCH PITFALL 4: Google JWTs may omit email_verified at the access-token
+    // claim surface. getUser() pulls the authoritative auth.users row.
+    const { data: userData } = await supabase.auth.getUser()
+    const user = userData?.user
+    if (user) {
+      const provider = user.app_metadata?.provider as string | undefined
+      // Trust email_confirmed_at (Supabase-managed) and provider==='google'
+      // (Google always verifies email — Apple does too, but Apple is deferred).
+      // DO NOT trust user_metadata.email_verified (user-writable).
+      if (user.email_confirmed_at || provider === 'google') {
+        isVerified = true
+      }
+    }
+  }
+
+  // AUTH-04: unverified users are gated out of verified-only prefixes
+  if (isAuthed && !isVerified && isVerifiedOnlyPath) {
     const url = request.nextUrl.clone()
     url.pathname = '/verify-pending'
     url.search = ''
