@@ -112,7 +112,14 @@ Plans:
   3. Rate limits hold: a sender hitting 6 sends in 24h is rejected on the 6th; a sender attempting to contact the same recipient 3 times in a week is rejected on the 3rd; a banned sender, banned recipient, blocked pair, or `accepting_contact=false` recipient is rejected with a clear error
   4. Any authed member can report another profile (reason enum + optional note), block another member (blocked users disappear from their directory view and cannot contact them), and a single SQL `UPDATE profiles SET banned=true WHERE id=...` hides a profile from the directory and rejects all relay sends to/from that user
   5. A successful relay send fires `posthog.capture('contact_initiated', ...)` from the Edge Function with anonymized IDs, and a Resend bounce/complaint webhook at `/api/webhooks/resend` updates `contact_requests.status`
-**Plans**: TBD
+**Plans:** 6 plans
+Plans:
+- [x] 05-01-PLAN.md — Wave 1: shadcn sheet/dropdown-menu/select + react-email install, Zod schemas (MessageSchema, ReportReasonEnum, ReportSchema, BlockSchema) + result types, Wave 0 test stubs + contact-helpers fixture
+- [ ] 05-02-PLAN.md — Wave 2: Migration 005 (contact_requests + blocks + reports + RLS + indexes + directory-visibility cascade + contact_eligibility RPC) + [BLOCKING] supabase db push + type regen + fill contact-eligibility + reports-rls unit tests
+- [ ] 05-03-PLAN.md — Wave 3: React Email template + Edge Function send-contact (eligibility + 3-layer rate limit + insert + Resend + PostHog shutdown) + Resend webhook route + fill webhook + response-shape unit tests + human checkpoint (deploy + secrets + Resend webhook config)
+- [ ] 05-04-PLAN.md — Wave 3: Admin-notify email template + lib/actions/contact.ts (sendContactRequest proxy, blockMember, reportMember + admin notify, markContactsSeen) + server-action unit tests
+- [ ] 05-05-PLAN.md — Wave 4: Contact Sheet UI (ContactButton + ContactForm + ContactSuccessState), OverflowMenu + BlockDialog + ReportDialog, ProfileCard viewer-context wiring, /m/[username] force-dynamic + human smoke test
+- [ ] 05-06-PLAN.md — Wave 5: Nav badge (layout fetch + NavLinks render + /profile clear), directory post-block sonner toast, fill all 6 E2E spec bodies + human checkpoint (full suite + mail-tester + PostHog + admin ban runbook)
 
 ### Phase 6: Landing Page & PWA Polish
 **Goal**: The new Next.js landing page at `/` matches the existing `index.html` visual identity (sage/forest/clay + Lora/Inter + warm community aesthetic) with sections for hero, how-it-works (3-step), founding-member strip (live profiles), county coverage, signup CTA, and footer — plus Georgia-honor-system framing copy, responsive mobile-first layout (≥360px), Open Graph meta/favicon/manifest icons, and a Serwist-powered installable PWA. Legacy Netlify `index.html` is retired once parity is verified.
