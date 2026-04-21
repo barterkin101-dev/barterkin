@@ -246,5 +246,10 @@ export async function markContactsSeen(): Promise<MarkContactsSeenResult> {
     console.error('[markContactsSeen] rpc failed', { code: error.code })
     return { ok: false, error: 'Could not mark contacts as seen.' }
   }
+
+  // M-03 fix: bust the AppLayout cache segment so the unseen-contact badge clears immediately.
+  // AppLayout and the profile page data-fetch are concurrent in Next.js App Router, so without
+  // this revalidation the badge count may reflect the pre-update state on the same render.
+  revalidatePath('/(app)', 'layout')
   return { ok: true, count: 0 }
 }
