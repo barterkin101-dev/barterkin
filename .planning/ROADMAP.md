@@ -146,9 +146,9 @@ Plans:
   5. The pre-launch "Looks Done But Isn't" checklist from PITFALLS.md is worked through and every item checked off before public launch
 **Plans:** 5 plans
 Plans:
-- [ ] 07-01-PLAN.md — Wave 1: outreach-template.md (11 DM variants + Google Form spec) + Wave 0 test stubs (seed-founding-members.test.ts, founding-badge.spec.ts)
-- [ ] 07-02-PLAN.md — Wave 2: scripts/seed-founding-members.mjs (idempotent service-role seed; listUsers NOT getUserByEmail) + fill unit test bodies
-- [ ] 07-03-PLAN.md — Wave 2: FoundingMemberBadge.tsx + DirectoryCard + ProfileCard integration + directory.types/directory.ts SELECT + fill E2E tests
+- [x] 07-01-PLAN.md — Wave 1: outreach-template.md (11 DM variants + Google Form spec) + Wave 0 test stubs (seed-founding-members.test.ts, founding-badge.spec.ts)
+- [x] 07-02-PLAN.md — Wave 2: scripts/seed-founding-members.mjs (idempotent service-role seed; listUsers NOT getUserByEmail) + fill unit test bodies
+- [x] 07-03-PLAN.md — Wave 2: FoundingMemberBadge.tsx + DirectoryCard + ProfileCard integration + directory.types/directory.ts SELECT + fill E2E tests
 - [ ] 07-04-PLAN.md — Wave 3 (checkpoint-heavy): outreach preconditions → 11 DMs → transcribe Google Sheet to members[] → run seed script → SEED-05 SQL gate (≥30/≥2/≥3)
 - [ ] 07-05-PLAN.md — Wave 4: 07-PRELAUNCH-CHECKLIST.md (32 items: 23 PITFALLS §13 + 9 Phase 7-new) + STATE.md Founder Commitment (SEED-06)
 
