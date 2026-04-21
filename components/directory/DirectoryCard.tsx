@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { FoundingMemberBadge } from '@/components/profile/FoundingMemberBadge'
 import type { DirectoryProfile } from '@/lib/data/directory.types'
 
 export function DirectoryCard({ profile }: { profile: DirectoryProfile }) {
@@ -24,7 +25,10 @@ export function DirectoryCard({ profile }: { profile: DirectoryProfile }) {
 
   return (
     <Link href={`/m/${profile.username}`} aria-label={ariaLabel} className="block">
-      <Card className="bg-sage-pale ring-1 ring-sage-light rounded-lg p-6 min-h-[220px] hover:ring-1 hover:ring-sage-light hover:shadow-sm hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 motion-reduce:transition-none transition-all border-0">
+      <Card className="relative bg-sage-pale ring-1 ring-sage-light rounded-lg p-6 min-h-[220px] hover:ring-1 hover:ring-sage-light hover:shadow-sm hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 motion-reduce:transition-none transition-all border-0">
+        {profile.founding_member && (
+          <FoundingMemberBadge className="absolute right-4 top-4" />
+        )}
         <div className="flex items-start gap-4">
           <Avatar className="h-16 w-16 border border-sage-light flex-shrink-0">
             <AvatarImage src={profile.avatar_url ?? undefined} alt="" />
