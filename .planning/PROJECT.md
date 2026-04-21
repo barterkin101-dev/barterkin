@@ -12,14 +12,14 @@ A Georgian with a skill to trade can find another Georgian with a matching need,
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] SSO signup with Google + magic-link email (no password) — Validated in Phase 1: Auth & Onboarding
+- [x] Email verification required before appearing in directory — Validated in Phase 1: Auth & Onboarding
+- [x] Member profile: skills offered, skills wanted, bio, photo, county, availability (free text), contact preference, optional TikTok handle — Validated in Phase 3: Profile & Georgia Gate
+- [x] Directory: browse + search with category, county, and keyword filters — Validated in Phase 4: Directory
 
 ### Active
 
-- [ ] SSO signup with Google + magic-link email (no password); Apple deferred to Capacitor wrap milestone
-- [ ] Email verification required before appearing in directory
-- [ ] Member profile: skills offered, skills wanted, bio, photo, county, availability (free text), contact preference, optional TikTok handle
-- [ ] Directory: browse + search with category, county, and keyword filters
+- [ ] Platform-relayed contact: sender fills a short form, recipient gets an email from platform (Reply-To: sender); replies go direct after first touch
 - [ ] 10-category Georgia taxonomy seeded at launch (Food, Farm & Garden, Skilled Trades, Beauty & Hair, Wellness, Crafts, Childcare/Tutoring, Tech, Home/Cleaning, Transportation)
 - [ ] Platform-relayed contact: sender fills a short form, recipient gets an email from platform (Reply-To: sender); replies go direct after first touch
 - [ ] Rate limits + CAPTCHA + report + block as day-one trust floor (launches with contact relay, not after)
