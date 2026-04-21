@@ -4,8 +4,28 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { ExternalLink } from 'lucide-react'
 import type { ProfileWithRelations } from '@/lib/actions/profile.types'
+import { ContactButton } from '@/components/profile/ContactButton'
+import { OverflowMenu } from '@/components/profile/OverflowMenu'
 
-export function ProfileCard({ profile }: { profile: ProfileWithRelations }) {
+interface ProfileCardProps {
+  profile: ProfileWithRelations
+  /** ID of the viewing auth user. null = anonymous viewer. */
+  viewerOwnerId?: string | null
+  /** owner_id of the profile being viewed. */
+  profileOwnerId?: string
+  /** ID (row PK) of the profile being viewed — needed for reportMember. */
+  profileId?: string
+  /** profiles.accepting_contact value. */
+  acceptingContact?: boolean
+}
+
+export function ProfileCard({
+  profile,
+  viewerOwnerId,
+  profileOwnerId,
+  profileId,
+  acceptingContact,
+}: ProfileCardProps) {
   const initial = (profile.display_name ?? '?').charAt(0).toUpperCase()
   const county = profile.counties?.name ?? null
   const category = profile.categories?.name ?? null
@@ -13,17 +33,36 @@ export function ProfileCard({ profile }: { profile: ProfileWithRelations }) {
     ? profile.tiktok_handle.slice(1)
     : profile.tiktok_handle
 
+  // Viewer context: show contact/overflow only when authenticated viewer is NOT the profile owner
+  const showViewerActions =
+    viewerOwnerId != null &&
+    profileOwnerId != null &&
+    profileId != null &&
+    viewerOwnerId !== profileOwnerId
+
   return (
     <Card className="bg-sage-pale border-sage-light">
-      <CardHeader className="flex flex-row items-center gap-6 p-6 lg:p-8">
-        <Avatar className="h-40 w-40 border border-sage-light">
+      <CardHeader className="flex flex-row items-start gap-6 p-6 lg:p-8">
+        <Avatar className="h-40 w-40 shrink-0 border border-sage-light">
           <AvatarImage src={profile.avatar_url ?? undefined} alt={profile.display_name ?? ''} />
           <AvatarFallback className="text-4xl">{initial}</AvatarFallback>
         </Avatar>
-        <div className="space-y-2">
-          <h1 className="font-serif text-2xl font-bold leading-[1.2] text-forest-deep">
-            {profile.display_name ?? 'Member'}
-          </h1>
+        <div className="flex-1 space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <h1 className="font-serif text-2xl font-bold leading-[1.2] text-forest-deep">
+              {profile.display_name ?? 'Member'}
+            </h1>
+            {/* 3-dot overflow menu (Block + Report) — hidden on own profile */}
+            {showViewerActions && (
+              <OverflowMenu
+                viewerOwnerId={viewerOwnerId}
+                profileOwnerId={profileOwnerId!}
+                profileId={profileId!}
+                displayName={profile.display_name ?? 'Member'}
+                username={profile.username ?? ''}
+              />
+            )}
+          </div>
           {(county || category) && (
             <p className="text-base text-forest-mid">
               {[county, category].filter(Boolean).join(' \u00b7 ')}
@@ -33,6 +72,15 @@ export function ProfileCard({ profile }: { profile: ProfileWithRelations }) {
       </CardHeader>
 
       <CardContent className="space-y-8 p-6 pt-0 lg:p-8 lg:pt-0">
+        {/* Contact CTA slot — shown to authenticated non-owners only */}
+        {showViewerActions && acceptingContact != null && (
+          <ContactButton
+            recipientProfileId={profileId!}
+            recipientDisplayName={profile.display_name ?? 'Member'}
+            recipientAcceptingContact={acceptingContact}
+          />
+        )}
+
         {profile.bio && (
           <p className="text-base leading-[1.5] text-forest-deep">{profile.bio}</p>
         )}
@@ -101,12 +149,6 @@ export function ProfileCard({ profile }: { profile: ProfileWithRelations }) {
             </a>
           </p>
         )}
-
-        {/* Phase 5 placeholder (removed when contact relay lands) */}
-        <div className="rounded-md border border-sage-light bg-sage-pale p-4 text-sm text-muted-foreground">
-          Messaging arrives in a few weeks -- members will be able to reach out to you through
-          Barterkin&rsquo;s relay.
-        </div>
       </CardContent>
     </Card>
   )

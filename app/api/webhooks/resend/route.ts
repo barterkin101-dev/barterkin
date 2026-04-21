@@ -6,7 +6,8 @@
 import 'server-only'
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
+import type { Database } from '@/lib/database.types'
 
 export const runtime = 'nodejs'
 
@@ -68,6 +69,19 @@ export async function POST(req: Request) {
       // Ignore opens, clicks, and any other event types for MVP
       return new NextResponse('ok', { status: 200 })
   }
+
+  // Lazy-initialize service-role client inside the handler (not at module level)
+  // to avoid Next.js build-time env var evaluation failure (supabaseUrl is required).
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !serviceRoleKey) {
+    console.error('[resend-webhook] missing Supabase env vars')
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 })
+  }
+
+  const supabaseAdmin = createSupabaseAdmin<Database>(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  })
 
   const { error } = await supabaseAdmin
     .from('contact_requests')

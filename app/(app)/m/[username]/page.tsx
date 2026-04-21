@@ -7,6 +7,12 @@ import type { ProfileWithRelations } from '@/lib/actions/profile.types'
 
 // Middleware's VERIFIED_REQUIRED_PREFIXES already covers '/m/' — auth+verify gate runs before this page.
 
+// Pitfall §9: force-dynamic prevents cross-viewer cache leak.
+// Without this, Next.js may cache a rendered page for User A and serve it to User B,
+// exposing the wrong ContactButton / OverflowMenu visibility.
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function generateMetadata({
   params,
 }: {
@@ -63,9 +69,19 @@ export default async function MemberProfilePage({
     )
   }
 
+  // Pitfall §1: getUser() revalidates against auth server — use for identity, not getSession()
+  const { data: { user } } = await supabase.auth.getUser()
+  const viewerOwnerId = user?.id ?? null
+
   return (
     <div className="mx-auto max-w-2xl">
-      <ProfileCard profile={profileRow as ProfileWithRelations} />
+      <ProfileCard
+        profile={profileRow as ProfileWithRelations}
+        viewerOwnerId={viewerOwnerId}
+        profileOwnerId={profileRow.owner_id}
+        profileId={profileRow.id}
+        acceptingContact={profileRow.accepting_contact}
+      />
     </div>
   )
 }
