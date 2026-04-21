@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: context exhaustion at 98% (2026-04-20)
-last_updated: "2026-04-20T17:31:46.677Z"
+stopped_at: context exhaustion — phase 3 UAT complete
+last_updated: "2026-04-21T05:41:32.714Z"
 progress:
   total_phases: 7
-  completed_phases: 2
-  total_plans: 23
-  completed_plans: 20
-  percent: 87
+  completed_phases: 3
+  total_plans: 28
+  completed_plans: 24
+  percent: 86
 ---
 
 # State: Georgia Barter
@@ -55,14 +55,14 @@ progress:
 
 ## Current Position
 
-Phase: 03 (profile-georgia-gate) — EXECUTING
+Phase: 04 (directory) — EXECUTING
 Plan: 1 of 5
 **Phase:** 3
-**Status:** Executing Phase 03
-**Progress:** [██░░░░░] Phase 1 complete, Phase 2 not yet planned
+**Status:** Executing Phase 04
+**Progress:** [███░░░░] Phases 1–3 complete
 
 ```
-[▰▰▱▱▱▱▱] Phase 1 complete. Next: plan + execute Phase 2 (Auth & Legal)
+[▰▰▰▱▱▱▱] Phase 3 complete. Next: plan + execute Phase 4 (Directory)
 ```
 
 ### CI fixes discovered in Phase 1 (apply to all future phases)
@@ -77,8 +77,8 @@ Plan: 1 of 5
 | # | Phase | Status |
 |---|-------|--------|
 | 1 | Foundation & Infrastructure | ✅ complete (5bc75c1, 2026-04-19) |
-| 2 | Authentication & Legal | Not started — plan with `/gsd-plan-phase 2` |
-| 3 | Profile & Georgia Gate | Not started |
+| 2 | Authentication & Legal | ✅ complete (2026-04-20) |
+| 3 | Profile & Georgia Gate | ✅ complete — all 6 UATs passed (2026-04-20) |
 | 4 | Directory | Not started |
 | 5 | Contact Relay + Trust (joined) | Not started |
 | 6 | Landing Page & PWA Polish | Not started |
@@ -154,16 +154,16 @@ None currently — roadmap complete, awaiting phase-1 planning.
 
 ### Last Session
 
-- **Date:** 2026-04-18
-- **Action:** Executed Plan 01-03 supabase-ssr (Wave 2)
-- **Outcome:** Installed `@supabase/ssr@0.10.2` + `@supabase/supabase-js@2.103.3`; scaffolded four-client factory at `lib/supabase/{client,server,middleware,admin}.ts`; root `middleware.ts` with matcher excluding static + webhooks + PWA assets; `lib/database.types.ts` placeholder. Probed HAS_GETCLAIMS → middleware uses `supabase.auth.getClaims()` primary path (JWKS-verified, no round-trip). admin.ts `import 'server-only'` guards service-role key. `pnpm typecheck && pnpm build` exit 0 (17s). Commit `bc1e942` pushed to `origin/main`. FOUND-05, FOUND-06 covered.
-- **Stopped at:** context exhaustion at 98% (2026-04-20)
+- **Date:** 2026-04-20
+- **Action:** Completed Phase 03 UAT (all 6 tests) + wired production DNS
+- **Outcome:** Added root CNAME `barterkin.com → 35c7cc2beaeaa25c.vercel-dns-017.com` on Cloudflare; added Turnstile env vars to Vercel and redeployed; ran all 6 Phase 3 UATs via Playwright: (1) profile save, (2) publish gate tooltip, (3) avatar validation, (4) cross-session publish visibility, (5) empty state, (6) slug lock — all PASS. Phase 03 VERIFICATION and HUMAN-UAT updated to complete.
+- **Stopped at:** context exhaustion — phase 3 UAT complete
 
 ### Next Session Should
 
-1. Execute Plan 01-04 pwa-serwist (Wave 2 continuation) — Serwist service worker + manifest + install prompt. Middleware matcher already excludes `.webmanifest` so Serwist drops in without rework.
-2. Then fan out to remaining Wave 2+ plans per the phase dependency graph (01-05 posthog-resend, 01-06 supabase-migrations, 01-07 testing-infra, 01-08 ci-gitleaks, 01-09 cloudflare-dns, 01-10 vercel-link-deploy).
-3. Pre-phase procurement already complete per memory file: Supabase `hfdcsickergdcdvejbcw` (us-east-1), Cloudflare zone + domain + DNS records, Resend + 10/10 mail-tester, Vercel team ready
+1. Plan Phase 4 (Directory) with `/gsd-plan-phase 4`
+2. Execute Phase 4 with `/gsd-execute-phase 4`
+3. Phase 4 scope: directory listing page, search/filter by county + category + keyword, profile cards, pagination
 
 ### Context Budget
 
