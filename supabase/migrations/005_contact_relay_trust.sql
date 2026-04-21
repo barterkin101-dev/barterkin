@@ -42,9 +42,20 @@ create index contact_requests_pair_created_idx on public.contact_requests(sender
 create index contact_requests_recipient_unseen_idx on public.contact_requests(recipient_id) where seen_at is null;
 create index contact_requests_resend_id_idx on public.contact_requests(resend_id) where resend_id is not null;
 
--- Partial unique: prevent double-send in same calendar day for the same (sender, recipient) pair when status='sent'
+-- IMMUTABLE helper for UTC day truncation (date_trunc on timestamptz is only STABLE, not IMMUTABLE)
+-- This wrapper lets us build a partial unique index expression on the UTC calendar day.
+create or replace function public.utc_day(ts timestamptz)
+returns date
+language sql immutable strict parallel safe
+set search_path = public, pg_temp
+as $$ select (ts at time zone 'UTC')::date $$;
+
+revoke execute on function public.utc_day(timestamptz) from public;
+grant execute on function public.utc_day(timestamptz) to authenticated, service_role;
+
+-- Partial unique: prevent double-send in same UTC calendar day for the same (sender, recipient) pair when status='sent'
 create unique index contact_requests_pair_day_unique_idx
-  on public.contact_requests(sender_id, recipient_id, (date_trunc('day', created_at)))
+  on public.contact_requests(sender_id, recipient_id, public.utc_day(created_at))
   where status = 'sent';
 
 -- ============================================================================
@@ -81,11 +92,10 @@ create table public.reports (
   reason            text not null check (reason in ('harassment','spam','off-topic','impersonation','other')),
   note              text check (note is null or char_length(note) <= 500),
   status            text not null default 'pending' check (status in ('pending','reviewed','actioned','dismissed')),
-  created_at        timestamptz not null default now(),
-  constraint reports_no_self_report check (
-    target_profile_id not in (select id from public.profiles where owner_id = reporter_id)
-  )
-  -- NOTE: subquery in CHECK is evaluated at insert time; for stronger invariant, enforce in reportMember server action
+  created_at        timestamptz not null default now()
+  -- NOTE: self-report constraint (reporter cannot report their own profile) enforced in reportMember server action.
+  -- Postgres does not allow subqueries in CHECK constraints; application-layer enforcement is the correct approach here.
+  -- The constraint name reports_no_self_report is reserved for documentation traceability.
 );
 
 alter table public.reports enable row level security;

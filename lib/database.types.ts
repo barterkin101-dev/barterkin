@@ -12,8 +12,51 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
+      blocks: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           id: number
@@ -31,6 +74,54 @@ export type Database = {
           slug?: string
         }
         Relationships: []
+      }
+      contact_requests: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          recipient_id: string
+          resend_id: string | null
+          seen_at: string | null
+          sender_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          recipient_id: string
+          resend_id?: string | null
+          seen_at?: string | null
+          sender_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          recipient_id?: string
+          resend_id?: string | null
+          seen_at?: string | null
+          sender_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_requests_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_requests_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       counties: {
         Row: {
@@ -137,6 +228,44 @@ export type Database = {
           },
         ]
       }
+      reports: {
+        Row: {
+          created_at: string
+          id: string
+          note: string | null
+          reason: string
+          reporter_id: string
+          status: string
+          target_profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          reason: string
+          reporter_id: string
+          status?: string
+          target_profile_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string | null
+          reason?: string
+          reporter_id?: string
+          status?: string
+          target_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_target_profile_id_fkey"
+            columns: ["target_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       signup_attempts: {
         Row: {
           count: number
@@ -228,6 +357,25 @@ export type Database = {
     }
     Functions: {
       check_signup_ip: { Args: { p_ip: string }; Returns: boolean }
+      contact_eligibility: {
+        Args: { p_recipient_profile_id: string; p_sender_owner_id: string }
+        Returns: {
+          accepting_contact: boolean
+          blocked_by_recipient: boolean
+          blocked_by_sender: boolean
+          recipient_banned: boolean
+          recipient_category_id: number
+          recipient_county_id: number
+          recipient_display_name: string
+          recipient_email: string
+          recipient_owner_id: string
+          recipient_username: string
+          sender_banned: boolean
+          sender_display_name: string
+          sender_profile_id: string
+          sender_username: string
+        }[]
+      }
       current_user_is_verified: { Args: never; Returns: boolean }
       refresh_profile_search_text: {
         Args: { p_profile_id: string }
@@ -235,6 +383,7 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      utc_day: { Args: { ts: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
@@ -363,6 +512,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
