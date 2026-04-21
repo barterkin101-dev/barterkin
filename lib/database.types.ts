@@ -1,4 +1,3 @@
-Initialising login role...
 export type Json =
   | string
   | number
@@ -383,6 +382,10 @@ export type Database = {
         Returns: undefined
       }
       show_limit: { Args: never; Returns: number }
+      mark_contacts_seen: {
+        Args: { p_recipient_profile_id: string }
+        Returns: undefined
+      }
       show_trgm: { Args: { "": string }; Returns: string[] }
       utc_day: { Args: { ts: string }; Returns: string }
     }
