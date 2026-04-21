@@ -6,6 +6,7 @@ import { ExternalLink } from 'lucide-react'
 import type { ProfileWithRelations } from '@/lib/actions/profile.types'
 import { ContactButton } from '@/components/profile/ContactButton'
 import { OverflowMenu } from '@/components/profile/OverflowMenu'
+import { FoundingMemberBadge } from '@/components/profile/FoundingMemberBadge'
 
 interface ProfileCardProps {
   profile: ProfileWithRelations
@@ -52,6 +53,7 @@ export function ProfileCard({
             <h1 className="font-serif text-2xl font-bold leading-[1.2] text-forest-deep">
               {profile.display_name ?? 'Member'}
             </h1>
+            {profile.founding_member && <FoundingMemberBadge />}
             {/* 3-dot overflow menu (Block + Report) — hidden on own profile */}
             {showViewerActions && (
               <OverflowMenu
