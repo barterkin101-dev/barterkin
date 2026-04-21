@@ -1,5 +1,7 @@
 -- Phase 5 (fix) — Atomic rate-limit + insert for send-contact Edge Function
 -- Addresses: H-01 race condition — concurrent requests can bypass daily/weekly cap checks
+--            H-03 rate-limit counts included status='sent' filter, so bounced/failed rows
+--                  didn't consume cap slots; all attempts now counted regardless of status
 -- Strategy: pg_advisory_xact_lock on sender serializes concurrent requests from the same sender
 -- The lock is released automatically at transaction end (xact-scoped advisory lock).
 
