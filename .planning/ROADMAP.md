@@ -99,7 +99,7 @@ Plans:
 - [x] 04-02-PLAN.md — Wave 1: shadcn pagination + skeleton install, shared directory types, parseSearchParams + full Vitest suite, Wave 0 test stubs (2 unit + 8 E2E)
 - [x] 04-03-PLAN.md — Wave 2: data layer (getDirectoryRows parallel count+rows), 7 server/client components (Card/Grid/Empty/ZeroResults/Error/Skeleton/Counter), RLS visibility test
 - [x] 04-04-PLAN.md — Wave 2: 5 client filter components (Filters wrapper + Category + County + KeywordSearch + ActiveFilterChips) with URL-as-state + 300ms debounce + page-reset invariant
-- [ ] 04-05-PLAN.md — Wave 3: directory page.tsx + loading.tsx + error.tsx + DirectoryPagination + layout max-w-5xl widen + AppNav active-state (NavLinks extract) + 8 E2E specs filled + TTFB smoke check
+- [x] 04-05-PLAN.md — Wave 3: directory page.tsx + loading.tsx + error.tsx + DirectoryPagination + layout max-w-5xl widen + AppNav active-state (NavLinks extract) + 8 E2E specs filled + TTFB smoke check
 **UI hint**: yes
 
 ### Phase 5: Contact Relay + Trust (joined)
