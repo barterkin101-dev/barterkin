@@ -6,6 +6,7 @@ import { ActiveFilterChips } from '@/components/directory/ActiveFilterChips'
 import { DirectoryResultCounter } from '@/components/directory/DirectoryResultCounter'
 import { DirectoryGrid } from '@/components/directory/DirectoryGrid'
 import { DirectoryPagination } from '@/components/directory/DirectoryPagination'
+import { BlockedToast } from '@/components/directory/BlockedToast'
 
 export const metadata: Metadata = {
   title: 'Directory',
@@ -24,8 +25,12 @@ export default async function DirectoryPage({
   const { profiles, totalCount, error } = await getDirectoryRows(filters)
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
 
+  const blockedName = typeof rawParams.blocked === 'string' ? rawParams.blocked : undefined
+  const blockedError = rawParams.blocked_error === '1'
+
   return (
     <>
+      <BlockedToast blockedName={blockedName} errorFlag={blockedError} />
       <header className="space-y-2">
         <h1 className="font-serif text-[32px] font-bold leading-[1.15] text-forest-deep">
           Directory
