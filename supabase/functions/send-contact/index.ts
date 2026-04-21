@@ -16,9 +16,8 @@ const posthogApiKey = Deno.env.get('POSTHOG_API_KEY')!
 const emailFrom = Deno.env.get('EMAIL_FROM') ?? 'Barterkin <noreply@barterkin.com>'
 const siteUrl = Deno.env.get('NEXT_PUBLIC_SITE_URL') ?? 'https://barterkin.com'
 
-const DAILY_CAP = 5
-const WEEKLY_CAP = 20
-const PER_RECIPIENT_WEEKLY_CAP = 2
+// Rate caps are now enforced atomically inside the send_contact_gated SQL RPC (H-01 fix).
+// The values are documented there: daily=5, weekly=20, per-pair-weekly=2.
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') {
@@ -129,78 +128,45 @@ Deno.serve(async (req) => {
     )
   }
 
-  // Rate limit checks — 3-layer defense (CONT-07, CONT-08)
-  const now = new Date()
-  const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString()
-  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
-
-  // Layer 1: Daily cap (≤5 per sender per day)
-  const { count: dailyCount } = await supabase
-    .from('contact_requests')
-    .select('id', { count: 'exact', head: true })
-    .eq('sender_id', elig.sender_profile_id)
-    .gte('created_at', dayAgo)
-    .eq('status', 'sent')
-
-  if ((dailyCount ?? 0) >= DAILY_CAP) {
-    return json(
-      {
-        code: 'daily_cap',
-        error: "You've reached your daily contact limit. You can send more messages tomorrow.",
-      },
-      429,
-    )
-  }
-
-  // Layer 2: Weekly cap (≤20 per sender per week)
-  const { count: weeklyCount } = await supabase
-    .from('contact_requests')
-    .select('id', { count: 'exact', head: true })
-    .eq('sender_id', elig.sender_profile_id)
-    .gte('created_at', weekAgo)
-    .eq('status', 'sent')
-
-  if ((weeklyCount ?? 0) >= WEEKLY_CAP) {
-    return json(
-      { code: 'weekly_cap', error: "You've reached your weekly contact limit." },
-      429,
-    )
-  }
-
-  // Layer 3: Per-pair weekly cap (≤2 contacts to same recipient per week)
-  const { count: pairCount } = await supabase
-    .from('contact_requests')
-    .select('id', { count: 'exact', head: true })
-    .eq('sender_id', elig.sender_profile_id)
-    .eq('recipient_id', recipientProfileId)
-    .gte('created_at', weekAgo)
-    .eq('status', 'sent')
-
-  if ((pairCount ?? 0) >= PER_RECIPIENT_WEEKLY_CAP) {
-    return json(
-      {
-        code: 'pair_cap',
-        error: `You've already contacted ${elig.recipient_display_name} this week.`,
-      },
-      429,
-    )
-  }
-
-  // Insert contact_requests row (service-role only — no INSERT policy for authenticated)
-  const { data: request, error: insertErr } = await supabase
-    .from('contact_requests')
-    .insert({
-      sender_id: elig.sender_profile_id,
-      recipient_id: recipientProfileId,
-      message,
-      status: 'sent',
+  // Rate limit checks + insert — atomic via send_contact_gated RPC (H-01 fix)
+  // The RPC acquires pg_advisory_xact_lock(sender) so concurrent requests from the same
+  // sender are serialized; caps and insert happen inside one transaction.
+  const { data: gatedId, error: gatedErr } = await supabase
+    .rpc('send_contact_gated', {
+      p_sender_profile_id: elig.sender_profile_id,
+      p_recipient_profile_id: recipientProfileId,
+      p_message: message,
     })
-    .select('id')
-    .single()
 
-  if (insertErr || !request) {
-    // 23505 = unique_violation (pair_day partial unique index from Plan 02)
-    if (insertErr?.code === '23505') {
+  if (gatedErr || !gatedId) {
+    // Map raised exceptions to structured error codes
+    const msg = gatedErr?.message ?? ''
+    if (msg.includes('daily_cap')) {
+      return json(
+        {
+          code: 'daily_cap',
+          error: "You've reached your daily contact limit. You can send more messages tomorrow.",
+        },
+        429,
+      )
+    }
+    if (msg.includes('weekly_cap')) {
+      return json(
+        { code: 'weekly_cap', error: "You've reached your weekly contact limit." },
+        429,
+      )
+    }
+    if (msg.includes('pair_cap')) {
+      return json(
+        {
+          code: 'pair_cap',
+          error: `You've already contacted ${elig.recipient_display_name} this week.`,
+        },
+        429,
+      )
+    }
+    // 23505 = unique_violation (pair_day partial unique index — same UTC day duplicate)
+    if (gatedErr?.code === '23505') {
       return json(
         {
           code: 'pair_dup',
@@ -209,9 +175,11 @@ Deno.serve(async (req) => {
         429,
       )
     }
-    console.error('[send-contact] insert failed', { code: insertErr?.code })
+    console.error('[send-contact] send_contact_gated failed', { code: gatedErr?.code, msg })
     return json({ code: 'unknown', error: 'Something went wrong.' }, 500)
   }
+
+  const request = { id: gatedId as string }
 
   // Send email via Resend (CONT-05)
   // CRITICAL: replyTo is senderEmail from validated JWT — NEVER from request body (T-5-03-06)
