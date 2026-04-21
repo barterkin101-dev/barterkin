@@ -7,6 +7,7 @@ import { PublishToggle } from '@/components/profile/PublishToggle'
 import { markContactsSeen } from '@/lib/actions/contact'
 import type { ProfileWithRelations } from '@/lib/actions/profile.types'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Your profile' }
 
 export default async function OwnProfilePage() {

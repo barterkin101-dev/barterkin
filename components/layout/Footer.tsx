@@ -10,11 +10,17 @@ import { LogoutButton } from '@/components/auth/LogoutButton'
  * T-2-08: uses claims.sub only for "is authed" check; never reads user_metadata for trust decisions.
  */
 export async function Footer() {
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getClaims()
-  const claims = data?.claims
-  const isAuthed = !!claims?.sub
-  const email = (claims?.email as string | undefined) ?? ''
+  let isAuthed = false
+  let email = ''
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase.auth.getClaims()
+    const claims = data?.claims
+    isAuthed = !!claims?.sub
+    email = (claims?.email as string | undefined) ?? ''
+  } catch {
+    // No request context during static prerendering — render unauthenticated state
+  }
 
   return (
     <footer className="bg-forest text-sage-bg py-8 px-6 mt-16">

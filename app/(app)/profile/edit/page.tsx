@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { ProfileEditForm } from '@/components/profile/ProfileEditForm'
 import type { ProfileWithRelations } from '@/lib/actions/profile.types'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Edit profile' }
 
 export default async function ProfileEditPage() {

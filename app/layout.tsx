@@ -8,6 +8,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' })
 const lora = Lora({ subsets: ['latin'], variable: '--font-serif', display: 'swap' })
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com'),
   title: 'Barterkin',

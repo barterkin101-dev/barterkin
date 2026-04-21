@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { LogoutButton } from '@/components/auth/LogoutButton'
 import { ResendLinkButton } from '@/components/auth/ResendLinkButton'
 
+export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Verify your email — Barterkin' }
 
 /**

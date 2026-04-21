@@ -14,6 +14,8 @@ import { FoundingMemberStrip } from '@/components/landing/FoundingMemberStrip'
 import { LandingNav } from '@/components/landing/LandingNav'
 import { SecondaryCTA } from '@/components/landing/SecondaryCTA'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: "Barterkin — Georgia's community skills exchange",
   description:
