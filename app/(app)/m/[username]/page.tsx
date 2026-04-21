@@ -48,7 +48,7 @@ export default async function MemberProfilePage({
   if (!profileRow) {
     // UI-SPEC §Empty states — /m/[username] not found / unpublished
     return (
-      <div className="space-y-6 text-center">
+      <div className="mx-auto max-w-2xl space-y-6 text-center">
         <h1 className="font-serif text-2xl font-bold leading-[1.2]">
           This profile isn&rsquo;t available.
         </h1>
@@ -63,5 +63,9 @@ export default async function MemberProfilePage({
     )
   }
 
-  return <ProfileCard profile={profileRow as ProfileWithRelations} />
+  return (
+    <div className="mx-auto max-w-2xl">
+      <ProfileCard profile={profileRow as ProfileWithRelations} />
+    </div>
+  )
 }

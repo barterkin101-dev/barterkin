@@ -17,5 +17,9 @@ export default async function ProfileEditPage() {
     .eq('owner_id', user.id)
     .maybeSingle()
 
-  return <ProfileEditForm userId={user.id} defaultValues={(data as ProfileWithRelations) ?? null} />
+  return (
+    <div className="mx-auto max-w-2xl">
+      <ProfileEditForm userId={user.id} defaultValues={(data as ProfileWithRelations) ?? null} />
+    </div>
+  )
 }

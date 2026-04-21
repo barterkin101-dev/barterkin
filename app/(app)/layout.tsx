@@ -30,7 +30,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen bg-sage-bg">
       <AppNav displayName={displayName} avatarUrl={avatarUrl} />
-      <main className="mx-auto max-w-2xl px-6 py-12 md:py-16">
+      <main className="mx-auto max-w-5xl px-6 py-12 md:py-16">
         {children}
       </main>
       <Toaster position="bottom-right" />

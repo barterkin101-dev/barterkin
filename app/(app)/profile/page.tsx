@@ -24,7 +24,7 @@ export default async function OwnProfilePage() {
   // User has never saved a profile -- nudge them to /profile/edit
   if (!profileRow) {
     return (
-      <div className="space-y-6 text-center">
+      <div className="mx-auto max-w-2xl space-y-6 text-center">
         <h1 className="font-serif text-3xl font-bold leading-[1.15] md:text-[32px]">
           Build your profile
         </h1>
@@ -41,7 +41,7 @@ export default async function OwnProfilePage() {
 
   const profile = profileRow as ProfileWithRelations
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-2xl space-y-8">
       <div className="flex items-start justify-between gap-4">
         <h1 className="font-serif text-3xl font-bold leading-[1.15] md:text-[32px]">
           Your profile
