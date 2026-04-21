@@ -14,6 +14,7 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'iphone-se', use: { ...devices['iPhone SE'] } },
   ],
   webServer: {
     // CI runs `pnpm build && pnpm start` (production build, webpack — not Turbopack dev).
