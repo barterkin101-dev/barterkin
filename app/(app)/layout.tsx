@@ -9,20 +9,22 @@ export const metadata: Metadata = {
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
-  // getClaims() for display-only (nav header) per CLAUDE.md + RESEARCH Pitfall 4
-  const { data } = await supabase.auth.getClaims()
-  const claims = data?.claims
-  const email = (claims?.email as string | undefined) ?? null
+  // M-01 fix: getUser() revalidates the JWT against Supabase Auth — not spoofable via cookie.
+  // CLAUDE.md bans getClaims()/getSession() for trust decisions; nav identity is a trust decision
+  // because it gates the profile lookup and unseen-contact badge.
+  const { data: { user } } = await supabase.auth.getUser()
+  const userId = user?.id ?? null
+  const email = user?.email ?? null
 
   // Fetch display_name + avatar_url + id for nav (separate query -- cheap, cached per-request)
   let displayName: string | null = null
   let avatarUrl: string | null = null
   let unseenContactCount = 0
-  if (claims?.sub) {
+  if (userId) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('id, display_name, avatar_url')
-      .eq('owner_id', claims.sub as string)
+      .eq('owner_id', userId)
       .maybeSingle()
     displayName = profile?.display_name ?? email
     avatarUrl = profile?.avatar_url ?? null
