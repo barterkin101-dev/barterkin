@@ -13,7 +13,10 @@ const withSerwist = withSerwistInit({
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [{ protocol: 'https', hostname: '*.supabase.co' }],
+    remotePatterns: [
+      { protocol: 'https', hostname: '*.supabase.co' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+    ],
   },
   // Empty turbopack config silences Next 16's "webpack config with no turbopack config"
   // error that fires when withSerwist injects its webpack config for the build step.

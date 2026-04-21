@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { Sprout } from 'lucide-react'
 
@@ -14,71 +15,87 @@ export interface HeroProps {
   isAuthed: boolean
 }
 
+const MOSAIC = [
+  { src: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80', alt: 'Fresh-baked sourdough loaves', aspect: '4/3' },
+  { src: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&q=80', alt: 'Community garden harvest', aspect: '3/4' },
+  { src: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=600&q=80', alt: 'Woodworking craft', aspect: '3/4' },
+  { src: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80', alt: 'Farmers market produce', aspect: '4/3' },
+]
+
 export function Hero({ stats, isAuthed }: HeroProps) {
-  const primaryLabel = isAuthed ? 'Go to your dashboard' : 'Join the network'
   const primaryHref = isAuthed ? '/profile' : '/signup'
-  const secondaryLabel = 'Browse the directory'
-  const secondaryHref = '/directory'
+  const primaryLabel = isAuthed ? 'Go to your profile' : 'Join the network'
 
   return (
-    <section
-      className="relative bg-gradient-to-b from-forest-deep via-forest to-forest-mid pt-20 pb-24 sm:pt-28 sm:pb-32"
-    >
-      <div className="mx-auto max-w-5xl px-6 text-center md:text-left">
-        <Badge
-          className="mb-6 inline-flex bg-sage-bg/10 text-sage-bg ring-1 ring-sage-bg/20 font-normal"
-          role="note"
-        >
-          Georgia residents only · Honor system
-        </Badge>
+    <section className="relative overflow-hidden bg-forest-deep">
+      {/* subtle grain */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-10 opacity-[0.035]"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }}
+      />
 
-        <h1 className="max-w-3xl md:max-w-4xl font-serif text-4xl font-bold text-sage-bg leading-[1.1] sm:text-5xl md:text-6xl">
-          <span className="italic text-clay">Trade</span> skills with your Georgia neighbors.
-        </h1>
+      <div className="relative z-20 mx-auto grid max-w-6xl grid-cols-1 px-6 py-20 sm:py-28 md:grid-cols-2 md:gap-14 md:items-center">
 
-        <p className="mt-6 max-w-lg text-base text-sage-bg/80 leading-[1.5] mx-auto md:mx-0">
-          Bakers, plumbers, braiders, beekeepers — find people near you offering what you need, and offer back what you make. No money. No middlemen.
-        </p>
+        {/* copy */}
+        <div>
+          <Badge className="mb-6 inline-flex bg-clay/20 text-clay ring-1 ring-clay/30 font-normal text-xs tracking-wide">
+            Georgia residents only · Honor system
+          </Badge>
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4 sm:justify-center md:justify-start">
-          <Button
-            asChild
-            size="lg"
-            className="h-14 sm:h-12 min-w-[200px] bg-clay hover:bg-clay/90 text-sage-bg"
-          >
-            <Link href={primaryHref}>
-              <Sprout className="mr-2 h-5 w-5" aria-hidden="true" />
-              {primaryLabel}
-            </Link>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            size="lg"
-            className="h-14 sm:h-12 min-w-[200px] border-sage-bg text-sage-bg bg-transparent hover:bg-sage-bg/10"
-          >
-            <Link href={secondaryHref}>{secondaryLabel}</Link>
-          </Button>
+          <h1 className="font-serif text-4xl font-bold text-sage-bg leading-[1.08] sm:text-5xl lg:text-[3.4rem]">
+            Trade skills with your{' '}
+            <em className="not-italic text-clay">Georgia</em>{' '}
+            neighbors.
+          </h1>
+
+          <p className="mt-6 max-w-md text-base text-sage-bg/75 leading-relaxed">
+            Bakers, plumbers, braiders, beekeepers — find people near you
+            offering what you need, and offer back what you make.{' '}
+            <span className="text-sage-bg/90 font-medium">No money. No middlemen.</span>
+          </p>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button asChild size="lg" className="h-12 min-w-[180px] bg-clay hover:bg-clay/90 text-sage-bg font-semibold">
+              <Link href={primaryHref}>
+                <Sprout className="mr-2 h-4 w-4" aria-hidden="true" />
+                {primaryLabel}
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="h-12 min-w-[180px] border-sage-bg/30 text-sage-bg bg-transparent hover:bg-sage-bg/10">
+              <Link href="/directory">Browse the directory</Link>
+            </Button>
+          </div>
+
+          <dl className="mt-12 flex gap-10 border-t border-sage-bg/10 pt-8">
+            {[
+              { value: `${stats.totalProfiles}+`, label: 'Georgians' },
+              { value: `${stats.distinctCounties}+`, label: 'Counties' },
+              { value: '10', label: 'Categories' },
+            ].map(({ value, label }) => (
+              <div key={label}>
+                <dd className="font-serif text-2xl font-bold text-sage-bg">{value}</dd>
+                <dt className="mt-0.5 text-xs text-sage-bg/50 uppercase tracking-widest">{label}</dt>
+              </div>
+            ))}
+          </dl>
         </div>
 
-        <dl className="mt-12 pt-10 border-t border-sage-bg/15 flex flex-col gap-6 sm:flex-row sm:gap-10 lg:gap-14 sm:justify-center md:justify-start">
-          <div className="flex flex-col">
-            <dd className="font-serif text-3xl font-bold text-sage-bg">
-              {stats.totalProfiles}+
-            </dd>
-            <dt className="text-sm text-sage-bg/70">Georgians signed up</dt>
-          </div>
-          <div className="flex flex-col">
-            <dd className="font-serif text-3xl font-bold text-sage-bg">
-              {stats.distinctCounties}+
-            </dd>
-            <dt className="text-sm text-sage-bg/70">Counties covered</dt>
-          </div>
-          <div className="flex flex-col">
-            <dd className="font-serif text-3xl font-bold text-sage-bg">10</dd>
-            <dt className="text-sm text-sage-bg/70">Skill categories</dt>
-          </div>
-        </dl>
+        {/* image mosaic */}
+        <div className="hidden md:grid grid-cols-2 gap-3 mt-8 md:mt-0" aria-hidden="true">
+          {MOSAIC.map(({ src, alt, aspect }, i) => (
+            <div key={i} className="relative overflow-hidden rounded-2xl shadow-2xl" style={{ aspectRatio: aspect }}>
+              <Image
+                src={src}
+                alt={alt}
+                fill
+                sizes="280px"
+                className="object-cover transition-transform duration-700 hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-forest-deep/40 to-transparent" />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )
