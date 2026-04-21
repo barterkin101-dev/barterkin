@@ -8,9 +8,11 @@ import { cn } from '@/lib/utils'
 export function NavLinks({
   displayName,
   avatarUrl,
+  unseenContactCount = 0,
 }: {
   displayName?: string | null
   avatarUrl?: string | null
+  unseenContactCount?: number
 }) {
   const pathname = usePathname()
   const isDirectory = pathname.startsWith('/directory')
@@ -33,11 +35,30 @@ export function NavLinks({
         href="/profile"
         className="flex items-center gap-2 text-sm text-forest-mid hover:text-forest-deep"
       >
-        <Avatar className="h-8 w-8 border border-sage-light">
-          <AvatarImage src={avatarUrl ?? undefined} alt={displayName ?? ''} />
-          <AvatarFallback>{initial}</AvatarFallback>
-        </Avatar>
+        <div className="relative">
+          <Avatar className="h-8 w-8 border border-sage-light">
+            <AvatarImage src={avatarUrl ?? undefined} alt={displayName ?? ''} />
+            <AvatarFallback>{initial}</AvatarFallback>
+          </Avatar>
+          {unseenContactCount > 0 && (
+            <span
+              aria-hidden="true"
+              className={
+                unseenContactCount === 1
+                  ? 'absolute -right-1 -top-1 h-2 w-2 rounded-full bg-destructive ring-2 ring-sage-bg'
+                  : 'absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-white ring-2 ring-sage-bg'
+              }
+            >
+              {unseenContactCount >= 2 ? (unseenContactCount > 9 ? '9+' : unseenContactCount) : null}
+            </span>
+          )}
+        </div>
         <span>Your profile</span>
+        {unseenContactCount > 0 && (
+          <span className="sr-only">
+            , {unseenContactCount} new contact{unseenContactCount === 1 ? '' : 's'}
+          </span>
+        )}
       </Link>
       <LogoutButton />
     </div>

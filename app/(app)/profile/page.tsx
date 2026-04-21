@@ -4,11 +4,15 @@ import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { ProfileCard } from '@/components/profile/ProfileCard'
 import { PublishToggle } from '@/components/profile/PublishToggle'
+import { markContactsSeen } from '@/lib/actions/contact'
 import type { ProfileWithRelations } from '@/lib/actions/profile.types'
 
 export const metadata = { title: 'Your profile' }
 
 export default async function OwnProfilePage() {
+  // Clear new-contact badge BEFORE render — visiting /profile marks contacts as seen
+  await markContactsSeen().catch(() => { /* non-blocking: render regardless */ })
+
   const supabase = await createClient()
   const {
     data: { user },
