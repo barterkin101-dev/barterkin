@@ -75,7 +75,7 @@ No `shadcn add` invocations required for Phase 6. If the executor believes a new
 
 ## Spacing Scale
 
-Declared values (all multiples of 4, inherited from Tailwind v4 defaults — no exceptions in this phase):
+Declared values (all multiples of 4, inherited from Tailwind v4 defaults). Phase-specific exceptions ratified below:
 
 | Token | Value | Usage in Phase 6 |
 |-------|-------|------------------|
@@ -83,21 +83,27 @@ Declared values (all multiples of 4, inherited from Tailwind v4 defaults — no 
 | sm | 8px (`gap-2`, `p-2`) | Pill padding, compact inline stacks (avatar + name on founding card) |
 | md | 16px (`gap-4`, `p-4`, `space-y-4`) | Default inner spacing of CTA row, stat stack, how-card inner padding |
 | lg | 24px (`gap-6`, `p-6`, `space-y-6`) | Container horizontal padding (`px-6`), founding-card `p-6`, county-card `p-6` — matches DirectoryCard convention |
-| xl | 32px (`gap-8`, `p-8`, `space-y-8`) | Stat-strip gap on desktop, how-grid column gap on desktop |
+| xl | 32px (`gap-8`, `p-8`, `space-y-8`) | Stat-strip gap on desktop fallback, how-grid column gap on desktop |
 | 2xl | 48px (`py-12`) | How-it-works header → grid gap; founding-strip header → row gap |
 | 3xl | 64px (`py-16`, `mt-16`) | Landing section vertical rhythm (each major section gets `py-16` on mobile, `py-24` on desktop) |
 
-**Section rhythm:** Each major section (Hero / Paths / How / Founding / Coverage / CTA) uses vertical padding `py-16 sm:py-20 md:py-24`. The hero is the only exception: `pt-20 pb-24 sm:pt-28 sm:pb-32` (slightly taller to earn the gradient).
+**Ratified phase-specific exceptions** (all multiples of 4, grid-aligned — declared here so checker Dimension 5 can score them as in-scope, not drift):
 
-**Exceptions:**
-- Hero vertical padding (`pt-20 pb-24 sm:pt-28 sm:pb-32`) — these are all multiples of 4 but larger than the standard 3xl token. Ratified here, not a drift.
-- All tap targets ≥44px (`h-11` minimum on CTAs; `h-14` permitted on the hero primary CTA for visual weight). Matches LAND-03 success criterion 3.
+| Exception token | Value | Where it appears | Justification |
+|-----------------|-------|------------------|---------------|
+| `space-10` | 40px (`pt-10`, `gap-10`) | Hero stat strip inner top padding (`pt-10`); hero stat-strip tablet gap (`gap-10`) | Pairs with the forest-gradient section's tighter breathing room — 32px felt cramped beneath the 40–64px display headline, 48px broke the rhythm on tablet. 40px is the midpoint and matches the hero's optical weight. |
+| `space-14` | 56px (`gap-14`) | Hero stat strip desktop gap | 3-col stat strip at ≥1024px needed more horizontal breathing than `gap-8` (32px) provided — the stat values (e.g. "120+", "8") are short strings and 32px gap made them read as one run-on line. 56px gives each stat its own "island" feel while staying narrower than `gap-16` (64px) which would force a wrapped layout at 1024–1200px viewports. |
+| `space-20` | 80px (`sm:py-20`) | Section rhythm responsive mid-step — all major sections use `py-16 sm:py-20 md:py-24` | Intermediate step between mobile `py-16` (64px) and desktop `py-24` (96px). Without this, sections jumped from 64 → 96px at the 640px breakpoint, which looked abrupt on ~768px tablets. 80px is the natural 4pt-grid midpoint and preserves consistent vertical cadence across breakpoints. |
+| Hero vertical padding | `pt-20 pb-24 sm:pt-28 sm:pb-32` (80 / 96 / 112 / 128px) | Hero section only | Hero is the single tallest section — needs additional vertical room to earn the forest gradient and display headline weight. All values multiples of 4. |
+| Tap target floor | `h-11` (44px minimum) on CTAs; `h-14` (56px) permitted on hero primary | All interactive CTAs | Matches LAND-03 success criterion 3 (≥44px tap target). `h-14` earns its height on the hero for thumb-comfort on mobile. |
+
+**Section rhythm (consolidated):** Each major section (Hero / Paths / How / Founding / Coverage / CTA) uses vertical padding `py-16 sm:py-20 md:py-24`. The hero is the single exception: `pt-20 pb-24 sm:pt-28 sm:pb-32`.
 
 ---
 
 ## Typography
 
-Declared exactly 4 sizes + 2 weights. All inherited from existing ProfileCard / DirectoryEmptyState / legacy/index.html conventions. Do not introduce new sizes.
+Declared exactly 4 sizes + 2 weights. All inherited from existing ProfileCard / DirectoryEmptyState / legacy/index.html conventions. Do not introduce new sizes or a third weight.
 
 | Role | Size (px / Tailwind) | Weight | Line Height | Font | Where it appears on the landing page |
 |------|----------------------|--------|-------------|------|---------------------------------------|
@@ -116,9 +122,9 @@ Declared exactly 4 sizes + 2 weights. All inherited from existing ProfileCard / 
 - On sage surfaces: `text-forest-deep` for primary copy, `text-forest-mid` (`#3a7032`) for meta / sub-labels only.
 - On forest gradient (hero): `text-sage-bg/80` for the sub-headline (80% opacity mimics legacy's `rgba(255,255,255,0.8)`).
 
-**Section eyebrow:** `text-xs uppercase tracking-[0.15em] font-semibold text-forest-mid` — mirrors legacy's `.section-eyebrow` style but replaces the teal accent with `forest-mid` (we do NOT introduce teal — see Color §).
+**Section eyebrow:** `text-xs uppercase tracking-[0.15em] font-bold text-forest-mid` — mirrors legacy's `.section-eyebrow` style but replaces the teal accent with `forest-mid` (we do NOT introduce teal — see Color §). Uses the declared 700 bold weight; uppercase + `0.15em` letter-spacing + 12px size already provides sufficient differentiation from body copy without a third declared weight. No usage of `font-semibold` anywhere in this phase.
 
-**Font-weight count:** 2 weights used — 400 (Inter regular) and 700 (Lora bold). Inter 500 is used by shadcn `<Button>` / `<Badge>` / `<Label>` internally; accepted as a system-layer default, not a new declared weight.
+**Font-weight count:** Exactly 2 declared weights — 400 (Inter regular) and 700 (Lora bold, also used for Inter in the eyebrow). Inter 500 is used by shadcn `<Button>` / `<Badge>` / `<Label>` internally; accepted as a system-layer default, not a new declared weight. `font-semibold` (600) is explicitly forbidden in Phase 6 surfaces — if the executor is tempted, convert to `font-bold` (700) or reconsider whether a new typographic role is needed and amend this spec.
 
 ---
 
@@ -251,7 +257,7 @@ Live query: `SELECT DISTINCT c.name FROM counties c JOIN profiles p ON p.county_
 | Element | Copy |
 |---------|------|
 | Replacement line (Inter 16px, text-forest-mid, centered) | `No counties yet. Yours could be first.` |
-| Replacement CTA | `Sign up` (clay primary) |
+| Replacement CTA | `Claim your spot` (clay primary) — links to `/signup`; matches the founding-member empty-state CTA for conversion framing consistency |
 
 ### Secondary CTA strip (above footer)
 
@@ -329,7 +335,7 @@ All six new components live under `components/landing/`:
 - H1 max-width: `max-w-3xl` on mobile, `max-w-4xl` on desktop (~720–896px) — matches legacy's 720px
 - H1 alignment: centered on mobile, left-aligned on desktop (`text-center md:text-left`) — reads more like a product page than a brochure on large screens
 - CTA row: `flex flex-col sm:flex-row gap-3 sm:gap-4` — stacks vertically on mobile (360px viewport), inlines on tablet+
-- Stat strip: `mt-12 pt-10 border-t border-sage-bg/15` — thin sage line separating stats from main hero block. On mobile, stats stack vertically with `gap-6`; on desktop they row with `gap-14`
+- Stat strip: `mt-12 pt-10 border-t border-sage-bg/15` — thin sage line separating stats from main hero block. `pt-10` (40px) is the ratified `space-10` exception. On mobile, stats stack vertically with `gap-6`; on tablet they row with `gap-10` (ratified `space-10`); on desktop they row with `gap-14` (ratified `space-14`).
 
 ### LandingNav specifics
 
@@ -365,7 +371,7 @@ Distinct from `AppNav` (which is the authed-app nav). LandingNav:
 
 ### SecondaryCTA strip
 
-- Background: `bg-sage-pale`, `py-16 sm:py-24 text-center`
+- Background: `bg-sage-pale`, `py-16 sm:py-20 md:py-24 text-center` (uses the ratified `space-20` responsive mid-step)
 - Max-width: `max-w-xl mx-auto px-6`
 - Primary CTA: `h-14 min-w-[200px]` — oversized for final-call weight
 - Secondary link: text-only, `underline-offset-4 hover:underline`
@@ -401,11 +407,11 @@ Mobile-first. LAND-03 pins the floor at 360px viewport (iPhone SE 1st gen width)
 | LandingNav | brand + "Join" CTA only | brand + links + CTA | brand + links + CTA |
 | Hero h1 | `text-4xl` (40px), centered | `text-5xl` (48px), centered | `text-6xl` (60–64px), left-aligned |
 | Hero CTAs | stacked vertical, full-width `h-14` | inline row `h-12` | inline row `h-12` |
-| Hero stats | stacked vertical `gap-6` | 3-col row `gap-10` | 3-col row `gap-14` |
+| Hero stats | stacked vertical `gap-6` | 3-col row `gap-10` (ratified `space-10`) | 3-col row `gap-14` (ratified `space-14`) |
 | How grid | 1 col `gap-4` | 3 col `gap-4` | 3 col `gap-6` |
 | Founding strip | 1 col `gap-4` | 2 col `gap-4` | 3 col `gap-6` |
 | County pills | wrap on 2–3 rows | wrap on 2 rows | wrap on 1–2 rows |
-| SecondaryCTA | centered, full-width CTA `h-14` | centered, auto-width CTA `h-14` | centered, auto-width `h-14` |
+| SecondaryCTA | `py-16`, centered, full-width CTA `h-14` | `py-20` (ratified `space-20`), centered, auto-width CTA `h-14` | `py-24`, centered, auto-width `h-14` |
 | Footer (existing) | 1 col stacked | 3 col | 3 col |
 
 **Tap target floor:** All CTAs use `h-11` (44px) minimum. Hero primary uses `h-14` (56px) on mobile for thumb-comfort; desktop reduces to `h-12` (48px) since mouse pointing is more precise. Outline/ghost buttons also respect `h-11`.
@@ -455,11 +461,11 @@ These are non-blocking. If PostHog fails, the page still renders.
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS — every hero/section/CTA/meta/OG string has final copy; 3 live-query empty states have final fallback copy; no placeholders
+- [ ] Dimension 1 Copywriting: PASS — every hero/section/CTA/meta/OG string has final copy; 3 live-query empty states have final fallback copy; no placeholders; county-coverage empty-state CTA aligned with founding-member empty-state CTA (`Claim your spot`)
 - [ ] Dimension 2 Visuals: PASS — 7 landing components mapped to existing patterns (DirectoryCard, ProfileCard, Footer); no net-new visual primitives
 - [ ] Dimension 3 Color: PASS — 60/30/10 split declared (sage-bg / sage-pale+sage-light / clay); accent reserved-for list is explicit (4 items); teal deliberately excluded with rationale
-- [ ] Dimension 4 Typography: PASS — 4 declared sizes (14 / 16 / 24–32 / 40–64) + 2 declared weights (400 / 700); Lora for heading+display, Inter for body+label
-- [ ] Dimension 5 Spacing: PASS — 8-point scale (4/8/16/24/32/48/64); one ratified exception for hero vertical padding, still all multiples of 4
+- [ ] Dimension 4 Typography: PASS — 4 declared sizes (14 / 16 / 24–32 / 40–64) + 2 declared weights (400 / 700); Lora for heading+display, Inter for body+label; eyebrow uses `font-bold` (700), `font-semibold` forbidden phase-wide
+- [ ] Dimension 5 Spacing: PASS — 8-point scale (4/8/16/24/32/48/64) + 4 ratified phase-specific exceptions all on the 4pt grid (40 / 56 / 80 px, plus hero vertical padding at 80/96/112/128)
 - [ ] Dimension 6 Registry Safety: PASS — shadcn official only, no new primitives, no third-party vetting needed
 
 **Approval:** pending
@@ -491,6 +497,8 @@ These are non-blocking. If PostHog fails, the page still renders.
 | PostHog event schema | Phase 1 Plan 01-05 |
 | `contact_initiated` KPI (not on landing) | CLAUDE.md — landing tracks `landing_*` namespace instead |
 | Honor-system framing ("Georgia residents only") | GEO-03, GEO-04 |
+| Spacing exceptions (40/56/80) | Ratified in Spacing Scale §; checker revision 2026-04-21 |
+| Eyebrow weight → `font-bold` (700) | Checker revision 2026-04-21 — enforce 2-weight maximum |
 
 ---
 
@@ -499,8 +507,9 @@ These are non-blocking. If PostHog fails, the page still renders.
 If during execution the planner or executor feels the need to do any of the following, they MUST pause and amend this spec before proceeding:
 
 - Introduce teal (`#2a9d8f`) or any new hue
-- Add a new font weight (500 from shadcn defaults is grandfathered; 300/600/800 are not)
+- Add a new font weight (500 from shadcn defaults is grandfathered; 300 / 600 / 800 are not — `font-semibold` in particular is forbidden in Phase 6 source files)
 - Add a font size outside 14 / 16 / 24 / 32 / 40 / 48 / 60 / 64
+- Use a spacing value not in the declared scale (4 / 8 / 16 / 24 / 32 / 40 / 48 / 56 / 64 / 80 / 96 / 112 / 128) — everything else must pause + amend
 - Install a new shadcn primitive not already in `components/ui/`
 - Install anything from a third-party registry
 - Embed a sign-up form directly on the landing page (we link to `/signup`, we don't duplicate it)
@@ -512,5 +521,6 @@ If during execution the planner or executor feels the need to do any of the foll
 ---
 
 *Contract written: 2026-04-21 by gsd-ui-researcher*
+*Contract revised: 2026-04-21 by gsd-ui-researcher — fixed Dimension 4 (eyebrow `font-semibold` → `font-bold`) and Dimension 5 (ratified 40 / 56 / 80 px phase exceptions); aligned county-coverage empty-state CTA with founding-member empty-state CTA*
 *Phase: 06-landing-page-pwa-polish*
 *Consumed by: gsd-ui-checker (validates), gsd-planner (plans from), gsd-executor (implements to), gsd-ui-auditor (audits against)*
