@@ -116,8 +116,8 @@ Plans:
 Plans:
 - [x] 05-01-PLAN.md — Wave 1: shadcn sheet/dropdown-menu/select + react-email install, Zod schemas (MessageSchema, ReportReasonEnum, ReportSchema, BlockSchema) + result types, Wave 0 test stubs + contact-helpers fixture
 - [x] 05-02-PLAN.md — Wave 2: Migration 005 (contact_requests + blocks + reports + RLS + indexes + directory-visibility cascade + contact_eligibility RPC) + [BLOCKING] supabase db push + type regen + fill contact-eligibility + reports-rls unit tests
-- [ ] 05-03-PLAN.md — Wave 3: React Email template + Edge Function send-contact (eligibility + 3-layer rate limit + insert + Resend + PostHog shutdown) + Resend webhook route + fill webhook + response-shape unit tests + human checkpoint (deploy + secrets + Resend webhook config)
-- [ ] 05-04-PLAN.md — Wave 3: Admin-notify email template + lib/actions/contact.ts (sendContactRequest proxy, blockMember, reportMember + admin notify, markContactsSeen) + server-action unit tests
+- [x] 05-03-PLAN.md — Wave 3: React Email template + Edge Function send-contact (eligibility + 3-layer rate limit + insert + Resend + PostHog shutdown) + Resend webhook route + fill webhook + response-shape unit tests + human checkpoint (deploy + secrets + Resend webhook config)
+- [x] 05-04-PLAN.md — Wave 3: Admin-notify email template + lib/actions/contact.ts (sendContactRequest proxy, blockMember, reportMember + admin notify, markContactsSeen) + server-action unit tests
 - [ ] 05-05-PLAN.md — Wave 4: Contact Sheet UI (ContactButton + ContactForm + ContactSuccessState), OverflowMenu + BlockDialog + ReportDialog, ProfileCard viewer-context wiring, /m/[username] force-dynamic + human smoke test
 - [ ] 05-06-PLAN.md — Wave 5: Nav badge (layout fetch + NavLinks render + /profile clear), directory post-block sonner toast, fill all 6 E2E spec bodies + human checkpoint (full suite + mail-tester + PostHog + admin ban runbook)
 
