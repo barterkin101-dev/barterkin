@@ -73,7 +73,7 @@ test.describe('DIR-08: empty states', () => {
   })
 
   test('empty-directory state: no published profiles shows "Nobody\'s here yet."', async ({
-    page,
+    page: _page,
   }) => {
     test.skip(!hasEnv, 'Supabase env vars not set — skip DB-seeded E2E')
     // NOTE: This test is hard to run reliably in a shared DB (other profiles exist).
