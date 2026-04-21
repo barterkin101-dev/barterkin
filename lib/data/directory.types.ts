@@ -36,6 +36,7 @@ export interface DirectoryProfile {
   username: string | null
   display_name: string | null
   avatar_url: string | null
+  founding_member: boolean
   counties: { name: string } | null
   categories: { name: string } | null
   skills_offered: DirectorySkill[]
