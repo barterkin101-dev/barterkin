@@ -90,7 +90,7 @@ export async function getFoundingMembers(): Promise<FoundersResult> {
 
     if (error) throw error
 
-    const profiles: LandingFounderCard[] = (data ?? []).map((row: any) => {
+    const profiles: LandingFounderCard[] = (data ?? []).map((row: Record<string, unknown>) => {
       const allSkills = (row.skills_offered ?? []) as Array<{
         skill_text: string
         sort_order: number
