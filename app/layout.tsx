@@ -9,6 +9,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swa
 const lora = Lora({ subsets: ['latin'], variable: '--font-serif', display: 'swap' })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com'),
   title: 'Barterkin',
   description: "Georgia's community skills exchange.",
   appleWebApp: { capable: true, title: 'Barterkin', statusBarStyle: 'default' },
@@ -26,6 +27,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${lora.variable}`}>
       <body className="font-sans bg-sage-bg text-forest-deep min-h-screen antialiased">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-forest focus:text-sage-bg focus:px-4 focus:py-2 focus:rounded"
+        >
+          Skip to content
+        </a>
         <PostHogProvider>
           {children}
           <Footer />
