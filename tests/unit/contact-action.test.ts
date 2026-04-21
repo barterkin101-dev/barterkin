@@ -53,17 +53,20 @@ function makeSupabaseMock(overrides?: {
   getUser?: ReturnType<typeof vi.fn>
   getSession?: ReturnType<typeof vi.fn>
   from?: ReturnType<typeof vi.fn>
+  rpc?: ReturnType<typeof vi.fn>
 }) {
   const getUserMock = overrides?.getUser ?? vi.fn()
   const getSessionMock = overrides?.getSession ?? vi.fn()
   const fromMock = overrides?.from ?? vi.fn()
+  const rpcMock = overrides?.rpc ?? vi.fn()
   const client = {
     auth: { getUser: getUserMock, getSession: getSessionMock },
     from: fromMock,
+    rpc: rpcMock,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   vi.mocked(createClient).mockResolvedValue(client as any)
-  return { getUserMock, getSessionMock, fromMock, client }
+  return { getUserMock, getSessionMock, fromMock, rpcMock, client }
 }
 
 beforeEach(() => {
@@ -353,26 +356,21 @@ describe('markContactsSeen', () => {
     expect(result.ok).toBe(false)
   })
 
-  it('returns ok and count after UPDATE', async () => {
-    const { getUserMock, fromMock } = makeSupabaseMock()
+  it('returns ok after RPC call', async () => {
+    const { getUserMock, fromMock, rpcMock } = makeSupabaseMock()
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
-    // 1st from('profiles'): SELECT id for profile lookup
+    // from('profiles'): SELECT id for profile lookup
     const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: 'profile-1' }, error: null })
     const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
     const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
+    fromMock.mockReturnValueOnce({ select: profileSelect })
 
-    // 2nd from('contact_requests'): UPDATE ... eq ... is
-    const updateIs = vi.fn().mockResolvedValue({ error: null, count: 3 })
-    const updateEq = vi.fn().mockReturnValue({ is: updateIs })
-    const updateFn = vi.fn().mockReturnValue({ eq: updateEq })
-
-    fromMock
-      .mockReturnValueOnce({ select: profileSelect })
-      .mockReturnValueOnce({ update: updateFn })
+    // RPC: mark_contacts_seen (H-02 security fix — uses SECURITY DEFINER fn instead of direct UPDATE)
+    rpcMock.mockResolvedValue({ error: null })
 
     const result = await markContactsSeen()
     expect(result.ok).toBe(true)
-    expect(result.count).toBe(3)
+    expect(result.count).toBe(0)
   })
 })
