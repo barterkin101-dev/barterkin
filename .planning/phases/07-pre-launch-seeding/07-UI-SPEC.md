@@ -1,7 +1,7 @@
 ---
 phase: 7
 slug: pre-launch-seeding
-status: draft
+status: approved
 shadcn_initialized: true
 preset: new-york / stone / lucide / cssVariables=true (components.json)
 created: 2026-04-21
