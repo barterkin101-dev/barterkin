@@ -119,7 +119,7 @@ Plans:
 - [x] 05-03-PLAN.md — Wave 3: React Email template + Edge Function send-contact (eligibility + 3-layer rate limit + insert + Resend + PostHog shutdown) + Resend webhook route + fill webhook + response-shape unit tests + human checkpoint (deploy + secrets + Resend webhook config)
 - [x] 05-04-PLAN.md — Wave 3: Admin-notify email template + lib/actions/contact.ts (sendContactRequest proxy, blockMember, reportMember + admin notify, markContactsSeen) + server-action unit tests
 - [x] 05-05-PLAN.md — Wave 4: Contact Sheet UI (ContactButton + ContactForm + ContactSuccessState), OverflowMenu + BlockDialog + ReportDialog, ProfileCard viewer-context wiring, /m/[username] force-dynamic + human smoke test
-- [ ] 05-06-PLAN.md — Wave 5: Nav badge (layout fetch + NavLinks render + /profile clear), directory post-block sonner toast, fill all 6 E2E spec bodies + human checkpoint (full suite + mail-tester + PostHog + admin ban runbook)
+- [x] 05-06-PLAN.md — Wave 5: Nav badge (layout fetch + NavLinks render + /profile clear), directory post-block sonner toast, fill all 6 E2E spec bodies + human checkpoint (full suite + mail-tester + PostHog + admin ban runbook)
 
 ### Phase 6: Landing Page & PWA Polish
 **Goal**: The new Next.js landing page at `/` matches the existing `index.html` visual identity (sage/forest/clay + Lora/Inter + warm community aesthetic) with sections for hero, how-it-works (3-step), founding-member strip (live profiles), county coverage, signup CTA, and footer — plus Georgia-honor-system framing copy, responsive mobile-first layout (≥360px), Open Graph meta/favicon/manifest icons, and a Serwist-powered installable PWA. Legacy Netlify `index.html` is retired once parity is verified.
