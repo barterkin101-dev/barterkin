@@ -1,26 +1,48 @@
-// STUB — FILLED IN: Plan 03 (Edge Function response contract + send-contact handler)
-import { describe, it } from 'vitest'
+// FILLED IN: Plan 03 — Edge Function response privacy invariant (CONT-06)
+// Static source analysis of send-contact/index.ts to verify recipient PII never appears in responses.
+import { describe, it, expect } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 
-const URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-const ANON = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-const SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY
-const hasAll = Boolean(URL && ANON && SERVICE)
-const d = hasAll ? describe : describe.skip
+describe('CONT-06 — Edge Function response never includes recipient PII', () => {
+  const src = readFileSync(
+    resolve(process.cwd(), 'supabase/functions/send-contact/index.ts'),
+    'utf8',
+  )
 
-// CONT-06 — privacy invariant: recipient email NEVER appears in Edge Function response shape.
-// The send-contact Edge Function returns { id, status } from Resend — never { to, email, recipient_email }.
-// This test mocks the Edge Function response and asserts no email field is present.
-d('CONT-06 Edge Function response privacy invariant', () => {
-  it.skip('response does not contain recipient email address', () => {
-    // FILLED IN: Plan 03 — import sendContactHandler, mock Resend + Supabase,
-    // call handler with valid payload, assert response body has no 'email', 'to', or 'recipient_email' key
+  it('success response returns only ok + contact_id', () => {
+    // Match the success return pattern: json({ ok: true, contact_id: ... })
+    const successMatches = src.match(/json\(\s*\{\s*ok:\s*true[^}]+\}/g) ?? []
+    expect(successMatches.length).toBeGreaterThan(0)
+    for (const m of successMatches) {
+      expect(m).not.toMatch(/recipient_email/)
+      expect(m).not.toMatch(/\bemail\s*:/i)
+      expect(m).not.toMatch(/\bto\s*:/)
+      expect(m).not.toMatch(/display_name/)
+      // Allow only ok + contact_id keys
+      const keys = m.match(/(\w+)\s*:/g)?.map((k) => k.replace(':', '').trim()) ?? []
+      for (const k of keys) {
+        expect(['ok', 'contact_id']).toContain(k)
+      }
+    }
   })
 
-  it.skip('response shape is { ok: true, contactId: string } on success', () => {
-    // FILLED IN: Plan 03 — verify the exact success response shape from send-contact
+  it('error responses never include recipient PII', () => {
+    // Match all json({ code: '...', error: ... }) calls
+    const errorMatches =
+      src.match(/json\(\s*\{\s*code:\s*'[^']+',\s*error:\s*[^}]+\}/g) ?? []
+    expect(errorMatches.length).toBeGreaterThanOrEqual(5)
+    for (const m of errorMatches) {
+      expect(m).not.toMatch(/recipient_email/)
+      expect(m).not.toMatch(/\.email/)
+    }
   })
 
-  it.skip('error response includes code but not email details', () => {
-    // FILLED IN: Plan 03 — verify error responses include code (e.g. daily_cap) but no PII
+  it('response shape never exposes the to: field', () => {
+    // The `to:` field is only used inside resend.emails.send() — never in a json() response
+    const jsonCalls = src.match(/json\(\s*\{[^)]+\}/g) ?? []
+    for (const call of jsonCalls) {
+      expect(call).not.toMatch(/\bto\s*:/)
+    }
   })
 })
