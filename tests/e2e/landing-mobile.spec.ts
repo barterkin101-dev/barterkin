@@ -1,6 +1,4 @@
-import { test, expect, devices } from '@playwright/test'
-
-test.use({ ...devices['iPhone SE'] })
+import { test, expect } from '@playwright/test'
 
 test.describe('landing mobile (LAND-03)', () => {
   test('no horizontal scroll at iPhone SE viewport', async ({ page }) => {
