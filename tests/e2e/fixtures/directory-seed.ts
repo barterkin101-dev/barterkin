@@ -37,6 +37,7 @@ export async function seedPublishedProfile(opts: {
   county_id?: number
   category_id?: number
   skills?: string[]
+  founding_member?: boolean  // NEW — defaults to false
 }): Promise<string> {
   const username = `${opts.display_name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`.slice(
     0,
@@ -52,6 +53,7 @@ export async function seedPublishedProfile(opts: {
       category_id: opts.category_id ?? 1,
       is_published: true,
       banned: false,
+      founding_member: opts.founding_member ?? false,
     })
     .select('id')
     .single()
