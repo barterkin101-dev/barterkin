@@ -235,15 +235,16 @@ export async function markContactsSeen(): Promise<MarkContactsSeenResult> {
     .maybeSingle()
   if (!profile) return { ok: true, count: 0 }
 
-  const { error, count } = await supabase
-    .from('contact_requests')
-    .update({ seen_at: new Date().toISOString() }, { count: 'exact' })
-    .eq('recipient_id', profile.id)
-    .is('seen_at', null)
+  // H-02 fix: call SECURITY DEFINER RPC instead of direct .update()
+  // Direct UPDATE on contact_requests has been revoked from authenticated; the RPC
+  // only mutates seen_at, preventing column-level abuse via the Supabase API.
+  const { error } = await supabase.rpc('mark_contacts_seen', {
+    p_recipient_profile_id: profile.id,
+  })
 
   if (error) {
-    console.error('[markContactsSeen] update failed', { code: error.code })
+    console.error('[markContactsSeen] rpc failed', { code: error.code })
     return { ok: false, error: 'Could not mark contacts as seen.' }
   }
-  return { ok: true, count: count ?? 0 }
+  return { ok: true, count: 0 }
 }
