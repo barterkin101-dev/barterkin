@@ -1,7 +1,8 @@
 ---
 phase: 8
 slug: admin-dashboard-non-technical-ui-at-admin-for-wife-to-manage
-status: draft
+status: approved
+reviewed_at: 2026-04-21
 shadcn_initialized: true
 preset: new-york (stone base) — detected from components.json
 created: 2026-04-21
@@ -39,7 +40,7 @@ Declared values (Tailwind default 4-pt scale; admin uses only these):
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px (`gap-1`, `p-1`) | Icon-to-label gap inside badges and buttons |
-| sm | 8px (`gap-2`, `p-2`) | Compact element spacing; stats-card inner rhythm |
+| sm | 8px (`gap-2`, `p-2`, `py-2`) | Compact element spacing; stats-card inner rhythm; members table row vertical padding |
 | md | 16px (`gap-4`, `p-4`) | Default element spacing; table cell padding; card body padding |
 | lg | 24px (`gap-6`, `p-6`) | Admin page gutter (`px-6`); section padding |
 | xl | 32px (`gap-8`, `py-8`) | Stats-grid vertical rhythm |
@@ -48,7 +49,7 @@ Declared values (Tailwind default 4-pt scale; admin uses only these):
 
 Exceptions:
 - **Touch targets:** All tappable controls (ban/unban buttons, member row, tab triggers, search clear) render at ≥44px tall. Use shadcn Button `size="default"` (40px) upgraded to `size="lg"` (44px) or `h-11` for primary admin actions — matches the `Build your profile` pattern in `DirectoryEmptyState.tsx`.
-- **Members list row:** Each row has `py-3` (12px) top/bottom padding on a 48px min-height row — an intentional deviation from the pure 8-point scale to keep the table dense enough for a non-technical scanner and still hit the 44px touch target.
+- **Members list row:** Each row uses `py-2` (8px) top/bottom padding plus `min-h-[44px]` to satisfy the 44px touch-target rule without introducing a non-scale value. All padding stays inside the declared `{4, 8, 16, 24, 32, 48, 64}` set; `min-height` is a constraint, not a padding token, so it is exempt from the scale.
 
 Max content width: `max-w-5xl` (matches `(app)` layout) with `px-6` gutter.
 
@@ -60,13 +61,14 @@ Exactly 4 sizes, exactly 2 weights (regular 400 + bold 700). Mirrors the directo
 
 | Role | Size | Weight | Line Height | Family |
 |------|------|--------|-------------|--------|
-| Display (page H1) | 32px (`text-[32px]`) | 700 (`font-bold`) | 1.15 (`leading-[1.15]`) | Lora (`font-serif`) |
+| Display (page H1, stat value number) | 32px (`text-[32px]`) | 700 (`font-bold`) | 1.15 (`leading-[1.15]`) | Lora (`font-serif`) for H1 / Inter (`font-sans`) for stat value |
 | Heading (card title, section H2) | 20px (`text-xl`) | 700 (`font-bold`) | 1.2 (`leading-tight`) | Lora (`font-serif`) |
 | Body (default text, table cells, dialog body) | 16px (`text-base`) | 400 (`font-normal`) | 1.5 (`leading-normal`) | Inter (`font-sans`) |
 | Label (table headers, badges, helper copy) | 14px (`text-sm`) | 400 or 700 | 1.5 | Inter (`font-sans`) |
 
 Rules:
-- Headings and display: Lora / forest-deep.
+- Headings and display (H1): Lora / forest-deep.
+- Stat value numbers use the Display size (32px/bold) but render in `font-sans` for tabular legibility and `text-clay` for the accent role.
 - Body and labels: Inter.
 - Never use a 5th size; never use weight 500 or 600 (match Phase 4 pattern — directory uses only 400/700).
 
@@ -123,6 +125,7 @@ Audience: Ashley's wife — non-technical. Copy uses plain English, no developer
 | Subheading | `{N} Georgians on the directory.` |
 | Search input placeholder | `Search by name…` |
 | Search input aria-label | `Search members by display name` |
+| Search clear button aria-label | `Clear search` |
 | Column header 1 | `Name` |
 | Column header 2 | `County` |
 | Column header 3 | `Joined` |
@@ -151,7 +154,7 @@ Audience: Ashley's wife — non-technical. Copy uses plain English, no developer
 |---------|------|
 | Title | `Ban {displayName}?` |
 | Body | `Their profile will be hidden from the directory. They won't get an email. You can unban them later.` |
-| Cancel button | `Cancel` |
+| Cancel button | `No, go back` |
 | Confirm button (destructive) | `Ban member` |
 | Success toast | `{displayName} has been banned.` |
 | Error toast | `Couldn't ban {displayName}. Try again.` |
@@ -162,7 +165,7 @@ Audience: Ashley's wife — non-technical. Copy uses plain English, no developer
 |---------|------|
 | Title | `Unban {displayName}?` |
 | Body | `Their profile will appear in the directory again.` |
-| Cancel button | `Cancel` |
+| Cancel button | `No, go back` |
 | Confirm button (accent) | `Unban member` |
 | Success toast | `{displayName} has been unbanned.` |
 | Error toast | `Couldn't unban {displayName}. Try again.` |
@@ -247,15 +250,15 @@ All of these are already installed in `components/ui/` (verified 2026-04-21). No
 
 - H1 block (display 32px/bold) with subheading (body 16px/muted-foreground)
 - 3-column stats grid (`grid-cols-1 md:grid-cols-3 gap-6`) of shadcn `<Card>`:
-  - Each card: `p-6`, label (text-sm uppercase tracking-wide forest-mid), stat value (text-[40px] font-bold clay), helper (text-sm forest-mid)
+  - Each card: `p-6`, label (text-sm uppercase tracking-wide forest-mid), stat value (`text-[32px] font-bold text-clay font-sans leading-[1.15]` — reuses the declared Display size), helper (text-sm forest-mid)
 - No other content on the home screen.
 
 ### Members list (`/admin/members`)
 
 - H1 block + count subheading
-- Search input: full-width `<Input>` with `Search` lucide icon left-padded, placeholder `Search by name…`, 300ms client-side debounced filter (matches directory keyword-search pattern)
+- Search input: full-width `<Input>` with `Search` lucide icon left-padded, placeholder `Search by name…`, 300ms client-side debounced filter (matches directory keyword-search pattern). Clear X-button (lucide `X` icon) sits inside the input when a query is present, with `aria-label="Clear search"`.
 - Table container: `bg-sage-pale ring-1 ring-sage-light rounded-lg overflow-hidden`
-- Each row: avatar + name (`font-sans font-bold text-forest-deep`) + county (`text-sm text-forest-mid`) + joined (formatted as `Apr 14, 2026`, text-sm forest-mid) + status badge; clickable link to `/admin/members/[id]` with `hover:bg-sage-light/40` treatment
+- Each row: `py-2 min-h-[44px]` (satisfies 44px touch target via min-height without leaving the 8-point scale), avatar + name (`font-sans font-bold text-forest-deep`) + county (`text-sm text-forest-mid`) + joined (formatted as `Apr 14, 2026`, text-sm forest-mid) + status badge; clickable link to `/admin/members/[id]` with `hover:bg-sage-light/40` treatment
 
 ### Member detail (`/admin/members/[id]`)
 
@@ -274,7 +277,7 @@ All of these are already installed in `components/ui/` (verified 2026-04-21). No
 
 ## Interaction Contract
 
-- **Real-time search (members):** No submit button; 300ms debounce; clears with an X button inside the input when a query is present; Escape key also clears.
+- **Real-time search (members):** No submit button; 300ms debounce; clears with an X button inside the input when a query is present (button has `aria-label="Clear search"`); Escape key also clears.
 - **Row click:** Full-row `<Link>` to detail page; focus ring on keyboard navigation (forest-mid outline, matches existing `focus-visible` pattern).
 - **Ban flow:** Click `Ban this member` → AlertDialog opens → Confirm fires Server Action using `lib/supabase/admin.ts` service-role client → on success, dialog closes, page revalidates, sonner toast `{displayName} has been banned.`, status pill flips to `Banned`, primary button re-labels to `Unban this member`.
 - **Unban flow:** Same pattern, inverse.
@@ -287,11 +290,11 @@ All of these are already installed in `components/ui/` (verified 2026-04-21). No
 ## Accessibility Contract
 
 - All interactive elements are keyboard-reachable (Tab / Shift+Tab) with visible focus rings (`focus-visible:ring-2 focus-visible:ring-clay ring-offset-2 ring-offset-sage-pale`).
-- All icons are decorative unless paired with a label; icon-only buttons have `aria-label`.
+- All icons are decorative unless paired with a label; icon-only buttons have `aria-label` (e.g. the members search clear button: `aria-label="Clear search"`).
 - Color is never the sole status indicator — status badges always include text labels (`Published` / `Unpublished` / `Banned`).
 - AlertDialog uses Radix's built-in focus-trap + Escape-to-close + `aria-describedby` on the body text.
 - Tables use semantic `<table>` / `<thead>` / `<th scope="col">` / `<tbody>` / `<tr>` / `<td>` — no divs-as-tables.
-- Minimum tap target 44×44px for all primary admin actions (enforced via `h-11` on the ban/unban buttons and `py-3` rows on the members table).
+- Minimum tap target 44×44px for all primary admin actions (enforced via `h-11` on the ban/unban buttons and `min-h-[44px]` on the members table rows paired with `py-2` padding).
 - Contrast: clay `#c4956a` on sage-bg passes WCAG AA for large text (≥18px bold); body text is forest-deep `#1e4420` on sage-bg, which passes AAA.
 
 ---
