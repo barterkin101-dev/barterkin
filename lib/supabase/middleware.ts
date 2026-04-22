@@ -100,5 +100,27 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // ADMIN-06 (Phase 8) — admin email guard
+  // Spec: /admin/* is reachable only by the designated ADMIN_EMAIL; all others redirect.
+  // Uses claims.email (top-level, JWKS-verified) — NEVER the user_metadata.email field (user-writable).
+  // ADMIN_EMAIL has no NEXT_PUBLIC_ prefix — server-only per defense-in-depth.
+  const ADMIN_PREFIX = '/admin'
+  if (pathname.startsWith(ADMIN_PREFIX)) {
+    if (!isAuthed) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      url.search = ''
+      return NextResponse.redirect(url)
+    }
+    const adminEmail = process.env.ADMIN_EMAIL
+    const userEmail = claims?.email as string | undefined
+    if (!adminEmail || userEmail !== adminEmail) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      url.search = ''
+      return NextResponse.redirect(url)
+    }
+  }
+
   return response
 }
