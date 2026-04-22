@@ -192,7 +192,41 @@ Phase 1 (Foundation & Infrastructure)
 | 6. Landing Page & PWA Polish | 0/? | Not started | - |
 | 7. Pre-Launch Seeding | 0/? | Not started | - |
 
+### Phase 8: Admin Dashboard — non-technical UI at /admin for wife to manage members (list, view profiles, search), review contact requests (view, mark read), ban/unban members, and see basic stats (total members, contacts sent, new members this week). Protected by a Supabase admin role. Minimal, clean UI — she is non-technical.
+
+**Goal:** Ashley's wife (non-technical) can log in at `/admin`, see at-a-glance platform stats (total members / contacts sent / new members in the last 7 days), browse and real-time-search the full member roster, drill into any member's full profile, and one-click ban/unban offenders via a confirmation dialog — all behind a server-only `ADMIN_EMAIL` middleware guard with ASVS L1 threat mitigations baked into the implementation.
+**Requirements**: ADMIN-01, ADMIN-02, ADMIN-03, ADMIN-04, ADMIN-05, ADMIN-06
+**Depends on:** Phase 7
+**Plans:** 4 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Wave 0: middleware admin email guard + ADMIN_EMAIL env var docs + FK-verified lib/data/admin.ts + lib/actions/admin.ts + 5 test stubs
+- [ ] 08-02-PLAN.md — Wave 1: /admin layout + AdminNav + /admin stats page + /admin/members list + MembersTable real-time search + filled ADMIN-02 unit test
+- [ ] 08-03-PLAN.md — Wave 2: /admin/members/[id] detail + MemberDetailView + BanUnbanButton (AlertDialog + Server Action) + filled ADMIN-03 + ADMIN-04 E2E specs
+- [ ] 08-04-PLAN.md — Wave 3: shadcn tabs install + /admin/contacts + ContactStatusTabs + ContactsTable + filled ADMIN-05 unit tests + filled ADMIN-06 non-admin redirect E2E + phase verification gate
+
+### Phase 9: Onboarding Wizard — multi-step in-app guide for new members showing how to complete their profile, browse the directory, and send their first contact request. Shown once after first sign-up, dismissible, resumable.
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 8
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 9 to break down)
+
+### Phase 10: n8n Automation Server — self-hosted n8n instance on the VPS alongside OpenClaw, wired to Supabase webhooks for welcome emails (new member joins), contact-request alerts (admin notification when relay fires), and future automation triggers.
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 9
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd-plan-phase 10 to break down)
+
 ---
 *Roadmap created: 2026-04-17 from REQUIREMENTS.md + research synthesis*
 *Phase 1 planned: 2026-04-18 — 10 plans across 9 waves*
+*Phase 8 planned: 2026-04-22 — 4 plans across 4 waves (ADMIN-01..ADMIN-06)*
 *Next: `/gsd-execute-phase 1`*
