@@ -197,7 +197,7 @@ Phase 1 (Foundation & Infrastructure)
 **Goal:** Ashley's wife (non-technical) can log in at `/admin`, see at-a-glance platform stats (total members / contacts sent / new members in the last 7 days), browse and real-time-search the full member roster, drill into any member's full profile, and one-click ban/unban offenders via a confirmation dialog — all behind a server-only `ADMIN_EMAIL` middleware guard with ASVS L1 threat mitigations baked into the implementation.
 **Requirements**: ADMIN-01, ADMIN-02, ADMIN-03, ADMIN-04, ADMIN-05, ADMIN-06
 **Depends on:** Phase 7
-**Plans:** 4 plans
+**Plans:** 4/4 plans complete
 
 Plans:
 - [x] 08-01-PLAN.md — Wave 0: middleware admin email guard + ADMIN_EMAIL env var docs + FK-verified lib/data/admin.ts + lib/actions/admin.ts + 5 test stubs
