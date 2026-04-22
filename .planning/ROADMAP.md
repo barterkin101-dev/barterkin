@@ -200,8 +200,8 @@ Phase 1 (Foundation & Infrastructure)
 **Plans:** 4 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — Wave 0: middleware admin email guard + ADMIN_EMAIL env var docs + FK-verified lib/data/admin.ts + lib/actions/admin.ts + 5 test stubs
-- [ ] 08-02-PLAN.md — Wave 1: /admin layout + AdminNav + /admin stats page + /admin/members list + MembersTable real-time search + filled ADMIN-02 unit test
+- [x] 08-01-PLAN.md — Wave 0: middleware admin email guard + ADMIN_EMAIL env var docs + FK-verified lib/data/admin.ts + lib/actions/admin.ts + 5 test stubs
+- [x] 08-02-PLAN.md — Wave 1: /admin layout + AdminNav + /admin stats page + /admin/members list + MembersTable real-time search + filled ADMIN-02 unit test
 - [ ] 08-03-PLAN.md — Wave 2: /admin/members/[id] detail + MemberDetailView + BanUnbanButton (AlertDialog + Server Action) + filled ADMIN-03 + ADMIN-04 E2E specs
 - [ ] 08-04-PLAN.md — Wave 3: shadcn tabs install + /admin/contacts + ContactStatusTabs + ContactsTable + filled ADMIN-05 unit tests + filled ADMIN-06 non-admin redirect E2E + phase verification gate
 
