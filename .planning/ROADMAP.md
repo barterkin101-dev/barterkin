@@ -207,13 +207,15 @@ Plans:
 
 ### Phase 9: Onboarding Wizard — multi-step in-app guide for new members showing how to complete their profile, browse the directory, and send their first contact request. Shown once after first sign-up, dismissible, resumable.
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** An email-verified new member landing in the app for the first time is shown a three-step wizard (Profile / Directory / Contact) at `/onboarding` that walks them through completing their profile, explains how to browse the directory, and explains how to send their first contact request — with middleware-enforced first-time redirect, dismissible skip-to-directory, resume via a persistent AppNav "Finish setup" link, and DB-persisted completion state (nullable `profiles.onboarding_completed_at`).
+**Requirements**: D-01..D-16 (decision IDs from 09-CONTEXT.md serve as requirement IDs for this phase; no requirement IDs were defined in REQUIREMENTS.md for Phase 9)
 **Depends on:** Phase 8
-**Plans:** 0 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 9 to break down)
+- [ ] 09-01-PLAN.md — Wave 1: Migration 009 (onboarding_completed_at) + [BLOCKING] supabase db push + type regen + middleware /onboarding guard + safeReturnTo helper + Wave 0 test stubs
+- [ ] 09-02-PLAN.md — Wave 2: (onboarding) route group + layout + wizard page + 5 step components + markOnboardingComplete server action + 4 filled unit tests
+- [ ] 09-03-PLAN.md — Wave 3: AppNav "Finish setup" link + ProfileEditForm returnTo wiring + 15 filled E2E specs + phase verification gate
 
 ### Phase 10: n8n Automation Server — self-hosted n8n instance on the VPS alongside OpenClaw, wired to Supabase webhooks for welcome emails (new member joins), contact-request alerts (admin notification when relay fires), and future automation triggers.
 
