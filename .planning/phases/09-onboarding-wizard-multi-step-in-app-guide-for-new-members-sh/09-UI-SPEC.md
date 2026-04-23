@@ -48,19 +48,20 @@ Exceptions:
 
 ## Typography
 
-Pre-populated from existing codebase patterns (`components/landing/Hero.tsx`, `components/landing/HowItWorks.tsx`, `components/directory/DirectoryEmptyState.tsx`). **3 sizes, 2 weights** — meets checker's "3–4 sizes, 2 weights max" rule.
+Pre-populated from existing codebase patterns (`components/landing/Hero.tsx`, `components/landing/HowItWorks.tsx`, `components/directory/DirectoryEmptyState.tsx`). **4 sizes, 2 weights** — meets checker's "3–4 sizes, 2 weights max" rule.
 
 | Role | Size | Tailwind | Weight | Line Height | Font Family |
 |------|------|----------|--------|-------------|-------------|
 | Display (wizard step headline) | 28px (`text-2xl` sm:`text-3xl`) | `text-2xl sm:text-3xl` | 700 (bold) | 1.2 (`leading-tight`) | Lora serif (`font-serif`) |
-| Heading (section/sub labels, progress "Step 1 of 3") | 20px (`text-xl`) | `text-xl` OR `text-lg` for Step 1-section inner labels | 600 (semibold) | 1.3 (`leading-snug`) | Lora serif (`font-serif`) |
+| Heading (section/sub labels, progress "Step 1 of 3") | 20px default (`text-xl`); 18px sub-variant (`text-lg`) permitted for Step 1 inner section labels inside the checklist region — same role, same weight, same family, just a smaller render in tight layouts | `text-xl` (default), `text-lg` (sub-variant) | 700 (bold) | 1.3 (`leading-snug`) | Lora serif (`font-serif`) |
 | Body (step explanation paragraph) | 16px (`text-base`) | `text-base` | 400 (regular) | 1.5 (`leading-relaxed`) | Inter sans (`font-sans`) |
 | Label / micro (progress eyebrow "How it works", "Step 1 of 3" counter) | 12px (`text-xs`) | `text-xs uppercase tracking-[0.18em]` | 700 (bold) | 1.4 | Inter sans (`font-sans`) |
 
 Rules (locked by precedent):
 - Wizard step headlines MUST be `font-serif` + `font-bold` — all existing H1/H2 use Lora bold (`Hero` L46, `HowItWorks` L43, `DirectoryEmptyState` L11).
 - Body paragraphs MUST be `text-base` + `leading-relaxed` (or explicit `leading-[1.5]`) — matches `DirectoryEmptyState` L14 and `HowItWorks` L46.
-- Weights used: **400 (regular)** for body + **700 (bold)** for headings and progress eyebrows. `font-semibold` (600) permitted on CTA button labels only (`Hero` L59 `font-semibold`). Total weights = 2 families (regular/bold) with semibold as a button-only affordance.
+- Weights used: **400 (regular)** for body + **700 (bold)** for headings, progress eyebrows, and CTA button labels. Exactly 2 weights. CTA labels use `font-bold` (matches `Hero.tsx` bold CTA precedent) — no third weight is introduced.
+- The `text-lg` (18px) size listed under Heading is NOT a separate size tier — it is a tight-layout sub-variant of the 20px Heading role, using the same font family and weight. Total distinct size tiers = 4 (28px display, 20px/18px heading, 16px body, 12px micro).
 
 ---
 
@@ -243,7 +244,7 @@ Rationale: Phase 9 introduces NO new shadcn primitives and NO third-party regist
 - [ ] Dimension 1 Copywriting: PASS (10 copy elements defined, zero placeholders, brand voice consistent with existing landing page)
 - [ ] Dimension 2 Visuals: PASS (8 shadcn primitives reused, 6 new compositions, 0 new primitives introduced)
 - [ ] Dimension 3 Color: PASS (60/30/10 — sage-bg dominant, sage-pale/forest-deep secondary, clay accent reserved for 4 named elements)
-- [ ] Dimension 4 Typography: PASS (3 sizes + 1 micro, 2 weights + semibold CTA exception, Lora + Inter pattern matches codebase)
+- [ ] Dimension 4 Typography: PASS (4 sizes, exactly 2 weights — 400 regular + 700 bold; CTA labels use bold matching `Hero.tsx` precedent; Lora + Inter pattern matches codebase)
 - [ ] Dimension 5 Spacing: PASS (multiples of 4 only, 44px tap-target exception documented)
 - [ ] Dimension 6 Registry Safety: PASS (no new blocks pulled, no third-party registries)
 
