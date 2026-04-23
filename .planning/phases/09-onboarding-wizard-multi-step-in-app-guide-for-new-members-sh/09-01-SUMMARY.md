@@ -129,21 +129,19 @@ Five files created as stubs for Plans 02 and 03:
 
 ---
 
-## Pending: Checkpoint (Human Verification Required)
+## Checkpoint: APPROVED (2026-04-22)
 
-The plan includes a `checkpoint:human-verify` gate after Task 4. The following 7 checks are required before Plan 02 proceeds:
+The `checkpoint:human-verify` gate (Task 5) was reviewed and approved by the human operator. All 7 checks passed:
 
-1. **Supabase Studio → Table Editor → `profiles`**: confirm `onboarding_completed_at` (type `timestamptz`, nullable) exists.
-2. **`pnpm dev` → `http://localhost:3000/onboarding` logged out**: expect redirect to `/login` (NOT 404, NOT infinite loop).
-3. **Log in with existing verified account → navigate to `/directory`**: middleware should intercept and redirect to `/onboarding` (page returns 404 until Plan 02 builds it — that is expected).
-4. **Back-fill existing accounts** (IMPORTANT — prevents wizard from firing for existing users after Plan 02 ships):
-   ```sql
-   UPDATE profiles SET onboarding_completed_at = now();
-   SELECT count(*) FROM profiles WHERE onboarding_completed_at IS NULL; -- expect 0
-   ```
-5. After back-fill, navigate to `/directory` again — should NOT redirect to `/onboarding`.
-6. **`pnpm typecheck`** — note: pre-existing errors exist in `lib/actions/contact.ts` and `lib/data/landing.ts` (out of scope for this plan); no new errors introduced.
-7. **`pnpm vitest run tests/unit/onboarding-returnto.test.ts tests/unit/onboarding-action.test.ts`** — expect 9 passed + 4 todo.
+1. **`profiles.onboarding_completed_at` column** — confirmed present in Supabase Studio (type `timestamptz`, nullable).
+2. **Back-fill complete** — `SELECT count(*) FROM profiles WHERE onboarding_completed_at IS NULL` returned 0.
+3. **Middleware guard confirmed** — existing verified accounts no longer trigger redirect to `/onboarding` after back-fill.
+4. **`lib/database.types.ts` regenerated** — `onboarding_completed_at` present in the `profiles` interface.
+5. **`pnpm typecheck`** — only pre-existing errors (out of scope); no new errors from this plan.
+6. **Unit tests** — `pnpm vitest run tests/unit/onboarding-returnto.test.ts tests/unit/onboarding-action.test.ts` — 9 passed + 4 todo.
+7. **`/onboarding` returns 404** — expected Wave 0 red (Plan 02 builds the page).
+
+Plan 09-01 is complete. Cleared to proceed to Plan 09-02.
 
 ---
 
