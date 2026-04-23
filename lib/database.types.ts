@@ -1,3 +1,4 @@
+Initialising login role...
 export type Json =
   | string
   | number
@@ -164,6 +165,7 @@ export type Database = {
           founding_member: boolean
           id: string
           is_published: boolean
+          onboarding_completed_at: string | null
           owner_id: string
           search_text: string | null
           search_vector: unknown
@@ -184,6 +186,7 @@ export type Database = {
           founding_member?: boolean
           id?: string
           is_published?: boolean
+          onboarding_completed_at?: string | null
           owner_id: string
           search_text?: string | null
           search_vector?: unknown
@@ -204,6 +207,7 @@ export type Database = {
           founding_member?: boolean
           id?: string
           is_published?: boolean
+          onboarding_completed_at?: string | null
           owner_id?: string
           search_text?: string | null
           search_vector?: unknown
@@ -382,10 +386,6 @@ export type Database = {
         Returns: undefined
       }
       show_limit: { Args: never; Returns: number }
-      mark_contacts_seen: {
-        Args: { p_recipient_profile_id: string }
-        Returns: undefined
-      }
       show_trgm: { Args: { "": string }; Returns: string[] }
       utc_day: { Args: { ts: string }; Returns: string }
     }
