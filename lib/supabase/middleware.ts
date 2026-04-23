@@ -18,6 +18,7 @@ const ALWAYS_ALLOWED = [
   '/auth/signout',
   '/auth/error',
   '/legal/',
+  '/onboarding', // D-02/Pitfall 1: prevents infinite redirect loop when the user IS on /onboarding
 ]
 
 export async function updateSession(request: NextRequest) {
@@ -117,6 +118,48 @@ export async function updateSession(request: NextRequest) {
     if (!adminEmail || userEmail !== adminEmail) {
       const url = request.nextUrl.clone()
       url.pathname = '/'
+      url.search = ''
+      return NextResponse.redirect(url)
+    }
+  }
+
+  // Phase 9 D-02 + D-10: onboarding redirect guard.
+  // Intercepts authed + email-verified users whose profiles.onboarding_completed_at IS NULL
+  // and redirects them to /onboarding.
+  //
+  // Scoped to VERIFIED_REQUIRED_PREFIXES only (matches the email-verify check at line 67-69)
+  // so the DB round-trip does not run for unauthenticated or landing-page requests.
+  // Pitfall 2 mitigation: unconditional query would cost 10-30ms on every authed request.
+  //
+  // Skips: /onboarding itself (loop prevention via ALWAYS_ALLOWED), /admin (admin flow separate),
+  // and any path already in ALWAYS_ALLOWED.
+  const isVerifiedPrefixed = VERIFIED_REQUIRED_PREFIXES.some((p) => pathname.startsWith(p))
+  const isAlreadyOnboarding = pathname.startsWith('/onboarding')
+  const isAdminPath = pathname.startsWith('/admin')
+  const isAlwaysAllowedPath = ALWAYS_ALLOWED.some((p) => pathname.startsWith(p))
+
+  if (
+    isAuthed &&
+    isVerified &&
+    isVerifiedPrefixed &&
+    !isAlreadyOnboarding &&
+    !isAdminPath &&
+    !isAlwaysAllowedPath
+  ) {
+    // Use claims.sub (JWKS-verified) — NOT getUser() — consistent with admin guard pattern.
+    // The anon client + user cookie satisfies the "Owners see own profile" RLS SELECT policy
+    // (verified against 003_profile_tables.sql line 291-293).
+    const { data: onboardingProfile } = await supabase
+      .from('profiles')
+      .select('onboarding_completed_at')
+      .eq('owner_id', claims!.sub as string)
+      .maybeSingle()
+
+    // NULL onboarding_completed_at OR no profile row yet → redirect to /onboarding.
+    // RESEARCH Open Question 2: new user with no profile row is still a wizard candidate.
+    if (!onboardingProfile || onboardingProfile.onboarding_completed_at === null) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/onboarding'
       url.search = ''
       return NextResponse.redirect(url)
     }
