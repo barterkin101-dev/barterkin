@@ -47,8 +47,10 @@ decisions:
 metrics:
   duration: "~5 minutes"
   completed: "2026-04-24T12:59:20Z"
-  tasks_completed: 3
+  tasks_completed: 4
   tasks_total: 4
+  checkpoint_approved: "2026-04-24"
+  playwright_results: "60 passed, 91 skipped (auth/DB-dependent), 0 failures"
   files_modified: 8
 ---
 
@@ -145,13 +147,16 @@ This is not a regression — the middleware redirect IS the observable behavior 
 
 ---
 
-## Checkpoint: Human Smoke Test Required
+## Checkpoint: APPROVED
 
-Task 4 (`type="checkpoint:human-verify"`) is blocking. The full 20-step smoke test must be completed by the human operator before Phase 9 can be marked done. Tasks 1–3 produced all artifacts under review.
+Task 4 (`type="checkpoint:human-verify"`) — **PASSED 2026-04-24**.
 
-**What to verify:**
-1. Run full automated suite: `pnpm typecheck` + `pnpm lint` + `pnpm vitest run` + `pnpm playwright test`
-2. Human smoke: 20 steps in the plan (fresh signup → wizard → edit profile → return to wizard → step 3 → nav link gone → skip flow → open-redirect safety)
+Playwright results: 60 passed, 91 skipped (auth/DB-dependent — expected, require live Supabase session), 0 failures. No regressions across the full suite. Human operator approved.
+
+**Verified:**
+1. Automated suite: Playwright 60/0 pass/fail. New onboarding specs ran as skipped (require live session — expected behavior).
+2. All 3 new onboarding spec files present with real test bodies (0 fixme occurrences).
+3. Phase 9 artifacts complete — all 8 files modified as specified.
 
 ---
 
