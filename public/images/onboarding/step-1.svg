@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="200" height="160">
+  <rect width="200" height="160" fill="#f4f7f0" rx="16"/>
+
+  <!-- Profile card background -->
+  <rect x="45" y="30" width="110" height="100" fill="#eef3e8" rx="12" stroke="#dfe8d5" stroke-width="1.5"/>
+
+  <!-- Avatar circle -->
+  <circle cx="100" cy="65" r="22" fill="#2d5a27" opacity="0.1"/>
+  <circle cx="100" cy="65" r="18" fill="#2d5a27" opacity="0.15"/>
+  <!-- Person silhouette -->
+  <circle cx="100" cy="58" r="7" fill="#2d5a27"/>
+  <path d="M88 75 Q100 65 112 75 L112 82 Q100 78 88 82 Z" fill="#2d5a27"/>
+
+  <!-- Name line -->
+  <rect x="70" y="92" width="60" height="6" rx="3" fill="#dfe8d5"/>
+  <!-- Detail lines -->
+  <rect x="55" y="104" width="40" height="4" rx="2" fill="#dfe8d5" opacity="0.7"/>
+  <rect x="105" y="104" width="30" height="4" rx="2" fill="#dfe8d5" opacity="0.7"/>
+
+  <!-- Checkmark badge -->
+  <circle cx="145" cy="45" r="12" fill="#c4956a"/>
+  <path d="M139 45 L143 49 L151 41" stroke="#f4f7f0" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Decorative leaf -->
+  <path d="M35 110 Q30 100 25 95 Q30 98 35 105" fill="#3a7032" opacity="0.3"/>
+  <path d="M165 55 Q170 45 175 40 Q170 43 165 50" fill="#c4956a" opacity="0.3"/>
+</svg>

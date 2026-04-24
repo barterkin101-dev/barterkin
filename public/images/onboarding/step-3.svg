@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" width="200" height="160">
+  <rect width="200" height="160" fill="#f4f7f0" rx="16"/>
+
+  <!-- Left person -->
+  <circle cx="65" cy="70" r="22" fill="#2d5a27" opacity="0.1"/>
+  <circle cx="65" cy="60" r="9" fill="#2d5a27" opacity="0.25"/>
+  <path d="M50 82 Q65 72 80 82 L80 92 Q65 85 50 92 Z" fill="#2d5a27" opacity="0.25"/>
+
+  <!-- Right person -->
+  <circle cx="135" cy="70" r="22" fill="#c4956a" opacity="0.12"/>
+  <circle cx="135" cy="60" r="9" fill="#c4956a" opacity="0.35"/>
+  <path d="M120 82 Q135 72 150 82 L150 92 Q135 85 120 92 Z" fill="#c4956a" opacity="0.35"/>
+
+  <!-- Message bubble between them -->
+  <rect x="75" y="48" width="50" height="32" rx="10" fill="#eef3e8" stroke="#dfe8d5" stroke-width="1.5"/>
+  <polygon points="95,80 100,88 105,80" fill="#eef3e8" stroke="#dfe8d5" stroke-width="0"/>
+  <polygon points="97,80 100,85 103,80" fill="#eef3e8"/>
+  <!-- Text lines in bubble -->
+  <rect x="83" y="58" width="34" height="3" rx="1.5" fill="#c4956a" opacity="0.5"/>
+  <rect x="83" y="66" width="24" height="3" rx="1.5" fill="#c4956a" opacity="0.3"/>
+
+  <!-- Connection line -->
+  <path d="M87 95 Q100 105 113 95" stroke="#dfe8d5" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+
+  <!-- Small heart accent -->
+  <path d="M100 115 C96 111, 92 113, 92 117 C92 121, 100 127, 100 127 C100 127, 108 121, 108 117 C108 113, 104 111, 100 115" fill="#c4956a" opacity="0.4"/>
+
+  <!-- Decorative leaves -->
+  <path d="M35 100 Q30 90 28 85 Q32 88 35 95" fill="#3a7032" opacity="0.2"/>
+  <path d="M165 100 Q170 90 172 85 Q168 88 165 95" fill="#c4956a" opacity="0.2"/>
+</svg>
