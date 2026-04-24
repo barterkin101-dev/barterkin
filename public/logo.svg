@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 60" width="280" height="60">
+  <defs>
+    <linearGradient id="stemGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+      <stop offset="0%" stop-color="#2d5a27"/>
+      <stop offset="100%" stop-color="#1e4420"/>
+    </linearGradient>
+    <linearGradient id="leafLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3a7032"/>
+      <stop offset="100%" stop-color="#2d5a27"/>
+    </linearGradient>
+    <linearGradient id="leafRight" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c4956a"/>
+      <stop offset="100%" stop-color="#a87b52"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon mark -->
+  <g transform="translate(8, 6)">
+    <!-- Root/seed base -->
+    <ellipse cx="24" cy="44" rx="8" ry="4" fill="#c4956a" opacity="0.3"/>
+    <!-- Stem -->
+    <path d="M24 44 Q24 25 24 12" stroke="url(#stemGrad)" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <!-- Left leaf -->
+    <path d="M24 25 Q6 18 0 6 Q6 10 24 16" fill="url(#leafLeft)"/>
+    <path d="M24 21 Q12 16 6 8" stroke="#2d5a27" stroke-width="0.8" fill="none" opacity="0.4"/>
+    <!-- Right leaf -->
+    <path d="M24 20 Q42 13 48 1 Q42 5 24 11" fill="url(#leafRight)"/>
+    <path d="M24 16 Q36 11 42 3" stroke="#a87b52" stroke-width="0.8" fill="none" opacity="0.4"/>
+    <!-- Center bud -->
+    <circle cx="24" cy="12" r="3.5" fill="#c4956a"/>
+    <circle cx="24" cy="12" r="1.5" fill="#f4f7f0"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="64" y="40" font-family="Georgia, 'Times New Roman', serif" font-size="32" font-weight="bold" fill="#1e4420" letter-spacing="-0.5">Barterkin</text>
+</svg>
