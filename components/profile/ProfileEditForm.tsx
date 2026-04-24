@@ -1,5 +1,6 @@
 'use client'
 import { useActionState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useForm, FormProvider, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -29,10 +30,13 @@ import { AvatarUploader } from '@/components/profile/AvatarUploader'
 export function ProfileEditForm({
   userId,
   defaultValues,
+  returnTo,
 }: {
   userId: string
   defaultValues: ProfileWithRelations | null
+  returnTo?: string
 }) {
+  const router = useRouter()
   const [state, formAction, pending] = useActionState<SaveProfileResult | null, FormData>(
     saveProfile,
     null,
@@ -55,13 +59,20 @@ export function ProfileEditForm({
     },
   })
 
-  // D-04: stay on page, toast success
+  // D-04: stay on page + toast, UNLESS a valid returnTo is supplied (D-06) — then redirect.
+  // returnTo has already been validated by safeReturnTo() on the server (T-9-03 mitigation),
+  // so it is safe to pass to router.push without further checks.
   useEffect(() => {
-    if (state?.ok) toast('Profile saved.')
-    else if (state && state.ok === false && !state.fieldErrors) {
+    if (state?.ok) {
+      if (returnTo) {
+        router.push(returnTo)
+      } else {
+        toast('Profile saved.')
+      }
+    } else if (state && state.ok === false && !state.fieldErrors) {
       toast.error(state.error ?? "Couldn't save your profile. Please try again in a moment.")
     }
-  }, [state])
+  }, [state, returnTo, router])
 
   // Map server fieldErrors to RHF field errors
   useEffect(() => {

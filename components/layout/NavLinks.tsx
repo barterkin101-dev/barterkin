@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { ArrowRight } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { LogoutButton } from '@/components/auth/LogoutButton'
 import { cn } from '@/lib/utils'
@@ -9,10 +10,12 @@ export function NavLinks({
   displayName,
   avatarUrl,
   unseenContactCount = 0,
+  showFinishSetup,
 }: {
   displayName?: string | null
   avatarUrl?: string | null
   unseenContactCount?: number
+  showFinishSetup?: boolean
 }) {
   const pathname = usePathname()
   const isDirectory = pathname.startsWith('/directory')
@@ -20,6 +23,15 @@ export function NavLinks({
 
   return (
     <div className="flex items-center gap-6">
+      {showFinishSetup && (
+        <Link
+          href="/onboarding"
+          className="flex items-center gap-1 text-sm font-bold text-clay hover:text-forest-deep"
+          aria-label="Finish setup"
+        >
+          Finish setup <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+        </Link>
+      )}
       <Link
         href="/directory"
         className={cn(

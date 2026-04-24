@@ -6,10 +6,12 @@ export function AppNav({
   displayName,
   avatarUrl,
   unseenContactCount,
+  showFinishSetup,
 }: {
   displayName?: string | null
   avatarUrl?: string | null
   unseenContactCount?: number
+  showFinishSetup?: boolean
 }) {
   return (
     <nav className="border-b border-sage-light bg-sage-pale">
@@ -25,7 +27,12 @@ export function AppNav({
           />
           <span>Barterkin</span>
         </Link>
-        <NavLinks displayName={displayName} avatarUrl={avatarUrl} unseenContactCount={unseenContactCount} />
+        <NavLinks
+          displayName={displayName}
+          avatarUrl={avatarUrl}
+          unseenContactCount={unseenContactCount}
+          showFinishSetup={showFinishSetup}
+        />
       </div>
     </nav>
   )
