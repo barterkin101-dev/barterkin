@@ -28,6 +28,24 @@ export function Hero({ stats, isAuthed }: HeroProps) {
 
   return (
     <section className="relative overflow-hidden bg-forest-deep">
+      {/* Mobile background image */}
+      <div className="absolute inset-0 md:hidden" aria-hidden="true">
+        <Image
+          src="/images/hero-mobile.jpg"
+          alt=""
+          fill
+          sizes="100vw"
+          priority
+          className="object-cover"
+        />
+      </div>
+      {/* Mobile dark overlay for text legibility */}
+      <div
+        className="absolute inset-0 md:hidden"
+        aria-hidden="true"
+        style={{ background: 'linear-gradient(180deg, rgba(30,68,32,0.88) 0%, rgba(30,68,32,0.82) 50%, rgba(30,68,32,0.92) 100%)' }}
+      />
+
       {/* subtle grain */}
       <div
         aria-hidden="true"
@@ -79,21 +97,6 @@ export function Hero({ stats, isAuthed }: HeroProps) {
               </div>
             ))}
           </dl>
-        </div>
-
-        {/* Mobile hero image — visible below copy on small screens */}
-        <div className="md:hidden mt-8" aria-hidden="true">
-          <div className="relative overflow-hidden rounded-2xl shadow-2xl aspect-[16/10]">
-            <Image
-              src="/images/hero-mobile.jpg"
-              alt="Fresh-baked sourdough loaves"
-              fill
-              sizes="100vw"
-              priority
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-forest-deep/50 to-transparent" />
-          </div>
         </div>
 
         {/* Desktop image mosaic */}
