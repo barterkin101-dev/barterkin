@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
@@ -14,6 +15,14 @@ export function StepProfile({
 }) {
   return (
     <div className="space-y-6">
+      <Image
+        src="/images/onboarding/step-1.svg"
+        alt=""
+        width={200}
+        height={160}
+        className="mx-auto h-auto w-full max-w-[200px]"
+        aria-hidden="true"
+      />
       <div className="space-y-2">
         <h2 className="font-serif text-2xl font-bold leading-tight text-forest-deep sm:text-3xl">
           First, finish your profile.

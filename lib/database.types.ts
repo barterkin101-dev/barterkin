@@ -386,6 +386,7 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      mark_contacts_seen: { Args: { p_recipient_profile_id: string }; Returns: undefined }
       utc_day: { Args: { ts: string }; Returns: string }
     }
     Enums: {

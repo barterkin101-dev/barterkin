@@ -1,10 +1,19 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, Compass } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function StepDirectory() {
   return (
     <div className="space-y-6">
+      <Image
+        src="/images/onboarding/step-2.svg"
+        alt=""
+        width={200}
+        height={160}
+        className="mx-auto h-auto w-full max-w-[200px]"
+        aria-hidden="true"
+      />
       <div className="space-y-2">
         <h2 className="font-serif text-2xl font-bold leading-tight text-forest-deep sm:text-3xl">
           Next, browse your neighbors.
