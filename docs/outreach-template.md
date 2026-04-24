@@ -20,7 +20,7 @@ I'm building a dedicated home for the Georgia barter community at barterkin.com 
 - You help shape the platform's first feedback round
 
 If you're in, would you fill out this quick form? It captures the info I need to set up your account:
-👉 {GOOGLE_FORM_URL}
+👉 https://docs.google.com/forms/d/e/1FAIpQLSciedKPIYVfQrvtTCh3CIAufuW02Gv2RsK38owKC1OC-uL8eg/viewform?entry.781771819=@{tiktok-handle}
 
 Takes ~3 minutes. If you'd rather just reply over email, hello@barterkin.com is me — I'll set you up from there.
 
@@ -35,7 +35,7 @@ Barterkin
 - `{first-name-or-handle}` — first name if known, else TikTok handle (no `@`)
 - `{listing-name}` — legacy listing title, verbatim from `legacy/index.html`
 - `{legacy-site-reference}` — short reference like "the original Georgia Barter directory page"
-- `{GOOGLE_FORM_URL}` — the Google Form URL Ashley receives after creating the form (Section 4). Append `?entry.{TIKTOK_FIELD_ID}=@handle` per listing so the form arrives pre-filled with the TikTok handle.
+- `{GOOGLE_FORM_URL}` — resolved. Base viewform URL: `https://docs.google.com/forms/d/e/1FAIpQLSciedKPIYVfQrvtTCh3CIAufuW02Gv2RsK38owKC1OC-uL8eg/viewform`. TikTok field entry ID = `781771819`. Per-member pre-fill: append `?entry.781771819=@handle`. The DM template above uses `@{tiktok-handle}` — swap that for the actual handle before sending (e.g. `@kerryscountrylife`).
 
 ## Section 3 — Per-Listing Personalization Table
 
@@ -43,17 +43,17 @@ The 11 founding-member listings from `legacy/index.html`. Each hook is distinct 
 
 | # | Listing name | TikTok handle | Legacy category | Probable county | Personal hook (1-2 sentences) | Notes |
 |---|---|---|---|---|---|---|
-| 1 | GG's Goodies Galore | @ggs_goodies | food | Douglas County (Douglasville) | Your from-scratch baking + the way you show up in the Douglasville food community is exactly the kind of founding-member story I want Barterkin to lead with. | |
-| 2 | Kerry's Country Life | @kerryscountrylife | agriculture | Paulding County (Dallas) | Your herbal syrups and tincture knowledge are exactly what I hope the directory becomes — Georgian skills trading Georgian skills. Would love to have you set the tone. | ANCHOR per D-11. Seed first; after Kerry's profile is live, ask her to post to her 1,400+ followers about Barterkin. |
-| 3 | Local Homesteader | @llaaddyybugg | agriculture | Paulding County (Dallas) | The homesteading content you put out — especially the seed-saving posts — is the kind of hands-on know-how that makes a barter directory actually work. | |
-| 4 | Tamathaca's Homestead | @tamathacal | agriculture | Paulding County (Dallas) | Your homestead rhythm (the chickens, the canning, the slow-build) is the soul of what the directory is for — real Georgians trading real work. | |
-| 5 | FEYOUG Plumbing | @feyoug | services | Georgia (city TBD) | Honestly, a plumber in a barter directory is the one that proves the whole concept — the services side is what most community directories miss, and I want it anchored from day one. | County unknown — confirm in consent form; D-04 marks county as required field. |
-| 6 | Ashley's Nail Studio | @ashley | beauty | Paulding County (Dallas) | Your nail work is beautiful, and having a beauty/self-care founder in the directory balances out all the food and homestead energy — it shows the breadth of what "skills" means here. | |
-| 7 | Lovelylocs | @lovelylocs | wellness | Georgia (city TBD) | The natural hair + scalp care knowledge you share is real specialist work, and that's exactly the kind of skill the directory needs to surface properly by category. | County unknown — confirm in consent form; D-04 marks county as required field. |
-| 8 | Kelly's Kitchen | @kellymystic119 | food | Paulding County (Dallas) | Your kitchen content — the from-scratch, "here's how I actually cook for my people" energy — is the warm tone I want the whole directory to feel like. | |
-| 9 | Yellow Butterfly Farm | @yellow_butterfly_farm | agriculture | Carroll County (Carrollton) | A working farm in Carroll County would give the directory geographic reach outside Paulding, which is exactly what a "find a Georgian" platform needs to feel real. | |
-| 10 | SiR Arts & Etc | @sir_arts | crafts | Fulton County (South Fulton) | Your art + craft practice brings South Fulton into the directory, and it's the kind of creative-trade that rounds out a community where most of the early listings are food/farm. | |
-| 11 | Donna Marie | @donnamarie | wellness | Georgia (city TBD) | Your wellness work (especially the holistic-care content) belongs in the directory alongside the homesteaders and cooks — it makes the whole offering feel complete. | County unknown — confirm in consent form; D-04 marks county as required field. |
+| 1 | GG's Goodies Galore | @ggs_goodies | food | Douglas County (Douglasville) | Your from-scratch baking + the way you show up in the Douglasville food community is exactly the kind of founding-member story I want Barterkin to lead with. | ⚠️ HANDLE NOT FOUND (Apr 2026 audit) — re-verify handle before sending. |
+| 2 | Kerry's Country Life | @kerryscountrylife | agriculture | Paulding County (Dallas) | Your herbal syrups and tincture knowledge are exactly what I hope the directory becomes — Georgian skills trading Georgian skills. Would love to have you set the tone. | ANCHOR per D-11. Seed first. ⚠️ Audit: account found (453 followers, not 1,400+); bio is "Horses dogs and guns" — verify this is the Georgia Barter Kerry before sending. |
+| 3 | Local Homesteader | @llaaddyybugg | agriculture | Paulding County (Dallas) | The homesteading content you put out — especially the seed-saving posts — is the kind of hands-on know-how that makes a barter directory actually work. | ✅ Active — 2,563 followers, farm/gardening/animals content confirmed. |
+| 4 | Tamathaca's Homestead | @tamathacal | agriculture | Paulding County (Dallas) | Your homestead rhythm (the chickens, the canning, the slow-build) is the soul of what the directory is for — real Georgians trading real work. | ✅ Active — 1,392 followers, chickens/homestead content confirmed. |
+| 5 | FEYOUG Plumbing | @feyoug | services | Georgia (city TBD) | Honestly, a plumber in a barter directory is the one that proves the whole concept — the services side is what most community directories miss, and I want it anchored from day one. | County unknown — confirm in consent form. ⚠️ Audit: account is private (74 followers). Can still DM from TikTok. |
+| 6 | Ashley's Nail Studio | @ashley | beauty | Paulding County (Dallas) | Your nail work is beautiful, and having a beauty/self-care founder in the directory balances out all the food and homestead energy — it shows the breadth of what "skills" means here. | ⚠️ Audit: account is private (2,103 followers). Can still DM from TikTok. |
+| 7 | Lovelylocs | @lovelylocs | wellness | Georgia (city TBD) | The natural hair + scalp care knowledge you share is real specialist work, and that's exactly the kind of skill the directory needs to surface properly by category. | County unknown — confirm in consent form. ⚠️ Audit: DORMANT — 6 followers, last video 2020 (quarantine era). Verify this is the right account. |
+| 8 | Kelly's Kitchen | @kellymystic119 | food | Paulding County (Dallas) | Your kitchen content — the from-scratch, "here's how I actually cook for my people" energy — is the warm tone I want the whole directory to feel like. | ✅ Active — 1,065 followers, cooking/tarot/astrology content. |
+| 9 | Yellow Butterfly Farm | @yellow_butterfly_farm | agriculture | Carroll County (Carrollton) | A working farm in Carroll County would give the directory geographic reach outside Paulding, which is exactly what a "find a Georgian" platform needs to feel real. | ✅ Active — 1,175 followers, Black female farmer content confirmed. |
+| 10 | SiR Arts & Etc | @sir_arts | crafts | Fulton County (South Fulton) | Your art + craft practice brings South Fulton into the directory, and it's the kind of creative-trade that rounds out a community where most of the early listings are food/farm. | ⚠️ HANDLE NOT FOUND (Apr 2026 audit) — re-verify handle before sending. |
+| 11 | Donna Marie | @donnamarie | wellness | Georgia (city TBD) | Your wellness work (especially the holistic-care content) belongs in the directory alongside the homesteaders and cooks — it makes the whole offering feel complete. | County unknown — confirm in consent form. ⚠️ Audit: account exists (2,159 followers) but zero videos published on TikTok. |
 
 ## Section 4 — Google Form Spec (SEED-02)
 
@@ -68,14 +68,15 @@ The consent form Ashley creates in Google Forms. All fields documented here so A
 - **Skills wanted:** up to 5 short-text fields (optional; mirrors `skills_wanted` cap)
 - **County:** dropdown of 159 Georgia counties (REQUIRED — this is the data legacy lacks)
 - **Preferred email:** email (REQUIRED; used for Supabase auth user creation)
-- **TikTok handle:** short-text (pre-filled from DM via `?entry.XXXX=@handle` URL param per Open Question #5)
+- **TikTok handle:** short-text (pre-filled from DM via `?entry.781771819=@handle` URL param — TIKTOK_FIELD_ID = `781771819`, resolved)
+- **Instagram handle:** short-text (optional; collected so members can be tagged in launch announcements)
 
 **Form metadata:**
 
 - **Form name:** "Barterkin — Founding Member Consent"
 - **Description (at top of form):** "Barterkin is the new home for the Georgia Barter community. If you're opting in, this form captures everything I need to set up your founding-member profile. If you're declining, just answer Q1 = No and that's it — your info won't be migrated, and your legacy listing stays up until the old site retires."
 - **Response destination:** Linked Google Sheet, file name "Barterkin Founding Member Responses". Ashley reviews responses weekly and copies consenting rows into `scripts/seed-founding-members.mjs` `members[]` array.
-- **URL pre-fill spec (Open Question #5):** For each DM, Ashley appends `?entry.{TIKTOK_FIELD_ID}=@handle` so the form arrives pre-filled with the member's TikTok handle. Ashley looks up the field ID once after creating the form (Form editor → three-dot menu → "Get pre-filled link" → fill TikTok field → copy URL → the `entry.XXXXXXX` numeric ID is the `TIKTOK_FIELD_ID`). She then populates it per-listing in the DM variants above.
+- **URL pre-fill spec (Open Question #5 — RESOLVED):** TikTok field entry ID = `781771819`. For each DM, append `?entry.781771819=@handle` to the base viewform URL. Example for Kerry: `https://docs.google.com/forms/d/e/1FAIpQLSciedKPIYVfQrvtTCh3CIAufuW02Gv2RsK38owKC1OC-uL8eg/viewform?entry.781771819=@kerryscountrylife`. The DM template in Section 2 already shows this format — swap `@{tiktok-handle}` for the actual handle before sending.
 - **Decline handling (Open Question #3):** If consent=No, do NOT seed and do NOT remove from legacy. Legacy retires in Phase 6 regardless; "no" respondents simply don't carry over. This is documented in the form description so respondents understand the opt-out is low-friction (no email, no follow-up).
 
 **Category mapping reference** (Ashley applies after response; confirm with member if ambiguous per Assumption A4 in `07-RESEARCH.md`):

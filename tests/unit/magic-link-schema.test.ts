@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { MagicLinkSchema } from '@/lib/actions/auth'
+import { MagicLinkSchema } from '@/lib/schemas/auth'
 
 describe('MagicLinkSchema (AUTH-02)', () => {
   it('accepts valid email + captchaToken', () => {

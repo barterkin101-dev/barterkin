@@ -213,8 +213,8 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Wave 1: Migration 009 (onboarding_completed_at) + [BLOCKING] supabase db push + type regen + middleware /onboarding guard + safeReturnTo helper + Wave 0 test stubs
-- [ ] 09-02-PLAN.md — Wave 2: (onboarding) route group + layout + wizard page + 5 step components + markOnboardingComplete server action + 4 filled unit tests
+- [x] 09-01-PLAN.md — Wave 1: Migration 009 (onboarding_completed_at) + [BLOCKING] supabase db push + type regen + middleware /onboarding guard + safeReturnTo helper + Wave 0 test stubs
+- [x] 09-02-PLAN.md — Wave 2: (onboarding) route group + layout + wizard page + 5 step components + markOnboardingComplete server action + 4 filled unit tests
 - [ ] 09-03-PLAN.md — Wave 3: AppNav "Finish setup" link + ProfileEditForm returnTo wiring + 15 filled E2E specs + phase verification gate
 
 ### Phase 10: n8n Automation Server — self-hosted n8n instance on the VPS alongside OpenClaw, wired to Supabase webhooks for welcome emails (new member joins), contact-request alerts (admin notification when relay fires), and future automation triggers.
