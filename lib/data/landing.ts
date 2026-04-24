@@ -90,11 +90,16 @@ export async function getFoundingMembers(): Promise<FoundersResult> {
 
     if (error) throw error
 
-    const profiles: LandingFounderCard[] = (data ?? []).map((row: Record<string, unknown>) => {
-      const allSkills = (row.skills_offered ?? []) as Array<{
-        skill_text: string
-        sort_order: number
-      }>
+    const profiles = ((data ?? []) as Array<{
+      id: string
+      username: string | null
+      display_name: string | null
+      avatar_url: string | null
+      counties: { name: string } | null
+      categories: { name: string } | null
+      skills_offered: Array<{ skill_text: string; sort_order: number }> | null
+    }>).map((row) => {
+      const allSkills = row.skills_offered ?? []
       const topSkills = [...allSkills]
         .sort((a, b) => a.sort_order - b.sort_order)
         .slice(0, 3)
@@ -107,7 +112,7 @@ export async function getFoundingMembers(): Promise<FoundersResult> {
         county_name: row.counties?.name ?? 'Unknown',
         category_name: row.categories?.name ?? '',
         top_skills: topSkills,
-      }
+      } satisfies LandingFounderCard
     })
 
     return { profiles, error: null }

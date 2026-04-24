@@ -16,7 +16,8 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle } from 'lucide-react'
-import { sendMagicLink, type SendMagicLinkResult } from '@/lib/actions/auth'
+import { sendMagicLink } from '@/lib/actions/auth'
+import { type SendMagicLinkResult } from '@/lib/schemas/auth'
 
 const LoginSchema = z.object({
   email: z.string().trim().toLowerCase().email('Please enter a valid email.'),

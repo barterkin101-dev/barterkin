@@ -81,7 +81,22 @@ export function Hero({ stats, isAuthed }: HeroProps) {
           </dl>
         </div>
 
-        {/* image mosaic */}
+        {/* Mobile hero image — visible below copy on small screens */}
+        <div className="md:hidden mt-8" aria-hidden="true">
+          <div className="relative overflow-hidden rounded-2xl shadow-2xl aspect-[16/10]">
+            <Image
+              src="/images/hero-mobile.jpg"
+              alt="Fresh-baked sourdough loaves"
+              fill
+              sizes="100vw"
+              priority
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-forest-deep/50 to-transparent" />
+          </div>
+        </div>
+
+        {/* Desktop image mosaic */}
         <div className="hidden md:grid grid-cols-2 gap-3 mt-8 md:mt-0" aria-hidden="true">
           {MOSAIC.map(({ src, alt, aspect }, i) => (
             <div key={i} className="relative overflow-hidden rounded-2xl shadow-2xl" style={{ aspectRatio: aspect }}>

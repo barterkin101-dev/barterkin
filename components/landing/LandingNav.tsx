@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Sprout } from 'lucide-react'
+import Image from 'next/image'
 
 import { Button } from '@/components/ui/button'
 
@@ -11,7 +11,14 @@ export function LandingNav() {
           href="/"
           className="flex items-center gap-2 font-serif text-lg font-bold text-sage-bg"
         >
-          <Sprout className="h-5 w-5" aria-hidden="true" />
+          <Image
+            src="/logo-mark.svg"
+            alt=""
+            width={28}
+            height={28}
+            aria-hidden="true"
+            className="h-7 w-7"
+          />
           <span>Barterkin</span>
         </Link>
         <div className="flex items-center gap-6">
