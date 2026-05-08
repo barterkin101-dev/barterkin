@@ -26,7 +26,7 @@ export function CtaFooter() {
             viewport={{ once: true, amount: 0.5 }}
             transition={{ delay: 0.1, duration: 0.5 }}
           >
-            Takes two minutes. Email-verify, fill in what you offer, and you're in the directory.
+            Takes two minutes. Email-verify, fill in what you offer, and you&apos;re in the directory.
           </motion.p>
           <motion.div
             className="flex items-center gap-4 justify-center flex-wrap"

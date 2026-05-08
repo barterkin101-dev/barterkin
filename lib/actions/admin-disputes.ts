@@ -2,6 +2,7 @@
 import 'server-only'
 import { revalidatePath } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { assertAdmin } from './admin'
 
 export interface AdminMediateDisputeResult {
   ok: boolean
@@ -17,6 +18,9 @@ export async function adminMediateDispute(
   _prev: AdminMediateDisputeResult | null,
   formData: FormData,
 ): Promise<AdminMediateDisputeResult> {
+  const auth = await assertAdmin()
+  if (!auth.ok) return { ok: false, error: auth.error }
+
   const disputeId = formData.get('disputeId')
   const content = formData.get('content')
   const mediatorProfileId = formData.get('mediatorProfileId')
@@ -70,6 +74,9 @@ export async function adminResolveDispute(
   _prev: AdminResolveDisputeResult | null,
   formData: FormData,
 ): Promise<AdminResolveDisputeResult> {
+  const auth = await assertAdmin()
+  if (!auth.ok) return { ok: false, error: auth.error }
+
   const disputeId = formData.get('disputeId')
   const resolution = formData.get('resolution')
   const outcome = formData.get('outcome')

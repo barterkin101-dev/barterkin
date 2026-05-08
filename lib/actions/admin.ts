@@ -1,6 +1,7 @@
 'use server'
 import 'server-only'
 import { revalidatePath } from 'next/cache'
+import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
 // ============================================================================
@@ -10,7 +11,24 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 // (ADMIN-06). Server Actions invoked from those pages inherit that protection.
 // Service-role client bypasses RLS — we intentionally want to mutate the
 // banned flag which owners themselves cannot set (see migration 003 RLS).
+//
+// Defense-in-depth: every admin action also verifies the caller's email
+// matches ADMIN_EMAIL before executing. This prevents direct Server Action
+// invocation by non-admin authenticated users.
 // ============================================================================
+
+export async function assertAdmin(): Promise<{ ok: false; error: string } | { ok: true }> {
+  const adminEmail = process.env.ADMIN_EMAIL
+  if (!adminEmail) {
+    return { ok: false, error: 'Admin not configured.' }
+  }
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || user.email !== adminEmail) {
+    return { ok: false, error: 'Unauthorized.' }
+  }
+  return { ok: true }
+}
 
 export interface BanResult {
   ok: boolean
@@ -18,6 +36,9 @@ export interface BanResult {
 }
 
 export async function banMember(profileId: string): Promise<BanResult> {
+  const auth = await assertAdmin()
+  if (!auth.ok) return { ok: false, error: auth.error }
+
   if (!profileId || typeof profileId !== 'string') {
     return { ok: false, error: 'Invalid profile id.' }
   }
@@ -41,6 +62,9 @@ export async function banMember(profileId: string): Promise<BanResult> {
 }
 
 export async function unbanMember(profileId: string): Promise<BanResult> {
+  const auth = await assertAdmin()
+  if (!auth.ok) return { ok: false, error: auth.error }
+
   if (!profileId || typeof profileId !== 'string') {
     return { ok: false, error: 'Invalid profile id.' }
   }

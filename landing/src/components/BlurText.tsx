@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks, react-hooks/refs -- ref is passed to createElement, not read during render */
 import { motion, useInView } from 'motion/react'
 import { useRef, createElement } from 'react'
 
@@ -37,5 +38,6 @@ export function BlurText({
     </motion.span>
   ))
 
+  // eslint-disable-next-line react-hooks/refs -- ref is passed to createElement, not read during render
   return createElement(as, { ref, className }, children)
 }

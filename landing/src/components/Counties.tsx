@@ -19,7 +19,7 @@ export function Counties() {
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.5 }}
           >
-            Where we're growing
+            Where we&apos;re growing
           </motion.p>
           <motion.h2
             className="font-display font-bold text-2xl md:text-3xl text-foreground mb-4"
@@ -37,7 +37,7 @@ export function Counties() {
             viewport={{ once: true, amount: 0.5 }}
             transition={{ delay: 0.16, duration: 0.5 }}
           >
-            Barterkin is Georgia-only. Every member lives here. If your county isn't listed, be the one who puts it there.
+            Barterkin is Georgia-only. Every member lives here. If your county isn&apos;t listed, be the one who puts it there.
           </motion.p>
         </div>
 

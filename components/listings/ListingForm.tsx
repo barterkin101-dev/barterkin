@@ -293,7 +293,7 @@ export function ListingForm({
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>Optional. What you'd like in return. Max 200 characters.</FormDescription>
+                  <FormDescription>Optional. What you&apos;d like in return. Max 200 characters.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

@@ -26,7 +26,7 @@ export async function getListings(
           p_condition: filters.condition ?? null,
           p_page: filters.page,
           p_page_size: PAGE_SIZE,
-        } as any,
+        } as Record<string, unknown>,
       )
       if (rowsErr) {
         console.error('[getListings] search rows error', { code: rowsErr.code })
@@ -40,7 +40,7 @@ export async function getListings(
           p_category_id: filters.categoryId ?? null,
           p_county_id: filters.countyId ?? null,
           p_condition: filters.condition ?? null,
-        } as any,
+        } as Record<string, unknown>,
       )
       if (countErr) {
         console.error('[getListings] search count error', { code: countErr.code })

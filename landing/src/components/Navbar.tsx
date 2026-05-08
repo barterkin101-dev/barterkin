@@ -13,6 +13,7 @@ export function Navbar() {
       <header style={{ background: FOREST }} className="fixed top-0 inset-x-0 z-50">
         <div className="max-w-[var(--max)] mx-auto px-[var(--gutter)] h-16 flex items-center justify-between">
           {/* Logo */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- landing is a Vite project, not Next.js */}
           <a href="/" className="flex items-center gap-2.5">
             <div className="w-5 h-5 rounded-full" style={{ background: CLAY }} />
             <span className="font-display font-bold text-white text-[17px] tracking-tight">Barterkin</span>

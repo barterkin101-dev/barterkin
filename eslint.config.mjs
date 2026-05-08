@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     "public/swe-worker-*.js",
     // Parallel agent worktrees — not source code for this repo
     ".claude/worktrees/**",
+    // Landing page build output
+    "landing/dist/**",
   ]),
 ]);
 

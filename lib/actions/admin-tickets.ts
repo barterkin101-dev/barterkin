@@ -2,6 +2,7 @@
 import 'server-only'
 import { revalidatePath } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { assertAdmin } from './admin'
 
 export interface AdminUpdateTicketStatusResult {
   ok: boolean
@@ -17,6 +18,9 @@ export async function adminUpdateTicketStatus(
   _prev: AdminUpdateTicketStatusResult | null,
   formData: FormData,
 ): Promise<AdminUpdateTicketStatusResult> {
+  const auth = await assertAdmin()
+  if (!auth.ok) return { ok: false, error: auth.error }
+
   const ticketId = formData.get('ticketId')
   const status = formData.get('status')
 
@@ -53,6 +57,9 @@ export async function adminReplyTicket(
   _prev: AdminReplyTicketResult | null,
   formData: FormData,
 ): Promise<AdminReplyTicketResult> {
+  const auth = await assertAdmin()
+  if (!auth.ok) return { ok: false, error: auth.error }
+
   const ticketId = formData.get('ticketId')
   const content = formData.get('content')
 

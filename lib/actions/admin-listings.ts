@@ -2,6 +2,7 @@
 import 'server-only'
 import { revalidatePath } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { assertAdmin } from './admin'
 
 export interface AdminModerateListingResult {
   ok: boolean
@@ -12,6 +13,9 @@ export async function adminModerateListing(
   _prev: AdminModerateListingResult | null,
   formData: FormData,
 ): Promise<AdminModerateListingResult> {
+  const auth = await assertAdmin()
+  if (!auth.ok) return { ok: false, error: auth.error }
+
   const listingId = formData.get('listingId')
   const action = formData.get('action')
 

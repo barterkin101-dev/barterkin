@@ -61,7 +61,7 @@ export default async function DashboardListingsPage() {
       {listings.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16">
-            <p className="text-lg text-muted-foreground">You haven't created any listings yet.</p>
+            <p className="text-lg text-muted-foreground">You haven&apos;t created any listings yet.</p>
             <p className="mt-1 text-sm text-muted-foreground">
               List something you want to trade and start connecting with other Georgians.
             </p>
