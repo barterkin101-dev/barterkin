@@ -38,6 +38,9 @@ export const ListingFormSchema = z.object({
   priceEstimate: z
     .string()
     .max(100, 'Price estimate must be 100 characters or fewer.')
+    .refine((val) => !val || !/^-\d/.test(val.trim()), {
+      message: 'Price estimate cannot be a negative number.',
+    })
     .optional()
     .or(z.literal('')),
   images: z
