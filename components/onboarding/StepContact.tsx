@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, MessageSquare } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { markOnboardingComplete } from '@/lib/actions/onboarding'
 
 /**
@@ -38,14 +39,18 @@ export async function StepContact() {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <Button asChild variant="outline" className="h-11">
-          <Link href="/directory">
-            <MessageSquare className="mr-1 h-4 w-4" aria-hidden="true" /> Find someone to contact <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
-          </Link>
-        </Button>
-        <Button asChild className="h-11 bg-clay hover:bg-clay/90 text-sage-bg">
-          <Link href="/directory">I&apos;m all set</Link>
-        </Button>
+        <Link
+          href="/directory"
+          className={cn(buttonVariants({ variant: 'outline' }), 'h-11')}
+        >
+          <MessageSquare className="mr-1 h-4 w-4" aria-hidden="true" /> Find someone to contact <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
+        </Link>
+        <Link
+          href="/directory"
+          className={cn(buttonVariants(), 'h-11 bg-clay hover:bg-clay/90 text-sage-bg')}
+        >
+          I&apos;m all set
+        </Link>
       </div>
     </div>
   )

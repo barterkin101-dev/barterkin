@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { Sprout } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export interface HeroStats {
   totalProfiles: number
@@ -74,15 +75,25 @@ export function Hero({ stats, isAuthed }: HeroProps) {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild size="lg" className="h-12 min-w-[180px] bg-clay hover:bg-clay/90 text-sage-bg font-semibold">
-              <Link href={primaryHref}>
-                <Sprout className="mr-2 h-4 w-4" aria-hidden="true" />
-                {primaryLabel}
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="h-12 min-w-[180px] border-sage-bg/30 text-sage-bg bg-transparent hover:bg-sage-bg/10">
-              <Link href="/directory">Browse the directory</Link>
-            </Button>
+            <Link
+              href={primaryHref}
+              className={cn(
+                buttonVariants({ size: 'lg' }),
+                'h-12 min-w-[180px] bg-clay hover:bg-clay/90 text-sage-bg font-semibold'
+              )}
+            >
+              <Sprout className="mr-2 h-4 w-4" aria-hidden="true" />
+              {primaryLabel}
+            </Link>
+            <Link
+              href="/directory"
+              className={cn(
+                buttonVariants({ variant: 'outline', size: 'lg' }),
+                'h-12 min-w-[180px] border-sage-bg/30 text-sage-bg bg-transparent hover:bg-sage-bg/10'
+              )}
+            >
+              Browse the directory
+            </Link>
           </div>
 
           <dl className="mt-12 flex gap-10 border-t border-sage-bg/10 pt-8">

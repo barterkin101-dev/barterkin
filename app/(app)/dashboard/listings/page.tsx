@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getMyListings } from '@/lib/data/listings'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Plus, Pause, Play, Trash2, Pencil } from 'lucide-react'
@@ -28,9 +29,9 @@ export default async function DashboardListingsPage() {
     return (
       <div className="py-16 text-center">
         <p className="text-muted-foreground">Complete your profile to create listings.</p>
-        <Button asChild className="mt-4">
-          <Link href="/onboarding">Finish setup</Link>
-        </Button>
+        <Link href="/onboarding" className={cn(buttonVariants(), 'mt-4')}>
+          Finish setup
+        </Link>
       </div>
     )
   }
@@ -50,12 +51,10 @@ export default async function DashboardListingsPage() {
         <h1 className="font-serif text-3xl font-bold leading-[1.15] md:text-[32px]">
           My Listings
         </h1>
-        <Button asChild>
-          <Link href="/dashboard/listings/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Listing
-          </Link>
-        </Button>
+        <Link href="/dashboard/listings/new" className={cn(buttonVariants())}>
+          <Plus className="mr-2 h-4 w-4" />
+          New Listing
+        </Link>
       </div>
 
       {listings.length === 0 ? (
@@ -65,9 +64,9 @@ export default async function DashboardListingsPage() {
             <p className="mt-1 text-sm text-muted-foreground">
               List something you want to trade and start connecting with other Georgians.
             </p>
-            <Button asChild className="mt-6">
-              <Link href="/dashboard/listings/new">Create your first listing</Link>
-            </Button>
+            <Link href="/dashboard/listings/new" className={cn(buttonVariants(), 'mt-6')}>
+              Create your first listing
+            </Link>
           </CardContent>
         </Card>
       ) : (
@@ -122,12 +121,13 @@ export default async function DashboardListingsPage() {
                         </Button>
                       </form>
                     ) : null}
-                    <Button asChild variant="ghost" size="sm">
-                      <Link href={`/dashboard/listings/${listing.id}/edit`}>
-                        <Pencil className="mr-1 h-3 w-3" />
-                        Edit
-                      </Link>
-                    </Button>
+                    <Link
+                      href={`/dashboard/listings/${listing.id}/edit`}
+                      className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
+                    >
+                      <Pencil className="mr-1 h-3 w-3" />
+                      Edit
+                    </Link>
                     <form action={deleteListingForm}>
                       <input type="hidden" name="listingId" value={listing.id} />
                       <Button type="submit" variant="ghost" size="sm" className="text-destructive">

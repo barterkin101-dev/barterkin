@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export const metadata = {
   title: 'Page not found',
@@ -12,9 +13,9 @@ export default function NotFoundPage() {
       <p className="mt-4 text-lg text-muted-foreground">
         This page doesn&apos;t exist or may have been removed.
       </p>
-      <Button asChild className="mt-8">
-        <Link href="/">Back home</Link>
-      </Button>
+      <Link href="/" className={cn(buttonVariants(), 'mt-8')}>
+        Back home
+      </Link>
     </div>
   )
 }

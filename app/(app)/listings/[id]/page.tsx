@@ -3,7 +3,8 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getListingById } from '@/lib/data/listings'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { MessageCircle, MapPin, ArrowLeft } from 'lucide-react'
@@ -133,18 +134,20 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
 
           <div className="flex items-center gap-4">
             {isOwn ? (
-              <Button asChild variant="outline">
-                <Link href={`/dashboard/listings/${listing.id}/edit`}>
-                  Edit Listing
-                </Link>
-              </Button>
+              <Link
+                href={`/dashboard/listings/${listing.id}/edit`}
+                className={cn(buttonVariants({ variant: 'outline' }))}
+              >
+                Edit Listing
+              </Link>
             ) : listing.profiles ? (
-              <Button asChild>
-                <Link href={`/m/${listing.profiles.username}`}>
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  Contact Seller
-                </Link>
-              </Button>
+              <Link
+                href={`/m/${listing.profiles.username}`}
+                className={cn(buttonVariants())}
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Contact Seller
+              </Link>
             ) : null}
           </div>
 

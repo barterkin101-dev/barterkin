@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { ProfileCard } from '@/components/profile/ProfileCard'
 import { RatingCard } from '@/components/ratings/RatingCard'
 import { getRatingsForProfile } from '@/lib/data/ratings'
@@ -64,9 +65,9 @@ export default async function MemberProfilePage({
           It may have been removed, unpublished, or the link is wrong. Head to the directory to
           find other members.
         </p>
-        <Button asChild>
-          <Link href="/directory">Go to directory</Link>
-        </Button>
+        <Link href="/directory" className={cn(buttonVariants())}>
+          Go to directory
+        </Link>
       </div>
     )
   }

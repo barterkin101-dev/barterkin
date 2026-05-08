@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 /**
  * AUTH-04 UX companion. Sends the user back to /login where they can
@@ -13,8 +14,6 @@ import { Button } from '@/components/ui/button'
  *     with NO ?email= param (LoginForm leaves the field blank — clean UX)
  *   - When email is present and real, navigates to /login?email=<encoded> so
  *     LoginForm's useEffect hydrates the field
- *   - Uses next/link under <Button asChild> for guaranteed Next.js client-side
- *     navigation (raw <a> can fail to navigate in some Button-Slot edge cases)
  */
 export function ResendLinkButton({ email }: { email?: string | null }) {
   // Treat the page-level fallback string as "no real email" — never want it in a query param.
@@ -28,8 +27,8 @@ export function ResendLinkButton({ email }: { email?: string | null }) {
     : '/login'
 
   return (
-    <Button asChild size="lg" className="w-full">
-      <Link href={resendHref}>Resend verification link</Link>
-    </Button>
+    <Link href={resendHref} className={cn(buttonVariants({ size: 'lg' }), 'w-full')}>
+      Resend verification link
+    </Link>
   )
 }

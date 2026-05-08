@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, Compass } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export function StepDirectory() {
   return (
@@ -24,16 +25,18 @@ export function StepDirectory() {
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <Button asChild variant="outline" className="h-11">
-          <Link href="/directory">
-            <Compass className="mr-1 h-4 w-4" aria-hidden="true" /> Browse the directory <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
-          </Link>
-        </Button>
-        <Button asChild className="h-11 bg-clay hover:bg-clay/90 text-sage-bg">
-          <Link href="/onboarding?step=3">
-            Next: send your first hello <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
-          </Link>
-        </Button>
+        <Link
+          href="/directory"
+          className={cn(buttonVariants({ variant: 'outline' }), 'h-11')}
+        >
+          <Compass className="mr-1 h-4 w-4" aria-hidden="true" /> Browse the directory <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
+        </Link>
+        <Link
+          href="/onboarding?step=3"
+          className={cn(buttonVariants(), 'h-11 bg-clay hover:bg-clay/90 text-sage-bg')}
+        >
+          Next: send your first hello <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
+        </Link>
       </div>
     </div>
   )

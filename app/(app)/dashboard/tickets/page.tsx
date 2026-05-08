@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getTickets } from '@/lib/data/tickets'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Plus } from 'lucide-react'
@@ -46,12 +47,10 @@ export default async function TicketsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-serif text-3xl font-bold leading-[1.15] md:text-[32px]">Support Tickets</h1>
-        <Button asChild>
-          <Link href="/dashboard/tickets/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Ticket
-          </Link>
-        </Button>
+        <Link href="/dashboard/tickets/new" className={cn(buttonVariants())}>
+          <Plus className="mr-2 h-4 w-4" />
+          New Ticket
+        </Link>
       </div>
 
       {tickets.length === 0 ? (
