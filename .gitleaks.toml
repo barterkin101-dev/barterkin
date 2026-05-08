@@ -8,6 +8,7 @@ description = "Paths to exclude from scanning"
 paths = [
   '''\.planning/''',
   '''legacy/''',
+  '''\.env\.local$''',
   '''\.env\.local\.example$''',
   '''pnpm-lock\.yaml$''',
   '''\.github/workflows/.+\.yml$''',
@@ -16,4 +17,5 @@ paths = [
 regexes = [
   '''secrets\.GITHUB_TOKEN''',
   '''hfdcsickergdcdvejbcw''',
+  '''wnyev3689z''',
 ]
