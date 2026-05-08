@@ -36,7 +36,7 @@ jobs:
 
   deploy:
     name: Vercel production
-    needs: migrate
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
