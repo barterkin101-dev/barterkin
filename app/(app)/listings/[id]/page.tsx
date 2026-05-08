@@ -20,6 +20,8 @@ const conditionLabels: Record<string, string> = {
   'for-parts': 'For Parts',
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function ListingDetailPage({ params }: ListingDetailPageProps) {
   const { id } = await params
   const listing = await getListingById(id)
