@@ -77,7 +77,7 @@ as $$
         and p.banned = false
     )
   order by
-    case when p_query is not null and p_query <> '' then rank end desc nulls last,
+    case when p_query is not null and p_query <> '' then ts_rank(l.search_vector, websearch_to_tsquery('english', p_query)) end desc nulls last,
     l.created_at desc
   limit p_page_size
   offset (p_page - 1) * p_page_size;

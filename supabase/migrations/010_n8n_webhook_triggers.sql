@@ -95,32 +95,34 @@ comment on function public.contact_request_alert_payload(uuid) is
 
 -- Welcome-email trigger: adds WHEN (OLD.onboarding_completed_at IS NULL AND NEW IS NOT NULL)
 -- Replace <trigger_name_welcome> with the real name from pg_trigger.
-DROP TRIGGER IF EXISTS <trigger_name_welcome> ON public.profiles;
-CREATE TRIGGER <trigger_name_welcome>
-  AFTER UPDATE ON public.profiles
-  FOR EACH ROW
-  WHEN (OLD.onboarding_completed_at IS NULL AND NEW.onboarding_completed_at IS NOT NULL)
-  EXECUTE FUNCTION supabase_functions.http_request(
-    'https://n8n.barterkin.com/webhook/welcome-email',
-    'POST',
-    '{"Content-Type":"application/json","X-Barterkin-Webhook-Secret":"__WEBHOOK_SECRET__"}',
-    '{}',
-    '5000'
-  );
+-- PLACEHOLDER: uncomment after substituting real trigger names.
+-- DROP TRIGGER IF EXISTS <trigger_name_welcome> ON public.profiles;
+-- CREATE TRIGGER <trigger_name_welcome>
+--   AFTER UPDATE ON public.profiles
+--   FOR EACH ROW
+--   WHEN (OLD.onboarding_completed_at IS NULL AND NEW.onboarding_completed_at IS NOT NULL)
+--   EXECUTE FUNCTION supabase_functions.http_request(
+--     'https://n8n.barterkin.com/webhook/welcome-email',
+--     'POST',
+--     '{"Content-Type":"application/json","X-Barterkin-Webhook-Secret":"__WEBHOOK_SECRET__"}',
+--     '{}',
+--     '5000'
+--   );
 
 -- Contact-request-alert trigger: fires on every INSERT; no WHEN clause needed.
 -- Replace <trigger_name_contact> with the real name from pg_trigger.
 -- Recreated here for two reasons:
 --   1. Ensures the header is X-Barterkin-Webhook-Secret (future Studio edits won't clobber this migration source of truth).
 --   2. Makes the migration file a self-contained source of truth for both triggers.
-DROP TRIGGER IF EXISTS <trigger_name_contact> ON public.contact_requests;
-CREATE TRIGGER <trigger_name_contact>
-  AFTER INSERT ON public.contact_requests
-  FOR EACH ROW
-  EXECUTE FUNCTION supabase_functions.http_request(
-    'https://n8n.barterkin.com/webhook/contact-request-alert',
-    'POST',
-    '{"Content-Type":"application/json","X-Barterkin-Webhook-Secret":"__WEBHOOK_SECRET__"}',
-    '{}',
-    '5000'
-  );
+-- PLACEHOLDER: uncomment after substituting real trigger names.
+-- DROP TRIGGER IF EXISTS <trigger_name_contact> ON public.contact_requests;
+-- CREATE TRIGGER <trigger_name_contact>
+--   AFTER INSERT ON public.contact_requests
+--   FOR EACH ROW
+--   EXECUTE FUNCTION supabase_functions.http_request(
+--     'https://n8n.barterkin.com/webhook/contact-request-alert',
+--     'POST',
+--     '{"Content-Type":"application/json","X-Barterkin-Webhook-Secret":"__WEBHOOK_SECRET__"}',
+--     '{}',
+--     '5000'
+--   );
