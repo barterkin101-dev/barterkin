@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
 import { ProfileCard } from '@/components/profile/ProfileCard'
+import { RatingCard } from '@/components/ratings/RatingCard'
+import { getRatingsForProfile } from '@/lib/data/ratings'
 import type { ProfileWithRelations } from '@/lib/actions/profile.types'
 
 // Middleware's VERIFIED_REQUIRED_PREFIXES already covers '/m/' — auth+verify gate runs before this page.
@@ -73,15 +75,30 @@ export default async function MemberProfilePage({
   const { data: { user } } = await supabase.auth.getUser()
   const viewerOwnerId = user?.id ?? null
 
+  const { ratings, avg, count } = await getRatingsForProfile(profileRow.id)
+
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-2xl space-y-8">
       <ProfileCard
         profile={profileRow as ProfileWithRelations}
         viewerOwnerId={viewerOwnerId}
         profileOwnerId={profileRow.owner_id}
         profileId={profileRow.id}
         acceptingContact={profileRow.accepting_contact}
+        ratingAvg={avg}
+        ratingCount={count}
       />
+
+      {count > 0 && (
+        <div className="space-y-4">
+          <h2 className="font-serif text-2xl font-bold">Reviews</h2>
+          <div className="space-y-3">
+            {ratings.map((rating) => (
+              <RatingCard key={rating.id} rating={rating} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

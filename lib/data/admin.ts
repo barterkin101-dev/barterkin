@@ -12,6 +12,10 @@ export interface AdminStats {
   totalMembers: number
   totalContacts: number
   newThisWeek: number
+  totalListings: number
+  totalTickets: number
+  totalDisputes: number
+  totalConversations: number
 }
 
 export interface AdminMemberRow {
@@ -59,13 +63,25 @@ export interface AdminContactRow {
 export async function getAdminStats(): Promise<AdminStats> {
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
-  const [totalMembers, totalContacts, newThisWeek] = await Promise.all([
+  const [
+    totalMembers,
+    totalContacts,
+    newThisWeek,
+    totalListings,
+    totalTickets,
+    totalDisputes,
+    totalConversations,
+  ] = await Promise.all([
     supabaseAdmin.from('profiles').select('id', { count: 'exact', head: true }),
     supabaseAdmin.from('contact_requests').select('id', { count: 'exact', head: true }),
     supabaseAdmin
       .from('profiles')
       .select('id', { count: 'exact', head: true })
       .gte('created_at', sevenDaysAgo),
+    supabaseAdmin.from('listings').select('id', { count: 'exact', head: true }),
+    supabaseAdmin.from('tickets').select('id', { count: 'exact', head: true }),
+    supabaseAdmin.from('disputes').select('id', { count: 'exact', head: true }),
+    supabaseAdmin.from('conversations').select('id', { count: 'exact', head: true }),
   ])
 
   if (totalMembers.error) {
@@ -85,6 +101,10 @@ export async function getAdminStats(): Promise<AdminStats> {
     totalMembers: totalMembers.count ?? 0,
     totalContacts: totalContacts.count ?? 0,
     newThisWeek: newThisWeek.count ?? 0,
+    totalListings: totalListings.count ?? 0,
+    totalTickets: totalTickets.count ?? 0,
+    totalDisputes: totalDisputes.count ?? 0,
+    totalConversations: totalConversations.count ?? 0,
   }
 }
 

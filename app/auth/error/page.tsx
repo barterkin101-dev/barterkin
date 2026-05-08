@@ -20,6 +20,10 @@ export default async function AuthErrorPage({ searchParams }: ErrorPageProps) {
       heading: 'That link is missing something',
       body: 'Request a new magic link below.',
     },
+    verify_failed: {
+      heading: 'That link has expired',
+      body: 'Magic links are valid for 1 hour and can only be used once. Request a fresh link below.',
+    },
     default: {
       heading: 'Something went wrong',
       body: 'Please try signing in again.',

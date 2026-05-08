@@ -1,0 +1,102 @@
+/* ── Fonts ─────────────────────────────────────────────────── */
+@import "@fontsource/playfair-display/400.css";
+@import "@fontsource/playfair-display/400-italic.css";
+@import "@fontsource/playfair-display/700.css";
+@import "@fontsource/playfair-display/700-italic.css";
+@import "@fontsource/playfair-display/900.css";
+@import "@fontsource/playfair-display/900-italic.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+
+@import "tailwindcss";
+
+/* ── Design tokens ─────────────────────────────────────────── */
+:root {
+  /* Raw palette */
+  --forest:  120 28% 17%;   /* dark green — hero / nav / footer */
+  --cream:    44 18% 94%;   /* warm off-white page bg */
+  --ink:     120 15% 11%;   /* near-black text */
+  --clay:     27 55% 55%;   /* warm clay CTA orange */
+  --sage:    120 22% 44%;   /* mid-green accent */
+
+  /* Semantic tokens */
+  --background:             var(--cream);
+  --foreground:             var(--ink);
+  --card:                   0 0% 100%;
+  --card-foreground:        var(--ink);
+  --primary:                var(--clay);
+  --primary-foreground:     44 18% 97%;
+  --secondary:              var(--sage);
+  --secondary-foreground:   44 18% 97%;
+  --muted:                  44 12% 89%;
+  --muted-foreground:       120 8% 46%;
+  --border:                 120 8% 85%;
+  --input:                  120 8% 85%;
+  --ring:                   var(--clay);
+  --radius:                 0.75rem;
+
+  /* Typography */
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body:    "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
+
+  /* Layout */
+  --gutter: clamp(20px, 4.2vw, 56px);
+  --max:    1440px;
+}
+
+html, body, #root {
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+.font-display { font-family: var(--font-display); }
+.font-body    { font-family: var(--font-body); }
+
+/* ── Tailwind v4 theme ─────────────────────────────────────── */
+@theme {
+  --color-background:         hsl(var(--background));
+  --color-foreground:         hsl(var(--foreground));
+  --color-card:               hsl(var(--card));
+  --color-card-foreground:    hsl(var(--card-foreground));
+  --color-primary:            hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary:          hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted:              hsl(var(--muted));
+  --color-muted-foreground:   hsl(var(--muted-foreground));
+  --color-border:             hsl(var(--border));
+  --color-input:              hsl(var(--input));
+  --color-ring:               hsl(var(--ring));
+  --color-forest:             hsl(var(--forest));
+
+  --radius-sm:  calc(var(--radius) - 4px);
+  --radius-md:  calc(var(--radius) - 2px);
+  --radius-lg:  var(--radius);
+  --radius-xl:  calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 10px);
+  --radius-3xl: calc(var(--radius) + 18px);
+
+  --animate-marquee:     marquee 32s linear infinite;
+  --animate-marquee-rev: marquee-rev 38s linear infinite;
+}
+
+@keyframes marquee     { from { transform: translateX(0) } to { transform: translateX(-50%) } }
+@keyframes marquee-rev { from { transform: translateX(-50%) } to { transform: translateX(0) } }
+@keyframes accordion-down {
+  from { height: 0; }
+  to   { height: var(--radix-accordion-content-height); }
+}
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to   { height: 0; }
+}

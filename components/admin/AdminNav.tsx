@@ -6,6 +6,9 @@ const NAV_LINKS = [
   { href: '/admin', label: 'Overview' },
   { href: '/admin/members', label: 'Members' },
   { href: '/admin/contacts', label: 'Contacts' },
+  { href: '/admin/listings', label: 'Listings' },
+  { href: '/admin/tickets', label: 'Tickets' },
+  { href: '/admin/disputes', label: 'Disputes' },
 ] as const
 
 function isActive(pathname: string, href: string): boolean {

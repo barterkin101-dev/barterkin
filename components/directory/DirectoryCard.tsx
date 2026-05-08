@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { FoundingMemberBadge } from '@/components/profile/FoundingMemberBadge'
+import { StarRating } from '@/components/ratings/StarRating'
 import type { DirectoryProfile } from '@/lib/data/directory.types'
 
 export function DirectoryCard({ profile }: { profile: DirectoryProfile }) {
@@ -41,6 +42,14 @@ export function DirectoryCard({ profile }: { profile: DirectoryProfile }) {
             <p className="text-sm text-forest-mid">
               {county} · {category}
             </p>
+            {profile.rating_count > 0 && (
+              <div className="mt-1 flex items-center gap-1">
+                <StarRating value={Math.round(profile.rating_avg ?? 0)} readOnly size="sm" />
+                <span className="text-xs text-muted-foreground">
+                  ({profile.rating_count})
+                </span>
+              </div>
+            )}
           </div>
         </div>
         <div className="mt-4">

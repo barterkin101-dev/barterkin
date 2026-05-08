@@ -7,6 +7,7 @@ import type { ProfileWithRelations } from '@/lib/actions/profile.types'
 import { ContactButton } from '@/components/profile/ContactButton'
 import { OverflowMenu } from '@/components/profile/OverflowMenu'
 import { FoundingMemberBadge } from '@/components/profile/FoundingMemberBadge'
+import { RatingSummary } from '@/components/ratings/RatingSummary'
 
 interface ProfileCardProps {
   profile: ProfileWithRelations
@@ -18,6 +19,8 @@ interface ProfileCardProps {
   profileId?: string
   /** profiles.accepting_contact value. */
   acceptingContact?: boolean
+  ratingAvg?: number | null | undefined
+  ratingCount?: number | undefined
 }
 
 export function ProfileCard({
@@ -26,6 +29,8 @@ export function ProfileCard({
   profileOwnerId,
   profileId,
   acceptingContact,
+  ratingAvg,
+  ratingCount = 0,
 }: ProfileCardProps) {
   const initial = (profile.display_name ?? '?').charAt(0).toUpperCase()
   const county = profile.counties?.name ?? null
@@ -70,6 +75,7 @@ export function ProfileCard({
               {[county, category].filter(Boolean).join(' \u00b7 ')}
             </p>
           )}
+          <RatingSummary avg={ratingAvg ?? null} count={ratingCount ?? 0} />
         </div>
       </CardHeader>
 

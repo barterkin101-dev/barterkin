@@ -19,6 +19,8 @@ export function NavLinks({
 }) {
   const pathname = usePathname()
   const isDirectory = pathname.startsWith('/directory')
+  const isListings = pathname.startsWith('/listings')
+  const isDashboard = pathname.startsWith('/dashboard')
   const initial = (displayName ?? '?').charAt(0).toUpperCase()
 
   return (
@@ -42,6 +44,28 @@ export function NavLinks({
         )}
       >
         Directory
+      </Link>
+      <Link
+        href="/listings"
+        className={cn(
+          'text-sm',
+          isListings
+            ? 'text-forest-deep border-b-2 border-clay pb-1'
+            : 'text-forest-mid hover:text-forest-deep',
+        )}
+      >
+        Listings
+      </Link>
+      <Link
+        href="/dashboard"
+        className={cn(
+          'text-sm',
+          isDashboard
+            ? 'text-forest-deep border-b-2 border-clay pb-1'
+            : 'text-forest-mid hover:text-forest-deep',
+        )}
+      >
+        Dashboard
       </Link>
       <Link
         href="/profile"

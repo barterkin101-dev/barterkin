@@ -48,7 +48,7 @@ export async function getDirectoryRows(
     let q = supabase
       .from('profiles')
       .select(
-        `id, username, display_name, avatar_url, founding_member,
+        `id, username, display_name, avatar_url, founding_member, rating_avg, rating_count,
          counties!inner(name),
          categories!inner(name),
          skills_offered(skill_text, sort_order)`,
@@ -61,10 +61,11 @@ export async function getDirectoryRows(
         config: 'english',
       })
     }
-    // Default ordering: most recent first. When keyword search is active, the
-    // FTS/trigram rank ordering is handled at the index level; created_at is a
-    // stable tiebreaker.
+    // Trust-based ranking: Bayesian average prevents single-rating profiles from dominating.
+    // Unrated profiles sort below rated ones. created_at is the tiebreaker.
     return q
+      .order('rating_avg', { ascending: false, nullsFirst: false })
+      .order('rating_count', { ascending: false })
       .order('created_at', { ascending: false })
       .range(
         (filters.page - 1) * PAGE_SIZE,
@@ -107,6 +108,8 @@ export async function getDirectoryRows(
         founding_member: Boolean(
           (row as { founding_member?: boolean }).founding_member,
         ),
+        rating_avg: (row as { rating_avg?: number | null }).rating_avg ?? null,
+        rating_count: (row as { rating_count?: number }).rating_count ?? 0,
         counties: row.counties
           ? { name: (row.counties as { name: string }).name }
           : null,

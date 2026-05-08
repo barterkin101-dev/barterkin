@@ -8,7 +8,8 @@ const AUTH_GROUP_PATHS = ['/login', '/signup']
 // AUTH-04: unverified users bounced to /verify-pending from these prefixes.
 // Phase 2 installs this list in advance of /directory, /m/, /profile existing
 // (Phase 3/4). Check is a no-op until those paths exist.
-const VERIFIED_REQUIRED_PREFIXES = ['/directory', '/m/', '/profile']
+// v1.5 additions: /dashboard (member area), /listings/new (create listing)
+const VERIFIED_REQUIRED_PREFIXES = ['/directory', '/m/', '/profile', '/dashboard']
 
 // Paths always accessible (even to unverified users) so they don't redirect-loop
 const ALWAYS_ALLOWED = [

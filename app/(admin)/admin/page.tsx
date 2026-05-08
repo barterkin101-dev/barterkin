@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Users, Mail, UserPlus } from 'lucide-react'
+import Link from 'next/link'
+import { Users, Mail, UserPlus, ShoppingBag, Ticket, AlertTriangle, MessageCircle } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'
 import { getAdminStats } from '@/lib/data/admin'
 
@@ -20,7 +21,7 @@ export default async function AdminHomePage() {
         </p>
       </header>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-sage-pale ring-1 ring-sage-light">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm uppercase tracking-wide text-forest-mid font-bold">
@@ -55,7 +56,7 @@ export default async function AdminHomePage() {
         <Card className="bg-sage-pale ring-1 ring-sage-light">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm uppercase tracking-wide text-forest-mid font-bold">
-              New members this week
+              New this week
             </CardTitle>
             <UserPlus className="h-4 w-4 text-forest-mid" aria-hidden="true" />
           </CardHeader>
@@ -68,6 +69,79 @@ export default async function AdminHomePage() {
             </CardDescription>
           </CardContent>
         </Card>
+
+        <Card className="bg-sage-pale ring-1 ring-sage-light">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm uppercase tracking-wide text-forest-mid font-bold">
+              Conversations
+            </CardTitle>
+            <MessageCircle className="h-4 w-4 text-forest-mid" aria-hidden="true" />
+          </CardHeader>
+          <CardContent className="space-y-1">
+            <p className="text-[32px] font-bold text-clay font-sans leading-[1.15]">
+              {stats.totalConversations}
+            </p>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Link href="/admin/listings">
+          <Card className="bg-sage-pale ring-1 ring-sage-light transition-colors hover:bg-sage-light/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm uppercase tracking-wide text-forest-mid font-bold">
+                Listings
+              </CardTitle>
+              <ShoppingBag className="h-4 w-4 text-forest-mid" aria-hidden="true" />
+            </CardHeader>
+            <CardContent className="space-y-1">
+              <p className="text-[32px] font-bold text-clay font-sans leading-[1.15]">
+                {stats.totalListings}
+              </p>
+              <CardDescription className="text-sm text-forest-mid">
+                Manage marketplace listings
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/admin/tickets">
+          <Card className="bg-sage-pale ring-1 ring-sage-light transition-colors hover:bg-sage-light/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm uppercase tracking-wide text-forest-mid font-bold">
+                Tickets
+              </CardTitle>
+              <Ticket className="h-4 w-4 text-forest-mid" aria-hidden="true" />
+            </CardHeader>
+            <CardContent className="space-y-1">
+              <p className="text-[32px] font-bold text-clay font-sans leading-[1.15]">
+                {stats.totalTickets}
+              </p>
+              <CardDescription className="text-sm text-forest-mid">
+                Support requests
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/admin/disputes">
+          <Card className="bg-sage-pale ring-1 ring-sage-light transition-colors hover:bg-sage-light/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm uppercase tracking-wide text-forest-mid font-bold">
+                Disputes
+              </CardTitle>
+              <AlertTriangle className="h-4 w-4 text-forest-mid" aria-hidden="true" />
+            </CardHeader>
+            <CardContent className="space-y-1">
+              <p className="text-[32px] font-bold text-clay font-sans leading-[1.15]">
+                {stats.totalDisputes}
+              </p>
+              <CardDescription className="text-sm text-forest-mid">
+                Trade mediation
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </Link>
       </section>
     </div>
   )
