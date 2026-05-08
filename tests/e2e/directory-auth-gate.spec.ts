@@ -1,15 +1,11 @@
 /**
- * Phase 4 — DIR-01 — unauthed visit to /directory redirects to /login
+ * Phase 4 — DIR-01 — /directory is publicly browseable (v1.5 fix)
  */
 import { test, expect } from '@playwright/test'
 
-test('DIR-01: unauthed user visiting /directory is redirected to /login', async ({
-  page,
-}) => {
-  // Clear all cookies to ensure no session
+test('DIR-01: unauthed user can visit /directory', async ({ page }) => {
   await page.context().clearCookies()
   const response = await page.goto('/directory')
-  // Middleware redirects unauthenticated visitors to /login
-  await expect(page).toHaveURL(/\/login(\?.*)?$/)
+  await expect(page).toHaveURL('/directory')
   expect(response?.ok()).toBeTruthy()
 })
