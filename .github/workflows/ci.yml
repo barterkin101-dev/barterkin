@@ -108,8 +108,8 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
-      - name: Install chromium
-        run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium webkit
       - name: Build
         run: pnpm build
       - name: E2E
