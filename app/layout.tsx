@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { PostHogProvider } from './providers'
 import { Footer } from '@/components/layout/Footer'
 import { ChatWidget } from '@/components/chatbot/ChatWidget'
+import { ClarityScript } from '@/components/analytics/ClarityScript'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' })
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </PostHogProvider>
         <ChatWidget />
         <Analytics />
+        <ClarityScript />
       </body>
     </html>
   )

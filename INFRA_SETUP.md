@@ -59,6 +59,34 @@ curl -s https://www.barterkin.com/listings | head -1
 
 ---
 
+## 3. Microsoft Clarity (Heatmaps & Session Recordings)
+
+Current state: integration is wired but inactive until a project ID is added.
+
+### Setup steps
+
+1. Go to [clarity.microsoft.com](https://clarity.microsoft.com) and sign in with your Microsoft account
+2. Click **New Project** → enter `barterkin.com` as the site
+3. Copy the **Project ID** from Settings → Setup (looks like `abcdefghij`)
+4. Add it to Vercel environment variables:
+
+```bash
+npx vercel env add NEXT_PUBLIC_CLARITY_PROJECT_ID production
+# Paste: your-project-id
+```
+
+5. Redeploy: `npx vercel --prod`
+
+### Verification
+
+After deploy, open Clarity dashboard. Within a few minutes you should see:
+- Active sessions
+- Heatmaps
+- Scroll depth
+- Click tracking
+
+---
+
 ## 3. n8n Webhook Secret (Rotated)
 
 **Status:** ✅ Rotated on 2026-05-08
