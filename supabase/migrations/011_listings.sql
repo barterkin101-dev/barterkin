@@ -63,6 +63,19 @@ create policy "listings_update_own" on public.listings for update to authenticat
 create policy "listings_delete_own" on public.listings for delete to authenticated
   using (profile_id in (select id from public.profiles where owner_id = (select auth.uid())));
 
+-- SELECT (anon): public can read active listings from published profiles
+-- Required because listings page is public browse; RLS defaults to deny for anon.
+create policy "listings_read_active_anon" on public.listings for select to anon
+  using (
+    status = 'active'
+    and exists (
+      select 1 from public.profiles p
+      where p.id = listings.profile_id
+        and p.is_published = true
+        and p.banned = false
+    )
+  );
+
 -- Indexes
 create index listings_profile_idx on public.listings(profile_id, created_at desc);
 create index listings_status_category_idx on public.listings(status, category_id) where status = 'active';
@@ -146,6 +159,22 @@ create policy "listing_images_delete_own" on public.listing_images for delete to
       select 1 from public.listings l
       where l.id = listing_images.listing_id
         and l.profile_id in (select id from public.profiles where owner_id = (select auth.uid()))
+    )
+  );
+
+-- SELECT (anon): public can read images for active listings from published profiles
+create policy "listing_images_read_active_anon" on public.listing_images for select to anon
+  using (
+    exists (
+      select 1 from public.listings l
+      where l.id = listing_images.listing_id
+        and l.status = 'active'
+        and exists (
+          select 1 from public.profiles p
+          where p.id = l.profile_id
+            and p.is_published = true
+            and p.banned = false
+        )
     )
   );
 
