@@ -32,7 +32,7 @@ export const viewport: Viewport = {
 }
 
 function ClarityScript() {
-  const projectId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID
+  const projectId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID?.trim()
   if (!projectId) return null
   return <script async src={`https://www.clarity.ms/tag/${projectId}`} />
 }
