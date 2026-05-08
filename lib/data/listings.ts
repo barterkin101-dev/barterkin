@@ -15,7 +15,6 @@ export async function getListings(
   const supabase = await createClient()
 
   try {
-    console.log('[getListings] start', { filters })
     // Use the search RPC if there's a query; otherwise use plain select
     if (filters.q && filters.q.trim() !== '') {
       const { data: rows, error: rowsErr } = await supabase.rpc(
@@ -100,8 +99,7 @@ export async function getListings(
       buildRows(),
     ])
 
-    console.log('[getListings] countResult', { count: countResult.count, countError: countResult.error })
-    console.log('[getListings] rowsResult', { rowsLen: rowsResult.data?.length, rowsError: rowsResult.error })
+
     if (countResult.error) {
       console.error('[getListings] count error', { code: countResult.error.code })
       return { listings: [], totalCount: 0, error: 'count_failed' }
@@ -125,8 +123,6 @@ export async function getListings(
   } catch (err) {
     console.error('[getListings] unexpected', err)
     return { listings: [], totalCount: 0, error: 'unknown' }
-  } finally {
-    console.log('[getListings] end')
   }
 }
 

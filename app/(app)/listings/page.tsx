@@ -35,9 +35,7 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
     supabase.from('counties').select('id, name').order('name'),
   ])
 
-  console.log('[ListingsPage] before getListings')
   const { listings, totalCount, error } = await getListings(filters)
-  console.log('[ListingsPage] after getListings', { listingsLen: listings.length, totalCount, error })
   const totalPages = Math.ceil(totalCount / PAGE_SIZE)
 
   return (
