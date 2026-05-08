@@ -4,7 +4,6 @@ import { Analytics } from '@vercel/analytics/next'
 import { PostHogProvider } from './providers'
 import { Footer } from '@/components/layout/Footer'
 import { ChatWidget } from '@/components/chatbot/ChatWidget'
-import { ClarityScript } from '@/components/analytics/ClarityScript'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans', display: 'swap' })
@@ -30,6 +29,12 @@ export const viewport: Viewport = {
   themeColor: '#2d5a27',
   width: 'device-width',
   initialScale: 1,
+}
+
+function ClarityScript() {
+  const projectId = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID
+  if (!projectId) return null
+  return <script async src={`https://www.clarity.ms/tag/${projectId}`} />
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
