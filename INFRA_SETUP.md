@@ -87,18 +87,42 @@ After deploy, open Clarity dashboard. Within a few minutes you should see:
 
 ---
 
-## 3. n8n Webhook Secret (Rotated)
+## 3. n8n Webhook Automations
 
-**Status:** ✅ Rotated on 2026-05-08
+**Status:** ✅ Active — 7 webhooks + 5 RPC payload resolvers
 
-**New secret:** `da38cce0e1459e9d77384c3c53bedc1e62e040e9d547f3ae02ba5ff942065eea`
+### Webhook Endpoints
 
-**What was updated:**
-- Database triggers (5 webhooks) now use the new secret
-- Vercel env var `N8N_WEBHOOK_SECRET` updated
+| Endpoint | Trigger | Table | Condition |
+|----------|---------|-------|-----------|
+| `/webhook/welcome-email` | AFTER UPDATE | `profiles` | `onboarding_completed_at` NULL → value |
+| `/webhook/contact-request-alert` | AFTER INSERT | `contact_requests` | Every insert |
+| `/webhook/new-message` | AFTER INSERT | `messages` | Every insert |
+| `/webhook/new-ticket` | AFTER INSERT | `tickets` | Every insert |
+| `/webhook/new-dispute` | AFTER INSERT | `disputes` | Every insert |
+| `/webhook/chat-escalated` | AFTER UPDATE | `chat_sessions` | Status transitions to `escalated` |
+| `/webhook/new-listing` | AFTER INSERT | `listings` | Every insert (moderation alert) |
+
+### RPC Payload Resolvers (service_role only)
+
+| Function | Purpose |
+|----------|---------|
+| `profile_owner_email(uuid)` | Resolve auth email from profile ID |
+| `contact_request_alert_payload(uuid)` | Sender/recipient names + created_at |
+| `message_alert_payload(uuid)` | Sender name, conversation participants, preview |
+| `ticket_alert_payload(uuid)` | Ticket details + profile name. **Refined:** includes `source` (web/chatbot/email), `user_email`, and falls back to `user_email` for anonymous chatbot tickets |
+| `dispute_alert_payload(uuid)` | Dispute reason + participant names |
+| `chat_escalation_payload(uuid)` | Session details, message count, last message preview, ticket linkage |
+| `listing_alert_payload(uuid)` | Listing details + profile name for moderation |
+
+### Webhook Secret
+
+**Current secret:** `da38cce0e1459e9d77384c3c53bedc1e62e040e9d547f3ae02ba5ff942065eea`
+
+**Rotated:** 2026-05-08
 
 **Action required in n8n:**
-Update your n8n webhook workflows to verify requests using the new `X-Barterkin-Webhook-Secret` header value.
+Update your n8n webhook workflows to verify requests using the `X-Barterkin-Webhook-Secret` header value.
 
 ---
 
