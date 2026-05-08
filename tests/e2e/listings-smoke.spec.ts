@@ -15,6 +15,6 @@ test.describe('LIST-SMOKE — Listings public browse', () => {
   test('listing detail page loads for a valid id', async ({ page }) => {
     // Use a random UUID — the page should show "not found" gracefully
     await page.goto('/listings/00000000-0000-0000-0000-000000000000')
-    await expect(page.getByText(/could not be found/i)).toBeVisible()
+    await expect(page.getByText(/doesn.t exist or may have been removed/i)).toBeVisible()
   })
 })

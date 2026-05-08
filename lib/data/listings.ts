@@ -21,12 +21,12 @@ export async function getListings(
         'search_listings',
         {
           p_query: filters.q.trim(),
-          p_category_id: filters.categoryId ?? null,
-          p_county_id: filters.countyId ?? null,
-          p_condition: filters.condition ?? null,
+          p_category_id: filters.categoryId ?? undefined,
+          p_county_id: filters.countyId ?? undefined,
+          p_condition: filters.condition ?? undefined,
           p_page: filters.page,
           p_page_size: PAGE_SIZE,
-        } as Record<string, unknown>,
+        },
       )
       if (rowsErr) {
         console.error('[getListings] search rows error', { code: rowsErr.code })
@@ -37,10 +37,10 @@ export async function getListings(
         'search_listings_count',
         {
           p_query: filters.q.trim(),
-          p_category_id: filters.categoryId ?? null,
-          p_county_id: filters.countyId ?? null,
-          p_condition: filters.condition ?? null,
-        } as Record<string, unknown>,
+          p_category_id: filters.categoryId ?? undefined,
+          p_county_id: filters.countyId ?? undefined,
+          p_condition: filters.condition ?? undefined,
+        },
       )
       if (countErr) {
         console.error('[getListings] search count error', { code: countErr.code })

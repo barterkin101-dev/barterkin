@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       blocks: {
@@ -74,6 +49,89 @@ export type Database = {
           slug?: string
         }
         Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          intent: string | null
+          metadata: Json | null
+          role: string
+          session_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          intent?: string | null
+          metadata?: Json | null
+          role: string
+          session_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          intent?: string | null
+          metadata?: Json | null
+          role?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          profile_id: string | null
+          status: string
+          ticket_id: string | null
+          updated_at: string
+          user_email: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          status?: string
+          ticket_id?: string | null
+          updated_at?: string
+          user_email?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          profile_id?: string | null
+          status?: string
+          ticket_id?: string | null
+          updated_at?: string
+          user_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_sessions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_sessions_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       contact_requests: {
         Row: {
@@ -123,6 +181,71 @@ export type Database = {
           },
         ]
       }
+      conversation_participants: {
+        Row: {
+          conversation_id: string
+          joined_at: string
+          last_read_at: string | null
+          profile_id: string
+        }
+        Insert: {
+          conversation_id: string
+          joined_at?: string
+          last_read_at?: string | null
+          profile_id: string
+        }
+        Update: {
+          conversation_id?: string
+          joined_at?: string
+          last_read_at?: string | null
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_participants_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       counties: {
         Row: {
           id: number
@@ -137,6 +260,141 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      disposable_email_domains: {
+        Row: {
+          domain: string
+        }
+        Insert: {
+          domain: string
+        }
+        Update: {
+          domain?: string
+        }
+        Relationships: []
+      }
+      dispute_messages: {
+        Row: {
+          content: string
+          created_at: string
+          dispute_id: string
+          id: string
+          sender_profile_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          dispute_id: string
+          id?: string
+          sender_profile_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          dispute_id?: string
+          id?: string
+          sender_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispute_messages_dispute_id_fkey"
+            columns: ["dispute_id"]
+            isOneToOne: false
+            referencedRelation: "disputes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dispute_messages_sender_profile_id_fkey"
+            columns: ["sender_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      disputes: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          id: string
+          initiator_profile_id: string
+          listing_id: string | null
+          mediator_profile_id: string | null
+          reason: string
+          resolution: string | null
+          resolution_outcome: string | null
+          resolved_at: string | null
+          responder_profile_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          initiator_profile_id: string
+          listing_id?: string | null
+          mediator_profile_id?: string | null
+          reason: string
+          resolution?: string | null
+          resolution_outcome?: string | null
+          resolved_at?: string | null
+          responder_profile_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          initiator_profile_id?: string
+          listing_id?: string | null
+          mediator_profile_id?: string | null
+          reason?: string
+          resolution?: string | null
+          resolution_outcome?: string | null
+          resolved_at?: string | null
+          responder_profile_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disputes_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_initiator_profile_id_fkey"
+            columns: ["initiator_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_mediator_profile_id_fkey"
+            columns: ["mediator_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "disputes_responder_profile_id_fkey"
+            columns: ["responder_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       listing_images: {
         Row: {
@@ -240,17 +498,47 @@ export type Database = {
           },
         ]
       }
-      disposable_email_domains: {
+      messages: {
         Row: {
-          domain: string
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          sender_profile_id: string
+          updated_at: string
         }
         Insert: {
-          domain: string
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          sender_profile_id: string
+          updated_at?: string
         }
         Update: {
-          domain?: string
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          sender_profile_id?: string
+          updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_profile_id_fkey"
+            columns: ["sender_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -339,6 +627,61 @@ export type Database = {
           },
         ]
       }
+      ratings: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          id: string
+          listing_id: string | null
+          ratee_profile_id: string
+          rater_profile_id: string
+          review_text: string | null
+          score: number
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          ratee_profile_id: string
+          rater_profile_id: string
+          review_text?: string | null
+          score: number
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          ratee_profile_id?: string
+          rater_profile_id?: string
+          review_text?: string | null
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ratings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_ratee_profile_id_fkey"
+            columns: ["ratee_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ratings_rater_profile_id_fkey"
+            columns: ["rater_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reports: {
         Row: {
           created_at: string
@@ -371,370 +714,6 @@ export type Database = {
           {
             foreignKeyName: "reports_target_profile_id_fkey"
             columns: ["target_profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      ratings: {
-        Row: {
-          id: string
-          rater_profile_id: string
-          ratee_profile_id: string
-          listing_id: string | null
-          conversation_id: string | null
-          score: number
-          review_text: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          rater_profile_id: string
-          ratee_profile_id: string
-          listing_id?: string | null
-          conversation_id?: string | null
-          score: number
-          review_text?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          rater_profile_id?: string
-          ratee_profile_id?: string
-          listing_id?: string | null
-          conversation_id?: string | null
-          score?: number
-          review_text?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ratings_rater_profile_id_fkey"
-            columns: ["rater_profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ratings_ratee_profile_id_fkey"
-            columns: ["ratee_profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ratings_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      conversations: {
-        Row: {
-          id: string
-          listing_id: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          listing_id?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          listing_id?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "conversations_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      conversation_participants: {
-        Row: {
-          conversation_id: string
-          profile_id: string
-          joined_at: string
-          last_read_at: string | null
-        }
-        Insert: {
-          conversation_id: string
-          profile_id: string
-          joined_at?: string
-          last_read_at?: string | null
-        }
-        Update: {
-          conversation_id?: string
-          profile_id?: string
-          joined_at?: string
-          last_read_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "conversation_participants_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "conversation_participants_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      messages: {
-        Row: {
-          id: string
-          conversation_id: string
-          sender_profile_id: string
-          content: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          conversation_id: string
-          sender_profile_id: string
-          content: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          conversation_id?: string
-          sender_profile_id?: string
-          content?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messages_conversation_id_fkey"
-            columns: ["conversation_id"]
-            isOneToOne: false
-            referencedRelation: "conversations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messages_sender_profile_id_fkey"
-            columns: ["sender_profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tickets: {
-        Row: {
-          id: string
-          profile_id: string
-          subject: string
-          description: string
-          status: string
-          priority: string
-          category: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          profile_id: string
-          subject: string
-          description: string
-          status?: string
-          priority?: string
-          category: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          profile_id?: string
-          subject?: string
-          description?: string
-          status?: string
-          priority?: string
-          category?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tickets_profile_id_fkey"
-            columns: ["profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      ticket_messages: {
-        Row: {
-          id: string
-          ticket_id: string
-          sender_profile_id: string | null
-          content: string
-          is_internal: boolean
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          ticket_id: string
-          sender_profile_id?: string | null
-          content: string
-          is_internal?: boolean
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          ticket_id?: string
-          sender_profile_id?: string | null
-          content?: string
-          is_internal?: boolean
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ticket_messages_ticket_id_fkey"
-            columns: ["ticket_id"]
-            isOneToOne: false
-            referencedRelation: "tickets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "ticket_messages_sender_profile_id_fkey"
-            columns: ["sender_profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      disputes: {
-        Row: {
-          id: string
-          initiator_profile_id: string
-          responder_profile_id: string
-          listing_id: string | null
-          conversation_id: string | null
-          reason: string
-          status: string
-          resolution: string | null
-          resolution_outcome: string | null
-          mediator_profile_id: string | null
-          created_at: string
-          updated_at: string
-          resolved_at: string | null
-        }
-        Insert: {
-          id?: string
-          initiator_profile_id: string
-          responder_profile_id: string
-          listing_id?: string | null
-          conversation_id?: string | null
-          reason: string
-          status?: string
-          resolution?: string | null
-          resolution_outcome?: string | null
-          mediator_profile_id?: string | null
-          created_at?: string
-          updated_at?: string
-          resolved_at?: string | null
-        }
-        Update: {
-          id?: string
-          initiator_profile_id?: string
-          responder_profile_id?: string
-          listing_id?: string | null
-          conversation_id?: string | null
-          reason?: string
-          status?: string
-          resolution?: string | null
-          resolution_outcome?: string | null
-          mediator_profile_id?: string | null
-          created_at?: string
-          updated_at?: string
-          resolved_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "disputes_initiator_profile_id_fkey"
-            columns: ["initiator_profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "disputes_responder_profile_id_fkey"
-            columns: ["responder_profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "disputes_listing_id_fkey"
-            columns: ["listing_id"]
-            isOneToOne: false
-            referencedRelation: "listings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "disputes_mediator_profile_id_fkey"
-            columns: ["mediator_profile_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      dispute_messages: {
-        Row: {
-          id: string
-          dispute_id: string
-          sender_profile_id: string
-          content: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          dispute_id: string
-          sender_profile_id: string
-          content: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          dispute_id?: string
-          sender_profile_id?: string
-          content?: string
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "dispute_messages_dispute_id_fkey"
-            columns: ["dispute_id"]
-            isOneToOne: false
-            referencedRelation: "disputes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "dispute_messages_sender_profile_id_fkey"
-            columns: ["sender_profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -826,6 +805,98 @@ export type Database = {
           },
         ]
       }
+      ticket_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_internal: boolean
+          sender_profile_id: string | null
+          ticket_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          sender_profile_id?: string | null
+          ticket_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          sender_profile_id?: string | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_messages_sender_profile_id_fkey"
+            columns: ["sender_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tickets: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          priority: string
+          profile_id: string | null
+          source: string | null
+          status: string
+          subject: string
+          updated_at: string
+          user_email: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          priority?: string
+          profile_id?: string | null
+          source?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+          user_email?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          priority?: string
+          profile_id?: string | null
+          source?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_email?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -851,55 +922,66 @@ export type Database = {
           sender_username: string
         }[]
       }
+      contact_request_alert_payload: {
+        Args: { p_contact_request_id: string }
+        Returns: Json
+      }
       current_user_is_verified: { Args: never; Returns: boolean }
+      dispute_alert_payload: { Args: { p_dispute_id: string }; Returns: Json }
+      find_conversation_between: {
+        Args: { p_profile_a: string; p_profile_b: string }
+        Returns: {
+          id: string
+        }[]
+      }
+      mark_contacts_seen: {
+        Args: { p_recipient_profile_id: string }
+        Returns: undefined
+      }
+      message_alert_payload: { Args: { p_message_id: string }; Returns: Json }
+      profile_owner_email: { Args: { p_profile_id: string }; Returns: string }
       refresh_profile_search_text: {
         Args: { p_profile_id: string }
         Returns: undefined
       }
-      show_limit: { Args: never; Returns: number }
-      show_trgm: { Args: { "": string }; Returns: string[] }
-      mark_contacts_seen: { Args: { p_recipient_profile_id: string }; Returns: undefined }
-      utc_day: { Args: { ts: string }; Returns: string }
       search_listings: {
         Args: {
-          p_query?: string
           p_category_id?: number
-          p_county_id?: number
           p_condition?: string
+          p_county_id?: number
           p_page?: number
           p_page_size?: number
+          p_query: string
         }
         Returns: {
-          id: string
-          profile_id: string
-          title: string
-          description: string
           category_id: number
-          county_id: number
           condition: string
-          trade_terms: string
-          status: string
-          price_estimate: string
+          county_id: number
           created_at: string
+          description: string
+          id: string
+          price_estimate: string
+          profile_id: string
           rank: number
+          status: string
+          title: string
+          trade_terms: string
         }[]
       }
       search_listings_count: {
         Args: {
-          p_query?: string
           p_category_id?: number
-          p_county_id?: number
           p_condition?: string
+          p_county_id?: number
+          p_query: string
         }
         Returns: number
       }
-      find_conversation_between: {
-        Args: {
-          p_profile_a: string
-          p_profile_b: string
-        }
-        Returns: { id: string }[]
-      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
+      ticket_alert_payload: { Args: { p_ticket_id: string }; Returns: Json }
+      update_webhook_secret: { Args: never; Returns: undefined }
+      utc_day: { Args: { ts: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
@@ -1028,9 +1110,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

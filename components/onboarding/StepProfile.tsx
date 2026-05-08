@@ -36,7 +36,7 @@ export function StepProfile({
 
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
         <Button asChild variant="outline" className="h-11">
-          <Link href="/profile/edit?returnTo=/onboarding?step=1">
+          <Link href="/profile/edit?returnTo=%2Fonboarding%3Fstep%3D1">
             Edit my profile <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
           </Link>
         </Button>

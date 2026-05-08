@@ -143,14 +143,14 @@ export default async function DashboardPage() {
         </Card>
 
         <Card className="transition-colors hover:bg-muted/50">
-          <Link href="/dashboard/profile/edit">
+          <Link href="/profile/edit">
             <CardContent className="flex items-center gap-4 p-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <User className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold">Edit Profile</h3>
-                <p className="text-sm text-muted-foreground">Update your bio and settings</p>
+                <p className="text-sm text-muted-foreground">Update your profile and settings</p>
               </div>
             </CardContent>
           </Link>
@@ -166,7 +166,7 @@ export default async function DashboardPage() {
               A complete profile with a bio helps others trust you and improves your visibility.
             </p>
             <Button asChild variant="outline" className="mt-3 border-amber-300">
-              <Link href="/dashboard/profile/edit">Finish your profile</Link>
+              <Link href="/profile/edit">Finish your profile</Link>
             </Button>
           </CardContent>
         </Card>

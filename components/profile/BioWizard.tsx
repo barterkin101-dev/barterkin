@@ -91,6 +91,11 @@ export function BioWizard({ userId, profile }: BioWizardProps) {
     if (result?.ok) {
       toast('Profile saved!')
       router.push('/dashboard')
+    } else if (result?.fieldErrors && Object.keys(result.fieldErrors).length > 0) {
+      // Some required fields (e.g. displayName) are missing. Redirect to full editor.
+      const missing = Object.keys(result.fieldErrors).join(', ')
+      toast.error(`Your profile needs a few more details (${missing}). Opening the full editor...`)
+      router.push('/profile/edit?returnTo=%2Fdashboard')
     } else {
       toast.error(result?.error ?? 'Something went wrong.')
     }
