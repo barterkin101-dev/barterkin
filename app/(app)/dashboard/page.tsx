@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getMyListings } from '@/lib/data/listings'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ShoppingBag, MessageSquare, Star, Ticket, User } from 'lucide-react'
 
@@ -165,9 +166,12 @@ export default async function DashboardPage() {
             <p className="mt-1 text-sm text-amber-800">
               A complete profile with a bio helps others trust you and improves your visibility.
             </p>
-            <Button asChild variant="outline" className="mt-3 border-amber-300">
-              <Link href="/profile/edit">Finish your profile</Link>
-            </Button>
+            <Link
+              href="/profile/edit"
+              className={cn(buttonVariants({ variant: 'outline' }), 'mt-3 border-amber-300')}
+            >
+              Finish your profile
+            </Link>
           </CardContent>
         </Card>
       )}

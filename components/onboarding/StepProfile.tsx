@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 import { ProfileCompletenessChecklist } from '@/components/profile/ProfileCompletenessChecklist'
 import type { ProfileCompletenessInput } from '@/lib/schemas/profile'
+import { cn } from '@/lib/utils'
 
 export function StepProfile({
   completenessInput,
@@ -35,18 +36,20 @@ export function StepProfile({
       <ProfileCompletenessChecklist {...completenessInput} />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
-        <Button asChild variant="outline" className="h-11">
-          <Link href="/profile/edit?returnTo=%2Fonboarding%3Fstep%3D1">
-            Edit my profile <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
-          </Link>
-        </Button>
+        <Link
+          href="/profile/edit?returnTo=%2Fonboarding%3Fstep%3D1"
+          className={cn(buttonVariants({ variant: 'outline' }), 'h-11')}
+        >
+          Edit my profile <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
+        </Link>
 
         {profileComplete ? (
-          <Button asChild className="h-11 bg-clay hover:bg-clay/90 text-sage-bg">
-            <Link href="/onboarding?step=2">
-              Next: browse the directory <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
-            </Link>
-          </Button>
+          <Link
+            href="/onboarding?step=2"
+            className={cn(buttonVariants(), 'h-11 bg-clay hover:bg-clay/90 text-sage-bg')}
+          >
+            Next: browse the directory <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
+          </Link>
         ) : (
           <TooltipProvider>
             <Tooltip>

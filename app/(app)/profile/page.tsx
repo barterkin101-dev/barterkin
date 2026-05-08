@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { ProfileCard } from '@/components/profile/ProfileCard'
 import { PublishToggle } from '@/components/profile/PublishToggle'
 import { markContactsSeen } from '@/lib/actions/contact'
@@ -37,9 +38,9 @@ export default async function OwnProfilePage() {
           A few minutes now makes it easy for the right Georgian to find you. Start with your name,
           add a photo, and list what you can trade.
         </p>
-        <Button asChild size="lg">
-          <Link href="/profile/edit">Start your profile</Link>
-        </Button>
+        <Link href="/profile/edit" className={cn(buttonVariants({ size: 'lg' }))}>
+          Start your profile
+        </Link>
       </div>
     )
   }
@@ -51,9 +52,9 @@ export default async function OwnProfilePage() {
         <h1 className="font-serif text-3xl font-bold leading-[1.15] md:text-[32px]">
           Your profile
         </h1>
-        <Button asChild>
-          <Link href="/profile/edit">Edit profile</Link>
-        </Button>
+        <Link href="/profile/edit" className={cn(buttonVariants())}>
+          Edit profile
+        </Link>
       </div>
 
       {!profile.is_published && (
