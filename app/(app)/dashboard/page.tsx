@@ -24,7 +24,31 @@ export default async function DashboardPage() {
     .eq('owner_id', user.id)
     .maybeSingle()
 
-  const listings = profile ? await getMyListings(profile.id) : []
+  const [listings, messageCount, ticketCount] = profile ? await Promise.all([
+    getMyListings(profile.id),
+    supabase
+      .from('conversation_participants')
+      .select('conversation_id', { count: 'exact', head: true })
+      .eq('profile_id', profile.id)
+      .then(({ count, error }) => {
+        if (error) {
+          console.error('[DashboardPage] message count error', { code: error.code })
+        }
+
+        return count ?? 0
+      }),
+    supabase
+      .from('tickets')
+      .select('id', { count: 'exact', head: true })
+      .eq('profile_id', profile.id)
+      .then(({ count, error }) => {
+        if (error) {
+          console.error('[DashboardPage] ticket count error', { code: error.code })
+        }
+
+        return count ?? 0
+      }),
+  ]) : [[], 0, 0]
   const activeListings = listings.filter((l) => l.status === 'active')
 
   return (
@@ -68,7 +92,7 @@ export default async function DashboardPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Messages</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{messageCount}</div>
           </CardContent>
         </Card>
         <Card>
@@ -76,7 +100,7 @@ export default async function DashboardPage() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Tickets</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{ticketCount}</div>
           </CardContent>
         </Card>
       </div>
