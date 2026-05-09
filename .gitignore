@@ -58,3 +58,5 @@ assets/Lora-Variable.ttf
 .claude/
 .planning/
 .env.vercel
+.daemon-logs/
+.env.telegram
