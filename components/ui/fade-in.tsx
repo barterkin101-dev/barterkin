@@ -75,9 +75,10 @@ export function FadeIn({
   amount = 0.3,
 }: FadeInProps) {
   const selected = variantsMap[variant]
+  const baseTransition = (selected.visible as { transition: object }).transition
   const customTransition = duration
-    ? { ...selected.visible, transition: { ...(selected.visible as any).transition, duration, delay } }
-    : { ...selected.visible, transition: { ...(selected.visible as any).transition, delay } }
+    ? { ...selected.visible, transition: { ...baseTransition, duration, delay } }
+    : { ...selected.visible, transition: { ...baseTransition, delay } }
 
   return (
     <motion.div
