@@ -1,24 +1,10 @@
 #!/usr/bin/env python3
-"""
-Barterkin Telegram Bot
-======================
-Sends status updates, approval requests, and business metrics
-to the Barterkin groupchat. Handles inline button callbacks.
-
-Usage:
-  export TELEGRAM_BOT_TOKEN="your-bot-token"
-  export TELEGRAM_GROUP_ID="-123456789"   # groupchat ID (negative for groups)
-  python3 scripts/telegram-bot.py status    # send status update
-  python3 scripts/telegram-bot.py ask       # send approval request
-  python3 scripts/telegram-bot.py metrics   # send business metrics
-  python3 scripts/telegram-bot.py poll      # start polling for callbacks
-"""
-
 import os
 import sys
 import asyncio
 import json
 import subprocess
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -30,6 +16,12 @@ from telegram.ext import (
     ContextTypes,
 )
 
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__)
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 LOG_DIR = PROJECT_ROOT / ".daemon-logs"
 HANDOFF = PROJECT_ROOT / ".continue-here.md"
@@ -40,9 +32,7 @@ GROUP_ID = os.environ.get("TELEGRAM_GROUP_ID", "")
 
 def run_cmd(cmd: list[str], cwd: Path = PROJECT_ROOT) -> str:
     try:
-        result = subprocess.run(
-            cmd, cwd=cwd, capture_output=True, text=True, timeout=30
-        )
+        result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=30)
         return (result.stdout + result.stderr).strip()
     except Exception as e:
         return f"Error: {e}"
@@ -63,7 +53,6 @@ def get_recent_logs() -> str:
         name = log.name
         with open(log) as f:
             content = f.read().strip().splitlines()
-        # Find exit code
         exit_code = "?"
         for line in reversed(content):
             if "AI session exited with code:" in line:
@@ -78,7 +67,6 @@ def get_next_tasks() -> str:
     if not HANDOFF.exists():
         return "No handoff file found."
     content = HANDOFF.read_text()
-    # Extract next task queue
     in_queue = False
     tasks = []
     for line in content.splitlines():
@@ -108,23 +96,12 @@ def build_status_message() -> str:
     )
 
 
-def build_approval_message(task: str, details: str = "") -> str:
-    return (
-        f"⚠️ <b>Approval Required</b>\n\n"
-        f"Task: <code>{task}</code>\n"
-        f"{details}\n\n"
-        f"Shall I proceed?"
-    )
-
-
 async def send_status(application: Application) -> None:
     if not GROUP_ID:
         print("ERROR: TELEGRAM_GROUP_ID not set")
         return
     msg = build_status_message()
-    await application.bot.send_message(
-        chat_id=GROUP_ID, text=msg, parse_mode="HTML"
-    )
+    await application.bot.send_message(chat_id=GROUP_ID, text=msg, parse_mode="HTML")
 
 
 async def send_approval(application: Application, task: str, details: str = "") -> None:
@@ -132,98 +109,53 @@ async def send_approval(application: Application, task: str, details: str = "") 
         print("ERROR: TELEGRAM_GROUP_ID not set")
         return
     keyboard = [
-        [
-            InlineKeyboardButton("✅ Approve", callback_data=f"approve:{task}"),
-            InlineKeyboardButton("❌ Reject", callback_data=f"reject:{task}"),
-        ],
-        [
-            InlineKeyboardButton("⏭ Skip", callback_data=f"skip:{task}"),
-            InlineKeyboardButton("🔍 Details", callback_data=f"details:{task}"),
-        ],
+        [InlineKeyboardButton("✅ Approve", callback_data=f"approve:{task}"),
+         InlineKeyboardButton("❌ Reject", callback_data=f"reject:{task}")],
+        [InlineKeyboardButton("⏭ Skip", callback_data=f"skip:{task}"),
+         InlineKeyboardButton("🔍 Details", callback_data=f"details:{task}")],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    msg = build_approval_message(task, details)
-    await application.bot.send_message(
-        chat_id=GROUP_ID,
-        text=msg,
-        parse_mode="HTML",
-        reply_markup=reply_markup,
-    )
+    msg = (f"⚠️ <b>Approval Required</b>\n\nTask: <code>{task}</code>\n{details}\n\nShall I proceed?")
+    await application.bot.send_message(chat_id=GROUP_ID, text=msg, parse_mode="HTML", reply_markup=reply_markup)
 
 
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-
     data = query.data or ""
     action, task = data.split(":", 1) if ":" in data else (data, "")
-
     user = query.from_user.username or query.from_user.first_name
 
     if action == "approve":
         await query.edit_message_text(
-            f"✅ <b>Approved by {user}</b>\n\nTask: <code>{task}</code>\n\n"
-            f"Daemon will pick this up on the next run.",
+            f"✅ <b>Approved by {user}</b>\n\nTask: <code>{task}</code>\n\nDaemon will pick this up on the next run.",
             parse_mode="HTML",
         )
-        # Write approval to a file the daemon can read
         approval_file = PROJECT_ROOT / ".daemon-approvals.json"
-        approvals = []
-        if approval_file.exists():
-            approvals = json.loads(approval_file.read_text())
-        approvals.append({
-            "task": task,
-            "action": "approve",
-            "user": user,
-            "time": datetime.now(timezone.utc).isoformat(),
-        })
+        approvals = json.loads(approval_file.read_text()) if approval_file.exists() else []
+        approvals.append({"task": task, "action": "approve", "user": user, "time": datetime.now(timezone.utc).isoformat()})
         approval_file.write_text(json.dumps(approvals, indent=2))
-
     elif action == "reject":
-        await query.edit_message_text(
-            f"❌ <b>Rejected by {user}</b>\n\nTask: <code>{task}</code>\n\n"
-            f"Skipped. Will not proceed.",
-            parse_mode="HTML",
-        )
-
+        await query.edit_message_text(f"❌ <b>Rejected by {user}</b>\n\nTask: <code>{task}</code>\n\nSkipped.", parse_mode="HTML")
     elif action == "skip":
-        await query.edit_message_text(
-            f"⏭ <b>Skipped by {user}</b>\n\nTask: <code>{task}</code>\n\n"
-            f"Deferring to later.",
-            parse_mode="HTML",
-        )
-
+        await query.edit_message_text(f"⏭ <b>Skipped by {user}</b>\n\nTask: <code>{task}</code>\n\nDeferring.", parse_mode="HTML")
     elif action == "details":
-        await query.edit_message_text(
-            f"🔍 <b>Task Details</b>\n\n"
-            f"Task: <code>{task}</code>\n\n"
-            f"See .continue-here.md for full context.",
-            parse_mode="HTML",
-        )
+        await query.edit_message_text(f"🔍 <b>Task Details</b>\n\nTask: <code>{task}</code>\n\nSee .continue-here.md for full context.", parse_mode="HTML")
 
 
 async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    msg = build_status_message()
-    await update.message.reply_text(msg, parse_mode="HTML")
+    await update.message.reply_text(build_status_message(), parse_mode="HTML")
 
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        "🤖 <b>Barterkin Bot</b>\n\n"
-        "Commands:\n"
-        "/status — Current autonomous status\n"
-        "/start — Show this help\n"
-        "/tasks — Show next task queue\n"
-        "/approve — List pending approvals\n",
+        "🤖 <b>Barterkin Bot</b>\n\nCommands:\n/status — Current status\n/tasks — Next task queue\n/approvals — Pending approvals\n/start — This help",
         parse_mode="HTML",
     )
 
 
 async def cmd_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    tasks = get_next_tasks()
-    await update.message.reply_text(
-        f"📋 <b>Next Tasks</b>\n\n<pre>{tasks}</pre>", parse_mode="HTML"
-    )
+    await update.message.reply_text(f"📋 <b>Next Tasks</b>\n\n<pre>{get_next_tasks()}</pre>", parse_mode="HTML")
 
 
 async def cmd_approvals(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -237,47 +169,41 @@ async def cmd_approvals(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await update.message.reply_text("No pending approvals.")
         return
     lines = [f"• {a['task']} (approved by {a['user']})" for a in pending[-5:]]
-    await update.message.reply_text(
-        f"✅ <b>Recent Approvals</b>\n\n" + "\n".join(lines), parse_mode="HTML"
-    )
+    await update.message.reply_text(f"✅ <b>Recent Approvals</b>\n\n" + "\n".join(lines), parse_mode="HTML")
 
 
-async def main() -> None:
+def run_poll() -> None:
     if not TOKEN:
-        print("ERROR: Set TELEGRAM_BOT_TOKEN env var")
-        sys.exit(1)
-
+        print("ERROR: Set TELEGRAM_BOT_TOKEN env var"); sys.exit(1)
+    logger.info("Starting polling bot...")
     application = Application.builder().token(TOKEN).build()
-
     application.add_handler(CommandHandler("start", cmd_start))
     application.add_handler(CommandHandler("status", cmd_status))
     application.add_handler(CommandHandler("tasks", cmd_tasks))
     application.add_handler(CommandHandler("approvals", cmd_approvals))
     application.add_handler(CallbackQueryHandler(handle_callback))
+    application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
 
-    mode = sys.argv[1] if len(sys.argv) > 1 else "poll"
 
-    if mode == "status":
-        async with application:
+async def run_once() -> None:
+    if not TOKEN:
+        print("ERROR: Set TELEGRAM_BOT_TOKEN env var"); sys.exit(1)
+    application = Application.builder().token(TOKEN).build()
+    mode = sys.argv[1] if len(sys.argv) > 1 else "status"
+    async with application:
+        if mode == "status":
             await send_status(application)
-    elif mode == "ask":
-        task = sys.argv[2] if len(sys.argv) > 2 else "unknown task"
-        details = sys.argv[3] if len(sys.argv) > 3 else ""
-        async with application:
+        elif mode == "ask":
+            task = sys.argv[2] if len(sys.argv) > 2 else "unknown task"
+            details = sys.argv[3] if len(sys.argv) > 3 else ""
             await send_approval(application, task, details)
-    elif mode == "poll":
-        print("Starting polling bot...")
-        await application.initialize()
-        await application.start()
-        await application.updater.start_polling()
-        # Keep running
-        stop_event = asyncio.Event()
-        await stop_event.wait()
-    else:
-        print(f"Unknown mode: {mode}")
-        print("Usage: status | ask <task> [details] | poll")
-        sys.exit(1)
+        else:
+            print(f"Unknown mode: {mode}")
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    mode = sys.argv[1] if len(sys.argv) > 1 else "poll"
+    if mode == "poll":
+        run_poll()
+    else:
+        asyncio.run(run_once())
