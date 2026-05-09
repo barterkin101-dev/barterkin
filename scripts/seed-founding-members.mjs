@@ -20,6 +20,7 @@ import { randomUUID } from 'node:crypto'
 const URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY
 const RESEND = process.env.RESEND_API_KEY
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://barterkin.com'
 
 if (!URL || !SERVICE) {
   console.error('Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
@@ -125,8 +126,8 @@ export async function sendWelcomeEmail(email, displayName, username) {
         from: 'Barterkin <hello@barterkin.com>',
         to: [email],
         subject: "You're a founding member of Georgia Barter 🌿",
-        text: `Hi ${displayName},\n\nYour Georgia Barter profile is live: https://barterkin.com/m/${username}\n\nClaim your account any time — go to https://barterkin.com/login, enter ${email}, and you'll get a magic link. From there you can edit your profile, respond to contacts, and change anything we got wrong.\n\nThanks for trusting us with your listing.\n\n— Ashley\nBarterkin`,
-        html: `<p>Hi ${displayName},</p><p>Your Georgia Barter profile is live: <a href="https://barterkin.com/m/${username}">barterkin.com/m/${username}</a></p><p>Claim your account any time — go to <a href="https://barterkin.com/login">barterkin.com/login</a>, enter <strong>${email}</strong>, and you'll get a magic link. From there you can edit your profile, respond to contacts, and change anything we got wrong.</p><p>Thanks for trusting us with your listing.</p><p>— Ashley<br/>Barterkin</p>`,
+        text: `Hi ${displayName},\n\nYour Georgia Barter profile is live: ${SITE_URL}/m/${username}\n\nClaim your account any time — go to ${SITE_URL}/login, enter ${email}, and you'll get a magic link. From there you can edit your profile, respond to contacts, and change anything we got wrong.\n\nThanks for trusting us with your listing.\n\n— Ashley\nBarterkin`,
+        html: `<p>Hi ${displayName},</p><p>Your Georgia Barter profile is live: <a href="${SITE_URL}/m/${username}">${SITE_URL.replace('https://','')}/m/${username}</a></p><p>Claim your account any time — go to <a href="${SITE_URL}/login">${SITE_URL.replace('https://','')}/login</a>, enter <strong>${email}</strong>, and you'll get a magic link. From there you can edit your profile, respond to contacts, and change anything we got wrong.</p><p>Thanks for trusting us with your listing.</p><p>— Ashley<br/>Barterkin</p>`,
       }),
     })
     if (!res.ok) {
