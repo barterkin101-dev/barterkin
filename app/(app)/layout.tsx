@@ -20,6 +20,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   let displayName: string | null = null
   let avatarUrl: string | null = null
   let unseenContactCount = 0
+  let unseenMessageCount = 0
   let showFinishSetup = false
   if (userId) {
     const { data: profile } = await supabase
@@ -37,12 +38,38 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
     // Count unseen contact requests for badge (graceful degradation on error)
     if (profile?.id) {
-      const { count } = await supabase
+      const { count: contactCount } = await supabase
         .from('contact_requests')
         .select('id', { count: 'exact', head: true })
         .eq('recipient_id', profile.id)
         .is('seen_at', null)
-      unseenContactCount = count ?? 0
+      unseenContactCount = contactCount ?? 0
+
+      // Count unread messages across all conversations
+      const { data: unreadMessages } = await supabase
+        .from('conversation_participants')
+        .select(
+          `conversation_id, last_read_at,
+           conversations!inner(
+             messages!inner(
+               id, sender_profile_id, created_at
+             )
+           )`,
+        )
+        .eq('profile_id', profile.id)
+
+      let messageCount = 0
+      for (const row of (unreadMessages ?? [])) {
+        const msgs = (row.conversations as unknown as { messages: Array<{ sender_profile_id: string; created_at: string }> }).messages ?? []
+        const lastRead = row.last_read_at
+        for (const m of msgs) {
+          if (m.sender_profile_id === profile.id) continue
+          if (!lastRead || new Date(m.created_at) > new Date(lastRead)) {
+            messageCount++
+          }
+        }
+      }
+      unseenMessageCount = messageCount
     }
   }
 
@@ -52,6 +79,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         displayName={displayName}
         avatarUrl={avatarUrl}
         unseenContactCount={unseenContactCount}
+        unseenMessageCount={unseenMessageCount}
         showFinishSetup={showFinishSetup}
       />
       <main className="mx-auto max-w-5xl px-6 py-12 md:py-16">

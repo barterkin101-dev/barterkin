@@ -10,11 +10,13 @@ export function NavLinks({
   displayName,
   avatarUrl,
   unseenContactCount = 0,
+  unseenMessageCount = 0,
   showFinishSetup,
 }: {
   displayName?: string | null
   avatarUrl?: string | null
   unseenContactCount?: number
+  unseenMessageCount?: number
   showFinishSetup?: boolean
 }) {
   const pathname = usePathname()
@@ -59,13 +61,26 @@ export function NavLinks({
       <Link
         href="/dashboard"
         className={cn(
-          'text-sm',
+          'relative text-sm',
           isDashboard
             ? 'text-forest-deep border-b-2 border-clay pb-1'
             : 'text-forest-mid hover:text-forest-deep',
         )}
       >
         Dashboard
+        {unseenMessageCount > 0 && (
+          <span
+            aria-hidden="true"
+            className="absolute -right-2.5 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-white ring-2 ring-sage-bg"
+          >
+            {unseenMessageCount > 9 ? '9+' : unseenMessageCount}
+          </span>
+        )}
+        {unseenMessageCount > 0 && (
+          <span className="sr-only">
+            , {unseenMessageCount} unread message{unseenMessageCount === 1 ? '' : 's'}
+          </span>
+        )}
       </Link>
       <Link
         href="/profile"
