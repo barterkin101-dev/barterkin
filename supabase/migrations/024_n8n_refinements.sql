@@ -98,8 +98,8 @@ as $$
   select jsonb_build_object(
            'listing_id',     l.id,
            'title',          l.title,
-           'category',       l.category,
-           'county',         l.county,
+           'category_id',    l.category_id,
+           'county_id',      l.county_id,
            'status',         l.status,
            'price_estimate', l.price_estimate,
            'profile_name',   coalesce(p.display_name, p.username, '(unknown)'),
