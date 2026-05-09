@@ -57,6 +57,16 @@ export interface AdminContactRow {
   recipient_display_name: string | null
 }
 
+export interface AdminConversationRow {
+  id: string
+  listing_id: string | null
+  created_at: string
+  updated_at: string
+  participant_names: string[]
+  last_message: string | null
+  message_count: number
+}
+
 // ---------------------------------------------------------------------------
 // ADMIN-01 — stats dashboard COUNT queries (parallel)
 // ---------------------------------------------------------------------------
@@ -213,5 +223,77 @@ export async function getAdminContacts(status?: string): Promise<AdminContactRow
     created_at: row.created_at as string,
     sender_display_name: ((row.sender as { display_name?: string } | null)?.display_name as string | undefined) ?? null,
     recipient_display_name: ((row.recipient as { display_name?: string } | null)?.display_name as string | undefined) ?? null,
+  }))
+}
+
+// ---------------------------------------------------------------------------
+// ADMIN-06 — conversations list for admin oversight
+// ---------------------------------------------------------------------------
+export async function getAdminConversations(): Promise<AdminConversationRow[]> {
+  const { data: convs, error: convErr } = await supabaseAdmin
+    .from('conversations')
+    .select('id, listing_id, created_at, updated_at')
+    .order('updated_at', { ascending: false })
+
+  if (convErr) {
+    console.error('[getAdminConversations] query error', { code: convErr.code })
+    return []
+  }
+
+  const conversationIds = (convs ?? []).map((c) => c.id)
+  if (conversationIds.length === 0) return []
+
+  // Fetch participants with profile names
+  const { data: participants, error: partErr } = await supabaseAdmin
+    .from('conversation_participants')
+    .select(
+      `conversation_id, profile_id, profiles!inner(id, display_name, username)`,
+    )
+    .in('conversation_id', conversationIds)
+
+  if (partErr) {
+    console.error('[getAdminConversations] participants error', { code: partErr.code })
+  }
+
+  // Fetch message counts + last message per conversation
+  const { data: messages, error: msgErr } = await supabaseAdmin
+    .from('messages')
+    .select('conversation_id, content, created_at')
+    .in('conversation_id', conversationIds)
+    .order('created_at', { ascending: false })
+
+  if (msgErr) {
+    console.error('[getAdminConversations] messages error', { code: msgErr.code })
+  }
+
+  // Build participant name map
+  const participantNamesByConv: Record<string, string[]> = {}
+  for (const p of (participants ?? [])) {
+    if (!participantNamesByConv[p.conversation_id]) {
+      participantNamesByConv[p.conversation_id] = []
+    }
+    const profile = p.profiles as unknown as { display_name: string | null; username: string | null }
+    const name = profile.display_name ?? profile.username ?? 'Member'
+    participantNamesByConv[p.conversation_id].push(name)
+  }
+
+  // Build message stats per conversation
+  const messageCountByConv: Record<string, number> = {}
+  const lastMessageByConv: Record<string, string> = {}
+  for (const m of (messages ?? [])) {
+    messageCountByConv[m.conversation_id] = (messageCountByConv[m.conversation_id] ?? 0) + 1
+    if (!lastMessageByConv[m.conversation_id]) {
+      lastMessageByConv[m.conversation_id] = m.content
+    }
+  }
+
+  return (convs ?? []).map((c) => ({
+    id: c.id,
+    listing_id: c.listing_id,
+    created_at: c.created_at,
+    updated_at: c.updated_at,
+    participant_names: participantNamesByConv[c.id] ?? [],
+    last_message: lastMessageByConv[c.id] ?? null,
+    message_count: messageCountByConv[c.id] ?? 0,
   }))
 }
