@@ -73,6 +73,6 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
-      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm exec playwright install --with-deps chromium webkit
       - run: pnpm e2e tests/e2e/listings-smoke.spec.ts
       - run: pnpm e2e tests/e2e/landing-smoke.spec.ts
