@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Barterkin Autonomous Task Runner (Codex Edition)
+# Barterkin Autonomous Task Runner (Hermes Edition)
 # Runs a SINGLE task via Codex non-interactively, then exits.
 
 set -euo pipefail
@@ -13,7 +13,7 @@ if [[ "${1:-}" == "--dry-run" ]]; then
 fi
 
 # ─── Config ──────────────────────────────────────────────────────────
-AI_CLI="${AI_CLI:-codex}"
+AI_CLI="${AI_CLI:-/root/.local/bin/hermes}"
 MAX_DURATION="${MAX_DURATION:-900}"
 LOG_DIR="${PROJECT_ROOT}/.daemon-logs"
 mkdir -p "$LOG_DIR"
@@ -98,7 +98,7 @@ if [[ "$DRY_RUN" == "true" ]]; then
   exit 0
 fi
 
-timeout "$MAX_DURATION" "$AI_CLI" exec   --dangerously-bypass-approvals-and-sandbox   "$PROMPT"   2>&1 | tee -a "$LOG_FILE"
+timeout "$MAX_DURATION" "$AI_CLI" -p barterkin -z "$PROMPT" 2>&1 | tee -a "$LOG_FILE"
 
 EXIT_CODE=${PIPESTATUS[0]}
 
