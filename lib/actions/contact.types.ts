@@ -13,12 +13,6 @@ export interface ReportMemberResult {
   fieldErrors?: Record<string, string[]>
 }
 
-export interface MarkContactsSeenResult {
-  ok: boolean
-  error?: string
-  count?: number
-}
-
 // Database row aliases — types resolve after migration 005 was applied and types regenerated (Plan 05-02).
 export type ContactRequestRow = Database['public']['Tables']['contact_requests']['Row']
 export type BlockRow = Database['public']['Tables']['blocks']['Row']

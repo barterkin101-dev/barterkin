@@ -11,7 +11,6 @@ import { createClient } from '@/lib/supabase/server'
 import { BlockSchema, ReportSchema } from '@/lib/schemas/contact'
 import type {
   ReportMemberResult,
-  MarkContactsSeenResult,
 } from '@/lib/actions/contact.types'
 import { ReportAdminNotifyEmail } from '@/emails/report-admin-notify'
 
@@ -146,35 +145,4 @@ export async function reportMember(
   return { ok: true }
 }
 
-// markContactsSeen is kept for backward compatibility with any legacy contact_requests data.
-// It is no longer called from the UI since the contact relay has been replaced by in-app messaging.
-export async function markContactsSeen(): Promise<MarkContactsSeenResult> {
-  const supabase = await createClient()
-  const { data: { user }, error: authErr } = await supabase.auth.getUser()
-  if (authErr || !user) return { ok: false, error: 'Not authenticated.' }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('owner_id', user.id)
-    .maybeSingle()
-  if (!profile) return { ok: true, count: 0 }
-
-  // H-02 fix: call SECURITY DEFINER RPC instead of direct .update()
-  // Direct UPDATE on contact_requests has been revoked from authenticated; the RPC
-  // only mutates seen_at, preventing column-level abuse via the Supabase API.
-  const { error } = await supabase.rpc('mark_contacts_seen', {
-    p_recipient_profile_id: profile.id,
-  })
-
-  if (error) {
-    console.error('[markContactsSeen] rpc failed', { code: error.code })
-    return { ok: false, error: 'Could not mark contacts as seen.' }
-  }
-
-  // M-03 fix: bust the AppLayout cache segment so the unseen-contact badge clears immediately.
-  // AppLayout and the profile page data-fetch are concurrent in Next.js App Router, so without
-  // this revalidation the badge count may reflect the pre-update state on the same render.
-  revalidatePath('/(app)', 'layout')
-  return { ok: true, count: 0 }
-}

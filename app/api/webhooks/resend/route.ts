@@ -1,4 +1,8 @@
 // Phase 5 — Resend bounce/complaint/delivered webhook
+// NOTE: This handler only updates the legacy contact_requests table.
+// The email-based contact relay has been retired in favor of in-app messaging.
+// This route is preserved for backward compatibility with any outstanding Resend
+// webhook subscriptions, but new contact flows do not create contact_requests rows.
 // Source: 05-RESEARCH.md §Pattern 4 + https://resend.com/docs/dashboard/webhooks/verify-webhooks-requests
 // Middleware already excludes /api/webhooks (see middleware.ts matcher) — no auth gating on this route.
 // Security: svix HMAC signature verification via resend.webhooks.verify() (T-5-03-01)

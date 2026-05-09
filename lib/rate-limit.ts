@@ -87,6 +87,5 @@ export async function limitCreateDispute(userId: string): Promise<RateLimitResul
   return rateLimit(`create-dispute:${userId}`, 3, 3600) // 3 per hour
 }
 
-export async function limitContactRequest(ip: string): Promise<RateLimitResult> {
-  return rateLimit(`contact-request:${ip}`, 5, 3600) // 5 per hour per IP
-}
+// limitContactRequest was removed — the legacy email-based contact relay has been
+// replaced by in-app messaging (limitSendMessage covers the new flow).

@@ -40,7 +40,6 @@ import { Resend } from 'resend'
 import {
   blockMember,
   reportMember,
-  markContactsSeen,
 } from '@/lib/actions/contact'
 
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000'
@@ -257,32 +256,4 @@ describe('reportMember', () => {
   })
 })
 
-// ============================================================================
-// markContactsSeen
-// ============================================================================
-describe('markContactsSeen', () => {
-  it('returns not-authenticated when no user', async () => {
-    const { getUserMock } = makeSupabaseMock()
-    getUserMock.mockResolvedValue({ data: { user: null }, error: null })
-    const result = await markContactsSeen()
-    expect(result.ok).toBe(false)
-  })
 
-  it('returns ok after RPC call', async () => {
-    const { getUserMock, fromMock, rpcMock } = makeSupabaseMock()
-    getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
-
-    // from('profiles'): SELECT id for profile lookup
-    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: 'profile-1' }, error: null })
-    const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
-    const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
-    fromMock.mockReturnValueOnce({ select: profileSelect })
-
-    // RPC: mark_contacts_seen (H-02 security fix — uses SECURITY DEFINER fn instead of direct UPDATE)
-    rpcMock.mockResolvedValue({ error: null })
-
-    const result = await markContactsSeen()
-    expect(result.ok).toBe(true)
-    expect(result.count).toBe(0)
-  })
-})
