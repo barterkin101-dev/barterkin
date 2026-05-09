@@ -139,6 +139,14 @@ cmd_loop() {
       log "Task failed or timed out."
     fi
 
+    # Send Telegram status every 4th run (every ~2 hours at 30min interval)
+    if [[ $((today % 4)) -eq 0 ]]; then
+      if [[ -n "${TELEGRAM_BOT_TOKEN:-}" && -n "${TELEGRAM_GROUP_ID:-}" ]]; then
+        log "Sending Telegram status update..."
+        python3 "$PROJECT_ROOT/scripts/telegram-bot.py" status >> "$LOG_DIR/daemon.log" 2>&1 || true
+      fi
+    fi
+
     # Sleep until next interval
     log "Sleeping ${INTERVAL_MIN} minutes..."
     sleep "$((INTERVAL_MIN * 60))"

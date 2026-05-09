@@ -24,6 +24,21 @@ mkdir -p "$LOG_DIR"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 LOG_FILE="$LOG_DIR/task-$TIMESTAMP.log"
 
+# ─── Telegram Helpers ────────────────────────────────────────────────
+tg_notify() {
+  if [[ -n "${TELEGRAM_BOT_TOKEN:-}" && -n "${TELEGRAM_GROUP_ID:-}" ]]; then
+    python3 scripts/telegram-bot.py status >> "$LOG_FILE" 2>&1 || true
+  fi
+}
+
+tg_ask() {
+  local task="${1:-unknown task}"
+  local details="${2:-}"
+  if [[ -n "${TELEGRAM_BOT_TOKEN:-}" && -n "${TELEGRAM_GROUP_ID:-}" ]]; then
+    python3 scripts/telegram-bot.py ask "$task" "$details" >> "$LOG_FILE" 2>&1 || true
+  fi
+}
+
 # ─── Safety Checks ───────────────────────────────────────────────────
 if [[ ! -f ".continue-here.md" ]]; then
   echo "ERROR: .continue-here.md missing. Run gsd-pause-work or create it first." | tee -a "$LOG_FILE"
@@ -120,6 +135,7 @@ echo "AI session exited with code: $EXIT_CODE" | tee -a "$LOG_FILE"
 NEW_COMMITS=$(git rev-list HEAD...HEAD@{1} 2>/dev/null | wc -l | tr -d ' ' || echo "0")
 if [[ "$NEW_COMMITS" -gt 0 ]]; then
   echo "Commits made: $NEW_COMMITS" | tee -a "$LOG_FILE"
+  tg_notify
 else
   echo "No new commits." | tee -a "$LOG_FILE"
 fi
