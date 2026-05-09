@@ -4,7 +4,6 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { ExternalLink } from 'lucide-react'
 import type { ProfileWithRelations } from '@/lib/actions/profile.types'
-import { ContactButton } from '@/components/profile/ContactButton'
 import { MessageButton } from '@/components/messaging/MessageButton'
 import { OverflowMenu } from '@/components/profile/OverflowMenu'
 import { FoundingMemberBadge } from '@/components/profile/FoundingMemberBadge'
@@ -85,11 +84,6 @@ export function ProfileCard({
         {showViewerActions && acceptingContact != null && (
           <div className="flex flex-col gap-2 sm:flex-row">
             <MessageButton
-              recipientProfileId={profileId!}
-              recipientDisplayName={profile.display_name ?? 'Member'}
-              recipientAcceptingContact={acceptingContact}
-            />
-            <ContactButton
               recipientProfileId={profileId!}
               recipientDisplayName={profile.display_name ?? 'Member'}
               recipientAcceptingContact={acceptingContact}
