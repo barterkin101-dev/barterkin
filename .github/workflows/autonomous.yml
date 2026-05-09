@@ -1,0 +1,55 @@
+name: Autonomous Context Sync & Health Check
+
+on:
+  schedule:
+    # Every hour
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check context freshness
+        run: |
+          if [[ ! -f .continue-here.md ]]; then
+            echo "WARNING: .continue-here.md missing"
+            exit 1
+          fi
+          AGE_HOURS=$(( ($(date +%s) - $(stat -c %Y .continue-here.md 2>/dev/null || stat -f %m .continue-here.md)) / 3600 ))
+          echo "Context age: ${AGE_HOURS}h"
+          if [[ $AGE_HOURS -gt 24 ]]; then
+            echo "WARNING: Context is stale (>24h)"
+          fi
+
+      - name: Check for uncommitted daemon logs
+        run: |
+          if [[ -d .daemon-logs ]]; then
+            echo "Daemon logs present:"
+            ls -la .daemon-logs/
+          fi
+
+  sync-context:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs: health-check
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit latest context
+        run: |
+          git config user.name "Barterkin Bot"
+          git config user.email "bot@barterkin.com"
+          git add .continue-here.md .daemon-logs/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No context changes."
+          else
+            git commit -m "sync: server context backup $(date -Iseconds)"
+            git push
+          fi

@@ -57,3 +57,4 @@ public/swe-worker-*.js.map
 assets/Lora-Variable.ttf
 .claude/
 .planning/
+.env.vercel
