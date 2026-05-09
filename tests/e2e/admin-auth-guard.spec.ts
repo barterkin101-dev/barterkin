@@ -28,8 +28,8 @@ test.describe('ADMIN-06 — admin auth guard (unauthenticated)', () => {
     await expect(page).toHaveURL(/\/login/)
   })
 
-  test('unauthenticated user visiting /admin/contacts is redirected to /login', async ({ page }) => {
-    await page.goto('/admin/contacts')
+  test('unauthenticated user visiting /admin/messages is redirected to /login', async ({ page }) => {
+    await page.goto('/admin/messages')
     await expect(page).toHaveURL(/\/login/)
   })
 })
@@ -67,10 +67,10 @@ test.describe('ADMIN-06 — admin auth guard (authenticated non-admin)', () => {
     await expect(page).toHaveURL(/^https?:\/\/[^/]+\/?$/)
   })
 
-  test('authenticated non-admin user visiting /admin/contacts is redirected to /', async ({ page }) => {
+  test('authenticated non-admin user visiting /admin/messages is redirected to /', async ({ page }) => {
     test.skip(!hasEnv, 'requires Supabase env')
     await loginAs(page, pair!.senderEmail, pair!.senderPassword)
-    await page.goto('/admin/contacts')
+    await page.goto('/admin/messages')
     await expect(page).toHaveURL(/^https?:\/\/[^/]+\/?$/)
   })
 })
