@@ -16,7 +16,7 @@ export default defineConfig({
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'iphone-se', use: { ...devices['iPhone SE'] } },
   ],
-  webServer: {
+  webServer: process.env.PLAYWRIGHT_BASE_URL ? undefined : {
     // CI runs `pnpm build && pnpm start` (production build, webpack — not Turbopack dev).
     // Locally, a developer can `pnpm dev` first and Playwright will reuse that server.
     command: 'pnpm start',
