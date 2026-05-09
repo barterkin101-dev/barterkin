@@ -8,9 +8,11 @@ import type { ConversationRow } from '@/lib/data/messaging'
 export function ConversationList({
   conversations,
   activeId,
+  currentProfileId,
 }: {
   conversations: ConversationRow[]
   activeId?: string
+  currentProfileId: string
 }) {
   if (conversations.length === 0) {
     return (
@@ -24,7 +26,7 @@ export function ConversationList({
     <div className="divide-y">
       {conversations.map((conv) => {
         const otherParticipant = conv.participants.find(
-          (p) => p.profile?.id !== conv.participants[0]?.profile_id
+          (p) => p.profile_id !== currentProfileId
         )
         const isActive = conv.id === activeId
 

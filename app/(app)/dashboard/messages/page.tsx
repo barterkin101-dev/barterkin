@@ -27,7 +27,7 @@ export default async function MessagesPage() {
   return (
     <div className="space-y-6">
       <h1 className="font-serif text-3xl font-bold leading-[1.15] md:text-[32px]">Messages</h1>
-      <ConversationList conversations={conversations} />
+      <ConversationList conversations={conversations} currentProfileId={profile.id} />
     </div>
   )
 }
