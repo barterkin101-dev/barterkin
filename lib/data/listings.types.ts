@@ -28,6 +28,7 @@ export interface ListingRow {
     display_name: string | null
     username: string | null
     avatar_url: string | null
+    accepting_contact: boolean | null
   } | null
   counties: { name: string } | null
   categories: { name: string } | null

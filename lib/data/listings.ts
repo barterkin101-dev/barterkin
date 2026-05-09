@@ -133,7 +133,7 @@ export async function getListingById(id: string): Promise<ListingRow | null> {
     .from('listings')
     .select(
       `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at,
-       profiles!inner(id, display_name, username, avatar_url),
+       profiles!inner(id, display_name, username, avatar_url, accepting_contact),
        counties!left(name),
        categories!left(name)`,
     )

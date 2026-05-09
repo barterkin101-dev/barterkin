@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { MessageCircle, MapPin, ArrowLeft } from 'lucide-react'
+import { MessageButton } from '@/components/messaging/MessageButton'
 
 interface ListingDetailPageProps {
   params: Promise<{ id: string }>
@@ -141,13 +142,21 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                 Edit Listing
               </Link>
             ) : listing.profiles ? (
-              <Link
-                href={`/m/${listing.profiles.username}`}
-                className={cn(buttonVariants())}
-              >
-                <MessageCircle className="mr-2 h-4 w-4" />
-                Contact Seller
-              </Link>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <MessageButton
+                  recipientProfileId={listing.profiles.id}
+                  recipientDisplayName={listing.profiles.display_name ?? listing.profiles.username ?? 'Seller'}
+                  recipientAcceptingContact={listing.profiles.accepting_contact ?? true}
+                  listingId={listing.id}
+                />
+                <Link
+                  href={`/m/${listing.profiles.username}`}
+                  className={cn(buttonVariants({ variant: 'outline' }))}
+                >
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  View Profile
+                </Link>
+              </div>
             ) : null}
           </div>
 
