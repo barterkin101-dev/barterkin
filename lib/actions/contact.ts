@@ -1,93 +1,20 @@
 'use server'
 
-// Phase 5 — Contact Relay + Trust server actions.
+// Phase 5 — Trust server actions (block + report).
+// Contact relay (sendContactRequest) was removed in favor of in-app messaging.
 // See: .planning/phases/05-contact-relay-trust-joined/05-PATTERNS.md §lib/actions/contact.ts
 // Auth: Pitfall §1 — getUser() for DML identity, NOT getSession()/getClaims() for trust decisions.
-// Exception: sendContactRequest calls getSession() ONLY to extract access_token for Edge Function forwarding.
 
 import { Resend } from 'resend'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { MessageSchema, BlockSchema, ReportSchema } from '@/lib/schemas/contact'
+import { BlockSchema, ReportSchema } from '@/lib/schemas/contact'
 import type {
-  SendContactResult,
   ReportMemberResult,
   MarkContactsSeenResult,
 } from '@/lib/actions/contact.types'
 import { ReportAdminNotifyEmail } from '@/emails/report-admin-notify'
-
-// ============================================================================
-// sendContactRequest — proxy to Supabase Edge Function (CONT-03)
-// ============================================================================
-export async function sendContactRequest(
-  _prev: SendContactResult | null,
-  formData: FormData,
-): Promise<SendContactResult> {
-  const supabase = await createClient()
-
-  // Pitfall §1: getUser() revalidates against auth server (trust decision)
-  const { data: { user }, error: authErr } = await supabase.auth.getUser()
-  if (authErr || !user) return { ok: false, code: 'unauthorized', error: 'Please sign in.' }
-
-  const parsed = MessageSchema.safeParse({
-    recipientProfileId: formData.get('recipientProfileId'),
-    message: formData.get('message'),
-  })
-  if (!parsed.success) {
-    return {
-      ok: false,
-      code: 'bad_message',
-      error: parsed.error.issues[0]?.message ?? 'Please fix the message.',
-    }
-  }
-
-  // LEGITIMATE exception to Pitfall §1: getSession() to extract access_token for forwarding.
-  // The trust decision was already made by getUser() above. The Edge Function re-validates the JWT
-  // via verify_jwt=true + supabase.auth.getUser(jwt). See RESEARCH §Common Operation 1.
-  const { data: sess } = await supabase.auth.getSession()
-  const accessToken = sess?.session?.access_token
-  if (!accessToken) return { ok: false, code: 'unauthorized', error: 'Please sign in.' }
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  if (!supabaseUrl) {
-    console.error('[sendContactRequest] missing NEXT_PUBLIC_SUPABASE_URL')
-    return { ok: false, code: 'unknown', error: 'Something went wrong.' }
-  }
-
-  let resp: Response
-  try {
-    resp = await fetch(`${supabaseUrl}/functions/v1/send-contact`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        recipient_profile_id: parsed.data.recipientProfileId,
-        message: parsed.data.message,
-      }),
-    })
-  } catch (err) {
-    console.error('[sendContactRequest] edge function fetch failed', { code: (err as Error).name })
-    return { ok: false, code: 'unknown', error: 'Something went wrong.' }
-  }
-
-  const body = (await resp.json().catch(() => ({}))) as {
-    ok?: boolean
-    code?: SendContactResult['code']
-    error?: string
-    contact_id?: string
-  }
-  if (!resp.ok || !body.ok) {
-    return {
-      ok: false,
-      code: body.code ?? 'unknown',
-      error: body.error ?? 'Something went wrong.',
-    }
-  }
-  return { ok: true, contactId: body.contact_id }
-}
 
 // ============================================================================
 // blockMember — RLS-gated INSERT into blocks, redirects to /directory

@@ -12,7 +12,7 @@ import type { ProfileWithRelations } from '@/lib/actions/profile.types'
 
 // Pitfall §9: force-dynamic prevents cross-viewer cache leak.
 // Without this, Next.js may cache a rendered page for User A and serve it to User B,
-// exposing the wrong ContactButton / OverflowMenu visibility.
+// exposing the wrong MessageButton / OverflowMenu visibility.
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 

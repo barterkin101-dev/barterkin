@@ -38,7 +38,6 @@ import { revalidatePath } from 'next/cache'
 import { Resend } from 'resend'
 
 import {
-  sendContactRequest,
   blockMember,
   reportMember,
   markContactsSeen,
@@ -46,7 +45,6 @@ import {
 
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000'
 const OTHER_UUID = '550e8400-e29b-41d4-a716-446655440999'
-const VALID_MSG = 'Hello there this message has enough characters for CONT-02 validation!'
 
 // Helper to create a typed Supabase client mock
 function makeSupabaseMock(overrides?: {
@@ -78,92 +76,6 @@ beforeEach(() => {
   // Re-stub redirect to throw on every call
   vi.mocked(redirect).mockImplementation((url: string) => {
     throw new Error(`REDIRECT:${url}`)
-  })
-})
-
-// ============================================================================
-// sendContactRequest
-// ============================================================================
-describe('sendContactRequest', () => {
-  it('returns unauthorized when user not signed in', async () => {
-    const { getUserMock } = makeSupabaseMock()
-    getUserMock.mockResolvedValue({ data: { user: null }, error: null })
-
-    const fd = new FormData()
-    fd.set('recipientProfileId', VALID_UUID)
-    fd.set('message', VALID_MSG)
-    const result = await sendContactRequest(null, fd)
-    expect(result).toEqual({ ok: false, code: 'unauthorized', error: 'Please sign in.' })
-  })
-
-  it('returns bad_message when message is too short (< 20 chars)', async () => {
-    const { getUserMock } = makeSupabaseMock()
-    getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
-
-    const fd = new FormData()
-    fd.set('recipientProfileId', VALID_UUID)
-    fd.set('message', 'too short')
-    const result = await sendContactRequest(null, fd)
-    expect(result.ok).toBe(false)
-    expect(result.code).toBe('bad_message')
-  })
-
-  it('returns ok and contactId on successful Edge Function response', async () => {
-    const { getUserMock, getSessionMock } = makeSupabaseMock()
-    getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
-    getSessionMock.mockResolvedValue({ data: { session: { access_token: 'jwt-abc' } } })
-    fetchMock.mockResolvedValue({
-      ok: true,
-      json: async () => ({ ok: true, contact_id: 'cr-123' }),
-    })
-
-    const fd = new FormData()
-    fd.set('recipientProfileId', VALID_UUID)
-    fd.set('message', VALID_MSG)
-
-    const result = await sendContactRequest(null, fd)
-    expect(result).toEqual({ ok: true, contactId: 'cr-123' })
-    expect(fetchMock).toHaveBeenCalledWith(
-      'https://test.supabase.co/functions/v1/send-contact',
-      expect.objectContaining({
-        method: 'POST',
-        headers: expect.objectContaining({ Authorization: 'Bearer jwt-abc' }),
-      }),
-    )
-  })
-
-  it('passes through Edge Function error envelope on 429 daily_cap', async () => {
-    const { getUserMock, getSessionMock } = makeSupabaseMock()
-    getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
-    getSessionMock.mockResolvedValue({ data: { session: { access_token: 'jwt' } } })
-    fetchMock.mockResolvedValue({
-      ok: false,
-      json: async () => ({ code: 'daily_cap', error: "You've reached your daily contact limit." }),
-    })
-
-    const fd = new FormData()
-    fd.set('recipientProfileId', VALID_UUID)
-    fd.set('message', VALID_MSG)
-
-    const result = await sendContactRequest(null, fd)
-    expect(result.ok).toBe(false)
-    expect(result.code).toBe('daily_cap')
-    expect(result.error).toContain('daily contact limit')
-  })
-
-  it('returns unknown on fetch network error', async () => {
-    const { getUserMock, getSessionMock } = makeSupabaseMock()
-    getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
-    getSessionMock.mockResolvedValue({ data: { session: { access_token: 'jwt' } } })
-    fetchMock.mockRejectedValue(new Error('network'))
-
-    const fd = new FormData()
-    fd.set('recipientProfileId', VALID_UUID)
-    fd.set('message', VALID_MSG)
-
-    const result = await sendContactRequest(null, fd)
-    expect(result.ok).toBe(false)
-    expect(result.code).toBe('unknown')
   })
 })
 

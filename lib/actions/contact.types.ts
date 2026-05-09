@@ -1,29 +1,5 @@
 import type { Database } from '@/lib/database.types'
 
-/**
- * SendContactResult — return envelope for sendContactRequest server action.
- * `code` field maps 1:1 to inline error copy in the Contact Sheet (D-03).
- * Codes mirror the Edge Function's rejection codes in supabase/functions/send-contact/index.ts.
- */
-export interface SendContactResult {
-  ok: boolean
-  error?: string
-  code?:
-    | 'unauthorized'
-    | 'bad_message'
-    | 'daily_cap'
-    | 'weekly_cap'
-    | 'pair_cap'
-    | 'pair_dup'
-    | 'sender_banned'
-    | 'recipient_unreachable'
-    | 'not_accepting'
-    | 'sender_blocked'
-    | 'send_failed'
-    | 'unknown'
-  contactId?: string
-}
-
 export interface BlockMemberResult {
   ok: boolean
   error?: string
