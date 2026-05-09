@@ -5,13 +5,11 @@ import { NavLinks } from './NavLinks'
 export function AppNav({
   displayName,
   avatarUrl,
-  unseenContactCount,
   unseenMessageCount,
   showFinishSetup,
 }: {
   displayName?: string | null
   avatarUrl?: string | null
-  unseenContactCount?: number
   unseenMessageCount?: number
   showFinishSetup?: boolean
 }) {
@@ -32,7 +30,6 @@ export function AppNav({
         <NavLinks
           displayName={displayName}
           avatarUrl={avatarUrl}
-          unseenContactCount={unseenContactCount}
           unseenMessageCount={unseenMessageCount}
           showFinishSetup={showFinishSetup}
         />

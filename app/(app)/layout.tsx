@@ -19,7 +19,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Fetch display_name + avatar_url + id + onboarding_completed_at for nav (separate query -- cheap, cached per-request)
   let displayName: string | null = null
   let avatarUrl: string | null = null
-  let unseenContactCount = 0
   let unseenMessageCount = 0
   let showFinishSetup = false
   if (userId) {
@@ -36,16 +35,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     // profile.onboarding_completed_at is a timestamp → hide the link.
     showFinishSetup = !profile || profile.onboarding_completed_at === null
 
-    // Count unseen contact requests for badge (graceful degradation on error)
+    // Count unread messages across all conversations
     if (profile?.id) {
-      const { count: contactCount } = await supabase
-        .from('contact_requests')
-        .select('id', { count: 'exact', head: true })
-        .eq('recipient_id', profile.id)
-        .is('seen_at', null)
-      unseenContactCount = contactCount ?? 0
-
-      // Count unread messages across all conversations
       const { data: unreadMessages } = await supabase
         .from('conversation_participants')
         .select(
@@ -78,7 +69,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <AppNav
         displayName={displayName}
         avatarUrl={avatarUrl}
-        unseenContactCount={unseenContactCount}
         unseenMessageCount={unseenMessageCount}
         showFinishSetup={showFinishSetup}
       />

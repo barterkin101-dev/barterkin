@@ -1,8 +1,7 @@
 'use server'
 
-// Phase 5 — Trust server actions (block + report).
-// Contact relay (sendContactRequest) was removed in favor of in-app messaging.
-// See: .planning/phases/05-contact-relay-trust-joined/05-PATTERNS.md §lib/actions/contact.ts
+// Trust server actions (block + report).
+// The legacy email-based contact relay (sendContactRequest) was removed in favor of in-app messaging.
 // Auth: Pitfall §1 — getUser() for DML identity, NOT getSession()/getClaims() for trust decisions.
 
 import { Resend } from 'resend'
@@ -147,9 +146,8 @@ export async function reportMember(
   return { ok: true }
 }
 
-// ============================================================================
-// markContactsSeen — UPDATE seen_at on recipient's contact_requests (CONT-10)
-// ============================================================================
+// markContactsSeen is kept for backward compatibility with any legacy contact_requests data.
+// It is no longer called from the UI since the contact relay has been replaced by in-app messaging.
 export async function markContactsSeen(): Promise<MarkContactsSeenResult> {
   const supabase = await createClient()
   const { data: { user }, error: authErr } = await supabase.auth.getUser()
