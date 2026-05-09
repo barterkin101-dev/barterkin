@@ -60,3 +60,4 @@ assets/Lora-Variable.ttf
 .env.vercel
 .daemon-logs/
 .env.telegram
+.env.cloudflare
