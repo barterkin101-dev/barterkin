@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export function LandingNav() {
   return (
@@ -21,7 +22,7 @@ export function LandingNav() {
           />
           <span>Barterkin</span>
         </Link>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           <Link
             href="#how"
             className="hidden text-sm text-sage-bg/80 hover:text-sage-bg sm:inline-block"
@@ -34,13 +35,18 @@ export function LandingNav() {
           >
             Directory
           </Link>
-          <Button
-            asChild
-            size="sm"
-            className="h-9 bg-clay hover:bg-clay/90 text-sage-bg"
+          <Link
+            href="/login"
+            className="text-sm text-sage-bg/80 hover:text-sage-bg"
           >
-            <Link href="/signup">Join</Link>
-          </Button>
+            Sign in
+          </Link>
+          <Link
+            href="/signup"
+            className={cn(buttonVariants({ size: 'sm' }), 'h-9 bg-clay hover:bg-clay/90 text-sage-bg')}
+          >
+            Join
+          </Link>
         </div>
       </div>
     </nav>

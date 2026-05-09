@@ -3,8 +3,9 @@ import Link from 'next/link'
 import { Sprout } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { FadeIn, Stagger, StaggerItem } from '@/components/ui/fade-in'
 
 export interface HeroStats {
   totalProfiles: number
@@ -58,73 +59,83 @@ export function Hero({ stats, isAuthed }: HeroProps) {
 
         {/* copy */}
         <div>
-          <Badge className="mb-6 inline-flex bg-clay/20 text-clay ring-1 ring-clay/30 font-normal text-xs tracking-wide">
-            Georgia residents only · Honor system
-          </Badge>
+          <FadeIn delay={0}>
+            <Badge className="mb-6 inline-flex bg-clay/20 text-clay ring-1 ring-clay/30 font-normal text-xs tracking-wide">
+              Georgia residents only · Honor system
+            </Badge>
+          </FadeIn>
 
-          <h1 className="font-serif text-4xl font-bold text-sage-bg leading-[1.08] sm:text-5xl lg:text-[3.4rem]">
-            Trade skills with your{' '}
-            <em className="not-italic text-clay">Georgia</em>{' '}
-            neighbors.
-          </h1>
+          <FadeIn delay={0.1}>
+            <h1 className="font-serif text-4xl font-bold text-sage-bg leading-[1.08] sm:text-5xl lg:text-[3.4rem]">
+              Trade skills with your{' '}
+              <em className="not-italic text-clay">Georgia</em>{' '}
+              neighbors.
+            </h1>
+          </FadeIn>
 
-          <p className="mt-6 max-w-md text-base text-sage-bg/75 leading-relaxed">
-            Bakers, plumbers, braiders, beekeepers — find people near you
-            offering what you need, and offer back what you make.{' '}
-            <span className="text-sage-bg/90 font-medium">No money. No middlemen.</span>
-          </p>
+          <FadeIn delay={0.2}>
+            <p className="mt-6 max-w-md text-base text-sage-bg/75 leading-relaxed">
+              Bakers, plumbers, braiders, beekeepers — find people near you
+              offering what you need, and offer back what you make.{' '}
+              <span className="text-sage-bg/90 font-medium">No money. No middlemen.</span>
+            </p>
+          </FadeIn>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href={primaryHref}
-              className={cn(
-                buttonVariants({ size: 'lg' }),
-                'h-12 min-w-[180px] bg-clay hover:bg-clay/90 text-sage-bg font-semibold'
-              )}
-            >
-              <Sprout className="mr-2 h-4 w-4" aria-hidden="true" />
-              {primaryLabel}
-            </Link>
-            <Link
-              href="/directory"
-              className={cn(
-                buttonVariants({ variant: 'outline', size: 'lg' }),
-                'h-12 min-w-[180px] border-sage-bg/30 text-sage-bg bg-transparent hover:bg-sage-bg/10'
-              )}
-            >
-              Browse the directory
-            </Link>
-          </div>
+          <FadeIn delay={0.3}>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href={primaryHref}
+                className={cn(
+                  buttonVariants({ size: 'lg' }),
+                  'h-12 min-w-[180px] bg-clay hover:bg-clay/90 text-sage-bg font-semibold'
+                )}
+              >
+                <Sprout className="mr-2 h-4 w-4" aria-hidden="true" />
+                {primaryLabel}
+              </Link>
+              <Link
+                href="/directory"
+                className={cn(
+                  buttonVariants({ variant: 'outline', size: 'lg' }),
+                  'h-12 min-w-[180px] border-sage-bg/30 text-sage-bg bg-transparent hover:bg-sage-bg/10'
+                )}
+              >
+                Browse the directory
+              </Link>
+            </div>
+          </FadeIn>
 
-          <dl className="mt-12 flex gap-10 border-t border-sage-bg/10 pt-8">
+          <Stagger className="mt-12 flex gap-10 border-t border-sage-bg/10 pt-8" staggerDelay={0.1}>
             {[
               { value: `${stats.totalProfiles}+`, label: 'Georgians' },
               { value: `${stats.distinctCounties}+`, label: 'Counties' },
               { value: '10', label: 'Categories' },
             ].map(({ value, label }) => (
-              <div key={label}>
+              <StaggerItem key={label}>
                 <dd className="font-serif text-2xl font-bold text-sage-bg">{value}</dd>
                 <dt className="mt-0.5 text-xs text-sage-bg/50 uppercase tracking-widest">{label}</dt>
-              </div>
+              </StaggerItem>
             ))}
-          </dl>
+          </Stagger>
         </div>
 
         {/* Desktop image mosaic */}
-        <div className="hidden md:grid grid-cols-2 gap-3 mt-8 md:mt-0" aria-hidden="true">
+        <Stagger className="hidden md:grid grid-cols-2 gap-3 mt-8 md:mt-0" aria-hidden="true" staggerDelay={0.15}>
           {MOSAIC.map(({ src, alt, aspect }, i) => (
-            <div key={i} className="relative overflow-hidden rounded-2xl shadow-2xl" style={{ aspectRatio: aspect }}>
-              <Image
-                src={src}
-                alt={alt}
-                fill
-                sizes="280px"
-                className="object-cover transition-transform duration-700 hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-forest-deep/40 to-transparent" />
-            </div>
+            <StaggerItem key={i}>
+              <div className="relative overflow-hidden rounded-2xl shadow-2xl" style={{ aspectRatio: aspect }}>
+                <Image
+                  src={src}
+                  alt={alt}
+                  fill
+                  sizes="280px"
+                  className="object-cover transition-transform duration-700 hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-forest-deep/40 to-transparent" />
+              </div>
+            </StaggerItem>
           ))}
-        </div>
+        </Stagger>
       </div>
     </section>
   )
