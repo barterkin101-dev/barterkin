@@ -191,6 +191,7 @@ export async function getAdminMemberById(id: string): Promise<AdminMemberDetail 
 // This function is kept for backward compatibility with existing test contracts.
 // It always returns an empty array since the contact_requests table no longer exists.
 export async function getAdminContacts(_statusFilter?: string): Promise<AdminContactRow[]> {
+  void _statusFilter
   return []
 }
 
