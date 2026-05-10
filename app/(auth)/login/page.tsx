@@ -16,7 +16,7 @@ export default function LoginPage() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <LoginAuthCard mode="login" />
+        <LoginAuthCard />
         <p className="text-sm text-muted-foreground text-center">
           By continuing, you agree to our{' '}
           <Link href="/legal/tos" className="underline">Terms of Service</Link>,{' '}

@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle, RefreshCw } from 'lucide-react'
 
-export function LoginAuthCard({ mode: _mode }: { mode: 'login' | 'signup' }) {
+export function LoginAuthCard() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [turnstileStatus, setTurnstileStatus] = useState<'pending' | 'ok' | 'error' | 'expired'>('pending')
 

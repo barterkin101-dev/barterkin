@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { Button, buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { FadeIn, Stagger, StaggerItem } from '@/components/ui/fade-in'
