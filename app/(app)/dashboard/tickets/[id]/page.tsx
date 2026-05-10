@@ -1,8 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getTickets, getTicketMessages } from '@/lib/data/tickets'
-import { addTicketMessageForm } from '@/lib/actions/tickets'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
+import { TicketReplyForm } from './TicketReplyForm'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft } from 'lucide-react'
@@ -128,16 +126,7 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
         ))}
       </div>
 
-      <form action={addTicketMessageForm} className="flex items-end gap-2">
-        <input type="hidden" name="ticketId" value={ticket.id} />
-        <Textarea
-          name="content"
-          placeholder="Add a reply..."
-          className="min-h-[80px] resize-none"
-          required
-        />
-        <Button type="submit">Reply</Button>
-      </form>
+      <TicketReplyForm ticketId={ticket.id} />
     </div>
   )
 }
