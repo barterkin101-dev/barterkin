@@ -43,6 +43,7 @@ export async function blockMember(formData: FormData): Promise<void> {
 
   if (parsed.data.blockedOwnerId === user.id) {
     redirect('/directory')
+    return
   }
 
   const { error } = await supabase.from('blocks').upsert(

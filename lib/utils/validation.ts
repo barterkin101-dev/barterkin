@@ -72,9 +72,11 @@ export function validateAndSanitize<T>(
   const parsed = schema.safeParse(input)
   if (!parsed.success) {
     const flattened = parsed.error.flatten()
+    const firstIssue = parsed.error.issues[0]
+    const field = firstIssue?.path.join('.') ?? 'input'
     return {
       ok: false,
-      error: 'Please fix the highlighted fields.',
+      error: `${field}: ${firstIssue?.message ?? 'Please fix the highlighted fields.'}`,
       fieldErrors: flattened.fieldErrors as Record<string, string[]>,
     }
   }

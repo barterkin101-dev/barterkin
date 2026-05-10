@@ -90,19 +90,24 @@ export async function rateLimitByIp(
  * Returns 'unknown' if no IP can be determined.
  */
 export async function getClientIp(): Promise<string> {
-  const hdrs = await headers()
-  // Vercel / Cloudflare / common proxies
-  const forwarded = hdrs.get('x-forwarded-for')
-  if (forwarded) {
-    // X-Forwarded-For can be a comma-separated list; first is typically the client
-    const first = forwarded.split(',')[0].trim()
-    if (first) return first
+  try {
+    const hdrs = await headers()
+    // Vercel / Cloudflare / common proxies
+    const forwarded = hdrs.get('x-forwarded-for')
+    if (forwarded) {
+      // X-Forwarded-For can be a comma-separated list; first is typically the client
+      const first = forwarded.split(',')[0].trim()
+      if (first) return first
+    }
+    // Fallback headers
+    const realIp = hdrs.get('x-real-ip')
+    if (realIp) return realIp.trim()
+    const cfConnectingIp = hdrs.get('cf-connecting-ip')
+    if (cfConnectingIp) return cfConnectingIp.trim()
+  } catch {
+    // headers() throws outside a request scope (e.g. unit tests, edge cases)
+    // Return 'unknown' so rate limiting gracefully degrades to memory fallback
   }
-  // Fallback headers
-  const realIp = hdrs.get('x-real-ip')
-  if (realIp) return realIp.trim()
-  const cfConnectingIp = hdrs.get('cf-connecting-ip')
-  if (cfConnectingIp) return cfConnectingIp.trim()
   return 'unknown'
 }
 
