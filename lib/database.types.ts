@@ -133,54 +133,6 @@ export type Database = {
           },
         ]
       }
-      contact_requests: {
-        Row: {
-          created_at: string
-          id: string
-          message: string
-          recipient_id: string
-          resend_id: string | null
-          seen_at: string | null
-          sender_id: string
-          status: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          message: string
-          recipient_id: string
-          resend_id?: string | null
-          seen_at?: string | null
-          sender_id: string
-          status?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          message?: string
-          recipient_id?: string
-          resend_id?: string | null
-          seen_at?: string | null
-          sender_id?: string
-          status?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "contact_requests_recipient_id_fkey"
-            columns: ["recipient_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "contact_requests_sender_id_fkey"
-            columns: ["sender_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       conversation_participants: {
         Row: {
           conversation_id: string
