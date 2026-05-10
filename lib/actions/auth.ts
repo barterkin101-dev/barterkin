@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { isDisposableEmail } from '@/lib/utils/disposable-email'
 import { checkSignupRateLimit } from '@/lib/utils/rate-limit'
+import { limitAuthRequest } from '@/lib/rate-limit-public'
 import { MagicLinkSchema, type SendMagicLinkResult } from '@/lib/schemas/auth'
 
 export type { SendMagicLinkResult }
@@ -31,6 +32,18 @@ export async function sendMagicLink(
 
   const hdrs = await headers()
   const ip = (hdrs.get('x-forwarded-for') ?? '').split(',')[0].trim() || 'unknown'
+
+  // Layer 1: IP-based auth request rate limit (5 per 15 min) — fast, Redis-backed
+  const authLimit = await limitAuthRequest(ip)
+  if (!authLimit.success) {
+    return {
+      ok: false,
+      error:
+        'Too many requests from this network. Please try again in a few minutes.',
+    }
+  }
+
+  // Layer 2: Postgres per-IP signup counter (5 per day) — authoritative, persistent
   const rl = await checkSignupRateLimit(ip)
   if (!rl.allowed) {
     return {

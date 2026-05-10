@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { rateLimitByIp, getClientIp } from '@/lib/rate-limit-public'
 
 // Node runtime — resend SDK uses Node APIs.
 export const runtime = 'nodejs'
@@ -11,6 +12,16 @@ export async function POST(request: Request) {
   // Production guard — if this ever deploys to prod by mistake, return 404.
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json({ error: 'disabled in production' }, { status: 404 })
+  }
+
+  // Rate limit: 10 test emails per minute per IP (dev-only, generous)
+  const ip = await getClientIp()
+  const limit = await rateLimitByIp(`test-email:${ip}`, 10, 60)
+  if (!limit.success) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Slow down.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((limit.reset - Date.now()) / 1000)) } },
+    )
   }
 
   const apiKey = process.env.RESEND_API_KEY

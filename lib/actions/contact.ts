@@ -10,6 +10,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { BlockSchema, ReportSchema } from '@/lib/schemas/contact'
 import { validateAndSanitize } from '@/lib/utils/validation'
+import { getClientIp, limitBlockAction, limitReportSubmission } from '@/lib/rate-limit-public'
 import type {
   ReportMemberResult,
 } from '@/lib/actions/contact.types'
@@ -22,6 +23,13 @@ export async function blockMember(formData: FormData): Promise<void> {
   const supabase = await createClient()
   const { data: { user }, error: authErr } = await supabase.auth.getUser()
   if (authErr || !user) redirect('/login')
+
+  // Rate limit: 10 block actions per hour per IP
+  const ip = await getClientIp()
+  const limit = await limitBlockAction(ip)
+  if (!limit.success) {
+    redirect('/directory?blocked_error=rate_limited')
+  }
 
   const parsed = validateAndSanitize(BlockSchema, {
     blockedOwnerId: formData.get('blockedOwnerId'),
@@ -62,6 +70,13 @@ export async function reportMember(
   const { data: { user }, error: authErr } = await supabase.auth.getUser()
   if (authErr || !user) return { ok: false, code: 'unauthorized', error: 'Please sign in.' }
   if (!user.email_confirmed_at) return { ok: false, code: 'unauthorized', error: 'Verify your email first.' }
+
+  // Rate limit: 5 reports per hour per IP
+  const ip = await getClientIp()
+  const limit = await limitReportSubmission(ip)
+  if (!limit.success) {
+    return { ok: false, code: 'rate_limited', error: 'Too many reports. Please try again later.' }
+  }
 
   const parsed = validateAndSanitize(ReportSchema, {
     targetProfileId: formData.get('targetProfileId'),

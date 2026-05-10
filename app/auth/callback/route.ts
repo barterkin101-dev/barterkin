@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getClientIp, limitOAuthCallback } from '@/lib/rate-limit-public'
 
 /**
  * AUTH-01: Google OAuth callback.
@@ -8,6 +9,15 @@ import { createClient } from '@/lib/supabase/server'
  * and redirect to ?next (open-redirect guarded) or /directory.
  */
 export async function GET(request: NextRequest) {
+  // Rate limit OAuth callback to prevent brute-force code guessing
+  const ip = await getClientIp()
+  const limit = await limitOAuthCallback(ip)
+  if (!limit.success) {
+    return NextResponse.redirect(
+      `${request.nextUrl.origin}/auth/error?reason=rate_limited`,
+    )
+  }
+
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const nextParam = searchParams.get('next') ?? '/directory'

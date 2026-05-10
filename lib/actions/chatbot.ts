@@ -4,6 +4,7 @@ import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { generateBotResponse, escalateToTicket } from '@/lib/chatbot/engine'
+import { getClientIp, limitChatbotMessage } from '@/lib/rate-limit-public'
 import type { BotResponse } from '@/lib/chatbot/engine'
 import type { Json } from '@/lib/database.types'
 
@@ -19,6 +20,13 @@ export async function sendChatMessage(
   _prev: SendMessageResult | null,
   formData: FormData,
 ): Promise<SendMessageResult> {
+  // Rate limit: 30 chat messages per minute per IP (unauthenticated-friendly)
+  const ip = await getClientIp()
+  const limit = await limitChatbotMessage(ip)
+  if (!limit.success) {
+    return { ok: false, error: 'Too many messages. Please slow down.' }
+  }
+
   const sessionId = String(formData.get('sessionId') ?? '')
   const message = String(formData.get('message') ?? '').trim()
 

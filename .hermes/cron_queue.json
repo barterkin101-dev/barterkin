@@ -24,8 +24,8 @@
     "id": "4",
     "title": "Add Input Validation + Sanitization",
     "priority": "high",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "COMPLETED: Added Zod schemas for all server action inputs (listings, contact, disputes, tickets, messaging, ratings, profile, admin). Created lib/utils/validation.ts with reusable validators (email, uuid, currency, phone, url, etc.) and lib/utils/sanitize.ts with DOMPurify-backed HTML sanitization for rich text fields. Integrated validation into all server actions with clear error messages. All typecheck, lint pass. Committed as [task-4]."
   },
   {
     "id": "5",

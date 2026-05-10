@@ -7,7 +7,7 @@ export interface BlockMemberResult {
 export interface ReportMemberResult {
   ok: boolean
   error?: string
-  code?: 'unauthorized' | 'self_report' | 'bad_input' | 'unknown'
+  code?: 'unauthorized' | 'self_report' | 'bad_input' | 'rate_limited' | 'unknown'
   fieldErrors?: Record<string, string[]>
 }
 
