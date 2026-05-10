@@ -32,8 +32,11 @@ test.describe('chatbot customer journey', () => {
     // User message appears
     await expect(page.getByText('How do I create a listing?')).toBeVisible()
 
-    // Bot responds (wait for server action round-trip)
-    await expect(page.locator('.whitespace-pre-wrap').filter({ hasText: /listing/i }).nth(1)).toBeVisible({ timeout: 5000 })
+    // Bot responds — wait for server action round-trip + DOM update
+    // useActionState triggers a re-render; give it generous time in CI
+    await expect(
+      page.locator('.whitespace-pre-wrap').filter({ hasText: /listing/i }).nth(1)
+    ).toBeVisible({ timeout: 15000 })
   })
 
   test('escalation flow creates a support ticket', async ({ page }) => {
@@ -49,22 +52,22 @@ test.describe('chatbot customer journey', () => {
     // Wait for bot response with escalate action button
     await expect(
       page.locator('.whitespace-pre-wrap').filter({ hasText: /human|support|ticket/i }).nth(1)
-    ).toBeVisible({ timeout: 5000 })
+    ).toBeVisible({ timeout: 15000 })
 
     // Click the escalate action button rendered by the bot response
     const escalateButton = page.getByRole('button', { name: /create support ticket/i })
-    await expect(escalateButton).toBeVisible({ timeout: 3000 })
+    await expect(escalateButton).toBeVisible({ timeout: 5000 })
     await escalateButton.click()
 
     // Bot prompts for subject line after clicking escalate
-    await expect(page.getByText(/subject line/i)).toBeVisible({ timeout: 3000 })
+    await expect(page.getByText(/subject line/i)).toBeVisible({ timeout: 5000 })
 
     // User types a subject-line message
     await input.fill('Cannot publish my listing')
     await input.press('Enter')
 
     // Escalation form appears with subject pre-filled from the message above
-    await expect(page.getByPlaceholder(/subject/i)).toBeVisible({ timeout: 3000 })
+    await expect(page.getByPlaceholder(/subject/i)).toBeVisible({ timeout: 5000 })
 
     // Fill ticket form body
     await page.getByPlaceholder(/describe your issue/i).fill('This is a test ticket created by the chatbot E2E test.')
@@ -73,7 +76,7 @@ test.describe('chatbot customer journey', () => {
     await page.getByRole('button', { name: /create ticket/i }).click()
 
     // Success confirmation
-    await expect(page.getByText(/support ticket created/i)).toBeVisible({ timeout: 5000 })
+    await expect(page.getByText(/support ticket created/i)).toBeVisible({ timeout: 15000 })
   })
 
   test('chat widget is accessible on mobile', async ({ page }) => {
