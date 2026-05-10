@@ -3,7 +3,6 @@ import {
   createVerifiedPair,
   cleanupPair,
   setBanned,
-  adminClient,
 } from './fixtures/contact-helpers'
 import type { VerifiedPair } from './fixtures/contact-helpers'
 

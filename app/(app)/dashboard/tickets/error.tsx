@@ -2,7 +2,6 @@
 import { ErrorState } from '@/components/ui/ErrorState'
 
 export default function TicketsError({
-  error: _error,
   reset,
 }: {
   error: Error & { digest?: string }

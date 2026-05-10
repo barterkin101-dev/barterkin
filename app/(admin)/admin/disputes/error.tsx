@@ -2,7 +2,6 @@
 import { ErrorState } from '@/components/ui/ErrorState'
 
 export default function AdminDisputesError({
-  error: _error,
   reset,
 }: {
   error: Error & { digest?: string }

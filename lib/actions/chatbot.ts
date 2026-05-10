@@ -49,14 +49,6 @@ export async function sendChatMessage(
     .from('chat_messages')
     .insert({ session_id: sid, role: 'user', content: message })
 
-  // Get chat history for context
-  const { data: history } = await getSupabaseAdmin()
-    .from('chat_messages')
-    .select('role, content')
-    .eq('session_id', sid)
-    .order('created_at', { ascending: true })
-    .limit(20)
-
   // Build context
   const context = {
     email: user?.email ?? undefined,
