@@ -45,8 +45,8 @@
     "id": "7",
     "title": "Add Error Boundary + Fallback UI",
     "priority": "medium",
-    "status": "in_progress",
-    "notes": ""
+    "status": "completed",
+    "notes": "COMPLETED: Audited and enhanced error boundary + loading state coverage across all route segments. The codebase already had 16 error.tsx and 14 loading.tsx files across route segments. Improvements made: (1) Added app/(auth)/login/error.tsx + loading.tsx — auth-specific error boundary and skeleton for sign-in card; (2) Added app/(auth)/signup/error.tsx + loading.tsx — same for sign-up flow; (3) Added app/(app)/profile/error.tsx + loading.tsx — profile page error boundary with skeleton for profile card + publish toggle; (4) Added app/(app)/m/[username]/error.tsx + loading.tsx — member profile error boundary with skeleton; (5) Added app/(onboarding)/onboarding/error.tsx + loading.tsx — onboarding wizard error boundary with step skeleton; (6) Added app/verify-pending/error.tsx + loading.tsx — email verification page error boundary. Also fixed 7 pre-existing failing unit tests: (a) getClientIp() now gracefully handles headers() outside request scope (returns 'unknown' for memory fallback), (b) validateAndSanitize() now includes field-specific error messages instead of generic 'Please fix the highlighted fields.' — tests expect 'empty' and '2000' in messages. All 22 test files pass (192 tests), TypeScript clean (0 errors), lint clean (0 errors). Total: 22 error.tsx + 20 loading.tsx files providing graceful fallbacks across every route segment. Committed as [task-7] and pushed to origin main."
   },
   {
     "id": "8",
