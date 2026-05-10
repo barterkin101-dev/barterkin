@@ -1,11 +1,10 @@
 /**
- * Phase 5 — E2E fixture helpers for contact relay + trust tests
+ * Phase 5 — E2E fixture helpers for messaging + trust tests
  *
  * Uses the Supabase admin client (service-role key) to:
- *  - Create verified auth user pairs for two-profile contact flows
+ *  - Create verified auth user pairs for two-profile messaging flows
  *  - Flip accepting_contact and banned flags for edge case coverage
- *  - Insert blocks + query contact_requests for assertion helpers
- *  - Clean up all test data after each suite
+ *  - Insert blocks + clean up all test data after each suite
  *
  * Requires env vars: NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
  *
@@ -36,9 +35,9 @@ export interface VerifiedPair {
 
 /**
  * Creates two verified auth users with published profiles (accepting_contact=true).
- * Suitable as sender + recipient for contact relay E2E tests.
+ * Suitable as sender + recipient for messaging E2E tests.
  *
- * @param prefix - Short string to namespace emails/usernames (e.g. 'relay', 'block')
+ * @param prefix - Short string to namespace emails/usernames (e.g. 'msg', 'block')
  */
 export async function createVerifiedPair(prefix: string): Promise<VerifiedPair> {
   const stamp = Date.now()
@@ -109,7 +108,7 @@ export async function createVerifiedPair(prefix: string): Promise<VerifiedPair> 
 
 /**
  * cleanupPair — Deletes both auth users in a pair created by createVerifiedPair.
- * ON DELETE CASCADE removes profiles, contact_requests, blocks, reports automatically.
+ * ON DELETE CASCADE removes profiles, blocks, reports, conversations, messages automatically.
  *
  * @param senderId - auth.users.id of the sender
  * @param recipientId - auth.users.id of the recipient
@@ -137,7 +136,7 @@ export async function setAcceptingContact(ownerId: string, accepting: boolean): 
 
 /**
  * Flips the banned flag on a profile.
- * Used to test ban enforcement in directory visibility and relay rejection.
+ * Used to test ban enforcement in directory visibility and messaging flows.
  *
  * @param ownerId - auth.users.id (owner_id FK on profiles)
  * @param banned - target value for banned
@@ -169,26 +168,20 @@ export async function insertBlock(blockerOwnerId: string, blockedOwnerId: string
 }
 
 /**
- * Counts contact_requests rows for a recipient (optionally filtering unseen only).
- * Used for badge count assertions and relay insertion verification.
+ * Counts unread messages for a profile across all conversations.
+ * Used for unread badge assertions in messaging E2E tests.
  *
- * @param opts.recipientId - auth.users.id of the recipient
- * @param opts.unseenOnly - if true, only counts rows where seen_at IS NULL
+ * @param opts.profileId - profiles.id to check unread for
  */
-export async function countContactRequests(opts: {
-  recipientId: string
-  unseenOnly?: boolean
+export async function countUnreadMessages(opts: {
+  profileId: string
 }): Promise<number> {
-  let query = adminClient()
-    .from('contact_requests')
+  const { count, error } = await adminClient()
+    .from('conversation_participants')
     .select('id', { count: 'exact', head: true })
-    .eq('recipient_id', opts.recipientId)
+    .eq('profile_id', opts.profileId)
+    .is('last_read_at', null)
 
-  if (opts.unseenOnly) {
-    query = query.is('seen_at', null)
-  }
-
-  const { count, error } = await query
-  if (error) throw new Error(`countContactRequests failed: ${error.message}`)
+  if (error) throw new Error(`countUnreadMessages failed: ${error.message}`)
   return count ?? 0
 }

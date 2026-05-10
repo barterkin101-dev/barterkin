@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 import {
   createVerifiedPair,
   cleanupPair,
+  adminClient,
 } from './fixtures/contact-helpers'
 import type { VerifiedPair } from './fixtures/contact-helpers'
 
@@ -19,10 +20,8 @@ async function loginAs(page: import('@playwright/test').Page, email: string, pas
   await page.waitForURL(/\/(directory|profile|m\/)/, { timeout: 15_000 }).catch(() => undefined)
 }
 
-// CONT-10 — unseen-contact badge tests removed.
-// The legacy email-based contact relay has been retired in favor of in-app messaging.
-// The message unread badge is tested separately in messaging E2E specs.
-test.describe('CONT-10 unseen contact badge', () => {
+// MSG-06 — unread badge appears on Dashboard nav link when recipient has unread messages.
+test.describe('MSG-06 unread message badge', () => {
   let pair: VerifiedPair
 
   test.beforeAll(async () => {
@@ -34,16 +33,55 @@ test.describe('CONT-10 unseen contact badge', () => {
     if (pair) await cleanupPair(pair.senderId, pair.recipientId)
   })
 
-  test('legacy badge removed — no contact_request badge in nav', async ({ page }) => {
+  test('badge appears when unread messages exist and clears after reading', async ({ page }) => {
     test.skip(!hasEnv, 'requires Supabase env')
+    const admin = adminClient()
 
+    const { data: senderProfile } = await admin
+      .from('profiles')
+      .select('id')
+      .eq('owner_id', pair.senderId)
+      .single()
+    const { data: recipientProfile } = await admin
+      .from('profiles')
+      .select('id')
+      .eq('owner_id', pair.recipientId)
+      .single()
+
+    // Create a conversation where recipient has NOT read the message
+    const { data: conv } = await admin
+      .from('conversations')
+      .insert({})
+      .select('id')
+      .single()
+    if (!conv) throw new Error('Failed to create conversation')
+
+    await admin.from('conversation_participants').insert([
+      { conversation_id: conv.id, profile_id: senderProfile!.id, last_read_at: new Date().toISOString() },
+      { conversation_id: conv.id, profile_id: recipientProfile!.id, last_read_at: null },
+    ])
+
+    await admin.from('messages').insert({
+      conversation_id: conv.id,
+      sender_profile_id: senderProfile!.id,
+      content: 'Unread message for badge test',
+    })
+
+    // Login as RECIPIENT (the one who hasn't read)
     await loginAs(page, pair.recipientEmail, pair.recipientPassword)
     await page.goto('/directory')
+
+    // Badge should appear on Dashboard nav link
+    const badge = page.locator('nav .bg-destructive').first()
+    await expect(badge).toBeVisible({ timeout: 10_000 })
+
+    // Navigate to messages page — this should mark messages as read
+    await page.goto('/dashboard/messages')
     await page.waitForLoadState('networkidle')
 
-    // Legacy contact badge used nav .bg-destructive; messaging badge uses different selectors.
-    // Confirm the old selector no longer matches anything in nav.
-    const legacyBadge = page.locator('nav .bg-destructive').first()
-    await expect(legacyBadge).not.toBeVisible({ timeout: 5_000 })
+    // Navigate back to directory — badge should be gone
+    await page.goto('/directory')
+    await page.waitForLoadState('networkidle')
+    await expect(page.locator('nav .bg-destructive')).not.toBeVisible({ timeout: 5_000 })
   })
 })
