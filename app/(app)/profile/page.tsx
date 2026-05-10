@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { Button, buttonVariants } from '@/components/ui/button'
+
+import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ProfileCard } from '@/components/profile/ProfileCard'
 import { PublishToggle } from '@/components/profile/PublishToggle'

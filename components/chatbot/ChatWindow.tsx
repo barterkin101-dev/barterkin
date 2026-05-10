@@ -37,7 +37,7 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
   const [ticketSubject, setTicketSubject] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  const [sendState, sendAction, sendPending] = useActionState<SendMessageResult | null, FormData>(
+  const [sendState, sendAction] = useActionState<SendMessageResult | null, FormData>(
     sendChatMessage,
     null,
   )

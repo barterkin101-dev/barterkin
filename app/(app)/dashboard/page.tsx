@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getMyListings } from '@/lib/data/listings'
-import { Button, buttonVariants } from '@/components/ui/button'
+
+import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ShoppingBag, MessageSquare, Star, Ticket, User } from 'lucide-react'
