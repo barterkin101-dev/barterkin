@@ -16,6 +16,8 @@ paths = [
 
 regexes = [
   '''secrets\.GITHUB_TOKEN''',
-  '''hfdcsickergdcdvejbcw''',
+  '''hfdcsickerggcdvejbcw''',
   '''wnyev3689z''',
+  '''X-Barterkin-Webhook-Secret''',
+  '''webhook-secret''',
 ]
