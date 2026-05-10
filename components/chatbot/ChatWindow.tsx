@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect, startTransition, useActionState } from 'react'
-import { useFormStatus } from 'react-dom'
 import { ChatMessage } from './ChatMessage'
 import { sendChatMessage, createTicketFromChat } from '@/lib/actions/chatbot'
 import type { SendMessageResult, CreateTicketFromChatResult } from '@/lib/actions/chatbot'
@@ -14,8 +13,7 @@ interface Message {
   actions?: { type: 'link' | 'button'; label: string; href?: string; action?: string }[]
 }
 
-function SendButton() {
-  const { pending } = useFormStatus()
+function SendButton({ pending }: { pending: boolean }) {
   return (
     <Button type="submit" size="sm" disabled={pending} className="h-9 w-9 rounded-full p-0">
       {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
@@ -37,7 +35,7 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
   const [ticketSubject, setTicketSubject] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  const [sendState, sendAction] = useActionState<SendMessageResult | null, FormData>(
+  const [sendState, sendAction, sendPending] = useActionState<SendMessageResult | null, FormData>(
     sendChatMessage,
     null,
   )
@@ -197,7 +195,7 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
             className="flex-1 rounded-full border border-sage-light bg-sage-pale px-4 py-2 text-sm placeholder:text-forest-mid/50 focus:outline-none focus:ring-2 focus:ring-forest-deep/20"
             autoComplete="off"
           />
-          <SendButton />
+          <SendButton pending={sendPending} />
         </form>
       )}
     </div>
