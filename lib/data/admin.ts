@@ -188,40 +188,10 @@ export async function getAdminMemberById(id: string): Promise<AdminMemberDetail 
 }
 
 // ---------------------------------------------------------------------------
-// ADMIN-05 — contact requests list with optional status filter
+// ADMIN-05 — retired: contact_requests replaced by conversations/messages
 // ---------------------------------------------------------------------------
-export async function getAdminContacts(status?: string): Promise<AdminContactRow[]> {
-  // FK hints required because contact_requests has TWO FKs to profiles
-  // (sender_id + recipient_id). Verified FK names from Postgres default naming:
-  //   - contact_requests_sender_id_fkey
-  //   - contact_requests_recipient_id_fkey
-  let q = supabaseAdmin
-    .from('contact_requests')
-    .select(`
-      id, message, status, created_at,
-      sender:profiles!contact_requests_sender_id_fkey(display_name),
-      recipient:profiles!contact_requests_recipient_id_fkey(display_name)
-    `)
-    .order('created_at', { ascending: false })
-
-  if (status && status !== 'all') {
-    q = q.eq('status', status)
-  }
-
-  const { data, error } = await q
-  if (error) {
-    console.error('[getAdminContacts] query error', { code: error.code })
-    throw new Error(error.message)
-  }
-
-  return (data ?? []).map((row: Record<string, unknown>) => ({
-    id: row.id as string,
-    message: row.message as string,
-    status: row.status as AdminContactRow['status'],
-    created_at: row.created_at as string,
-    sender_display_name: ((row.sender as { display_name?: string } | null)?.display_name as string | undefined) ?? null,
-    recipient_display_name: ((row.recipient as { display_name?: string } | null)?.display_name as string | undefined) ?? null,
-  }))
+export async function getAdminContacts(_status?: string): Promise<AdminContactRow[]> {
+  return []
 }
 
 // ---------------------------------------------------------------------------
