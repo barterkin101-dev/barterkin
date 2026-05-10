@@ -137,7 +137,7 @@ describe('reportMember', () => {
     },
     target: { id: string; owner_id: string; display_name: string; username: string } | null,
   ) {
-    const { getUserMock: _get, fromMock } = overrides
+    const { fromMock } = overrides
     // Call order from reportMember:
     //   1st from('profiles'): target SELECT
     //   2nd from('reports'): INSERT

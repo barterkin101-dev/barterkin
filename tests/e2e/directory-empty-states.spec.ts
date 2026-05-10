@@ -72,9 +72,7 @@ test.describe('DIR-08: empty states', () => {
     await expect(clearLink).toHaveAttribute('href', '/directory')
   })
 
-  test('empty-directory state: no published profiles shows "Nobody\'s here yet."', async ({
-    page: _page,
-  }) => {
+  test('empty-directory state: no published profiles shows "Nobody\'s here yet."', async () => {
     test.skip(!hasEnv, 'Supabase env vars not set — skip DB-seeded E2E')
     // NOTE: This test is hard to run reliably in a shared DB (other profiles exist).
     // We test the zero-results state instead as a proxy for the empty-state UI path,

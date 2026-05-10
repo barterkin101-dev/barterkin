@@ -190,7 +190,7 @@ export async function getAdminMemberById(id: string): Promise<AdminMemberDetail 
 // ---------------------------------------------------------------------------
 // ADMIN-05 — retired: contact_requests replaced by conversations/messages
 // ---------------------------------------------------------------------------
-export async function getAdminContacts(_status?: string): Promise<AdminContactRow[]> {
+export async function getAdminContacts(): Promise<AdminContactRow[]> {
   return []
 }
 

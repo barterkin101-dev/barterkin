@@ -100,13 +100,6 @@ export function FadeIn({
 // Stagger wrapper for grids / lists
 /* ------------------------------------------------------------------ */
 
-const container: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.12 },
-  },
-}
-
 const childFadeUp: Variants = {
   hidden: { opacity: 0, y: 28 },
   visible: {

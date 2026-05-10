@@ -5,7 +5,6 @@
 //   CLOUDFLARE_API_TOKEN   Scoped token with Zone:DNS:Edit for barterkin.com
 //   CLOUDFLARE_ZONE_ID     Zone ID (Cloudflare dashboard -> zone Overview, right sidebar)
 
-const DOMAIN = "barterkin.com";
 const RECORD_NAME = "test-barterkin.com.barterkin.com";
 
 const CF_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
