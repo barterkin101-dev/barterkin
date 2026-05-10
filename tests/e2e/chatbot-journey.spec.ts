@@ -46,20 +46,27 @@ test.describe('chatbot customer journey', () => {
     await input.fill('I need to talk to a human')
     await input.press('Enter')
 
-    // Wait for bot response
-    await expect(page.locator('.whitespace-pre-wrap').filter({ hasText: /human|support|ticket/i }).nth(1)).toBeVisible({ timeout: 5000 })
+    // Wait for bot response with escalate action button
+    await expect(
+      page.locator('.whitespace-pre-wrap').filter({ hasText: /human|support|ticket/i }).nth(1)
+    ).toBeVisible({ timeout: 5000 })
 
-    // Click escalate action if present
-    const escalateButton = page.getByRole('button', { name: /contact support|create support ticket/i })
-    if (await escalateButton.isVisible().catch(() => false)) {
-      await escalateButton.click()
-    }
+    // Click the escalate action button rendered by the bot response
+    const escalateButton = page.getByRole('button', { name: /create support ticket/i })
+    await expect(escalateButton).toBeVisible({ timeout: 3000 })
+    await escalateButton.click()
 
-    // Escalation form appears
+    // Bot prompts for subject line after clicking escalate
+    await expect(page.getByText(/subject line/i)).toBeVisible({ timeout: 3000 })
+
+    // User types a subject-line message
+    await input.fill('Cannot publish my listing')
+    await input.press('Enter')
+
+    // Escalation form appears with subject pre-filled from the message above
     await expect(page.getByPlaceholder(/subject/i)).toBeVisible({ timeout: 3000 })
 
-    // Fill ticket form
-    await page.getByPlaceholder(/subject/i).fill('Test chatbot escalation')
+    // Fill ticket form body
     await page.getByPlaceholder(/describe your issue/i).fill('This is a test ticket created by the chatbot E2E test.')
 
     // Submit
