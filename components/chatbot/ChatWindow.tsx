@@ -93,12 +93,19 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
     }
   }, [ticketState])
 
-  const handleSubmit = (formData: FormData) => {
-    const text = String(formData.get('message') ?? '').trim()
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const text = input.trim()
     if (!text) return
 
+    // Optimistically add user message immediately
     setMessages((prev) => [...prev, { role: 'user', content: text }])
     setInput('')
+
+    // Create FormData and call the server action
+    const formData = new FormData()
+    formData.set('message', text)
+    formData.set('sessionId', sessionId)
     sendAction(formData)
   }
 
@@ -183,7 +190,7 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
       {/* Input */}
       {!escalating && (
         <form
-          action={handleSubmit}
+          onSubmit={handleSubmit}
           className="flex items-center gap-2 border-t border-sage-light px-4 py-3"
         >
           <input type="hidden" name="sessionId" value={sessionId} />

@@ -29,11 +29,10 @@ test.describe('chatbot customer journey', () => {
     await input.fill('How do I create a listing?')
     await input.press('Enter')
 
-    // User message appears
+    // User message appears (optimistic render, should be instant)
     await expect(page.getByText('How do I create a listing?')).toBeVisible()
 
     // Bot responds — wait for server action round-trip + DOM update
-    // useActionState triggers a re-render; give it generous time in CI
     await expect(
       page.locator('.whitespace-pre-wrap').filter({ hasText: /listing/i }).nth(1)
     ).toBeVisible({ timeout: 15000 })
