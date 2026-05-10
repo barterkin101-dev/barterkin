@@ -45,7 +45,7 @@
     "id": "7",
     "title": "Add Error Boundary + Fallback UI",
     "priority": "medium",
-    "status": "pending",
+    "status": "in_progress",
     "notes": ""
   },
   {
@@ -59,8 +59,8 @@
     "id": "9",
     "title": "SEO / Meta Tags + Sitemap",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "COMPLETED: Added app/sitemap.ts (Next.js 13.3+ metadata API) generating sitemap.xml with static routes (home, listings, about, contact, legal pages) + dynamic listing routes from Supabase. Added app/robots.ts generating robots.txt with crawl rules and sitemap reference. Both use canonical URL from NEXT_PUBLIC_SITE_URL. Committed and pushed to origin main."
   },
   {
     "id": "10",
