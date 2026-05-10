@@ -3,7 +3,6 @@
 import { useState, useCallback } from 'react'
 import imageCompression from 'browser-image-compression'
 import { X, Upload, ImagePlus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { createClient } from '@/lib/supabase/client'
 import { isValidListingImageFile, LISTING_IMAGE_MAX_COUNT } from '@/lib/utils/listing-image-validation'

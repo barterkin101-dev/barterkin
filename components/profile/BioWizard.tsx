@@ -10,7 +10,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
@@ -44,7 +43,7 @@ const prompts = [
   },
 ]
 
-export function BioWizard({ userId, profile }: BioWizardProps) {
+export function BioWizard({ profile }: BioWizardProps) {
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [pending, setPending] = useState(false)

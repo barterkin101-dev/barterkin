@@ -160,8 +160,8 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
               required
             />
             <div className="flex gap-2">
-              <Button type="submit" size="sm" className="text-xs">
-                Create Ticket
+              <Button type="submit" size="sm" className="text-xs" disabled={ticketPending}>
+                {ticketPending ? 'Creating...' : 'Create Ticket'}
               </Button>
               <Button
                 type="button"
