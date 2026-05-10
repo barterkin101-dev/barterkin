@@ -16,6 +16,7 @@ export interface AdminStats {
   totalTickets: number
   totalDisputes: number
   totalConversations: number
+  totalMessages: number
 }
 
 export interface AdminMemberRow {
@@ -81,6 +82,7 @@ export async function getAdminStats(): Promise<AdminStats> {
     totalTickets,
     totalDisputes,
     totalConversations,
+    totalMessages,
   ] = await Promise.all([
     supabaseAdmin.from('profiles').select('id', { count: 'exact', head: true }),
     supabaseAdmin.from('contact_requests').select('id', { count: 'exact', head: true }),
@@ -92,15 +94,12 @@ export async function getAdminStats(): Promise<AdminStats> {
     supabaseAdmin.from('tickets').select('id', { count: 'exact', head: true }),
     supabaseAdmin.from('disputes').select('id', { count: 'exact', head: true }),
     supabaseAdmin.from('conversations').select('id', { count: 'exact', head: true }),
+    supabaseAdmin.from('messages').select('id', { count: 'exact', head: true }),
   ])
 
   if (totalMembers.error) {
     console.error('[getAdminStats] totalMembers error', { code: totalMembers.error.code })
     throw new Error(totalMembers.error.message)
-  }
-  if (totalContacts.error) {
-    console.error('[getAdminStats] totalContacts error', { code: totalContacts.error.code })
-    throw new Error(totalContacts.error.message)
   }
   if (newThisWeek.error) {
     console.error('[getAdminStats] newThisWeek error', { code: newThisWeek.error.code })
@@ -115,6 +114,7 @@ export async function getAdminStats(): Promise<AdminStats> {
     totalTickets: totalTickets.count ?? 0,
     totalDisputes: totalDisputes.count ?? 0,
     totalConversations: totalConversations.count ?? 0,
+    totalMessages: totalMessages.count ?? 0,
   }
 }
 

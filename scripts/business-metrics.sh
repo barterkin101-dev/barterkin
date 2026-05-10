@@ -74,7 +74,7 @@ MESSAGES=$(sb_count "messages" "")
 echo "💌 Messages: $MESSAGES"
 
 CONTACTS=$(sb_count "contact_requests" "")
-echo "📨 Contact Requests: $CONTACTS"
+echo "📨 Contact Requests (legacy): $CONTACTS"
 
 BANNED=$(sb_count "profiles" "banned=eq.true")
 echo "🚫 Banned Members: $BANNED"

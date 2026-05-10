@@ -1,5 +1,3 @@
-import type { Database } from '@/lib/database.types'
-
 export interface BlockMemberResult {
   ok: boolean
   error?: string
@@ -13,7 +11,18 @@ export interface ReportMemberResult {
   fieldErrors?: Record<string, string[]>
 }
 
-// Database row aliases — types resolve after migration 005 was applied and types regenerated (Plan 05-02).
-export type ContactRequestRow = Database['public']['Tables']['contact_requests']['Row']
-export type BlockRow = Database['public']['Tables']['blocks']['Row']
-export type ReportRow = Database['public']['Tables']['reports']['Row']
+export type BlockRow = {
+  blocker_id: string
+  blocked_id: string
+  created_at: string
+}
+
+export type ReportRow = {
+  id: string
+  reporter_id: string
+  target_profile_id: string
+  reason: string
+  note: string | null
+  status: string
+  created_at: string
+}
