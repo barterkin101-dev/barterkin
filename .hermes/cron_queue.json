@@ -1,0 +1,100 @@
+[
+  {
+    "id": "1",
+    "title": "Fix Vercel Deploy Token (GitHub Secret)",
+    "priority": "critical",
+    "status": "blocked",
+    "notes": "BLOCKED: Requires human action. The VERCEL_TOKEN GitHub secret is invalid/missing. No local Vercel credentials exist. Cannot authenticate with Vercel API from this server. ACTION NEEDED: (1) Generate a new Vercel token at https://vercel.com/account/tokens, (2) Add it as GitHub secret VERCEL_TOKEN at https://github.com/barterkin101-dev/barterkin/settings/secrets/actions, (3) Also verify VERCEL_ORG_ID and VERCEL_PROJECT_ID secrets are set."
+  },
+  {
+    "id": "2",
+    "title": "Add Missing Environment Variables to Vercel",
+    "priority": "high",
+    "status": "blocked",
+    "notes": "BLOCKED: Same root cause as task #1 — no valid Vercel token to authenticate with Vercel API. Cannot list or set env vars without authentication. Unblocks when task #1 is resolved."
+  },
+  {
+    "id": "3",
+    "title": "Fix Supabase Auth / Session Handling",
+    "priority": "high",
+    "status": "completed",
+    "notes": "COMPLETED: Audited auth patterns across the codebase. The auth architecture is already well-structured: middleware uses getClaims() (fast, JWKS-verified) for routing decisions with a getUser() fallback for OAuth edge cases; server components and server actions use getUser() for identity/trust decisions; client components use getUser() via browser client. No getSession() misuse found. Added a request-scoped session cache utility (getCachedUser) in listings/[id]/page.tsx to deduplicate getUser() calls within the same request — can be extracted to lib/supabase/server.ts if adopted elsewhere. All typecheck, lint, and unit tests pass."
+  },
+  {
+    "id": "4",
+    "title": "Add Input Validation + Sanitization",
+    "priority": "high",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "5",
+    "title": "Add Rate Limiting to Public Endpoints",
+    "priority": "high",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "6",
+    "title": "Add Health Check / Uptime Monitoring",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "7",
+    "title": "Add Error Boundary + Fallback UI",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "8",
+    "title": "Add Logging / Observability",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "9",
+    "title": "SEO / Meta Tags + Sitemap",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "10",
+    "title": "Add Loading States + Skeleton Screens",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "11",
+    "title": "Add Responsive / Mobile Polish",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "12",
+    "title": "Add Analytics (PostHog / Plausible / GA)",
+    "priority": "low",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "13",
+    "title": "Add E2E Tests (Playwright)",
+    "priority": "low",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "14",
+    "title": "Add Documentation (README + API Docs)",
+    "priority": "low",
+    "status": "pending",
+    "notes": ""
+  }
+]

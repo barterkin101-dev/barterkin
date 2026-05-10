@@ -209,3 +209,18 @@ async function isOwnListing(
     .maybeSingle()
   return profile?.id === profileId
 }
+
+// Session cache: deduplicate getUser() calls within the same request (Next.js request-scoped)
+const _sessionCache = new WeakMap<object, { user: Awaited<ReturnType<Awaited<ReturnType<typeof createClient>>['auth']['getUser']>>['data']['user'] | null }>()
+
+async function getCachedUser(supabase: Awaited<ReturnType<typeof createClient>>) {
+  // Use the cookie store as a stable key for the request scope
+  const cookieStore = await import('next/headers').then(m => m.cookies())
+  if (_sessionCache.has(cookieStore)) {
+    return _sessionCache.get(cookieStore)!
+  }
+  const { data: { user } } = await supabase.auth.getUser()
+  const result = { user }
+  _sessionCache.set(cookieStore, result)
+  return result
+}
