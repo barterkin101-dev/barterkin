@@ -96,7 +96,7 @@ After deploy, open Clarity dashboard. Within a few minutes you should see:
 | Endpoint | Trigger | Table | Condition |
 |----------|---------|-------|-----------|
 | `/webhook/welcome-email` | AFTER UPDATE | `profiles` | `onboarding_completed_at` NULL → value |
-| `/webhook/contact-request-alert` | AFTER INSERT | `contact_requests` | Every insert |
+| `/webhook/contact-request-alert` | AFTER INSERT | `contact_requests` | RETIRED — replaced by `/webhook/new-message` |
 | `/webhook/new-message` | AFTER INSERT | `messages` | Every insert |
 | `/webhook/new-ticket` | AFTER INSERT | `tickets` | Every insert |
 | `/webhook/new-dispute` | AFTER INSERT | `disputes` | Every insert |
