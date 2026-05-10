@@ -21,8 +21,8 @@ async function setOnboarding(ownerId: string, value: string | null) {
 
 /**
  * Creates a verified user with a complete profile and controllable onboarding_completed_at.
- * "Complete" means all 5 checklist items are filled so the middleware redirect does not
- * interfere with directory access once onboarding_completed_at is set.
+ * "Complete" means all 5 checklist items are filled so the proxy redirect does not
+ * fire (D-02).
  */
 async function createCompletedUser(prefix: string) {
   const admin = serviceRole()
@@ -88,19 +88,19 @@ async function loginAs(page: import('@playwright/test').Page, email: string, pas
 /**
  * Design note on test scope for "Finish setup" link visibility:
  *
- * The Phase 9 middleware redirects every verified-path (directory, profile, m/)
- * to /onboarding while onboarding_completed_at IS NULL. This means a user with
- * NULL timestamp is always intercepted BEFORE they reach an AppNav page.
- * The /onboarding route uses a separate (onboarding) route group with no AppNav.
- *
- * Therefore: the "Finish setup" link's VISIBLE state is only observable in a
- * DB-bypass scenario (direct URL manipulation while already authed). These 4
- * tests cover the observable regression guard: the link is HIDDEN for completed
- * users, and the Directory link is always present — which is the correct
- * contrapositive. If the showFinishSetup logic is inverted, these tests catch it.
- *
- * The "link is visible when NULL" case is covered indirectly by onboarding-redirect.spec.ts
- * D-02 (the middleware redirect IS the observable behavior for NULL users).
+   * The Phase 9 proxy redirects every verified-path (directory, profile, m/)
+   * to /onboarding while onboarding_completed_at IS NULL. This means a user with
+   * NULL timestamp is always intercepted BEFORE they reach an AppNav page.
+   * The /onboarding route uses a separate (onboarding) route group with no AppNav.
+   *
+   * Therefore: the "Finish setup" link's VISIBLE state is only observable in a
+   * DB-bypass scenario (direct URL manipulation while already authed). These 4
+   * tests cover the observable regression guard: the link is HIDDEN for completed
+   * users and HIDDEN for unauthed users (because unauthed users are redirected to
+   * /login before they reach /directory).
+   *
+   * The "link is visible when NULL" case is covered indirectly by onboarding-redirect.spec.ts
+   * D-02 (the proxy redirect IS the observable behavior for NULL users).
  */
 test.describe('AppNav "Finish setup" link (D-04, D-12)', () => {
   test('completed user (onboarding_completed_at set) navigating to /directory sees the normal AppNav without a "Finish setup" link', async ({ page }) => {
@@ -155,7 +155,7 @@ test.describe('AppNav "Finish setup" link (D-04, D-12)', () => {
     }
   })
 
-  test('middleware redirect integration: NULL-timestamp user never reaches /directory to see the nav (they are redirected to /onboarding instead) — contrapositive: landing on /directory implies onboarding_completed_at IS NOT NULL', async ({ page }) => {
+  test('proxy redirect integration: NULL-timestamp user never reaches /directory to see the nav (they are redirected to /onboarding instead) — contrapositive: landing on /directory implies onboarding_completed_at IS NOT NULL', async ({ page }) => {
     test.skip(!hasEnv, 'requires Supabase env')
     const { userId, email, password } = await createCompletedUser('nav4')
     try {

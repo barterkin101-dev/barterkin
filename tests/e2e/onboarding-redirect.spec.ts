@@ -95,7 +95,7 @@ test.describe('Onboarding redirect + wizard route (D-02, D-03, D-10, D-16)', () 
   // Until Plan 02 lands, this test will fail with 404; accepted as Wave 0 red.
   test('/onboarding responds with 200 (not 404)', async ({ page }) => {
     const response = await page.goto('/onboarding')
-    // The middleware will redirect unauth users to /login — either 200 or a redirect chain is fine;
+    // The proxy will redirect unauth users to /login — either 200 or a redirect chain is fine;
     // what we are asserting is NOT a 404 server error.
     expect(response?.status()).toBeLessThan(400)
   })

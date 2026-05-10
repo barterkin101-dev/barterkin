@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('session persistence (AUTH-03)', () => {
-  test('non-auth cookie survives a page reload through middleware (cookie adapter passthrough)', async ({ browser, baseURL }) => {
+  test('non-auth cookie survives a page reload through proxy (cookie adapter passthrough)', async ({ browser, baseURL }) => {
     // Create a fresh context — no shared cookie state with other tests.
     const context = await browser.newContext()
     const page = await context.newPage()
 
-    // Use a non-Supabase cookie to verify the middleware does not strip arbitrary
+    // Use a non-Supabase cookie to verify the proxy does not strip arbitrary
     // cookies. The Supabase auth cookie (`sb-<ref>-auth-token`) is actively
     // rewritten/cleared by @supabase/ssr when the value is not a valid JWT —
     // that behaviour is correct and by design. Verifying that a real Supabase
@@ -27,12 +27,12 @@ test.describe('session persistence (AUTH-03)', () => {
       },
     ])
 
-    // Load a public page — middleware runs the cookie adapter; non-auth cookies
+    // Load a public page — proxy runs the cookie adapter; non-auth cookies
     // must be left untouched.
     await page.goto('/')
     await page.reload()
 
-    // Assert the cookie is still present after the round-trip through middleware.
+    // Assert the cookie is still present after the round-trip through proxy.
     const cookies = await context.cookies(origin.origin)
     const probeCookie = cookies.find((cookie) => cookie.name === cookieName)
     expect(probeCookie).toBeDefined()

@@ -21,6 +21,6 @@ test.describe('verify-pending (AUTH-04)', () => {
     await expect(link).toHaveAttribute('href', 'mailto:contact@barterkin.com')
   })
 
-  // Full middleware redirect test requires an authed-unverified session.
+  // Full proxy redirect test requires an authed-unverified session.
   test.fixme('authed-but-unverified user is redirected from /directory to /verify-pending', async () => {})
 })
