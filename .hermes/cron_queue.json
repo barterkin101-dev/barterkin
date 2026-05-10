@@ -38,8 +38,8 @@
     "id": "6",
     "title": "Add Health Check / Uptime Monitoring",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "COMPLETED: Created lib/health-check.ts with dependency health checks for Supabase (REST HEAD), Upstash Redis (PING), and Resend (domain list). Two endpoints: GET /api/health (full check, returns 200/503 with no-cache headers) and GET /api/health/simple (lightweight edge ping for CDN/Vercel probes). Critical vs non-critical dependency classification — Supabase + Redis are critical, Resend is non-critical (degraded if it fails). Added 6 unit tests covering healthy, degraded, unhealthy, latency, and missing env var scenarios. All tests pass. Committed and pushed to origin main."
   },
   {
     "id": "7",
