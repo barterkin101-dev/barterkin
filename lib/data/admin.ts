@@ -76,16 +76,15 @@ export async function getAdminStats(): Promise<AdminStats> {
 
   const [
     totalMembers,
-    totalContacts,
+    totalMessages,
     newThisWeek,
     totalListings,
     totalTickets,
     totalDisputes,
     totalConversations,
-    totalMessages,
   ] = await Promise.all([
     supabaseAdmin.from('profiles').select('id', { count: 'exact', head: true }),
-    supabaseAdmin.from('contact_requests').select('id', { count: 'exact', head: true }),
+    supabaseAdmin.from('messages').select('id', { count: 'exact', head: true }),
     supabaseAdmin
       .from('profiles')
       .select('id', { count: 'exact', head: true })
@@ -94,7 +93,6 @@ export async function getAdminStats(): Promise<AdminStats> {
     supabaseAdmin.from('tickets').select('id', { count: 'exact', head: true }),
     supabaseAdmin.from('disputes').select('id', { count: 'exact', head: true }),
     supabaseAdmin.from('conversations').select('id', { count: 'exact', head: true }),
-    supabaseAdmin.from('messages').select('id', { count: 'exact', head: true }),
   ])
 
   if (totalMembers.error) {
@@ -108,7 +106,7 @@ export async function getAdminStats(): Promise<AdminStats> {
 
   return {
     totalMembers: totalMembers.count ?? 0,
-    totalContacts: totalContacts.count ?? 0,
+    totalContacts: totalMessages.count ?? 0,
     newThisWeek: newThisWeek.count ?? 0,
     totalListings: totalListings.count ?? 0,
     totalTickets: totalTickets.count ?? 0,
