@@ -1,5 +1,11 @@
 /**
- * Phase 8 — ADMIN-01 + ADMIN-05 — admin data layer contract
+ * Phase 8 — ADMIN-01 + ADMIN-05 + ADMIN-06 — admin data layer contract
+ *
+ * Tests the admin data layer against a live Supabase instance.
+ * Skipped when SUPABASE_SERVICE_ROLE_KEY is not available.
+ *
+ * NOTE: contact_requests table was retired and replaced by conversations/messages.
+ * This test file now seeds conversations + messages and tests getAdminConversations.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
@@ -12,7 +18,8 @@ d('Phase 8 — admin data layer', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let admin: any
   const fixtureUserIds: string[] = []
-  const fixtureContactIds: string[] = []
+  const fixtureConversationIds: string[] = []
+  const fixtureMessageIds: string[] = []
   const baseStamp = Date.now()
   let senderProfileId = ''
   let recipientProfileId = ''
@@ -49,25 +56,48 @@ d('Phase 8 — admin data layer', () => {
     return { userId, profileId: profile.id }
   }
 
-  async function seedContact(opts: {
-    sender_id: string
-    recipient_id: string
-    message?: string
-    status?: string
-  }): Promise<string> {
-    const { data, error } = await admin
-      .from('contact_requests')
-      .insert({
-        sender_id: opts.sender_id,
-        recipient_id: opts.recipient_id,
-        message: opts.message ?? 'Hello there this is a valid test message for admin data tests.',
-        status: opts.status ?? 'sent',
-      })
+  async function seedConversation(opts: {
+    participantIds: string[]
+    messageCount?: number
+  }): Promise<{ conversationId: string; messageIds: string[] }> {
+    // Create conversation
+    const { data: conv, error: convErr } = await admin
+      .from('conversations')
+      .insert({})
       .select('id')
       .single()
-    if (error) throw new Error(`insert contact: ${error.message}`)
-    fixtureContactIds.push(data.id)
-    return data.id
+    if (convErr) throw new Error(`insert conversation: ${convErr.message}`)
+    const conversationId = conv.id
+    fixtureConversationIds.push(conversationId)
+
+    // Add participants
+    for (const profileId of opts.participantIds) {
+      const { error: partErr } = await admin
+        .from('conversation_participants')
+        .insert({ conversation_id: conversationId, profile_id: profileId })
+      if (partErr) throw new Error(`insert participant: ${partErr.message}`)
+    }
+
+    // Seed messages
+    const messageIds: string[] = []
+    const count = opts.messageCount ?? 1
+    for (let i = 0; i < count; i++) {
+      const senderId = opts.participantIds[i % opts.participantIds.length]
+      const { data: msg, error: msgErr } = await admin
+        .from('messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_profile_id: senderId,
+          content: `Test message ${i + 1} from admin data test suite.`,
+        })
+        .select('id')
+        .single()
+      if (msgErr) throw new Error(`insert message: ${msgErr.message}`)
+      messageIds.push(msg.id)
+      fixtureMessageIds.push(msg.id)
+    }
+
+    return { conversationId, messageIds }
   }
 
   beforeAll(async () => {
@@ -78,24 +108,26 @@ d('Phase 8 — admin data layer', () => {
     senderProfileId = sender.profileId
     recipientProfileId = recipient.profileId
 
-    // Seed two contacts: one sent, one bounced
-    await seedContact({
-      sender_id: senderProfileId,
-      recipient_id: recipientProfileId,
-      status: 'sent',
+    // Seed two conversations: one with 1 message, one with 2 messages
+    await seedConversation({
+      participantIds: [senderProfileId, recipientProfileId],
+      messageCount: 1,
     })
-    await seedContact({
-      sender_id: senderProfileId,
-      recipient_id: recipientProfileId,
-      status: 'bounced',
-      message: 'This message will mark as bounced for admin test assertions here.',
+    await seedConversation({
+      participantIds: [senderProfileId, recipientProfileId],
+      messageCount: 2,
     })
   }, 60_000)
 
   afterAll(async () => {
     if (admin) {
-      for (const cid of fixtureContactIds) {
-        await admin.from('contact_requests').delete().eq('id', cid).catch(() => undefined)
+      // Clean up in reverse dependency order: messages → participants → conversations
+      for (const mid of fixtureMessageIds) {
+        await admin.from('messages').delete().eq('id', mid).catch(() => undefined)
+      }
+      for (const cid of fixtureConversationIds) {
+        await admin.from('conversation_participants').delete().eq('conversation_id', cid).catch(() => undefined)
+        await admin.from('conversations').delete().eq('id', cid).catch(() => undefined)
       }
       for (const uid of fixtureUserIds) {
         await admin.auth.admin.deleteUser(uid).catch(() => undefined)
@@ -103,23 +135,29 @@ d('Phase 8 — admin data layer', () => {
     }
   }, 60_000)
 
-  it('module exports 4 data functions', async () => {
+  it('module exports 5 data functions', async () => {
     const mod = await import('@/lib/data/admin')
     expect(typeof mod.getAdminStats).toBe('function')
     expect(typeof mod.getAdminMembers).toBe('function')
     expect(typeof mod.getAdminMemberById).toBe('function')
     expect(typeof mod.getAdminContacts).toBe('function')
+    expect(typeof mod.getAdminConversations).toBe('function')
   })
 
-  it('ADMIN-01 — getAdminStats returns non-negative integers for all 3 counts', async () => {
+  it('ADMIN-01 — getAdminStats returns non-negative integers for all counts', async () => {
     const { getAdminStats } = await import('@/lib/data/admin')
     const stats = await getAdminStats()
     expect(Number.isInteger(stats.totalMembers)).toBe(true)
     expect(stats.totalMembers).toBeGreaterThanOrEqual(2) // we just seeded 2
-    expect(Number.isInteger(stats.totalContacts)).toBe(true)
-    expect(stats.totalContacts).toBeGreaterThanOrEqual(2)
+    expect(Number.isInteger(stats.totalMessages)).toBe(true)
+    expect(stats.totalMessages).toBeGreaterThanOrEqual(3) // 1 + 2 messages seeded
     expect(Number.isInteger(stats.newThisWeek)).toBe(true)
     expect(stats.newThisWeek).toBeGreaterThanOrEqual(2)
+    expect(Number.isInteger(stats.totalListings)).toBe(true)
+    expect(Number.isInteger(stats.totalTickets)).toBe(true)
+    expect(Number.isInteger(stats.totalDisputes)).toBe(true)
+    expect(Number.isInteger(stats.totalConversations)).toBe(true)
+    expect(stats.totalConversations).toBeGreaterThanOrEqual(2)
   })
 
   it('getAdminMembers returns rows including our seeded sender + recipient', async () => {
@@ -148,34 +186,39 @@ d('Phase 8 — admin data layer', () => {
     expect(profile).toBeNull()
   })
 
-  it('ADMIN-05 — getAdminContacts (no status filter) returns rows newest-first', async () => {
+  it('ADMIN-05 — getAdminContacts (retired) returns empty array', async () => {
     const { getAdminContacts } = await import('@/lib/data/admin')
     const contacts = await getAdminContacts()
-    expect(contacts.length).toBeGreaterThanOrEqual(2)
-    // Verify descending created_at
-    for (let i = 1; i < contacts.length; i++) {
-      expect(new Date(contacts[i - 1].created_at).getTime()).toBeGreaterThanOrEqual(
-        new Date(contacts[i].created_at).getTime(),
+    expect(contacts).toEqual([])
+  })
+
+  it('ADMIN-06 — getAdminConversations returns rows with participant names and message counts', async () => {
+    const { getAdminConversations } = await import('@/lib/data/admin')
+    const conversations = await getAdminConversations()
+    expect(conversations.length).toBeGreaterThanOrEqual(2)
+
+    // Verify descending updated_at
+    for (let i = 1; i < conversations.length; i++) {
+      expect(new Date(conversations[i - 1].updated_at).getTime()).toBeGreaterThanOrEqual(
+        new Date(conversations[i].updated_at).getTime(),
       )
     }
-  })
 
-  it('ADMIN-05 — getAdminContacts(status=bounced) returns only bounced rows', async () => {
-    const { getAdminContacts } = await import('@/lib/data/admin')
-    const bounced = await getAdminContacts('bounced')
-    expect(bounced.length).toBeGreaterThanOrEqual(1)
-    for (const row of bounced) {
-      expect(row.status).toBe('bounced')
-    }
-  })
-
-  it('ADMIN-05 — getAdminContacts joins sender + recipient display_name via FK hints', async () => {
-    const { getAdminContacts } = await import('@/lib/data/admin')
-    const all = await getAdminContacts()
-    const ours = all.find(
-      (r) => r.sender_display_name === `AdminSender-${baseStamp}`,
+    // Verify our seeded conversations have correct participant names
+    const ours = conversations.filter((c) =>
+      c.participant_names.some((n) => n.includes(`AdminSender-${baseStamp}`)),
     )
-    expect(ours).toBeDefined()
-    expect(ours!.recipient_display_name).toBe(`AdminRecipient-${baseStamp}`)
+    expect(ours.length).toBeGreaterThanOrEqual(2)
+
+    // Verify message counts (1 and 2)
+    const counts = ours.map((c) => c.message_count).sort((a, b) => a - b)
+    expect(counts).toContain(1)
+    expect(counts).toContain(2)
+
+    // Verify last_message is populated
+    for (const c of ours) {
+      expect(c.last_message).not.toBeNull()
+      expect(c.last_message!.length).toBeGreaterThan(0)
+    }
   })
 })
