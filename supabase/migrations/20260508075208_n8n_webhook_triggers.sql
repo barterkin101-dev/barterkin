@@ -24,19 +24,12 @@ create trigger webhook_welcome_email
   );
 
 -- ============================================================================
--- SECTION 2: Contact request alert — fires on every contact_requests INSERT
+-- SECTION 2: RETIRED — Contact request alert trigger removed
+-- The email-based contact relay and contact_requests table have been replaced
+-- by in-app messaging (conversations + messages). The new-message trigger in
+-- Section 3 handles message alerts. This section is kept as a tombstone.
 -- ============================================================================
 drop trigger if exists webhook_contact_request on public.contact_requests;
-create trigger webhook_contact_request
-  after insert on public.contact_requests
-  for each row
-  execute function supabase_functions.http_request(
-    'https://n8n.barterkin.com/webhook/contact-request-alert',
-    'POST',
-    '{"Content-Type":"application/json","X-Barterkin-Webhook-Secret":"46cb811aa65c34d073f79d40d363687af5880961adba6333978d25b6f9f238bd"}',
-    '{}',
-    '5000'
-  );
 
 -- ============================================================================
 -- SECTION 3: New message alert — fires on every messages INSERT
