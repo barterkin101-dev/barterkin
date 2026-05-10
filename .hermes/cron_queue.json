@@ -31,8 +31,8 @@
     "id": "5",
     "title": "Add Rate Limiting to Public Endpoints",
     "priority": "high",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "COMPLETED: Created lib/rate-limit-public.ts with IP-based rate limiting for public/unauthenticated endpoints. Uses Upstash Redis in production with in-memory Map fallback for dev. Added getClientIp() helper parsing X-Forwarded-For / X-Real-IP / CF-Connecting-IP headers. Added 6 convenience presets: limitAuthRequest (5/15min), limitOAuthCallback (20/5min), limitChatbotMessage (30/1min), limitReportSubmission (5/hr), limitBlockAction (10/hr), limitGeneralApi (100/1min). Integrated rate limiting into: auth.ts (magic link — Layer 1 before Postgres counter), chatbot.ts (sendChatMessage), contact.ts (blockMember + reportMember), app/auth/callback/route.ts (OAuth callback brute-force protection), app/api/test-email/route.ts (dev-only endpoint). Existing user-based rate limiting (lib/rate-limit.ts) already covers: createListing, sendMessage, submitRating, createTicket, createDispute. Added comprehensive unit tests (9 tests) in tests/unit/rate-limit-public.test.ts covering memory fallback, blocking, window reset, and all preset functions. All new tests pass. Lint clean (0 errors). Pushed to origin main."
   },
   {
     "id": "6",
