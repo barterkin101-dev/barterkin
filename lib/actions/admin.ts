@@ -3,6 +3,8 @@ import 'server-only'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { AdminBanSchema } from '@/lib/schemas/admin'
+import { safeParse } from '@/lib/utils/validation'
 
 // ============================================================================
 // Phase 8 — ADMIN-04 ban/unban Server Actions
@@ -39,13 +41,15 @@ export async function banMember(profileId: string): Promise<BanResult> {
   const auth = await assertAdmin()
   if (!auth.ok) return { ok: false, error: auth.error }
 
-  if (!profileId || typeof profileId !== 'string') {
+  const parsed = safeParse(AdminBanSchema, { profileId })
+  if (!parsed) {
     return { ok: false, error: 'Invalid profile id.' }
   }
+
   const { error } = await supabaseAdmin
     .from('profiles')
     .update({ banned: true })
-    .eq('id', profileId)
+    .eq('id', parsed.profileId)
 
   if (error) {
     console.error('[banMember] update failed', { code: error.code })
@@ -55,7 +59,7 @@ export async function banMember(profileId: string): Promise<BanResult> {
   // Pitfall 3: invalidate BOTH the list page and the detail page; parent paths
   // are not automatically cleared by revalidating a child route.
   revalidatePath('/admin/members')
-  revalidatePath(`/admin/members/${profileId}`)
+  revalidatePath(`/admin/members/${parsed.profileId}`)
   // Directory visibility also changes — keep the public directory in sync.
   revalidatePath('/directory')
   return { ok: true }
@@ -65,13 +69,15 @@ export async function unbanMember(profileId: string): Promise<BanResult> {
   const auth = await assertAdmin()
   if (!auth.ok) return { ok: false, error: auth.error }
 
-  if (!profileId || typeof profileId !== 'string') {
+  const parsed = safeParse(AdminBanSchema, { profileId })
+  if (!parsed) {
     return { ok: false, error: 'Invalid profile id.' }
   }
+
   const { error } = await supabaseAdmin
     .from('profiles')
     .update({ banned: false })
-    .eq('id', profileId)
+    .eq('id', parsed.profileId)
 
   if (error) {
     console.error('[unbanMember] update failed', { code: error.code })
@@ -79,7 +85,7 @@ export async function unbanMember(profileId: string): Promise<BanResult> {
   }
 
   revalidatePath('/admin/members')
-  revalidatePath(`/admin/members/${profileId}`)
+  revalidatePath(`/admin/members/${parsed.profileId}`)
   revalidatePath('/directory')
   return { ok: true }
 }

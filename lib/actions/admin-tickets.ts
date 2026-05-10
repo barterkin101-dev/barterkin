@@ -2,6 +2,8 @@
 import 'server-only'
 import { revalidatePath } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { AdminTicketStatusSchema, AdminTicketReplySchema } from '@/lib/schemas/admin'
+import { validateAndSanitize } from '@/lib/utils/validation'
 import { assertAdmin } from './admin'
 
 export interface AdminUpdateTicketStatusResult {
@@ -21,25 +23,18 @@ export async function adminUpdateTicketStatus(
   const auth = await assertAdmin()
   if (!auth.ok) return { ok: false, error: auth.error }
 
-  const ticketId = formData.get('ticketId')
-  const status = formData.get('status')
-
-  if (!ticketId || typeof ticketId !== 'string') {
-    return { ok: false, error: 'Invalid ticket ID.' }
-  }
-  if (!status || typeof status !== 'string') {
-    return { ok: false, error: 'Invalid status.' }
-  }
-
-  const allowed = new Set(['open', 'in_progress', 'waiting', 'resolved', 'closed'])
-  if (!allowed.has(status)) {
-    return { ok: false, error: 'Invalid status value.' }
+  const parsed = validateAndSanitize(AdminTicketStatusSchema, {
+    ticketId: formData.get('ticketId'),
+    status: formData.get('status'),
+  })
+  if (!parsed.ok) {
+    return { ok: false, error: parsed.error }
   }
 
   const { error } = await supabaseAdmin
     .from('tickets')
-    .update({ status, updated_at: new Date().toISOString() })
-    .eq('id', ticketId)
+    .update({ status: parsed.data.status, updated_at: new Date().toISOString() })
+    .eq('id', parsed.data.ticketId)
 
   if (error) {
     console.error('[adminUpdateTicketStatus] failed', { code: error.code })
@@ -47,9 +42,9 @@ export async function adminUpdateTicketStatus(
   }
 
   revalidatePath('/admin/tickets')
-  revalidatePath(`/admin/tickets/${ticketId}`)
+  revalidatePath(`/admin/tickets/${parsed.data.ticketId}`)
   revalidatePath('/dashboard/tickets')
-  revalidatePath(`/dashboard/tickets/${ticketId}`)
+  revalidatePath(`/dashboard/tickets/${parsed.data.ticketId}`)
   return { ok: true }
 }
 
@@ -60,20 +55,18 @@ export async function adminReplyTicket(
   const auth = await assertAdmin()
   if (!auth.ok) return { ok: false, error: auth.error }
 
-  const ticketId = formData.get('ticketId')
-  const content = formData.get('content')
-
-  if (!ticketId || typeof ticketId !== 'string') {
-    return { ok: false, error: 'Invalid ticket ID.' }
-  }
-  if (!content || typeof content !== 'string' || content.trim().length === 0) {
-    return { ok: false, error: 'Reply cannot be empty.' }
+  const parsed = validateAndSanitize(AdminTicketReplySchema, {
+    ticketId: formData.get('ticketId'),
+    content: formData.get('content'),
+  })
+  if (!parsed.ok) {
+    return { ok: false, error: parsed.error }
   }
 
   const { error } = await supabaseAdmin.from('ticket_messages').insert({
-    ticket_id: ticketId,
+    ticket_id: parsed.data.ticketId,
     sender_profile_id: null, // null = system/admin
-    content: content.trim(),
+    content: parsed.data.content,
     is_internal: false,
   })
 
@@ -86,10 +79,10 @@ export async function adminReplyTicket(
   await supabaseAdmin
     .from('tickets')
     .update({ updated_at: new Date().toISOString() })
-    .eq('id', ticketId)
+    .eq('id', parsed.data.ticketId)
 
-  revalidatePath(`/admin/tickets/${ticketId}`)
-  revalidatePath(`/dashboard/tickets/${ticketId}`)
+  revalidatePath(`/admin/tickets/${parsed.data.ticketId}`)
+  revalidatePath(`/dashboard/tickets/${parsed.data.ticketId}`)
   return { ok: true }
 }
 

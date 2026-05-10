@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { RatingSchema } from '@/lib/schemas/ratings'
 import { captureEvent } from '@/lib/analytics'
 import { limitSubmitRating } from '@/lib/rate-limit'
+import { validateAndSanitize } from '@/lib/utils/validation'
 import type { SubmitRatingResult } from '@/lib/actions/ratings.types'
 
 export async function submitRating(
@@ -20,16 +21,17 @@ export async function submitRating(
     return { ok: false, error: 'Rate limit exceeded. Try again later.' }
   }
 
-  const parsed = RatingSchema.safeParse({
+  const parsed = validateAndSanitize(RatingSchema, {
     rateeProfileId: formData.get('rateeProfileId'),
     listingId: formData.get('listingId') || undefined,
     score: Number(formData.get('score')),
     reviewText: formData.get('reviewText') ?? '',
   })
-  if (!parsed.success) {
+  if (!parsed.ok) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? 'Please fix the highlighted fields.',
+      error: parsed.error,
+      fieldErrors: parsed.fieldErrors,
     }
   }
   const values = parsed.data

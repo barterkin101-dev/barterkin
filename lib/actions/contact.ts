@@ -9,6 +9,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { BlockSchema, ReportSchema } from '@/lib/schemas/contact'
+import { validateAndSanitize } from '@/lib/utils/validation'
 import type {
   ReportMemberResult,
 } from '@/lib/actions/contact.types'
@@ -22,13 +23,13 @@ export async function blockMember(formData: FormData): Promise<void> {
   const { data: { user }, error: authErr } = await supabase.auth.getUser()
   if (authErr || !user) redirect('/login')
 
-  const parsed = BlockSchema.safeParse({
+  const parsed = validateAndSanitize(BlockSchema, {
     blockedOwnerId: formData.get('blockedOwnerId'),
     blockedDisplayName: formData.get('blockedDisplayName'),
     blockedUsername: formData.get('blockedUsername'),
   })
-  if (!parsed.success) {
-    console.error('[blockMember] bad input', { issues: parsed.error.issues.length })
+  if (!parsed.ok) {
+    console.error('[blockMember] bad input', { issues: Object.keys(parsed.fieldErrors ?? {}) })
     redirect('/directory?blocked_error=1')
   }
 
@@ -62,17 +63,17 @@ export async function reportMember(
   if (authErr || !user) return { ok: false, code: 'unauthorized', error: 'Please sign in.' }
   if (!user.email_confirmed_at) return { ok: false, code: 'unauthorized', error: 'Verify your email first.' }
 
-  const parsed = ReportSchema.safeParse({
+  const parsed = validateAndSanitize(ReportSchema, {
     targetProfileId: formData.get('targetProfileId'),
     reason: formData.get('reason'),
     note: formData.get('note') ?? '',
   })
-  if (!parsed.success) {
+  if (!parsed.ok) {
     return {
       ok: false,
       code: 'bad_input',
-      error: 'Please fix the highlighted fields.',
-      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+      error: parsed.error,
+      fieldErrors: parsed.fieldErrors,
     }
   }
 

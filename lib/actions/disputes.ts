@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { DisputeSchema, DisputeMessageSchema, ResolveDisputeSchema } from '@/lib/schemas/disputes'
 import { captureEvent } from '@/lib/analytics'
 import { limitCreateDispute } from '@/lib/rate-limit'
+import { validateAndSanitize } from '@/lib/utils/validation'
 import type {
   CreateDisputeResult,
   AddDisputeMessageResult,
@@ -24,16 +25,17 @@ export async function createDispute(
     return { ok: false, error: 'Rate limit exceeded. Try again later.' }
   }
 
-  const parsed = DisputeSchema.safeParse({
+  const parsed = validateAndSanitize(DisputeSchema, {
     responderProfileId: formData.get('responderProfileId'),
     listingId: formData.get('listingId') || undefined,
     conversationId: formData.get('conversationId') || undefined,
     reason: formData.get('reason'),
   })
-  if (!parsed.success) {
+  if (!parsed.ok) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? 'Please fix the highlighted fields.',
+      error: parsed.error,
+      fieldErrors: parsed.fieldErrors,
     }
   }
   const values = parsed.data
@@ -87,14 +89,15 @@ export async function addDisputeMessage(
   const { data: { user }, error: authErr } = await supabase.auth.getUser()
   if (authErr || !user) return { ok: false, error: 'Not authenticated.' }
 
-  const parsed = DisputeMessageSchema.safeParse({
+  const parsed = validateAndSanitize(DisputeMessageSchema, {
     disputeId: formData.get('disputeId'),
     content: formData.get('content'),
   })
-  if (!parsed.success) {
+  if (!parsed.ok) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? 'Invalid message.',
+      error: parsed.error,
+      fieldErrors: parsed.fieldErrors,
     }
   }
   const values = parsed.data
@@ -150,15 +153,16 @@ export async function resolveDispute(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { ok: false, error: 'Not authenticated.' }
 
-  const parsed = ResolveDisputeSchema.safeParse({
+  const parsed = validateAndSanitize(ResolveDisputeSchema, {
     disputeId: formData.get('disputeId'),
     resolution: formData.get('resolution'),
     outcome: formData.get('outcome'),
   })
-  if (!parsed.success) {
+  if (!parsed.ok) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? 'Invalid input.',
+      error: parsed.error,
+      fieldErrors: parsed.fieldErrors,
     }
   }
   const values = parsed.data

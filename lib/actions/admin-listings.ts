@@ -2,6 +2,8 @@
 import 'server-only'
 import { revalidatePath } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { AdminListingModerationSchema } from '@/lib/schemas/admin'
+import { validateAndSanitize } from '@/lib/utils/validation'
 import { assertAdmin } from './admin'
 
 export interface AdminModerateListingResult {
@@ -16,25 +18,18 @@ export async function adminModerateListing(
   const auth = await assertAdmin()
   if (!auth.ok) return { ok: false, error: auth.error }
 
-  const listingId = formData.get('listingId')
-  const action = formData.get('action')
-
-  if (!listingId || typeof listingId !== 'string') {
-    return { ok: false, error: 'Invalid listing ID.' }
-  }
-  if (!action || typeof action !== 'string') {
-    return { ok: false, error: 'Invalid action.' }
-  }
-
-  const allowed = new Set(['active', 'paused', 'cancelled'])
-  if (!allowed.has(action)) {
-    return { ok: false, error: 'Invalid action value.' }
+  const parsed = validateAndSanitize(AdminListingModerationSchema, {
+    listingId: formData.get('listingId'),
+    action: formData.get('action'),
+  })
+  if (!parsed.ok) {
+    return { ok: false, error: parsed.error }
   }
 
   const { error } = await supabaseAdmin
     .from('listings')
-    .update({ status: action, updated_at: new Date().toISOString() })
-    .eq('id', listingId)
+    .update({ status: parsed.data.action, updated_at: new Date().toISOString() })
+    .eq('id', parsed.data.listingId)
 
   if (error) {
     console.error('[adminModerateListing] failed', { code: error.code })
@@ -42,9 +37,9 @@ export async function adminModerateListing(
   }
 
   revalidatePath('/admin/listings')
-  revalidatePath(`/admin/listings/${listingId}`)
+  revalidatePath(`/admin/listings/${parsed.data.listingId}`)
   revalidatePath('/listings')
-  revalidatePath(`/listings/${listingId}`)
+  revalidatePath(`/listings/${parsed.data.listingId}`)
   revalidatePath('/dashboard/listings')
   return { ok: true }
 }

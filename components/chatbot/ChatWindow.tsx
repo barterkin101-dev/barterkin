@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, startTransition, useActionState } from 'react'
+import { useState, useRef, useEffect, startTransition, useActionState, useCallback } from 'react'
 import { ChatMessage } from './ChatMessage'
 import { sendChatMessage, createTicketFromChat } from '@/lib/actions/chatbot'
 import type { SendMessageResult, CreateTicketFromChatResult } from '@/lib/actions/chatbot'
@@ -34,6 +34,7 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
   const [escalating, setEscalating] = useState(false)
   const [ticketSubject, setTicketSubject] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
 
   const [sendState, sendAction, sendPending] = useActionState<SendMessageResult | null, FormData>(
     sendChatMessage,
@@ -93,10 +94,12 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
     }
   }, [ticketState])
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    e.stopPropagation()
+    
     const text = input.trim()
-    if (!text) return
+    if (!text || sendPending) return
 
     // Optimistically add user message immediately
     setMessages((prev) => [...prev, { role: 'user', content: text }])
@@ -107,9 +110,17 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
     formData.set('message', text)
     formData.set('sessionId', sessionId)
     sendAction(formData)
-  }
+  }, [input, sendPending, sessionId, sendAction])
 
-  const handleAction = (action: string) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      e.stopPropagation()
+      formRef.current?.requestSubmit()
+    }
+  }, [])
+
+  const handleAction = useCallback((action: string) => {
     if (action === 'escalate') {
       setEscalating(true)
       setMessages((prev) => [
@@ -120,7 +131,7 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
         },
       ])
     }
-  }
+  }, [])
 
   return (
     <div className="flex h-[480px] w-[360px] flex-col rounded-2xl bg-white shadow-2xl ring-1 ring-sage-light">
@@ -190,6 +201,7 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
       {/* Input */}
       {!escalating && (
         <form
+          ref={formRef}
           onSubmit={handleSubmit}
           className="flex items-center gap-2 border-t border-sage-light px-4 py-3"
         >
@@ -198,6 +210,7 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
             name="message"
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             className="flex-1 rounded-full border border-sage-light bg-sage-pale px-4 py-2 text-sm placeholder:text-forest-mid/50 focus:outline-none focus:ring-2 focus:ring-forest-deep/20"
             autoComplete="off"

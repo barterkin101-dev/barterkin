@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { TicketSchema, TicketMessageSchema } from '@/lib/schemas/tickets'
 import { captureEvent } from '@/lib/analytics'
 import { limitCreateTicket } from '@/lib/rate-limit'
+import { validateAndSanitize } from '@/lib/utils/validation'
 import type {
   CreateTicketResult,
   AddTicketMessageResult,
@@ -23,16 +24,17 @@ export async function createTicket(
     return { ok: false, error: 'Rate limit exceeded. Try again later.' }
   }
 
-  const parsed = TicketSchema.safeParse({
+  const parsed = validateAndSanitize(TicketSchema, {
     subject: formData.get('subject'),
     description: formData.get('description'),
     category: formData.get('category'),
     priority: formData.get('priority') ?? 'normal',
   })
-  if (!parsed.success) {
+  if (!parsed.ok) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? 'Please fix the highlighted fields.',
+      error: parsed.error,
+      fieldErrors: parsed.fieldErrors,
     }
   }
   const values = parsed.data
@@ -82,14 +84,15 @@ export async function addTicketMessage(
   const { data: { user }, error: authErr } = await supabase.auth.getUser()
   if (authErr || !user) return { ok: false, error: 'Not authenticated.' }
 
-  const parsed = TicketMessageSchema.safeParse({
+  const parsed = validateAndSanitize(TicketMessageSchema, {
     ticketId: formData.get('ticketId'),
     content: formData.get('content'),
   })
-  if (!parsed.success) {
+  if (!parsed.ok) {
     return {
       ok: false,
-      error: parsed.error.issues[0]?.message ?? 'Invalid message.',
+      error: parsed.error,
+      fieldErrors: parsed.fieldErrors,
     }
   }
   const values = parsed.data

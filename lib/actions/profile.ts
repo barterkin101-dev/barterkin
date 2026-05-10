@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { ProfileFormSchema } from '@/lib/schemas/profile'
 import { generateSlug } from '@/lib/utils/slug'
+import { validateAndSanitize } from '@/lib/utils/validation'
 import type {
   SaveProfileResult,
   SetPublishedResult,
@@ -84,14 +85,14 @@ export async function saveProfile(
   if (authError || !user) return { ok: false, error: 'Not authenticated.' }
 
   const input = _coerceFormDataToProfileInput(formData)
-  const parsed = ProfileFormSchema.safeParse(input)
-  if (!parsed.success) {
+  const parsed = validateAndSanitize(ProfileFormSchema, input)
+  if (!parsed.ok) {
     // Never log field values (PII). Return flattened errors to UI.
-    console.error('[saveProfile] zod validation failed', { issues: parsed.error.issues.length })
+    console.error('[saveProfile] validation failed', { issues: Object.keys(parsed.fieldErrors ?? {}) })
     return {
       ok: false,
-      error: 'Please fix the highlighted fields.',
-      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+      error: parsed.error,
+      fieldErrors: parsed.fieldErrors,
     }
   }
   const values = parsed.data

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { SendMessageSchema, CreateConversationSchema } from '@/lib/schemas/messaging'
 import { captureEvent } from '@/lib/analytics'
 import { limitSendMessage } from '@/lib/rate-limit'
+import { validateAndSanitize } from '@/lib/utils/validation'
 import type {
   SendMessageResult,
   CreateConversationResult,
@@ -24,12 +25,12 @@ export async function sendMessage(
     return { ok: false, error: 'Rate limit exceeded. Please slow down.' }
   }
 
-  const parsed = SendMessageSchema.safeParse({
+  const parsed = validateAndSanitize(SendMessageSchema, {
     conversationId: formData.get('conversationId'),
     content: formData.get('content'),
   })
-  if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid message.' }
+  if (!parsed.ok) {
+    return { ok: false, error: parsed.error, fieldErrors: parsed.fieldErrors }
   }
   const values = parsed.data
 
@@ -98,13 +99,13 @@ export async function createConversation(
     return { ok: false, error: 'Rate limit exceeded. Please slow down.' }
   }
 
-  const parsed = CreateConversationSchema.safeParse({
+  const parsed = validateAndSanitize(CreateConversationSchema, {
     recipientProfileId: formData.get('recipientProfileId'),
     listingId: formData.get('listingId') || undefined,
     initialMessage: formData.get('initialMessage'),
   })
-  if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid input.' }
+  if (!parsed.ok) {
+    return { ok: false, error: parsed.error, fieldErrors: parsed.fieldErrors }
   }
   const values = parsed.data
 

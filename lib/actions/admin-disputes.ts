@@ -2,6 +2,8 @@
 import 'server-only'
 import { revalidatePath } from 'next/cache'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { AdminDisputeMediationSchema, AdminDisputeResolutionSchema } from '@/lib/schemas/admin'
+import { validateAndSanitize } from '@/lib/utils/validation'
 import { assertAdmin } from './admin'
 
 export interface AdminMediateDisputeResult {
@@ -21,25 +23,20 @@ export async function adminMediateDispute(
   const auth = await assertAdmin()
   if (!auth.ok) return { ok: false, error: auth.error }
 
-  const disputeId = formData.get('disputeId')
-  const content = formData.get('content')
-  const mediatorProfileId = formData.get('mediatorProfileId')
-
-  if (!disputeId || typeof disputeId !== 'string') {
-    return { ok: false, error: 'Invalid dispute ID.' }
-  }
-  if (!content || typeof content !== 'string' || content.trim().length === 0) {
-    return { ok: false, error: 'Message cannot be empty.' }
-  }
-  if (!mediatorProfileId || typeof mediatorProfileId !== 'string') {
-    return { ok: false, error: 'Mediator profile required.' }
+  const parsed = validateAndSanitize(AdminDisputeMediationSchema, {
+    disputeId: formData.get('disputeId'),
+    content: formData.get('content'),
+    mediatorProfileId: formData.get('mediatorProfileId'),
+  })
+  if (!parsed.ok) {
+    return { ok: false, error: parsed.error }
   }
 
   // Insert mediator message
   const { error: msgErr } = await supabaseAdmin.from('dispute_messages').insert({
-    dispute_id: disputeId,
-    sender_profile_id: mediatorProfileId,
-    content: content.trim(),
+    dispute_id: parsed.data.disputeId,
+    sender_profile_id: parsed.data.mediatorProfileId,
+    content: parsed.data.content,
   })
 
   if (msgErr) {
@@ -52,10 +49,10 @@ export async function adminMediateDispute(
     .from('disputes')
     .update({
       status: 'mediating',
-      mediator_profile_id: mediatorProfileId,
+      mediator_profile_id: parsed.data.mediatorProfileId,
       updated_at: new Date().toISOString(),
     })
-    .eq('id', disputeId)
+    .eq('id', parsed.data.disputeId)
     .eq('status', 'open')
 
   if (updateErr) {
@@ -63,8 +60,8 @@ export async function adminMediateDispute(
     // Don't fail — message was sent
   }
 
-  revalidatePath(`/admin/disputes/${disputeId}`)
-  revalidatePath(`/dashboard/disputes/${disputeId}`)
+  revalidatePath(`/admin/disputes/${parsed.data.disputeId}`)
+  revalidatePath(`/dashboard/disputes/${parsed.data.disputeId}`)
   revalidatePath('/admin/disputes')
   revalidatePath('/dashboard/disputes')
   return { ok: true }
@@ -77,43 +74,35 @@ export async function adminResolveDispute(
   const auth = await assertAdmin()
   if (!auth.ok) return { ok: false, error: auth.error }
 
-  const disputeId = formData.get('disputeId')
-  const resolution = formData.get('resolution')
-  const outcome = formData.get('outcome')
-  const mediatorProfileId = formData.get('mediatorProfileId')
-
-  if (!disputeId || typeof disputeId !== 'string') {
-    return { ok: false, error: 'Invalid dispute ID.' }
-  }
-  if (!resolution || typeof resolution !== 'string' || resolution.trim().length === 0) {
-    return { ok: false, error: 'Resolution is required.' }
-  }
-  if (!outcome || typeof outcome !== 'string') {
-    return { ok: false, error: 'Outcome is required.' }
-  }
-  if (!mediatorProfileId || typeof mediatorProfileId !== 'string') {
-    return { ok: false, error: 'Mediator profile required.' }
+  const parsed = validateAndSanitize(AdminDisputeResolutionSchema, {
+    disputeId: formData.get('disputeId'),
+    resolution: formData.get('resolution'),
+    outcome: formData.get('outcome'),
+    mediatorProfileId: formData.get('mediatorProfileId'),
+  })
+  if (!parsed.ok) {
+    return { ok: false, error: parsed.error }
   }
 
   const { error } = await supabaseAdmin
     .from('disputes')
     .update({
       status: 'resolved',
-      resolution: resolution.trim(),
-      resolution_outcome: outcome,
-      mediator_profile_id: mediatorProfileId,
+      resolution: parsed.data.resolution,
+      resolution_outcome: parsed.data.outcome,
+      mediator_profile_id: parsed.data.mediatorProfileId,
       resolved_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
-    .eq('id', disputeId)
+    .eq('id', parsed.data.disputeId)
 
   if (error) {
     console.error('[adminResolveDispute] failed', { code: error.code })
     return { ok: false, error: error.message }
   }
 
-  revalidatePath(`/admin/disputes/${disputeId}`)
-  revalidatePath(`/dashboard/disputes/${disputeId}`)
+  revalidatePath(`/admin/disputes/${parsed.data.disputeId}`)
+  revalidatePath(`/dashboard/disputes/${parsed.data.disputeId}`)
   revalidatePath('/admin/disputes')
   revalidatePath('/dashboard/disputes')
   return { ok: true }

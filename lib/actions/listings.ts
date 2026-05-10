@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ListingFormSchema } from '@/lib/schemas/listings'
 import { captureEvent } from '@/lib/analytics'
 import { limitCreateListing } from '@/lib/rate-limit'
+import { validateAndSanitize } from '@/lib/utils/validation'
 import type {
   SaveListingResult,
   DeleteListingResult,
@@ -61,15 +62,15 @@ export async function saveListing(
   if (authErr || !user) return { ok: false, error: 'Not authenticated.' }
 
   const input = coerceFormDataToListingInput(formData)
-  const parsed = ListingFormSchema.safeParse(input)
-  if (!parsed.success) {
-    console.error('[saveListing] zod validation failed', {
-      issues: parsed.error.issues.length,
+  const parsed = validateAndSanitize(ListingFormSchema, input)
+  if (!parsed.ok) {
+    console.error('[saveListing] validation failed', {
+      fieldErrors: parsed.fieldErrors ? Object.keys(parsed.fieldErrors) : [],
     })
     return {
       ok: false,
-      error: 'Please fix the highlighted fields.',
-      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+      error: parsed.error,
+      fieldErrors: parsed.fieldErrors,
     }
   }
   const values = parsed.data
