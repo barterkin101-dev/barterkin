@@ -1,11 +1,9 @@
 -- Phase 10 — n8n Webhook Triggers
 -- Requirements: D-03 (welcome-email fires ONLY on onboarding_completed_at NULL->timestamp transition),
---               D-05 (contact-request-alert fires on every contact_requests INSERT),
+--               D-05 (contact-request-alert fires on every contact_requests INSERT) — RETIRED,
 --               D-06 (WhatsApp leg data-only; no DB change needed)
 -- Depends on: 003_profile_tables.sql (profiles.owner_id, profiles.display_name — email resolving
 --               and display name lookups used in Sections 1 and 2),
---             005_contact_relay_trust.sql (contact_requests table — target of Section 2 RPC
---               and contact-request-alert trigger in Section 3),
 --             009_onboarding.sql (profiles.onboarding_completed_at — WHEN clause in Section 3
 --               welcome-email trigger depends on this column existing)
 -- Security: Uses CUSTOM header X-Barterkin-Webhook-Secret (NOT Authorization) to dodge
@@ -44,9 +42,10 @@ comment on function public.profile_owner_email(uuid) is
    Only service_role (n8n HTTP Request node using the Supabase service-role key) may invoke.';
 
 -- ============================================================================
--- SECTION 2: contact_request_alert_payload RPC (n8n contact-request-alert workflow uses this)
--- Webhook payload has sender_id + recipient_id UUIDs only; this RPC resolves both
--- display names and created_at in one round trip so the workflow doesn't fan out.
+-- SECTION 2: RETIRED — contact_request_alert_payload RPC
+-- The email-based contact relay and contact_requests table have been replaced by
+-- in-app messaging (conversations + messages). This function is kept as a no-op
+-- tombstone for backward compatibility with any external callers.
 -- ============================================================================
 create or replace function public.contact_request_alert_payload(p_contact_request_id uuid)
 returns jsonb
@@ -54,16 +53,8 @@ language sql
 security definer
 set search_path = public, pg_temp
 as $$
-  select jsonb_build_object(
-           'sender_display_name',    coalesce(s.display_name, '(unknown sender)'),
-           'recipient_display_name', coalesce(r.display_name, '(unknown recipient)'),
-           'created_at',             cr.created_at
-         )
-    from public.contact_requests cr
-    left join public.profiles s on s.id = cr.sender_id
-    left join public.profiles r on r.id = cr.recipient_id
-   where cr.id = p_contact_request_id
-   limit 1;
+  -- No-op: contact_requests table retired. Use message_alert_payload instead.
+  select null::jsonb;
 $$;
 
 revoke execute on function public.contact_request_alert_payload(uuid) from public;
@@ -72,10 +63,8 @@ revoke execute on function public.contact_request_alert_payload(uuid) from authe
 grant  execute on function public.contact_request_alert_payload(uuid) to   service_role;
 
 comment on function public.contact_request_alert_payload(uuid) is
-  'Phase 10 — resolves sender/recipient display names + created_at for the n8n
-   contact-request-alert workflow. SECURITY DEFINER because direct profile reads by
-   service_role are already allowed, but this keeps a single call contract. Only
-   service_role may invoke.';
+  'RETIRED — Phase 10. The contact_requests table has been replaced by in-app messaging.
+   This function is now a no-op. Use message_alert_payload for the messaging system.';
 
 -- ============================================================================
 -- SECTION 3: Re-create the Studio-managed triggers with WHEN clause + custom header
@@ -109,11 +98,9 @@ comment on function public.contact_request_alert_payload(uuid) is
 --     '5000'
 --   );
 
--- Contact-request-alert trigger: fires on every INSERT; no WHEN clause needed.
--- Replace <trigger_name_contact> with the real name from pg_trigger.
--- Recreated here for two reasons:
---   1. Ensures the header is X-Barterkin-Webhook-Secret (future Studio edits won't clobber this migration source of truth).
---   2. Makes the migration file a self-contained source of truth for both triggers.
+-- Contact-request-alert trigger: RETIRED — contact_requests table replaced by in-app messaging.
+-- The trigger below is commented out as a tombstone. If n8n still references this webhook,
+-- update the n8n workflow to use /webhook/new-message instead.
 -- PLACEHOLDER: uncomment after substituting real trigger names.
 -- DROP TRIGGER IF EXISTS <trigger_name_contact> ON public.contact_requests;
 -- CREATE TRIGGER <trigger_name_contact>

@@ -1,26 +1,25 @@
--- Phase 5 (fix H-02) — Narrow contact_requests UPDATE to seen_at only
--- Problem: the contact_requests_mark_seen UPDATE RLS policy gates *which rows* a recipient
---          can update but not *which columns* — a user can UPDATE any column via direct API.
--- Fix: revoke direct UPDATE from authenticated; expose a narrow SECURITY DEFINER function
---      that only sets seen_at, and grant execute only to authenticated.
+-- Phase 5 (fix H-02) — RETIRED
+-- The email-based contact relay and contact_requests table have been replaced by
+-- in-app messaging (conversations + messages). This migration is preserved as a
+-- tombstone to document the retirement. The function and table references below
+-- are no-op safe (IF EXISTS / OR REPLACE) and will not affect the current schema.
 
--- Drop the overly-broad UPDATE policy
+-- Legacy: drop the overly-broad UPDATE policy (table no longer exists)
 drop policy if exists "contact_requests_mark_seen" on public.contact_requests;
 
--- Revoke direct UPDATE privilege from the authenticated role
+-- Legacy: revoke direct UPDATE (table no longer exists)
 revoke update on public.contact_requests from authenticated;
 
--- Narrow SECURITY DEFINER function: only sets seen_at on the caller's received rows
+-- Legacy: mark_contacts_seen function — kept for backward compatibility with
+-- any external callers. It is now a no-op since contact_requests is retired.
 create or replace function public.mark_contacts_seen(p_recipient_profile_id uuid)
 returns void
 language sql
 security definer
 set search_path = public, pg_temp
 as $$
-  update public.contact_requests
-     set seen_at = now()
-   where recipient_id = p_recipient_profile_id
-     and seen_at is null;
+  -- No-op: contact_requests table retired. Use mark_conversation_read instead.
+  select 1 where false;
 $$;
 
 -- Restrict execute: authenticated callers only (not public/anon)
@@ -29,4 +28,4 @@ revoke execute on function public.mark_contacts_seen(uuid) from anon;
 grant execute on function public.mark_contacts_seen(uuid) to authenticated;
 
 comment on function public.mark_contacts_seen(uuid) is
-  'Phase 5 (fix H-02) — sets seen_at = now() on all unseen contact_requests where recipient_id matches the supplied profile id. SECURITY DEFINER so only seen_at is ever mutated; direct UPDATE on contact_requests has been revoked from authenticated.';
+  'RETIRED — Phase 5 (fix H-02). The contact_requests table has been replaced by in-app messaging. This function is now a no-op. Use mark_conversation_read for the messaging system.';

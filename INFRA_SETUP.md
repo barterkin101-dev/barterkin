@@ -108,7 +108,6 @@ After deploy, open Clarity dashboard. Within a few minutes you should see:
 | Function | Purpose |
 |----------|---------|
 | `profile_owner_email(uuid)` | Resolve auth email from profile ID |
-| `contact_request_alert_payload(uuid)` | Sender/recipient names + created_at |
 | `message_alert_payload(uuid)` | Sender name, conversation participants, preview |
 | `ticket_alert_payload(uuid)` | Ticket details + profile name. **Refined:** includes `source` (web/chatbot/email), `user_email`, and falls back to `user_email` for anonymous chatbot tickets |
 | `dispute_alert_payload(uuid)` | Dispute reason + participant names |

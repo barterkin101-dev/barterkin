@@ -874,10 +874,6 @@ export type Database = {
           sender_username: string
         }[]
       }
-      contact_request_alert_payload: {
-        Args: { p_contact_request_id: string }
-        Returns: Json
-      }
       current_user_is_verified: { Args: never; Returns: boolean }
       dispute_alert_payload: { Args: { p_dispute_id: string }; Returns: Json }
       find_conversation_between: {
@@ -885,10 +881,6 @@ export type Database = {
         Returns: {
           id: string
         }[]
-      }
-      mark_contacts_seen: {
-        Args: { p_recipient_profile_id: string }
-        Returns: undefined
       }
       message_alert_payload: { Args: { p_message_id: string }; Returns: Json }
       profile_owner_email: { Args: { p_profile_id: string }; Returns: string }
