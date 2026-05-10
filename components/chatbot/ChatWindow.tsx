@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useRef, useEffect, startTransition } from 'react'
-import { useFormState, useFormStatus } from 'react-dom'
+import { useState, useRef, useEffect, startTransition, useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { ChatMessage } from './ChatMessage'
 import { sendChatMessage, createTicketFromChat } from '@/lib/actions/chatbot'
 import type { SendMessageResult, CreateTicketFromChatResult } from '@/lib/actions/chatbot'
@@ -37,12 +37,12 @@ export function ChatWindow({ onClose }: { onClose: () => void }) {
   const [ticketSubject, setTicketSubject] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  const [sendState, sendAction] = useFormState<SendMessageResult | null, FormData>(
+  const [sendState, sendAction, sendPending] = useActionState<SendMessageResult | null, FormData>(
     sendChatMessage,
     null,
   )
 
-  const [ticketState, ticketAction] = useFormState<CreateTicketFromChatResult | null, FormData>(
+  const [ticketState, ticketAction, ticketPending] = useActionState<CreateTicketFromChatResult | null, FormData>(
     createTicketFromChat,
     null,
   )
