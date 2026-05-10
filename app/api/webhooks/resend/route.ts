@@ -4,7 +4,7 @@
 // This route is preserved for backward compatibility with any outstanding Resend
 // webhook subscriptions, but new contact flows do not create contact_requests rows.
 // Source: 05-RESEARCH.md §Pattern 4 + https://resend.com/docs/dashboard/webhooks/verify-webhooks-requests
-// Middleware already excludes /api/webhooks (see middleware.ts matcher) — no auth gating on this route.
+// Proxy already excludes /api/webhooks (see proxy.ts matcher) — no auth gating on this route.
 // Security: svix HMAC signature verification via resend.webhooks.verify() (T-5-03-01)
 
 import 'server-only'

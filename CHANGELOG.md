@@ -42,7 +42,7 @@ No external dependencies were added. The admin guard uses JWKS-verified claims, 
 - `components/layout/NavLinks.tsx` — conditional "Finish setup →" link rendered before the Directory link when `showFinishSetup` is true
 - `app/(app)/profile/edit/page.tsx` — reads `?returnTo` searchParam, validates via `safeReturnTo()`, passes to form
 - `components/profile/ProfileEditForm.tsx` — accepts `returnTo` prop; `router.push(returnTo)` on save success when set, `toast('Profile saved.')` otherwise
-- `lib/supabase/middleware.ts` — two new guard blocks: admin email check (Phase 8) and onboarding redirect (Phase 9)
+- `lib/supabase/middleware.ts` — two new guard blocks: admin email check (Phase 8) and onboarding redirect (Phase 9). Note: `middleware.ts` renamed to `proxy.ts` per Next.js 16 convention.
 - `app/layout.tsx` — added `icons` field to metadata (favicon + Apple touch icon)
 - `app/opengraph-image.tsx` — added Barterkin logo mark to the OG image
 

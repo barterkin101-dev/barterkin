@@ -57,7 +57,7 @@ grant execute on function public.check_signup_ip(text) to authenticated;
 -- so Phase 3 can reference it without adding a migration dependency
 -- between the auth-helper migration and the profiles-schema migration.
 -- Phase 2 enforces AUTH-04 at the middleware layer (lib/supabase/
--- middleware.ts VERIFIED_REQUIRED_PREFIXES gate); the RLS-layer gate
+-- proxy.ts VERIFIED_REQUIRED_PREFIXES gate); the RLS-layer gate
 -- completes in Phase 3.
 ----------------------------------------------------------------------
 create or replace function public.current_user_is_verified()
