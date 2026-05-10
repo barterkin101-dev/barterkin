@@ -1,0 +1,15 @@
+import { Skeleton } from '@/components/ui/skeleton'
+
+export default function RootLoading() {
+  return (
+    <div className="mx-auto max-w-5xl px-6 py-12 space-y-8">
+      <Skeleton className="h-10 w-64" />
+      <Skeleton className="h-16 w-full" />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Skeleton key={i} className="h-64 w-full" />
+        ))}
+      </div>
+    </div>
+  )
+}

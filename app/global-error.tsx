@@ -1,6 +1,9 @@
 'use client'
 
+import { ErrorState } from '@/components/ui/ErrorState'
+
 export default function GlobalError({
+  error,
   reset,
 }: {
   error: Error & { digest?: string }
@@ -8,11 +11,14 @@ export default function GlobalError({
 }) {
   return (
     <html lang="en">
-      <body style={{ fontFamily: 'sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', margin: 0 }}>
-        <div style={{ textAlign: 'center' }}>
-          <h2>Something went wrong</h2>
-          <button onClick={reset}>Try again</button>
-        </div>
+      <body>
+        <ErrorState
+          title="Something went wrong"
+          message={error?.message || 'We encountered an unexpected error. Please try again.'}
+          reset={reset}
+          showHome={false}
+          showBack={false}
+        />
       </body>
     </html>
   )
