@@ -3,6 +3,8 @@ import { render } from '@testing-library/react'
 import { ListingJsonLd } from '@/components/seo/ListingJsonLd'
 import type { ListingRow } from '@/lib/data/listings.types'
 
+const TEST_SITE_URL = 'https://www.barterkin.com'
+
 function makeListing(overrides: Partial<ListingRow> = {}): ListingRow {
   return {
     id: 'test-id',
@@ -104,11 +106,16 @@ describe('ListingJsonLd', () => {
     expect(data.itemCondition).toBeUndefined()
   })
 
-  it('falls back to OG image when no listing images', () => {
+  it('falls back to OG image when no listing images', async () => {
+    const original = process.env.NEXT_PUBLIC_SITE_URL
+    process.env.NEXT_PUBLIC_SITE_URL = TEST_SITE_URL
+    vi.resetModules()
+    const { ListingJsonLd: DynamicListingJsonLd } = await import('@/components/seo/ListingJsonLd')
     const listing = makeListing({ images: [] })
-    const { container } = render(<ListingJsonLd listing={listing} />)
+    const { container } = render(<DynamicListingJsonLd listing={listing} />)
     const data = JSON.parse(container.querySelector('script')!.textContent!)
-    expect(data.image).toEqual(['https://www.barterkin.com/opengraph-image'])
+    expect(data.image).toEqual([`${TEST_SITE_URL}/opengraph-image`])
+    process.env.NEXT_PUBLIC_SITE_URL = original
   })
 
   it('includes areaServed as Georgia', () => {
