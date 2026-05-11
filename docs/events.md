@@ -3,38 +3,98 @@
 PostHog is the source of truth for product metrics on Barterkin. Events fired in this file MUST match the schema documented here — any drift between code and this doc is a bug.
 
 **Project:** PostHog project id `387571` (US host: `https://us.i.posthog.com`).
-**Firing pattern:** server-side via `posthog-node` from the Phase 5 Supabase Edge Function `send-contact`, or client-side via `posthog-js` from client components when user-context is needed.
+**Firing pattern:** Server-side via `posthog-node` from server actions, client-side via `posthog-js` from client components. All events are non-blocking (wrapped in try/catch) and never throw.
 
-## KPI event: `contact_initiated`
+---
 
-The KPI of Barterkin v1. Fired from the `send-contact` Supabase Edge Function (Phase 5) after a successful platform-relayed contact send. One event = one successful first-touch relay.
+## Implemented Events
 
-**When fired:** Edge Function validates sender eligibility → inserts `contact_requests` row → calls Resend → on Resend success → fires the event.
+### `signup_started`
 
-**Properties (all anonymised / low-cardinality):**
+**When fired:** After a magic link OTP email is successfully queued (Supabase returns success).
+**Fires from:** `lib/actions/auth.ts` → `sendMagicLink()`
+**Properties:** None (PostHog auto-includes `$host`, `$lib`, `distinct_id`).
 
-| Property | Type | Required | Description |
-|----------|------|----------|-------------|
-| `recipient_county` | string (FIPS) | yes | 5-digit Georgia FIPS county code. No county names. |
-| `recipient_category` | string (slug) | yes | One of the 10 seeded Georgia category slugs (Phase 3). |
-| `sender_tenure_days` | integer | yes | `floor((now - profiles.created_at) / 1 day)`. |
-| `$host`, `$lib` | string | auto | PostHog defaults. |
+---
 
-**Source of truth:** the `public.contact_requests` row inserted by the Edge Function. Event-stream rebuildable from DB if PostHog data is ever lost.
+### `signup_completed`
 
-**Phase 1 scope:** declare schema only. No firing from the Next.js app (the Edge Function lands in Phase 5).
+**When fired:**
+- Non-OTP path: after successful user creation in `signUpAction()`
+- OTP path: after email confirmation succeeds in `app/auth/confirm/route.ts`
+**Fires from:** `lib/actions/auth.ts` + `app/auth/confirm/route.ts`
+**Side effects:** `aliasUser()` called to link anonymous ID to user ID.
 
-## Phase-1-only events
+---
 
-| Event | Purpose | Fires from |
-|-------|---------|------------|
-| `test_event` | Validates end-to-end wiring for ROADMAP success criterion #5 ("`posthog.capture('test_event', ...)` appears in the PostHog dashboard within 60 seconds"). | `components/fire-test-event.tsx` on home-page button click. Safe to fire anytime; ignored for KPI funnels. |
+### `profile_published`
 
-## Future events (out of scope for Phase 1)
+**When fired:** After a user successfully publishes their profile (`is_published = true`).
+**Fires from:** `lib/actions/profile.ts` → `publishProfileAction()`
+**Side effects:** `setPersonProperties()` called to enrich user profile with `username`, `county`, `category`.
 
-| Event | Phase | Notes |
-|-------|-------|-------|
-| `signup_started` / `signup_completed` | Phase 2 | Covers AUTH-01, AUTH-02 funnels. |
-| `profile_published` | Phase 3 | Covers PROF-12 publish gate. |
-| `directory_filter_applied` | Phase 4 | DIR-03..DIR-06. Include filter dimensions but not free-text keyword. |
-| `contact_reported` / `contact_blocked` | Phase 5 | TRUST-01, TRUST-02 signals. |
+---
+
+### `directory_filter_applied`
+
+**When fired:** When a user changes directory filters (debounced 500ms).
+**Fires from:** `components/directory/DirectoryFilters.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `category` | string \| null | Selected category slug |
+| `county` | string \| null | Selected county FIPS code |
+
+---
+
+### `contact_reported`
+
+**When fired:** After a member report is successfully submitted.
+**Fires from:** `lib/actions/contact.ts` → `reportMemberAction()`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `reason` | string | Report reason (`spam`, `harassment`, `scam`, `inappropriate`, `other`) |
+
+---
+
+### `contact_blocked`
+
+**When fired:** After a member is successfully blocked.
+**Fires from:** `lib/actions/contact.ts` → `blockMemberAction()`
+**Properties:** None.
+
+---
+
+### `test_event` *(Phase 1 wiring validation)*
+
+**When fired:** Home-page button click in dev/test environments.
+**Fires from:** `components/fire-test-event.tsx`
+**Purpose:** Validates end-to-end PostHog wiring. Ignored for KPI funnels.
+
+---
+
+## Event Inventory
+
+| Event | Status | Fires From | Phase |
+|-------|--------|------------|-------|
+| `signup_started` | ✅ Implemented | `lib/actions/auth.ts` | 2 |
+| `signup_completed` | ✅ Implemented | `lib/actions/auth.ts`, `app/auth/confirm/route.ts` | 2 |
+| `profile_published` | ✅ Implemented | `lib/actions/profile.ts` | 3 |
+| `directory_filter_applied` | ✅ Implemented | `components/directory/DirectoryFilters.tsx` | 4 |
+| `contact_reported` | ✅ Implemented | `lib/actions/contact.ts` | 5 |
+| `contact_blocked` | ✅ Implemented | `lib/actions/contact.ts` | 5 |
+| `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
+| `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |
+
+---
+
+## Implementation Notes
+
+- All server-side events use `posthog-node` via `lib/analytics.ts`
+- Client-side events use `posthog-js` via `lib/analytics-client.ts`
+- Events are **fire-and-forget** — failures are logged but never block user flows
+- The `distinct_id` is the Supabase user UUID for authenticated events
+- Anonymous events use PostHog's built-in anonymous ID until `identify()` is called
