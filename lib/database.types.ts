@@ -492,6 +492,71 @@ export type Database = {
           },
         ]
       }
+      message_email_notifications: {
+        Row: {
+          id: string
+          message_id: string
+          conversation_id: string
+          recipient_profile_id: string
+          sender_profile_id: string
+          status: string
+          sent_at: string | null
+          error_message: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          message_id: string
+          conversation_id: string
+          recipient_profile_id: string
+          sender_profile_id: string
+          status?: string
+          sent_at?: string | null
+          error_message?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          message_id?: string
+          conversation_id?: string
+          recipient_profile_id?: string
+          sender_profile_id?: string
+          status?: string
+          sent_at?: string | null
+          error_message?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_email_notifications_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_email_notifications_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_email_notifications_recipient_profile_id_fkey"
+            columns: ["recipient_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "message_email_notifications_sender_profile_id_fkey"
+            columns: ["sender_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           accepting_contact: boolean
