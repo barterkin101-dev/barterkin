@@ -5,18 +5,24 @@ import { useState } from 'react'
 import { ArrowRight, Menu, X } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { LogoutButton } from '@/components/auth/LogoutButton'
+import { NotificationBell } from './NotificationBell'
 import { cn } from '@/lib/utils'
+import type { NotificationRow } from '@/lib/data/notifications'
 
 export function NavLinks({
   displayName,
   avatarUrl,
   unseenMessageCount = 0,
   showFinishSetup,
+  notifications,
+  notificationUnreadCount = 0,
 }: {
   displayName?: string | null
   avatarUrl?: string | null
   unseenMessageCount?: number
   showFinishSetup?: boolean
+  notifications?: NotificationRow[]
+  notificationUnreadCount?: number
 }) {
   const pathname = usePathname()
   const isDirectory = pathname.startsWith('/directory')
@@ -122,6 +128,10 @@ export function NavLinks({
           </div>
           <span>Your profile</span>
         </Link>
+        <NotificationBell
+          notifications={notifications ?? []}
+          unreadCount={notificationUnreadCount}
+        />
         <LogoutButton />
       </div>
 

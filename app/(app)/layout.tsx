@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { Toaster } from '@/components/ui/sonner'
 import { AppNav } from '@/components/layout/AppNav'
+import { getNotifications } from '@/lib/data/notifications'
 
 export const metadata: Metadata = {
   title: { default: 'Barterkin', template: '%s -- Barterkin' },
@@ -21,6 +22,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   let avatarUrl: string | null = null
   let unseenMessageCount = 0
   let showFinishSetup = false
+  let notifications: Awaited<ReturnType<typeof getNotifications>>['notifications'] = []
+  let notificationUnreadCount = 0
+
   if (userId) {
     const { data: profile } = await supabase
       .from('profiles')
@@ -61,6 +65,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         }
       }
       unseenMessageCount = messageCount
+
+      // Fetch notifications
+      const notifResult = await getNotifications(profile.id)
+      notifications = notifResult.notifications
+      notificationUnreadCount = notifResult.unreadCount
     }
   }
 
@@ -71,6 +80,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         avatarUrl={avatarUrl}
         unseenMessageCount={unseenMessageCount}
         showFinishSetup={showFinishSetup}
+        notifications={notifications}
+        notificationUnreadCount={notificationUnreadCount}
       />
       <main className="mx-auto max-w-5xl px-6 py-12 md:py-16">
         {children}

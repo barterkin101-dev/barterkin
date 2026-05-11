@@ -7,11 +7,15 @@ export function AppNav({
   avatarUrl,
   unseenMessageCount,
   showFinishSetup,
+  notifications,
+  notificationUnreadCount,
 }: {
   displayName?: string | null
   avatarUrl?: string | null
   unseenMessageCount?: number
   showFinishSetup?: boolean
+  notifications?: import('@/lib/data/notifications').NotificationRow[]
+  notificationUnreadCount?: number
 }) {
   return (
     <nav className="border-b border-sage-light bg-sage-pale">
@@ -32,6 +36,8 @@ export function AppNav({
           avatarUrl={avatarUrl}
           unseenMessageCount={unseenMessageCount}
           showFinishSetup={showFinishSetup}
+          notifications={notifications}
+          notificationUnreadCount={notificationUnreadCount}
         />
       </div>
     </nav>
