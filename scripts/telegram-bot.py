@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+"""Barterkin Telegram Bot — Full system access."""
 import os
 import sys
 import asyncio
 import json
 import subprocess
 import logging
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -29,6 +31,15 @@ HANDOFF = PROJECT_ROOT / ".continue-here.md"
 TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 GROUP_ID = os.environ.get("TELEGRAM_GROUP_ID", "")
 
+# All API keys loaded from .env.bot
+SUPABASE_URL = os.environ.get("NEXT_PUBLIC_SUPABASE_URL", "")
+SUPABASE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+SUPABASE_ANON = os.environ.get("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "")
+CLOUDFLARE_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN", "")
+CLOUDFLARE_ZONE = os.environ.get("CLOUDFLARE_ZONE_ID", "")
+GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+SITE_URL = os.environ.get("NEXT_PUBLIC_SITE_URL", "https://www.barterkin.com")
+
 
 def run_cmd(cmd: list[str], cwd: Path = PROJECT_ROOT) -> str:
     try:
@@ -38,11 +49,86 @@ def run_cmd(cmd: list[str], cwd: Path = PROJECT_ROOT) -> str:
         return f"Error: {e}"
 
 
+def api_get(url: str, headers: dict | None = None) -> dict:
+    try:
+        req = urllib.request.Request(url, headers=headers or {})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return {"status": resp.status, "data": json.loads(resp.read())}
+    except Exception as e:
+        return {"error": str(e)}
+
+
 def get_git_status() -> str:
     branch = run_cmd(["git", "rev-parse", "--abbrev-ref", "HEAD"])
     last_commit = run_cmd(["git", "log", "-1", "--format=%h %s (%ar)"])
+    ahead = run_cmd(["git", "rev-list", "--count", "origin/main..main"])
     uncommitted = run_cmd(["git", "status", "--short"])
-    return f"Branch: {branch}\nLast: {last_commit}\nUncommitted: {len(uncommitted.splitlines()) if uncommitted else 0} files"
+    return f"Branch: {branch}\nLast: {last_commit}\nAhead of origin: {ahead}\nUncommitted: {len(uncommitted.splitlines()) if uncommitted else 0} files"
+
+
+def get_github_status() -> str:
+    if not GITHUB_TOKEN:
+        return "No GITHUB_TOKEN"
+    result = api_get(
+        "https://api.github.com/repos/barterkin101-dev/barterkin/commits?per_page=1",
+        {"Authorization": f"token {GITHUB_TOKEN}"}
+    )
+    if "error" in result:
+        return f"GitHub API error: {result['error']}"
+    commits = result.get("data", [])
+    if commits:
+        sha = commits[0].get("sha", "")[:7]
+        msg = commits[0].get("commit", {}).get("message", "")[:50]
+        return f"Latest on origin: {sha} {msg}"
+    return "No commits found"
+
+
+def get_supabase_metrics() -> str:
+    if not SUPABASE_URL or not SUPABASE_ANON:
+        return "No Supabase credentials"
+    base = f"{SUPABASE_URL}/rest/v1"
+    headers = {"apikey": SUPABASE_ANON, "Authorization": f"Bearer {SUPABASE_ANON}"}
+    tables = ["profiles", "listings", "conversations", "messages", "tickets"]
+    lines = []
+    for table in tables:
+        try:
+            req = urllib.request.Request(
+                f"{base}/{table}?select=count()&limit=1",
+                headers=headers, method="HEAD"
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                cr = resp.headers.get("content-range", "")
+                count = cr.split("/")[-1] if "/" in cr else "?"
+                lines.append(f"{table}: {count}")
+        except Exception as e:
+            lines.append(f"{table}: err")
+    return "\n".join(lines)
+
+
+def get_cloudflare_dns() -> str:
+    if not CLOUDFLARE_TOKEN or not CLOUDFLARE_ZONE:
+        return "No Cloudflare credentials"
+    result = api_get(
+        f"https://api.cloudflare.com/client/v4/zones/{CLOUDFLARE_ZONE}/dns_records",
+        {"Authorization": f"Bearer {CLOUDFLARE_TOKEN}"}
+    )
+    if "error" in result:
+        return f"Cloudflare API error: {result['error']}"
+    records = result.get("data", {}).get("result", [])
+    lines = []
+    for r in records:
+        if r.get("name") in ("barterkin.com", "www.barterkin.com"):
+            lines.append(f"{r['type']} {r['name']} → {r['content']}")
+    return "\n".join(lines) if lines else "No DNS records found"
+
+
+def get_site_health() -> str:
+    try:
+        req = urllib.request.Request(SITE_URL, headers={"User-Agent": "Barterkin-Bot/1.0"})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return f"Status: {resp.status}\nURL: {resp.url}"
+    except Exception as e:
+        return f"Site check failed: {e}"
 
 
 def get_recent_logs() -> str:
@@ -76,9 +162,9 @@ def get_next_tasks() -> str:
         if in_queue:
             if line.startswith("##"):
                 break
-            if line.strip().startswith(("1.", "2.", "3.", "4.", "5.")):
+            if line.strip().startswith(("1.", "2.", "3.", "4.", "5.", "6.", "7.", "8.", "9.")):
                 tasks.append(line.strip())
-    return "\n".join(tasks[:3]) if tasks else "No tasks queued."
+    return "\n".join(tasks[:5]) if tasks else "No tasks queued."
 
 
 def build_status_message() -> str:
@@ -86,9 +172,11 @@ def build_status_message() -> str:
     git = get_git_status()
     logs = get_recent_logs()
     tasks = get_next_tasks()
+    site = get_site_health()
     return (
         f"📊 <b>Barterkin Autonomous Status</b>\n"
         f"<i>{now}</i>\n\n"
+        f"🌐 <b>Site</b>\n<pre>{site}</pre>\n\n"
         f"📝 <b>Git</b>\n<pre>{git}</pre>\n\n"
         f"🤖 <b>Recent Sessions</b>\n<pre>{logs}</pre>\n\n"
         f"📋 <b>Next Up</b>\n<pre>{tasks}</pre>\n\n"
@@ -149,7 +237,15 @@ async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        "🤖 <b>Barterkin Bot</b>\n\nCommands:\n/status — Current status\n/tasks — Next task queue\n/approvals — Pending approvals\n/start — This help",
+        "🤖 <b>Barterkin Ops Bot</b>\n\n"
+        "Commands:\n"
+        "/status — Full system status\n"
+        "/metrics — Supabase business metrics\n"
+        "/dns — Cloudflare DNS records\n"
+        "/github — GitHub repo sync status\n"
+        "/health — All health checks\n"
+        "/tasks — Next task queue\n"
+        "/approvals — Pending approvals",
         parse_mode="HTML",
     )
 
@@ -172,15 +268,49 @@ async def cmd_approvals(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     await update.message.reply_text(f"✅ <b>Recent Approvals</b>\n\n" + "\n".join(lines), parse_mode="HTML")
 
 
+async def cmd_metrics(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    metrics = get_supabase_metrics()
+    await update.message.reply_text(f"📊 <b>Supabase Metrics</b>\n\n<pre>{metrics}</pre>", parse_mode="HTML")
+
+
+async def cmd_dns(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    dns = get_cloudflare_dns()
+    await update.message.reply_text(f"🌐 <b>Cloudflare DNS</b>\n\n<pre>{dns}</pre>", parse_mode="HTML")
+
+
+async def cmd_github(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    gh = get_github_status()
+    await update.message.reply_text(f"🐙 <b>GitHub Status</b>\n\n<pre>{gh}</pre>", parse_mode="HTML")
+
+
+async def cmd_health(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    site = get_site_health()
+    dns = get_cloudflare_dns()
+    gh = get_github_status()
+    metrics = get_supabase_metrics()
+    msg = (
+        f"🏥 <b>Full Health Check</b>\n\n"
+        f"<b>Site</b>\n<pre>{site}</pre>\n\n"
+        f"<b>DNS</b>\n<pre>{dns}</pre>\n\n"
+        f"<b>GitHub</b>\n<pre>{gh}</pre>\n\n"
+        f"<b>Database</b>\n<pre>{metrics}</pre>"
+    )
+    await update.message.reply_text(msg, parse_mode="HTML")
+
+
 def run_poll() -> None:
     if not TOKEN:
         print("ERROR: Set TELEGRAM_BOT_TOKEN env var"); sys.exit(1)
-    logger.info("Starting polling bot...")
+    logger.info("Starting polling bot with full API access...")
     application = Application.builder().token(TOKEN).build()
     application.add_handler(CommandHandler("start", cmd_start))
     application.add_handler(CommandHandler("status", cmd_status))
     application.add_handler(CommandHandler("tasks", cmd_tasks))
     application.add_handler(CommandHandler("approvals", cmd_approvals))
+    application.add_handler(CommandHandler("metrics", cmd_metrics))
+    application.add_handler(CommandHandler("dns", cmd_dns))
+    application.add_handler(CommandHandler("github", cmd_github))
+    application.add_handler(CommandHandler("health", cmd_health))
     application.add_handler(CallbackQueryHandler(handle_callback))
     application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
 

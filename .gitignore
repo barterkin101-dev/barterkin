@@ -62,3 +62,4 @@ assets/Lora-Variable.ttf
 .daemon-lock
 .env.telegram
 .env.cloudflare
+.env.bot
