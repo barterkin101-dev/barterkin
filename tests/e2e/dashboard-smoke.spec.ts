@@ -1,9 +1,6 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, Page } from '@playwright/test'
 
-const hasEnv =
-  !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.SUPABASE_SERVICE_ROLE_KEY
-
-async function loginAs(page: any, email: string, password: string) {
+async function loginAs(page: Page, email: string, password: string) {
   await page.goto('/login')
   await page.getByLabel(/email/i).fill(email)
   const pwField = page.getByLabel(/password/i)

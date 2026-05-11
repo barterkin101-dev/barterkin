@@ -138,10 +138,10 @@ function log(level: LogLevel, message: string, options?: Parameters<typeof build
   const output = serialize(entry)
 
   if (level === 'error' || level === 'fatal' || level === 'warn') {
-    // eslint-disable-next-line no-console
+     
     console.error(output)
   } else {
-    // eslint-disable-next-line no-console
+     
     console.log(output)
   }
 }
