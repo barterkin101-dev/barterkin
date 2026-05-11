@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { AdminListingModerationSchema } from '@/lib/schemas/admin'
 import { validateAndSanitize } from '@/lib/utils/validation'
 import { assertAdmin } from './admin'
+import { createLogger } from '@/lib/utils/logger'
 
 export interface AdminModerateListingResult {
   ok: boolean
@@ -32,7 +33,8 @@ export async function adminModerateListing(
     .eq('id', parsed.data.listingId)
 
   if (error) {
-    console.error('[adminModerateListing] failed', { code: error.code })
+    const log = createLogger('admin-listings')
+    log.error('adminModerateListing failed', { error, context: { code: error.code } })
     return { ok: false, error: error.message }
   }
 

@@ -1,4 +1,5 @@
 import 'server-only'
+import { createLogger } from '@/lib/utils/logger'
 import { createClient } from '@/lib/supabase/server'
 
 export interface RatingRow {
@@ -31,7 +32,8 @@ export async function getRatingsForProfile(profileId: string): Promise<{
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('[getRatingsForProfile] error', { code: error.code })
+    const log = createLogger('ratings')
+    log.error('getRatingsForProfile error', { context: { code: error.code } })
     return { ratings: [], avg: null, count: 0 }
   }
 

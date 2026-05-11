@@ -1,4 +1,5 @@
 import 'server-only'
+import { createLogger } from '@/lib/utils/logger'
 import { createClient } from '@/lib/supabase/server'
 
 export interface RateLimitResult {
@@ -26,11 +27,12 @@ export async function checkSignupRateLimit(ip: string): Promise<RateLimitResult>
 
   if (error) {
     // Fail OPEN — do not block legitimate signups on a broken rate-limiter.
-    console.error('[rate-limit] check_signup_ip RPC failed', {
+    const log = createLogger('rate-limit')
+    log.error('check_signup_ip RPC failed', { context: {
       ip_prefix: cleanIp.slice(0, 8),
-      code: error.code,
+        code: error.code,
       message: error.message,
-    })
+      } })
     return { allowed: true }
   }
 

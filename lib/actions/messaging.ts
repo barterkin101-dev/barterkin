@@ -6,6 +6,7 @@ import { SendMessageSchema, CreateConversationSchema } from '@/lib/schemas/messa
 import { captureEvent } from '@/lib/analytics'
 import { limitSendMessage } from '@/lib/rate-limit'
 import { validateAndSanitize } from '@/lib/utils/validation'
+import { createLogger } from '@/lib/utils/logger'
 import type {
   SendMessageResult,
   CreateConversationResult,
@@ -66,7 +67,8 @@ export async function sendMessage(
     .single()
 
   if (insertErr || !message) {
-    console.error('[sendMessage] insert failed', { code: insertErr?.code })
+    const log = createLogger('messaging')
+    log.error('sendMessage insert failed', { error: insertErr, context: { code: insertErr?.code } })
     return { ok: false, error: 'Something went wrong sending your message.' }
   }
 
@@ -133,7 +135,8 @@ export async function createConversation(
     }
   )
   if (existingErr) {
-    console.error('[createConversation] existing check failed', { code: existingErr.code })
+    const log = createLogger('messaging')
+    log.error('createConversation existing check failed', { error: existingErr, context: { code: existingErr.code } })
   }
 
   let conversationId: string
@@ -151,7 +154,8 @@ export async function createConversation(
       .select('id')
       .single()
     if (convErr || !conv) {
-      console.error('[createConversation] conv insert failed', { code: convErr?.code })
+      const log = createLogger('messaging')
+      log.error('createConversation conv insert failed', { error: convErr, context: { code: convErr?.code } })
       return { ok: false, error: 'Something went wrong creating the conversation.' }
     }
     conversationId = conv.id
@@ -164,7 +168,8 @@ export async function createConversation(
         { conversation_id: conversationId, profile_id: values.recipientProfileId },
       ])
     if (partErr) {
-      console.error('[createConversation] participant insert failed', { code: partErr.code })
+      const log = createLogger('messaging')
+      log.error('createConversation participant insert failed', { error: partErr, context: { code: partErr.code } })
       return { ok: false, error: 'Something went wrong.' }
     }
   }
@@ -181,7 +186,8 @@ export async function createConversation(
     .single()
 
   if (msgErr || !message) {
-    console.error('[createConversation] message insert failed', { code: msgErr?.code })
+    const log = createLogger('messaging')
+    log.error('createConversation message insert failed', { error: msgErr, context: { code: msgErr?.code } })
     return { ok: false, error: 'Something went wrong sending your message.' }
   }
 
@@ -220,7 +226,8 @@ export async function markConversationRead(
     .eq('profile_id', profile.id)
 
   if (error) {
-    console.error('[markConversationRead] update failed', { code: error.code })
+    const log = createLogger('messaging')
+    log.error('markConversationRead update failed', { error, context: { code: error.code } })
     return { ok: false, error: 'Something went wrong.' }
   }
 

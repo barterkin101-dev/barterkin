@@ -1,8 +1,8 @@
 import 'server-only'
 
 import { PostHog } from 'posthog-node'
-
 import { createClient } from '@/lib/supabase/server'
+import { createLogger } from '@/lib/utils/logger'
 
 export interface LandingFounderCard {
   id: string
@@ -117,7 +117,8 @@ export async function getFoundingMembers(): Promise<FoundersResult> {
 
     return { profiles, error: null }
   } catch (e) {
-    console.error('[getFoundingMembers]', e)
+    const log = createLogger('landing')
+    log.error('getFoundingMembers failed', { error: e })
     await captureError('landing_founding_strip_error', e)
     return { profiles: [], error: String(e) }
   }
@@ -151,7 +152,8 @@ export async function getCountyCoverage(): Promise<CoverageResult> {
 
     return { counties, error: null }
   } catch (e) {
-    console.error('[getCountyCoverage]', e)
+    const log = createLogger('landing')
+    log.error('getCountyCoverage failed', { error: e })
     await captureError('landing_county_coverage_error', e)
     return { counties: [], error: String(e) }
   }
@@ -192,7 +194,8 @@ export async function getStatCounts(): Promise<StatsResult> {
       error: null,
     }
   } catch (e) {
-    console.error('[getStatCounts]', e)
+    const log = createLogger('landing')
+    log.error('getStatCounts failed', { error: e })
     await captureError('landing_stat_strip_error', e)
     return { totalProfiles: 30, distinctCounties: 2, error: String(e) }
   }

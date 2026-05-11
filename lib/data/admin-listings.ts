@@ -1,4 +1,5 @@
 import 'server-only'
+import { createLogger } from '@/lib/utils/logger'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export interface AdminListingRow {
@@ -29,7 +30,8 @@ export async function getAdminListings(): Promise<AdminListingRow[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('[getAdminListings] error', { code: error.code })
+    const log = createLogger('admin')
+    log.error('getAdminListings error', { context: { code: error.code } })
     throw new Error(error.message)
   }
 
@@ -69,7 +71,8 @@ export async function getAdminListingById(id: string): Promise<AdminListingRow |
     .maybeSingle()
 
   if (error) {
-    console.error('[getAdminListingById] error', { code: error.code })
+    const log = createLogger('admin')
+    log.error('getAdminListingById error', { context: { code: error.code } })
     return null
   }
   if (!data) return null

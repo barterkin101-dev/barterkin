@@ -2,6 +2,7 @@ import { type EmailOtpType } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createLogger } from '@/lib/utils/logger'
 
 /**
  * AUTH-02: Magic-link verification.
@@ -22,11 +23,12 @@ export async function GET(request: NextRequest) {
     if (!error) {
       redirect(next)
     }
-    console.error('[auth/confirm] verifyOtp failed', {
+    const log = createLogger('auth')
+    log.error('verifyOtp failed', { context: {
       code: error?.code,
       status: error?.status,
       // deliberately NOT logging error.message — may contain PII
-    })
+      } })
     redirect(`/auth/error?reason=verify_failed`)
   }
 

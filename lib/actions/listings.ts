@@ -5,6 +5,7 @@ import { ListingFormSchema } from '@/lib/schemas/listings'
 import { captureEvent } from '@/lib/analytics'
 import { limitCreateListing } from '@/lib/rate-limit'
 import { validateAndSanitize } from '@/lib/utils/validation'
+import { createLogger } from '@/lib/utils/logger'
 import type {
   SaveListingResult,
   DeleteListingResult,
@@ -64,8 +65,9 @@ export async function saveListing(
   const input = coerceFormDataToListingInput(formData)
   const parsed = validateAndSanitize(ListingFormSchema, input)
   if (!parsed.ok) {
-    console.error('[saveListing] validation failed', {
-      fieldErrors: parsed.fieldErrors ? Object.keys(parsed.fieldErrors) : [],
+    const log = createLogger('listings')
+    log.warn('validation failed', {
+      context: { fieldErrors: Object.keys(parsed.fieldErrors ?? {}) },
     })
     return {
       ok: false,
@@ -82,7 +84,8 @@ export async function saveListing(
     .eq('owner_id', user.id)
     .maybeSingle()
   if (profileErr || !profile) {
-    console.error('[saveListing] profile lookup failed', { code: profileErr?.code })
+    const log = createLogger('listings')
+    log.error('profile lookup failed', { error: profileErr, context: { code: profileErr?.code } })
     return { ok: false, error: 'Profile not found. Complete onboarding first.' }
   }
 
@@ -129,7 +132,8 @@ export async function saveListing(
     .select('id')
     .single()
   if (upsertErr || !listing) {
-    console.error('[saveListing] upsert failed', { code: upsertErr?.code })
+    const log = createLogger('listings')
+    log.error('upsert failed', { error: upsertErr, context: { code: upsertErr?.code } })
     return { ok: false, error: 'Something went wrong saving your listing.' }
   }
 
@@ -139,7 +143,8 @@ export async function saveListing(
     .delete()
     .eq('listing_id', listing.id)
   if (deleteImagesErr) {
-    console.error('[saveListing] image delete failed', { code: deleteImagesErr.code })
+    const log = createLogger('listings')
+    log.warn('image delete failed', { error: deleteImagesErr, context: { code: deleteImagesErr.code } })
   }
 
   if (values.images.length > 0) {
@@ -152,7 +157,8 @@ export async function saveListing(
       .from('listing_images')
       .insert(imageRows)
     if (insertImagesErr) {
-      console.error('[saveListing] image insert failed', { code: insertImagesErr.code })
+      const log = createLogger('listings')
+      log.warn('image insert failed', { error: insertImagesErr, context: { code: insertImagesErr.code } })
     }
   }
 
@@ -219,7 +225,8 @@ export async function deleteListing(
     .update({ status: 'cancelled' })
     .eq('id', listingId)
   if (error) {
-    console.error('[deleteListing] update failed', { code: error.code })
+    const log = createLogger('listings')
+    log.error('delete update failed', { error, context: { code: error.code } })
     return { ok: false, error: 'Something went wrong deleting your listing.' }
   }
 
@@ -271,7 +278,8 @@ export async function toggleListingStatus(
     .update({ status: newStatus })
     .eq('id', listingId)
   if (error) {
-    console.error('[toggleListingStatus] update failed', { code: error.code })
+    const log = createLogger('listings')
+    log.error('toggle status update failed', { error, context: { code: error.code } })
     return { ok: false, error: 'Something went wrong updating your listing.' }
   }
 

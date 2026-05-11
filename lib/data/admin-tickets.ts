@@ -1,4 +1,5 @@
 import 'server-only'
+import { createLogger } from '@/lib/utils/logger'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export interface AdminTicketRow {
@@ -40,7 +41,8 @@ export async function getAdminTickets(): Promise<AdminTicketRow[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('[getAdminTickets] error', { code: error.code })
+    const log = createLogger('admin')
+    log.error('getAdminTickets error', { context: { code: error.code } })
     throw new Error(error.message)
   }
 
@@ -75,7 +77,8 @@ export async function getAdminTicketMessages(ticketId: string): Promise<AdminTic
     .order('created_at', { ascending: true })
 
   if (error) {
-    console.error('[getAdminTicketMessages] error', { code: error.code })
+    const log = createLogger('admin')
+    log.error('getAdminTicketMessages error', { context: { code: error.code } })
     throw new Error(error.message)
   }
 
@@ -107,7 +110,8 @@ export async function getAdminTicketById(ticketId: string): Promise<AdminTicketR
     .maybeSingle()
 
   if (error) {
-    console.error('[getAdminTicketById] error', { code: error.code })
+    const log = createLogger('admin')
+    log.error('getAdminTicketById error', { context: { code: error.code } })
     return null
   }
   if (!data) return null

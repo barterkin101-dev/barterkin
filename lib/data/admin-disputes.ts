@@ -1,4 +1,5 @@
 import 'server-only'
+import { createLogger } from '@/lib/utils/logger'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export interface AdminDisputeRow {
@@ -48,7 +49,8 @@ export async function getAdminDisputes(): Promise<AdminDisputeRow[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('[getAdminDisputes] error', { code: error.code })
+    const log = createLogger('admin')
+    log.error('getAdminDisputes error', { context: { code: error.code } })
     throw new Error(error.message)
   }
 
@@ -90,7 +92,8 @@ export async function getAdminDisputeMessages(disputeId: string): Promise<AdminD
     .order('created_at', { ascending: true })
 
   if (error) {
-    console.error('[getAdminDisputeMessages] error', { code: error.code })
+    const log = createLogger('admin')
+    log.error('getAdminDisputeMessages error', { context: { code: error.code } })
     throw new Error(error.message)
   }
 
@@ -125,7 +128,8 @@ export async function getAdminDisputeById(disputeId: string): Promise<AdminDispu
     .maybeSingle()
 
   if (error) {
-    console.error('[getAdminDisputeById] error', { code: error.code })
+    const log = createLogger('admin')
+    log.error('getAdminDisputeById error', { context: { code: error.code } })
     return null
   }
   if (!data) return null

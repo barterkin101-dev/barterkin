@@ -4,6 +4,7 @@
  * LIST-09 (browse), LIST-10 (filters), LIST-11 (pagination).
  */
 import 'server-only'
+import { createLogger } from '@/lib/utils/logger'
 import { createClient } from '@/lib/supabase/server'
 import type { ListingsQueryResult, ListingRow, ListingFilters } from '@/lib/data/listings.types'
 
@@ -29,7 +30,8 @@ export async function getListings(
         },
       )
       if (rowsErr) {
-        console.error('[getListings] search rows error', { code: rowsErr.code })
+        const log = createLogger('listings')
+        log.error('getListings search rows error', { error: rowsErr, context: { code: rowsErr.code } })
         return { listings: [], totalCount: 0, error: 'rows_failed' }
       }
 
@@ -43,7 +45,8 @@ export async function getListings(
         },
       )
       if (countErr) {
-        console.error('[getListings] search count error', { code: countErr.code })
+        const log = createLogger('listings')
+        log.error('getListings search count error', { error: countErr, context: { code: countErr.code } })
         return { listings: [], totalCount: 0, error: 'count_failed' }
       }
 
@@ -101,11 +104,13 @@ export async function getListings(
 
 
     if (countResult.error) {
-      console.error('[getListings] count error', { code: countResult.error.code })
+      const log = createLogger('listings')
+      log.error('getListings count error', { error: countResult.error, context: { code: countResult.error.code } })
       return { listings: [], totalCount: 0, error: 'count_failed' }
     }
     if (rowsResult.error) {
-      console.error('[getListings] rows error', { code: rowsResult.error.code })
+      const log = createLogger('listings')
+      log.error('getListings rows error', { error: rowsResult.error, context: { code: rowsResult.error.code } })
       return { listings: [], totalCount: 0, error: 'rows_failed' }
     }
 
@@ -121,7 +126,8 @@ export async function getListings(
       error: null,
     }
   } catch (err) {
-    console.error('[getListings] unexpected', err)
+    const log = createLogger('listings')
+    log.error('getListings unexpected error', { error: err })
     return { listings: [], totalCount: 0, error: 'unknown' }
   }
 }
@@ -141,7 +147,8 @@ export async function getListingById(id: string): Promise<ListingRow | null> {
     .maybeSingle()
 
   if (error) {
-    console.error('[getListingById] error', { code: error.code })
+    const log = createLogger('listings')
+    log.error('getListingById error', { context: { code: error.code } })
     return null
   }
   if (!data) return null
@@ -164,7 +171,8 @@ export async function getMyListings(profileId: string): Promise<ListingRow[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('[getMyListings] error', { code: error.code })
+    const log = createLogger('listings')
+    log.error('getMyListings error', { context: { code: error.code } })
     return []
   }
 
@@ -190,7 +198,8 @@ async function enrichListings(
     .order('sort_order', { ascending: true })
 
   if (imagesErr) {
-    console.error('[enrichListings] images error', { code: imagesErr.code })
+    const log = createLogger('listings')
+    log.warn('enrichListings images error', { context: { code: imagesErr.code } })
   }
 
   const imagesByListing: Record<string, { id: string; url: string; sort_order: number }[]> = {}

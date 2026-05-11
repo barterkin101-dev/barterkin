@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createLogger } from '@/lib/utils/logger'
 import { getClientIp, limitOAuthCallback } from '@/lib/rate-limit-public'
 
 /**
@@ -30,10 +31,11 @@ export async function GET(request: NextRequest) {
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`)
     }
-    console.error('[auth/callback] exchangeCodeForSession failed', {
-      code: error.code,
+    const log = createLogger('auth')
+    log.error('exchangeCodeForSession failed', { context: {
+        code: error.code,
       status: error.status,
-    })
+      } })
   }
 
   return NextResponse.redirect(`${origin}/auth/error?reason=exchange_failed`)

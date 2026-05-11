@@ -6,6 +6,7 @@ import { isDisposableEmail } from '@/lib/utils/disposable-email'
 import { checkSignupRateLimit } from '@/lib/utils/rate-limit'
 import { limitAuthRequest } from '@/lib/rate-limit-public'
 import { MagicLinkSchema, type SendMagicLinkResult } from '@/lib/schemas/auth'
+import { createLogger } from '@/lib/utils/logger'
 
 export type { SendMagicLinkResult }
 
@@ -63,9 +64,10 @@ export async function sendMagicLink(
     },
   })
   if (error) {
-    console.error('[sendMagicLink] signInWithOtp failed', {
-      code: error.code,
-      status: error.status,
+    const log = createLogger('auth')
+    log.error('signInWithOtp failed', {
+      error,
+      context: { code: error.code, status: error.status },
     })
     return { ok: false, error: 'Something went wrong. Please try again in a moment.' }
   }

@@ -6,6 +6,7 @@ import { DisputeSchema, DisputeMessageSchema, ResolveDisputeSchema } from '@/lib
 import { captureEvent } from '@/lib/analytics'
 import { limitCreateDispute } from '@/lib/rate-limit'
 import { validateAndSanitize } from '@/lib/utils/validation'
+import { createLogger } from '@/lib/utils/logger'
 import type {
   CreateDisputeResult,
   AddDisputeMessageResult,
@@ -66,7 +67,8 @@ export async function createDispute(
     .single()
 
   if (insertErr || !dispute) {
-    console.error('[createDispute] insert failed', { code: insertErr?.code })
+    const log = createLogger('disputes')
+    log.error('createDispute insert failed', { error: insertErr, context: { code: insertErr?.code } })
     return { ok: false, error: 'Something went wrong opening the dispute.' }
   }
 
@@ -137,7 +139,8 @@ export async function addDisputeMessage(
     })
 
   if (insertErr) {
-    console.error('[addDisputeMessage] insert failed', { code: insertErr.code })
+    const log = createLogger('disputes')
+    log.error('addDisputeMessage insert failed', { error: insertErr, context: { code: insertErr.code } })
     return { ok: false, error: 'Something went wrong sending your message.' }
   }
 
@@ -191,7 +194,8 @@ export async function resolveDispute(
     .eq('id', values.disputeId)
 
   if (error) {
-    console.error('[resolveDispute] update failed', { code: error.code })
+    const log = createLogger('disputes')
+    log.error('resolveDispute update failed', { error, context: { code: error.code } })
     return { ok: false, error: 'Something went wrong resolving the dispute.' }
   }
 

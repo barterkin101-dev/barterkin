@@ -1,4 +1,5 @@
 import 'server-only'
+import { createLogger } from '@/lib/utils/logger'
 import { createClient } from '@/lib/supabase/server'
 
 export interface ConversationRow {
@@ -53,7 +54,8 @@ export async function getConversations(profileId: string): Promise<ConversationR
     .order('conversations(updated_at)', { ascending: false })
 
   if (error) {
-    console.error('[getConversations] error', { code: error.code })
+    const log = createLogger('messaging')
+    log.error('getConversations error', { context: { code: error.code } })
     return []
   }
 
@@ -70,7 +72,8 @@ export async function getConversations(profileId: string): Promise<ConversationR
     .in('conversation_id', conversationIds)
 
   if (partErr) {
-    console.error('[getConversations] participants error', { code: partErr.code })
+    const log = createLogger('messaging')
+    log.warn('getConversations participants error', { context: { code: partErr.code } })
   }
 
   // Fetch last messages
@@ -81,7 +84,8 @@ export async function getConversations(profileId: string): Promise<ConversationR
     .order('created_at', { ascending: false })
 
   if (msgErr) {
-    console.error('[getConversations] messages error', { code: msgErr.code })
+    const log = createLogger('messaging')
+    log.warn('getConversations messages error', { context: { code: msgErr.code } })
   }
 
   // Fetch unread counts
@@ -91,7 +95,8 @@ export async function getConversations(profileId: string): Promise<ConversationR
     .in('conversation_id', conversationIds)
 
   if (unreadErr) {
-    console.error('[getConversations] unread error', { code: unreadErr.code })
+    const log = createLogger('messaging')
+    log.warn('getConversations unread error', { context: { code: unreadErr.code } })
   }
 
   const participantsByConv: Record<string, ConversationRow['participants']> = {}
@@ -155,7 +160,8 @@ export async function getMessages(conversationId: string): Promise<MessageRow[]>
     .order('created_at', { ascending: true })
 
   if (error) {
-    console.error('[getMessages] error', { code: error.code })
+    const log = createLogger('messaging')
+    log.error('getMessages error', { context: { code: error.code } })
     return []
   }
 

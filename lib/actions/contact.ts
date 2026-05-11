@@ -11,6 +11,7 @@ import { createClient } from '@/lib/supabase/server'
 import { BlockSchema, ReportSchema } from '@/lib/schemas/contact'
 import { validateAndSanitize } from '@/lib/utils/validation'
 import { getClientIp, limitBlockAction, limitReportSubmission } from '@/lib/rate-limit-public'
+import { createLogger } from '@/lib/utils/logger'
 import type {
   ReportMemberResult,
 } from '@/lib/actions/contact.types'
@@ -37,7 +38,8 @@ export async function blockMember(formData: FormData): Promise<void> {
     blockedUsername: formData.get('blockedUsername'),
   })
   if (!parsed.ok) {
-    console.error('[blockMember] bad input', { issues: Object.keys(parsed.fieldErrors ?? {}) })
+    const log = createLogger('contact')
+    log.warn('blockMember bad input', { context: { issues: Object.keys(parsed.fieldErrors ?? {}) } })
     redirect('/directory?blocked_error=1')
   }
 
@@ -51,7 +53,8 @@ export async function blockMember(formData: FormData): Promise<void> {
     { onConflict: 'blocker_id,blocked_id', ignoreDuplicates: true },
   )
   if (error) {
-    console.error('[blockMember] upsert failed', { code: error.code })
+    const log = createLogger('contact')
+    log.error('blockMember upsert failed', { error, context: { code: error.code } })
     redirect('/directory?blocked_error=1')
   }
 
@@ -100,7 +103,8 @@ export async function reportMember(
     .eq('id', parsed.data.targetProfileId)
     .maybeSingle()
   if (targetErr || !target) {
-    console.error('[reportMember] target lookup failed', { code: targetErr?.code })
+    const log = createLogger('contact')
+    log.error('reportMember target lookup failed', { error: targetErr, context: { code: targetErr?.code } })
     return { ok: false, code: 'bad_input', error: 'Target profile not found.' }
   }
   if (target.owner_id === user.id) {
@@ -119,7 +123,8 @@ export async function reportMember(
     .select('id, created_at')
     .single()
   if (insertErr || !inserted) {
-    console.error('[reportMember] insert failed', { code: insertErr?.code })
+    const log = createLogger('contact')
+    log.error('reportMember insert failed', { error: insertErr, context: { code: insertErr?.code } })
     return { ok: false, code: 'unknown', error: 'Something went wrong submitting your report.' }
   }
 
@@ -129,7 +134,8 @@ export async function reportMember(
     const adminEmail = process.env.ADMIN_NOTIFY_EMAIL ?? 'hello@barterkin.com'
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com'
     if (!apiKey) {
-      console.warn('[reportMember] RESEND_API_KEY missing; admin notify skipped')
+      const log = createLogger('contact')
+      log.warn('RESEND_API_KEY missing; admin notify skipped')
     } else {
       const { data: reporter } = await supabase
         .from('profiles')
@@ -156,7 +162,8 @@ export async function reportMember(
       })
     }
   } catch (err) {
-    console.error('[reportMember] admin notify failed', { code: (err as Error).name })
+    const log = createLogger('contact')
+    log.error('reportMember admin notify failed', { error: err, context: { code: (err as Error).name } })
   }
 
   return { ok: true }

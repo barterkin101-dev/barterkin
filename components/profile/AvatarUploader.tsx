@@ -37,7 +37,9 @@ export function AvatarUploader({
       const { data } = supabase.storage.from('avatars').getPublicUrl(path)
       onChange(`${data.publicUrl}?t=${Date.now()}`)   // Pitfall 7 cache bust
     } catch (e) {
-      console.error('[AvatarUploader] upload failed', { name: (e as Error).name })
+      import('@/lib/utils/client-logger').then(({ clientLogger }) =>
+        clientLogger.error('AvatarUploader', 'upload failed', { error: e })
+      )
       setError("Couldn't upload that photo. Please check your connection and try again.")
     } finally {
       setUploading(false)

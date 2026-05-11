@@ -5,6 +5,8 @@
  */
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { createLogger } from '@/lib/utils/logger'
+import { generateChatResponse } from '@/lib/chatbot/openai'
 
 export type ChatIntent =
   | 'greeting'
@@ -229,7 +231,8 @@ export async function escalateToTicket(
     .single()
 
   if (error || !ticket) {
-    console.error('[escalateToTicket] failed', { code: error?.code })
+    const log = createLogger('chatbot')
+    log.error('escalateToTicket failed', { context: { code: error?.code } })
     return { ok: false, error: 'Failed to create ticket. Please try again.' }
   }
 

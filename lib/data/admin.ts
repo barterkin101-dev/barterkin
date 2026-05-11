@@ -1,4 +1,5 @@
 import 'server-only'
+import { createLogger } from '@/lib/utils/logger'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
 // ============================================================================
@@ -96,11 +97,13 @@ export async function getAdminStats(): Promise<AdminStats> {
   ])
 
   if (totalMembers.error) {
-    console.error('[getAdminStats] totalMembers error', { code: totalMembers.error.code })
+    const log = createLogger('admin')
+    log.error('getAdminStats totalMembers error', { context: { code: totalMembers.error.code } })
     throw new Error(totalMembers.error.message)
   }
   if (newThisWeek.error) {
-    console.error('[getAdminStats] newThisWeek error', { code: newThisWeek.error.code })
+    const log = createLogger('admin')
+    log.error('getAdminStats newThisWeek error', { context: { code: newThisWeek.error.code } })
     throw new Error(newThisWeek.error.message)
   }
 
@@ -126,7 +129,8 @@ export async function getAdminMembers(): Promise<AdminMemberRow[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('[getAdminMembers] query error', { code: error.code })
+    const log = createLogger('admin')
+    log.error('getAdminMembers query error', { context: { code: error.code } })
     throw new Error(error.message)
   }
 
@@ -160,7 +164,8 @@ export async function getAdminMemberById(id: string): Promise<AdminMemberDetail 
     .maybeSingle()
 
   if (error) {
-    console.error('[getAdminMemberById] query error', { code: error.code })
+    const log = createLogger('admin')
+    log.error('getAdminMemberById query error', { context: { code: error.code } })
     return null
   }
   if (!data) return null
@@ -205,7 +210,8 @@ export async function getAdminConversations(): Promise<AdminConversationRow[]> {
     .order('updated_at', { ascending: false })
 
   if (convErr) {
-    console.error('[getAdminConversations] query error', { code: convErr.code })
+    const log = createLogger('admin')
+    log.error('getAdminConversations query error', { context: { code: convErr.code } })
     return []
   }
 
@@ -221,7 +227,8 @@ export async function getAdminConversations(): Promise<AdminConversationRow[]> {
     .in('conversation_id', conversationIds)
 
   if (partErr) {
-    console.error('[getAdminConversations] participants error', { code: partErr.code })
+    const log = createLogger('admin')
+    log.warn('getAdminConversations participants error', { context: { code: partErr.code } })
   }
 
   // Fetch message counts + last message per conversation
@@ -232,7 +239,8 @@ export async function getAdminConversations(): Promise<AdminConversationRow[]> {
     .order('created_at', { ascending: false })
 
   if (msgErr) {
-    console.error('[getAdminConversations] messages error', { code: msgErr.code })
+    const log = createLogger('admin')
+    log.warn('getAdminConversations messages error', { context: { code: msgErr.code } })
   }
 
   // Build participant name map

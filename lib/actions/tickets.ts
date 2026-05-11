@@ -6,6 +6,7 @@ import { TicketSchema, TicketMessageSchema } from '@/lib/schemas/tickets'
 import { captureEvent } from '@/lib/analytics'
 import { limitCreateTicket } from '@/lib/rate-limit'
 import { validateAndSanitize } from '@/lib/utils/validation'
+import { createLogger } from '@/lib/utils/logger'
 import type {
   CreateTicketResult,
   AddTicketMessageResult,
@@ -61,7 +62,8 @@ export async function createTicket(
     .single()
 
   if (insertErr || !ticket) {
-    console.error('[createTicket] insert failed', { code: insertErr?.code })
+    const log = createLogger('tickets')
+    log.error('createTicket insert failed', { error: insertErr, context: { code: insertErr?.code } })
     return { ok: false, error: 'Something went wrong creating your ticket.' }
   }
 
@@ -128,7 +130,8 @@ export async function addTicketMessage(
     })
 
   if (insertErr) {
-    console.error('[addTicketMessage] insert failed', { code: insertErr.code })
+    const log = createLogger('tickets')
+    log.error('addTicketMessage insert failed', { error: insertErr, context: { code: insertErr.code } })
     return { ok: false, error: 'Something went wrong sending your message.' }
   }
 

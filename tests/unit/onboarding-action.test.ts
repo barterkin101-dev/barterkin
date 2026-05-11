@@ -91,10 +91,10 @@ describe('markOnboardingComplete() (D-11)', () => {
 
     const result = await markOnboardingComplete()
     expect(result).toEqual({ ok: false })
-    expect(errSpy).toHaveBeenCalledWith(
-      '[markOnboardingComplete] update failed',
-      { code: '23503' },
-    )
+    expect(errSpy).toHaveBeenCalled()
+    const call = errSpy.mock.calls[0]?.[0] as string | undefined
+    expect(call).toContain('[onboarding]')
+    expect(call).toContain('markOnboardingComplete update failed')
     // Confirm no PII (email, message body) leaked into the log call
     const calls = errSpy.mock.calls.flat()
     const serialized = JSON.stringify(calls)

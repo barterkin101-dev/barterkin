@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { AdminDisputeMediationSchema, AdminDisputeResolutionSchema } from '@/lib/schemas/admin'
 import { validateAndSanitize } from '@/lib/utils/validation'
 import { assertAdmin } from './admin'
+import { createLogger } from '@/lib/utils/logger'
 
 export interface AdminMediateDisputeResult {
   ok: boolean
@@ -40,7 +41,8 @@ export async function adminMediateDispute(
   })
 
   if (msgErr) {
-    console.error('[adminMediateDispute] message failed', { code: msgErr.code })
+    const log = createLogger('admin-disputes')
+    log.error('adminMediateDispute message insert failed', { error: msgErr, context: { code: msgErr.code } })
     return { ok: false, error: msgErr.message }
   }
 
@@ -56,7 +58,8 @@ export async function adminMediateDispute(
     .eq('status', 'open')
 
   if (updateErr) {
-    console.error('[adminMediateDispute] status update failed', { code: updateErr.code })
+    const log = createLogger('admin-disputes')
+    log.warn('adminMediateDispute status update failed', { error: updateErr, context: { code: updateErr.code } })
     // Don't fail — message was sent
   }
 
@@ -97,7 +100,8 @@ export async function adminResolveDispute(
     .eq('id', parsed.data.disputeId)
 
   if (error) {
-    console.error('[adminResolveDispute] failed', { code: error.code })
+    const log = createLogger('admin-disputes')
+    log.error('adminResolveDispute failed', { error, context: { code: error.code } })
     return { ok: false, error: error.message }
   }
 

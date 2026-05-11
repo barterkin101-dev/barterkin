@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { AdminBanSchema } from '@/lib/schemas/admin'
 import { safeParse } from '@/lib/utils/validation'
+import { createLogger } from '@/lib/utils/logger'
 
 // ============================================================================
 // Phase 8 — ADMIN-04 ban/unban Server Actions
@@ -52,7 +53,8 @@ export async function banMember(profileId: string): Promise<BanResult> {
     .eq('id', parsed.profileId)
 
   if (error) {
-    console.error('[banMember] update failed', { code: error.code })
+    const log = createLogger('admin')
+    log.error('banMember update failed', { error, context: { code: error.code } })
     return { ok: false, error: error.message }
   }
 
@@ -80,7 +82,8 @@ export async function unbanMember(profileId: string): Promise<BanResult> {
     .eq('id', parsed.profileId)
 
   if (error) {
-    console.error('[unbanMember] update failed', { code: error.code })
+    const log = createLogger('admin')
+    log.error('unbanMember update failed', { error, context: { code: error.code } })
     return { ok: false, error: error.message }
   }
 

@@ -12,6 +12,7 @@
 
 import type { ZodSchema } from 'zod'
 import { sanitizeText, sanitizeMultiline } from './sanitize'
+import { createLogger } from '@/lib/utils/logger'
 
 export interface ValidationResult<T> {
   ok: true
@@ -93,7 +94,8 @@ export function validateAndSanitize<T>(
 export function safeParse<T>(schema: ZodSchema<T>, input: unknown): T | null {
   const result = schema.safeParse(input)
   if (!result.success) {
-    console.warn('[safeParse] validation failed', { issues: result.error.issues.length })
+    const log = createLogger('validation')
+    log.warn('safeParse validation failed', { context: { issues: result.error.issues.length } })
     return null
   }
   return result.data

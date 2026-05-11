@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createLogger } from '@/lib/utils/logger'
 
 /**
  * markOnboardingComplete — writes profiles.onboarding_completed_at = now() for the current user.
@@ -33,7 +34,8 @@ export async function markOnboardingComplete(): Promise<{ ok: boolean }> {
     .is('onboarding_completed_at', null)
 
   if (error) {
-    console.error('[markOnboardingComplete] update failed', { code: error.code })
+    const log = createLogger('onboarding')
+    log.error('markOnboardingComplete update failed', { context: { code: error.code } })
     return { ok: false }
   }
   return { ok: true }

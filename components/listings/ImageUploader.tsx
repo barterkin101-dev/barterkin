@@ -60,7 +60,9 @@ export function ImageUploader({ userId, values, onChange }: ImageUploaderProps) 
             })
 
           if (upErr) {
-            console.error('[ImageUploader] upload failed', { message: upErr.message })
+            import('@/lib/utils/client-logger').then(({ clientLogger }) =>
+              clientLogger.error('ImageUploader', 'upload failed', { context: { message: upErr.message } })
+            )
             setError('One or more uploads failed. Please try again.')
             continue
           }
@@ -73,7 +75,9 @@ export function ImageUploader({ userId, values, onChange }: ImageUploaderProps) 
           onChange([...values, ...uploadedUrls])
         }
       } catch (e) {
-        console.error('[ImageUploader] unexpected error', { name: (e as Error).name })
+        import('@/lib/utils/client-logger').then(({ clientLogger }) =>
+          clientLogger.error('ImageUploader', 'unexpected error', { error: e })
+        )
         setError('Something went wrong uploading images. Please try again.')
       } finally {
         setUploading(false)

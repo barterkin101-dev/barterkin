@@ -5,6 +5,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { AdminTicketStatusSchema, AdminTicketReplySchema } from '@/lib/schemas/admin'
 import { validateAndSanitize } from '@/lib/utils/validation'
 import { assertAdmin } from './admin'
+import { createLogger } from '@/lib/utils/logger'
 
 export interface AdminUpdateTicketStatusResult {
   ok: boolean
@@ -37,7 +38,8 @@ export async function adminUpdateTicketStatus(
     .eq('id', parsed.data.ticketId)
 
   if (error) {
-    console.error('[adminUpdateTicketStatus] failed', { code: error.code })
+    const log = createLogger('admin-tickets')
+    log.error('adminUpdateTicketStatus failed', { error, context: { code: error.code } })
     return { ok: false, error: error.message }
   }
 
@@ -71,7 +73,8 @@ export async function adminReplyTicket(
   })
 
   if (error) {
-    console.error('[adminReplyTicket] failed', { code: error.code })
+    const log = createLogger('admin-tickets')
+    log.error('adminReplyTicket failed', { error, context: { code: error.code } })
     return { ok: false, error: error.message }
   }
 

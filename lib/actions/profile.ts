@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ProfileFormSchema } from '@/lib/schemas/profile'
 import { generateSlug } from '@/lib/utils/slug'
 import { validateAndSanitize } from '@/lib/utils/validation'
+import { createLogger } from '@/lib/utils/logger'
 import type {
   SaveProfileResult,
   SetPublishedResult,
@@ -61,7 +62,8 @@ export async function resolveUniqueSlug(
     if (excludeProfileId) query = query.neq('id', excludeProfileId)
     const { count, error } = await query
     if (error) {
-      console.error('[resolveUniqueSlug] select failed', { code: error.code })
+      const log = createLogger('profile')
+      log.error('resolveUniqueSlug select failed', { error, context: { code: error.code } })
       // Fall through to next candidate; if all fail, the last (uuid-suffixed) candidate wins via insert attempt
       continue
     }
@@ -88,7 +90,8 @@ export async function saveProfile(
   const parsed = validateAndSanitize(ProfileFormSchema, input)
   if (!parsed.ok) {
     // Never log field values (PII). Return flattened errors to UI.
-    console.error('[saveProfile] validation failed', { issues: Object.keys(parsed.fieldErrors ?? {}) })
+    const log = createLogger('profile')
+    log.warn('validation failed', { context: { issues: Object.keys(parsed.fieldErrors ?? {}) } })
     return {
       ok: false,
       error: parsed.error,
@@ -104,7 +107,8 @@ export async function saveProfile(
     .eq('owner_id', user.id)
     .maybeSingle()
   if (fetchError) {
-    console.error('[saveProfile] fetch existing failed', { code: fetchError.code })
+    const log = createLogger('profile')
+    log.error('fetch existing failed', { error: fetchError, context: { code: fetchError.code } })
     return { ok: false, error: 'Something went wrong. Please try again.' }
   }
 
@@ -144,12 +148,14 @@ export async function saveProfile(
         .select('id, username')
         .single()
       if (retryError || !retryRow) {
-        console.error('[saveProfile] retry after 23505 failed', { code: retryError?.code })
+        const log = createLogger('profile')
+        log.error('retry after 23505 failed', { error: retryError, context: { code: retryError?.code } })
         return { ok: false, error: 'Something went wrong. Please try again.' }
       }
       finalSlug = retryRow.username
     } else {
-      console.error('[saveProfile] upsert failed', { code: upsertError.code })
+      const log = createLogger('profile')
+      log.error('upsert failed', { error: upsertError, context: { code: upsertError.code } })
       return { ok: false, error: 'Something went wrong. Please try again.' }
     }
   }
@@ -168,7 +174,8 @@ export async function saveProfile(
     }))
     const { error } = await supabase.from('skills_offered').insert(rows)
     if (error) {
-      console.error('[saveProfile] skills_offered insert failed', { code: error.code })
+      const log = createLogger('profile')
+      log.error('skills_offered insert failed', { error, context: { code: error.code } })
       return { ok: false, error: 'Something went wrong saving your skills. Please try again.' }
     }
   }
@@ -181,7 +188,8 @@ export async function saveProfile(
     }))
     const { error } = await supabase.from('skills_wanted').insert(rows)
     if (error) {
-      console.error('[saveProfile] skills_wanted insert failed', { code: error.code })
+      const log = createLogger('profile')
+      log.error('skills_wanted insert failed', { error, context: { code: error.code } })
       return { ok: false, error: 'Something went wrong saving your skills. Please try again.' }
     }
   }
@@ -223,7 +231,8 @@ export async function setPublished(
       .eq('id', profileId)
       .eq('owner_id', user.id)
     if (error) {
-      console.error('[setPublished] unpublish failed', { code: error.code })
+      const log = createLogger('profile')
+      log.error('unpublish failed', { error, context: { code: error.code } })
       return { ok: false, error: 'Something went wrong. Please try again.' }
     }
     return { ok: true }
@@ -237,7 +246,8 @@ export async function setPublished(
     .eq('owner_id', user.id)
     .maybeSingle()
   if (fetchError || !profile) {
-    console.error('[setPublished] fetch failed', { code: fetchError?.code })
+    const log = createLogger('profile')
+    log.error('setPublished fetch failed', { error: fetchError, context: { code: fetchError?.code } })
     return { ok: false, error: 'Profile not found.' }
   }
 
@@ -263,7 +273,8 @@ export async function setPublished(
     .eq('id', profileId)
     .eq('owner_id', user.id)
   if (updateError) {
-    console.error('[setPublished] publish update failed', { code: updateError.code })
+    const log = createLogger('profile')
+    log.error('publish update failed', { error: updateError, context: { code: updateError.code } })
     return { ok: false, error: 'Something went wrong. Please try again.' }
   }
   return { ok: true }

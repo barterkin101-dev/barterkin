@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { createLogger } from '@/lib/utils/logger'
 import { getMyListings } from '@/lib/data/listings'
 
 import { buttonVariants } from '@/components/ui/button'
@@ -33,7 +34,8 @@ export default async function DashboardPage() {
       .eq('profile_id', profile.id)
       .then(({ count, error }) => {
         if (error) {
-          console.error('[DashboardPage] message count error', { code: error.code })
+          const log = createLogger('dashboard')
+    log.error('message count error', { context: { code: error.code } })
         }
 
         return count ?? 0
@@ -44,7 +46,8 @@ export default async function DashboardPage() {
       .eq('profile_id', profile.id)
       .then(({ count, error }) => {
         if (error) {
-          console.error('[DashboardPage] ticket count error', { code: error.code })
+          const log = createLogger('dashboard')
+    log.error('ticket count error', { context: { code: error.code } })
         }
 
         return count ?? 0

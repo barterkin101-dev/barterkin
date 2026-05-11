@@ -1,4 +1,5 @@
 import 'server-only'
+import { createLogger } from '@/lib/utils/logger'
 import { createClient } from '@/lib/supabase/server'
 
 export interface TicketRow {
@@ -37,7 +38,8 @@ export async function getTickets(profileId: string): Promise<TicketRow[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('[getTickets] error', { code: error.code })
+    const log = createLogger('tickets')
+    log.error('getTickets error', { context: { code: error.code } })
     return []
   }
 
@@ -57,7 +59,8 @@ export async function getTicketMessages(ticketId: string): Promise<TicketMessage
     .order('created_at', { ascending: true })
 
   if (error) {
-    console.error('[getTicketMessages] error', { code: error.code })
+    const log = createLogger('tickets')
+    log.error('getTicketMessages error', { context: { code: error.code } })
     return []
   }
 

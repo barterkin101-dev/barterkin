@@ -1,4 +1,5 @@
 import 'server-only'
+import { createLogger } from '@/lib/utils/logger'
 import { createClient } from '@/lib/supabase/server'
 
 export interface DisputeRow {
@@ -59,7 +60,8 @@ export async function getDisputes(profileId: string): Promise<DisputeRow[]> {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('[getDisputes] error', { code: error.code })
+    const log = createLogger('disputes')
+    log.error('getDisputes error', { context: { code: error.code } })
     return []
   }
 
@@ -83,7 +85,8 @@ export async function getDisputeMessages(disputeId: string): Promise<DisputeMess
     .order('created_at', { ascending: true })
 
   if (error) {
-    console.error('[getDisputeMessages] error', { code: error.code })
+    const log = createLogger('disputes')
+    log.error('getDisputeMessages error', { context: { code: error.code } })
     return []
   }
 

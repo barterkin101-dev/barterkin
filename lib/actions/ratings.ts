@@ -6,6 +6,7 @@ import { RatingSchema } from '@/lib/schemas/ratings'
 import { captureEvent } from '@/lib/analytics'
 import { limitSubmitRating } from '@/lib/rate-limit'
 import { validateAndSanitize } from '@/lib/utils/validation'
+import { createLogger } from '@/lib/utils/logger'
 import type { SubmitRatingResult } from '@/lib/actions/ratings.types'
 
 export async function submitRating(
@@ -61,7 +62,8 @@ export async function submitRating(
       .eq('listing_id', values.listingId)
       .maybeSingle()
     if (existingErr) {
-      console.error('[submitRating] existing check failed', { code: existingErr.code })
+      const log = createLogger('ratings')
+      log.error('existing check failed', { error: existingErr, context: { code: existingErr.code } })
       return { ok: false, error: 'Something went wrong.' }
     }
     if (existing) {
@@ -78,7 +80,8 @@ export async function submitRating(
   })
 
   if (insertErr) {
-    console.error('[submitRating] insert failed', { code: insertErr.code })
+    const log = createLogger('ratings')
+    log.error('submitRating insert failed', { error: insertErr, context: { code: insertErr.code } })
     return { ok: false, error: 'Something went wrong submitting your rating.' }
   }
 

@@ -12,6 +12,7 @@
  * shared `applyFilters` helper (RESEARCH.md Pitfall 7).
  */
 import 'server-only'
+import { createLogger } from '@/lib/utils/logger'
 import { createClient } from '@/lib/supabase/server'
 import type {
   DirectoryFilters,
@@ -80,15 +81,13 @@ export async function getDirectoryRows(
     ])
 
     if (countResult.error) {
-      console.error('[getDirectoryRows] count error', {
-        code: countResult.error.code,
-      })
+      const log = createLogger('directory')
+      log.error('count error', { context: { code: countResult.error.code } })
       return { profiles: [], totalCount: 0, error: 'count_failed' }
     }
     if (rowsResult.error) {
-      console.error('[getDirectoryRows] rows error', {
-        code: rowsResult.error.code,
-      })
+      const log = createLogger('directory')
+      log.error('rows error', { context: { code: rowsResult.error.code } })
       return { profiles: [], totalCount: 0, error: 'rows_failed' }
     }
 
@@ -126,7 +125,8 @@ export async function getDirectoryRows(
       error: null,
     }
   } catch (err) {
-    console.error('[getDirectoryRows] unexpected', err)
+    const log = createLogger('directory')
+    log.error('unexpected error', { error: err })
     return { profiles: [], totalCount: 0, error: 'unknown' }
   }
 }
