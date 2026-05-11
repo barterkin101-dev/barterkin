@@ -6,7 +6,7 @@
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { createLogger } from '@/lib/utils/logger'
-import { generateChatResponse } from '@/lib/chatbot/openai'
+// import { generateChatResponse } from '@/lib/chatbot/openai'
 
 export type ChatIntent =
   | 'greeting'
