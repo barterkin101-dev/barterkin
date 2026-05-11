@@ -87,8 +87,8 @@
     "id": "13",
     "title": "Add E2E Tests (Playwright)",
     "priority": "low",
-    "status": "pending",
-    "notes": ""
+    "status": "in_progress",
+    "notes": "IN PROGRESS: The project already has 49 E2E spec files with comprehensive coverage. Fixed 3 tests that had stale assertions not matching current UI copy: (1) offline-page.spec.ts — updated text matcher from 'check your connection' to 'Barterkin will be back when your connection returns'; (2) sitemap-robots.spec.ts — updated from 'User-agent:' to 'User-Agent:' and 'Allow:' to 'Allow: /' to match actual robots.txt output; (3) verify-pending-page.spec.ts — updated heading matcher from 'check your email' to 'one more step' and resend button from button role to link role. Also added 8 new spec files: admin-pages-guard, auth-error-page, dashboard-smoke, health-check, listing-detail. 54 no-DB tests now pass in chromium. 47 tests fail because they require createVerifiedPair() which uses SUPABASE_SERVICE_ROLE_KEY — the key returns 401 Unauthorized from Supabase (likely revoked/rotated). 5 additional tests fail due to missing Turnstile/CAPTCHA env vars (expected in test env). BLOCKED on secret rotation for full DB-seeded test coverage."
   },
   {
     "id": "14",
