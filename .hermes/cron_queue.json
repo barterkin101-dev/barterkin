@@ -52,8 +52,8 @@
     "id": "8",
     "title": "Add Logging / Observability",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "COMPLETED: Created structured logging infrastructure across the entire codebase. (1) lib/utils/logger.ts — server-side structured logger with 5 severity levels, trace ID correlation, pretty-print in dev / JSON in prod, component-scoped createLogger(). (2) lib/observability.ts — request/response logging helpers (logRequest, logResponse), error wrappers (withErrorLogging, withTiming), and logServerError for catch blocks. (3) lib/utils/client-logger.ts — browser-side structured logger for client components, async-imported to avoid server bundle. (4) Replaced ~45 raw console.* calls across lib/actions/* (13 files), lib/data/* (10 files), lib/chatbot/engine.ts, lib/utils/validation.ts, lib/utils/rate-limit.ts, app/auth/callback/route.ts, app/auth/confirm/route.ts, app/(app)/dashboard/page.tsx, components/listings/ImageUploader.tsx, components/profile/AvatarUploader.tsx. (5) Added 9 unit tests for logger covering traceId generation, level routing, context inclusion, error serialization, component scoping, and LOG_LEVEL env respect. (6) Fixed pre-existing TS error in observability.ts (traceId type mismatch). All 192 unit tests pass. TypeScript clean (0 project errors). Committed as [task-8] and pushed to origin main."
   },
   {
     "id": "9",
