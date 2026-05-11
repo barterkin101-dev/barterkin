@@ -1,0 +1,17 @@
+[14:26:37] ════════════════════════════════════════
+[14:26:37] Barterkin Autonomous Daemon started
+[14:26:37] Interval: 30m | Max sessions/day: 48
+[14:26:37] Kill switch: /root/barterkin/.daemon-stop
+[14:26:37] ════════════════════════════════════════
+[14:26:37] Starting task session (0/48 today)...
+════════════════════════════════════════
+Barterkin Autonomous Task Runner
+Started: 2026-05-09T14:26:37+00:00
+AI CLI: claude
+Max Budget: $3.00
+Max Duration: 900s
+════════════════════════════════════════
+--dangerously-skip-permissions cannot be used with root/sudo privileges for security reasons
+[14:26:39] Task failed or timed out.
+[14:26:39] Sending Telegram status update...
+[14:26:40] Sleeping 30 minutes...

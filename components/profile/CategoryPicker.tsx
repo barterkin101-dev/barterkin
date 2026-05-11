@@ -14,7 +14,7 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
     <RadioGroup
       value={value != null ? String(value) : ''}
       onValueChange={(v) => onChange(Number(v))}
-      className="grid grid-cols-2 gap-2 md:grid-cols-3"
+      className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3"
     >
       {CATEGORIES.map((cat) => {
         const isSelected = value === cat.id

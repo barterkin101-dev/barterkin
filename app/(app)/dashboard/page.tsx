@@ -168,8 +168,8 @@ export default async function DashboardPage() {
           </Link>
         </Card>
 
-        <Card className="transition-colors hover:bg-muted/50">
-          <Link href="/profile/edit">
+        <Link href="/profile/edit" className="block">
+          <Card className="transition-colors hover:bg-muted/50 cursor-pointer">
             <CardContent className="flex items-center gap-4 p-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <User className="h-6 w-6 text-primary" />
@@ -179,8 +179,8 @@ export default async function DashboardPage() {
                 <p className="text-sm text-muted-foreground">Update your profile and settings</p>
               </div>
             </CardContent>
-          </Link>
-        </Card>
+          </Card>
+        </Link>
       </div>
 
       {/* Profile completeness nudge */}

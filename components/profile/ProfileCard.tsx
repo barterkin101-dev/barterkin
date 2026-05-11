@@ -48,8 +48,8 @@ export function ProfileCard({
 
   return (
     <Card className="bg-sage-pale border-sage-light">
-      <CardHeader className="flex flex-row items-start gap-6 p-6 lg:p-8">
-        <Avatar className="h-40 w-40 shrink-0 border border-sage-light">
+      <CardHeader className="flex flex-row items-start gap-4 p-6 sm:gap-6 lg:p-8">
+        <Avatar className="h-24 w-24 shrink-0 border border-sage-light sm:h-32 sm:w-32 lg:h-40 lg:w-40">
           <AvatarImage src={profile.avatar_url ?? undefined} alt={profile.display_name ?? ''} />
           <AvatarFallback className="text-4xl">{initial}</AvatarFallback>
         </Avatar>

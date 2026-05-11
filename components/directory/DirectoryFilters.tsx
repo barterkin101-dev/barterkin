@@ -62,15 +62,21 @@ export function DirectoryFilters({
       aria-label="Directory filters"
     >
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-2">
-        <DirectoryCategoryFilter
-          value={initialCategorySlug}
-          onChange={handleCategory}
-        />
-        <DirectoryCountyFilter
-          value={initialCountyFips}
-          onChange={handleCounty}
-        />
-        <DirectoryKeywordSearch initialValue={initialQ} onSubmit={handleQ} />
+        <div className="w-full md:w-auto">
+          <DirectoryCategoryFilter
+            value={initialCategorySlug}
+            onChange={handleCategory}
+          />
+        </div>
+        <div className="w-full md:w-auto">
+          <DirectoryCountyFilter
+            value={initialCountyFips}
+            onChange={handleCounty}
+          />
+        </div>
+        <div className="w-full md:w-auto md:min-w-[240px]">
+          <DirectoryKeywordSearch initialValue={initialQ} onSubmit={handleQ} />
+        </div>
         {activeFilterCount > 0 && (
           <Button
             type="button"

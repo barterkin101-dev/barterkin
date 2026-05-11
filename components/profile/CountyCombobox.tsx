@@ -40,10 +40,10 @@ export function CountyCombobox({
           <ChevronsUpDown className="ml-auto opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0">
+      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 sm:w-[300px]">
         <Command>
           <CommandInput placeholder="Search Georgia counties..." />
-          <CommandList>
+          <CommandList className="max-h-[300px] sm:max-h-[400px]">
             <CommandEmpty>No county found.</CommandEmpty>
             <CommandGroup>
               {georgiaCounties.map((county) => (
