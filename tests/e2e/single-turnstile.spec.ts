@@ -11,9 +11,14 @@ test.describe('UAT Gap 1: single Turnstile per auth page', () => {
       // The rendered Turnstile container
       const cfContainers = document.querySelectorAll('div#cf-turnstile')
       // Fallback for missing sitekey (dev mode without .env.local)
-      const fallback = Array.from(document.querySelectorAll('div')).filter((d) =>
-        (d.textContent || '').includes('Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY'),
-      ).length
+      // Use :scope to count only the innermost divs (not ancestor divs that also contain the text)
+      const fallback = Array.from(document.querySelectorAll('div')).filter((d) => {
+        const hasText = (d.textContent || '').includes('Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY')
+        const childAlsoHas = Array.from(d.children).some((c) =>
+          (c.textContent || '').includes('Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY'),
+        )
+        return hasText && !childAlsoHas
+      }).length
       // Real Cloudflare iframes (only in online prod with valid sitekey)
       const iframes = document.querySelectorAll('iframe[src*="challenges.cloudflare.com"]')
       return cfContainers.length + fallback + iframes.length
@@ -25,9 +30,13 @@ test.describe('UAT Gap 1: single Turnstile per auth page', () => {
     await page.goto('/signup')
     const widgetCount = await page.evaluate(() => {
       const cfContainers = document.querySelectorAll('div#cf-turnstile')
-      const fallback = Array.from(document.querySelectorAll('div')).filter((d) =>
-        (d.textContent || '').includes('Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY'),
-      ).length
+      const fallback = Array.from(document.querySelectorAll('div')).filter((d) => {
+        const hasText = (d.textContent || '').includes('Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY')
+        const childAlsoHas = Array.from(d.children).some((c) =>
+          (c.textContent || '').includes('Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY'),
+        )
+        return hasText && !childAlsoHas
+      }).length
       const iframes = document.querySelectorAll('iframe[src*="challenges.cloudflare.com"]')
       return cfContainers.length + fallback + iframes.length
     })
