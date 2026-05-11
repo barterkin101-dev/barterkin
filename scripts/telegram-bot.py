@@ -58,6 +58,27 @@ def api_get(url: str, headers: dict | None = None) -> dict:
         return {"error": str(e)}
 
 
+def sb_count(table: str, filter_q: str = "") -> str:
+    """Query Supabase count using Range+Prefer headers (avoids PGRST123)."""
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        return "?"
+    url = f"{SUPABASE_URL}/rest/v1/{table}?select=id"
+    if filter_q:
+        url += f"&{filter_q}"
+    try:
+        req = urllib.request.Request(url, method="HEAD")
+        req.add_header("apikey", SUPABASE_KEY)
+        req.add_header("Authorization", f"Bearer {SUPABASE_KEY}")
+        req.add_header("Range", "0-0")
+        req.add_header("Prefer", "count=exact")
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            cr = resp.headers.get("content-range", "")
+            # Format: "0-0/123"
+            return cr.split("/")[-1] if "/" in cr else "0"
+    except Exception:
+        return "err"
+
+
 def get_git_status() -> str:
     branch = run_cmd(["git", "rev-parse", "--abbrev-ref", "HEAD"])
     last_commit = run_cmd(["git", "log", "-1", "--format=%h %s (%ar)"])
@@ -84,24 +105,20 @@ def get_github_status() -> str:
 
 
 def get_supabase_metrics() -> str:
-    if not SUPABASE_URL or not SUPABASE_ANON:
+    if not SUPABASE_URL or not SUPABASE_KEY:
         return "No Supabase credentials"
-    base = f"{SUPABASE_URL}/rest/v1"
-    headers = {"apikey": SUPABASE_ANON, "Authorization": f"Bearer {SUPABASE_ANON}"}
-    tables = ["profiles", "listings", "conversations", "messages", "tickets"]
+    tables = [
+        ("profiles", ""),
+        ("listings", ""),
+        ("conversations", ""),
+        ("messages", ""),
+        ("tickets", "status=eq.open"),
+    ]
     lines = []
-    for table in tables:
-        try:
-            req = urllib.request.Request(
-                f"{base}/{table}?select=count()&limit=1",
-                headers=headers, method="HEAD"
-            )
-            with urllib.request.urlopen(req, timeout=10) as resp:
-                cr = resp.headers.get("content-range", "")
-                count = cr.split("/")[-1] if "/" in cr else "?"
-                lines.append(f"{table}: {count}")
-        except Exception as e:
-            lines.append(f"{table}: err")
+    for table, filt in tables:
+        count = sb_count(table, filt)
+        label = f"{table} (open)" if filt else table
+        lines.append(f"{label}: {count}")
     return "\n".join(lines)
 
 
@@ -118,7 +135,7 @@ def get_cloudflare_dns() -> str:
     lines = []
     for r in records:
         if r.get("name") in ("barterkin.com", "www.barterkin.com"):
-            lines.append(f"{r['type']} {r['name']} → {r['content']}")
+            lines.append(f"{r['type']} {r['name']} -> {r['content']}")
     return "\n".join(lines) if lines else "No DNS records found"
 
 
