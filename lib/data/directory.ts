@@ -14,6 +14,8 @@
 import 'server-only'
 import { createLogger } from '@/lib/utils/logger'
 import { createClient } from '@/lib/supabase/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/lib/database.types'
 import type {
   DirectoryFilters,
   DirectoryProfile,
@@ -25,8 +27,9 @@ const PAGE_SIZE = 20
 
 export async function getDirectoryRows(
   filters: DirectoryFilters,
+  client?: SupabaseClient<Database>,
 ): Promise<DirectoryQueryResult> {
-  const supabase = await createClient()
+  const supabase = client ?? (await createClient())
 
   // Apply filters identically to both queries (Pitfall 7)
   // Using separate builders because Supabase's chained builder is consumed when awaited.

@@ -123,14 +123,14 @@ d('Phase 8 — admin data layer', () => {
     if (admin) {
       // Clean up in reverse dependency order: messages → participants → conversations
       for (const mid of fixtureMessageIds) {
-        await admin.from('messages').delete().eq('id', mid).catch(() => undefined)
+        try { await admin.from('messages').delete().eq('id', mid) } catch { /* ignore */ }
       }
       for (const cid of fixtureConversationIds) {
-        await admin.from('conversation_participants').delete().eq('conversation_id', cid).catch(() => undefined)
-        await admin.from('conversations').delete().eq('id', cid).catch(() => undefined)
+        try { await admin.from('conversation_participants').delete().eq('conversation_id', cid) } catch { /* ignore */ }
+        try { await admin.from('conversations').delete().eq('id', cid) } catch { /* ignore */ }
       }
       for (const uid of fixtureUserIds) {
-        await admin.auth.admin.deleteUser(uid).catch(() => undefined)
+        try { await admin.auth.admin.deleteUser(uid) } catch { /* ignore */ }
       }
     }
   }, 60_000)

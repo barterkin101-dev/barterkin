@@ -87,7 +87,7 @@ d('DIR-02/03/04/05/07 — directory data layer', () => {
 
   it('getDirectoryRows is importable and returns DirectoryQueryResult shape', async () => {
     const { getDirectoryRows } = await import('@/lib/data/directory')
-    const result = await getDirectoryRows(baseFilters())
+    const result = await getDirectoryRows(baseFilters(), admin)
     expect(result).toHaveProperty('profiles')
     expect(result).toHaveProperty('totalCount')
     expect(result).toHaveProperty('error')
@@ -97,14 +97,14 @@ d('DIR-02/03/04/05/07 — directory data layer', () => {
 
   it('q filter "baking" matches the seeded baker (FTS exact)', async () => {
     const { getDirectoryRows } = await import('@/lib/data/directory')
-    const result = await getDirectoryRows(baseFilters({ q: 'baking', activeFilterCount: 1 }))
+    const result = await getDirectoryRows(baseFilters({ q: 'baking', activeFilterCount: 1 }), admin)
     const names = result.profiles.map((p) => p.display_name)
     expect(names).toContain('Data Test Baker')
   })
 
   it('q filter "bakng" (typo) still matches via pg_trgm', async () => {
     const { getDirectoryRows } = await import('@/lib/data/directory')
-    const result = await getDirectoryRows(baseFilters({ q: 'bakng', activeFilterCount: 1 }))
+    const result = await getDirectoryRows(baseFilters({ q: 'bakng', activeFilterCount: 1 }), admin)
     // With trigram fallback, "bakng" should match "baking". If textSearch alone
     // doesn't hit it, this documents the known escalation path to an RPC
     // (RESEARCH.md Example 5). For now, assert at minimum that it did not throw.
@@ -116,7 +116,7 @@ d('DIR-02/03/04/05/07 — directory data layer', () => {
 
   it('skills_offered is sorted ASC and truncated to 3', async () => {
     const { getDirectoryRows } = await import('@/lib/data/directory')
-    const result = await getDirectoryRows(baseFilters({ q: 'baking', activeFilterCount: 1 }))
+    const result = await getDirectoryRows(baseFilters({ q: 'baking', activeFilterCount: 1 }), admin)
     const baker = result.profiles.find((p) => p.display_name === 'Data Test Baker')
     expect(baker).toBeDefined()
     expect(baker!.skills_offered.length).toBeLessThanOrEqual(3)
@@ -129,7 +129,7 @@ d('DIR-02/03/04/05/07 — directory data layer', () => {
 
   it('categoryId filter narrows to that category', async () => {
     const { getDirectoryRows } = await import('@/lib/data/directory')
-    const result = await getDirectoryRows(baseFilters({ categoryId: 2, activeFilterCount: 1 }))
+    const result = await getDirectoryRows(baseFilters({ categoryId: 2, activeFilterCount: 1 }), admin)
     // All returned rows must be category 2 (Food & Kitchen)
     for (const p of result.profiles) {
       expect(p.categories?.name).toBe('Food & Kitchen')
@@ -138,7 +138,7 @@ d('DIR-02/03/04/05/07 — directory data layer', () => {
 
   it('count and rows use identical filters (count >= rows.length)', async () => {
     const { getDirectoryRows } = await import('@/lib/data/directory')
-    const result = await getDirectoryRows(baseFilters({ q: 'baking', activeFilterCount: 1 }))
+    const result = await getDirectoryRows(baseFilters({ q: 'baking', activeFilterCount: 1 }), admin)
     expect(result.profiles.length).toBeLessThanOrEqual(result.totalCount)
   })
 })
