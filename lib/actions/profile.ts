@@ -6,6 +6,7 @@ import { ProfileFormSchema } from '@/lib/schemas/profile'
 import { generateSlug } from '@/lib/utils/slug'
 import { validateAndSanitize } from '@/lib/utils/validation'
 import { createLogger } from '@/lib/utils/logger'
+import { captureEvent } from '@/lib/analytics'
 import type {
   SaveProfileResult,
   SetPublishedResult,
@@ -277,5 +278,11 @@ export async function setPublished(
     log.error('publish update failed', { error: updateError, context: { code: updateError.code } })
     return { ok: false, error: 'Something went wrong. Please try again.' }
   }
+
+  void captureEvent(user.id, 'profile_published', {
+    method: 'toggle',
+    profile_id: profileId,
+  })
+
   return { ok: true }
 }

@@ -12,6 +12,7 @@ import { BlockSchema, ReportSchema } from '@/lib/schemas/contact'
 import { validateAndSanitize } from '@/lib/utils/validation'
 import { getClientIp, limitBlockAction, limitReportSubmission } from '@/lib/rate-limit-public'
 import { createLogger } from '@/lib/utils/logger'
+import { captureEvent } from '@/lib/analytics'
 import type {
   ReportMemberResult,
 } from '@/lib/actions/contact.types'
@@ -57,6 +58,11 @@ export async function blockMember(formData: FormData): Promise<void> {
     log.error('blockMember upsert failed', { error, context: { code: error.code } })
     redirect('/directory?blocked_error=1')
   }
+
+  void captureEvent(user.id, 'contact_blocked', {
+    blocked_id: parsed.data.blockedOwnerId,
+    blocked_display_name: parsed.data.blockedDisplayName,
+  })
 
   revalidatePath('/directory')
   revalidatePath(`/m/${parsed.data.blockedUsername}`)
@@ -165,6 +171,12 @@ export async function reportMember(
     const log = createLogger('contact')
     log.error('reportMember admin notify failed', { error: err, context: { code: (err as Error).name } })
   }
+
+  void captureEvent(user.id, 'contact_reported', {
+    target_profile_id: parsed.data.targetProfileId,
+    reason: parsed.data.reason,
+    report_id: inserted.id,
+  })
 
   return { ok: true }
 }

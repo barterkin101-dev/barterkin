@@ -1,6 +1,7 @@
 'use client'
 import * as React from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import posthog from 'posthog-js'
 import { Button } from '@/components/ui/button'
 import { DirectoryCategoryFilter } from './DirectoryCategoryFilter'
 import { DirectoryCountyFilter } from './DirectoryCountyFilter'
@@ -33,26 +34,44 @@ export function DirectoryFilters({
     [router, pathname, searchParams],
   )
 
-  const handleCategory = (slug: string | null) =>
+  const trackFilter = React.useCallback(
+    (dimensions: { category?: string | null; county?: number | null; hasKeyword?: boolean }) => {
+      posthog.capture('directory_filter_applied', {
+        category_slug: dimensions.category ?? null,
+        county_fips: dimensions.county ?? null,
+        has_keyword: dimensions.hasKeyword ?? false,
+      })
+    },
+    [],
+  )
+
+  const handleCategory = (slug: string | null) => {
     pushWith((p) => {
       if (slug) p.set('category', slug)
       else p.delete('category')
     })
+    trackFilter({ category: slug, county: initialCountyFips, hasKeyword: !!initialQ })
+  }
 
-  const handleCounty = (fips: number | null) =>
+  const handleCounty = (fips: number | null) => {
     pushWith((p) => {
       if (fips !== null) p.set('county', String(fips))
       else p.delete('county')
     })
+    trackFilter({ category: initialCategorySlug, county: fips, hasKeyword: !!initialQ })
+  }
 
-  const handleQ = (q: string | null) =>
+  const handleQ = (q: string | null) => {
     pushWith((p) => {
       if (q && q.length >= 2) p.set('q', q)
       else p.delete('q')
     })
+    trackFilter({ category: initialCategorySlug, county: initialCountyFips, hasKeyword: !!q })
+  }
 
   const handleClearAll = () => {
     router.push(pathname)
+    posthog.capture('directory_filter_applied', { category_slug: null, county_fips: null, has_keyword: false })
   }
 
   return (

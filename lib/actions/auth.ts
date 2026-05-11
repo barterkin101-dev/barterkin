@@ -7,6 +7,7 @@ import { checkSignupRateLimit } from '@/lib/utils/rate-limit'
 import { limitAuthRequest } from '@/lib/rate-limit-public'
 import { MagicLinkSchema, type SendMagicLinkResult } from '@/lib/schemas/auth'
 import { createLogger } from '@/lib/utils/logger'
+import { captureEvent } from '@/lib/analytics'
 
 export type { SendMagicLinkResult }
 
@@ -71,6 +72,8 @@ export async function sendMagicLink(
     })
     return { ok: false, error: 'Something went wrong. Please try again in a moment.' }
   }
+
+  void captureEvent(email, 'signup_started', { method: 'magic_link' })
 
   return { ok: true }
 }

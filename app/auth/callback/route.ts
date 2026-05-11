@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
 import { getClientIp, limitOAuthCallback } from '@/lib/rate-limit-public'
+import { captureEvent } from '@/lib/analytics'
 
 /**
  * AUTH-01: Google OAuth callback.
@@ -27,8 +28,12 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    const { error, data } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      const user = data?.user
+      if (user) {
+        void captureEvent(user.id, 'signup_completed', { method: 'google_oauth' })
+      }
       return NextResponse.redirect(`${origin}${next}`)
     }
     const log = createLogger('auth')

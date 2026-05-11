@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
+import { captureEvent } from '@/lib/analytics'
 
 /**
  * AUTH-02: Magic-link verification.
@@ -19,8 +20,12 @@ export async function GET(request: NextRequest) {
 
   if (token_hash && type) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.verifyOtp({ type, token_hash })
+    const { error, data } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
+      const user = data?.user
+      if (user) {
+        void captureEvent(user.id, 'signup_completed', { method: 'magic_link' })
+      }
       redirect(next)
     }
     const log = createLogger('auth')
