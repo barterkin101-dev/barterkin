@@ -94,7 +94,7 @@
     "id": "14",
     "title": "Add Documentation (README + API Docs)",
     "priority": "low",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "COMPLETED: Created docs/infrastructure.md (180+ lines) covering validation/sanitization, rate limiting (IP-based + user-based), structured logging/observability, and health checks. Updated README.md with new 'Security & Infrastructure' section. Updated docs/API.md with Infrastructure section in TOC and cross-reference table. Updated docs/events.md with 'Last updated' header and related docs links. Removed scripts/supabase-local-env.sh (contained local Supabase keys flagged by GitHub push protection). All changes committed as [task-14] and pushed to origin main."
   }
 ]
