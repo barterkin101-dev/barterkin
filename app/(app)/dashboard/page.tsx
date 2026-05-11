@@ -3,10 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
 import { getMyListings } from '@/lib/data/listings'
 
-import { buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ShoppingBag, MessageSquare, Star, Ticket, User } from 'lucide-react'
+import { ProfileCompletionBar } from '@/components/profile/ProfileCompletionBar'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -22,7 +21,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published')
+    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, county_id, category_id')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -186,20 +185,21 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      {/* Profile completeness nudge */}
-      {profile && (!profile.bio || !profile.is_published) && (
-        <Card className="border-amber-200 bg-amber-50">
+      {/* Profile completion nudge */}
+      {profile && (
+        <Card className={profile.is_published ? 'border-border' : 'border-amber-200 bg-amber-50'}>
           <CardContent className="p-6">
-            <h3 className="font-semibold text-amber-900">Complete your profile</h3>
-            <p className="mt-1 text-sm text-amber-800">
-              A complete profile with a bio helps others trust you and improves your visibility.
-            </p>
-            <Link
-              href="/profile/edit"
-              className={cn(buttonVariants({ variant: 'outline' }), 'mt-3 border-amber-300')}
-            >
-              Finish your profile
-            </Link>
+            <ProfileCompletionBar
+              input={{
+                displayName: profile.display_name,
+                avatarUrl: profile.avatar_url,
+                countyId: profile.county_id,
+                categoryId: profile.category_id,
+                skillsOfferedCount: listings.length,
+                bio: profile.bio,
+              }}
+              showSteps={true}
+            />
           </CardContent>
         </Card>
       )}
