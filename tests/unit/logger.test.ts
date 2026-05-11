@@ -77,8 +77,9 @@ describe('logger', () => {
     // Delete and re-set to avoid read-only / descriptor issues
     delete (process.env as Record<string, string | undefined>).NODE_ENV
     delete (process.env as Record<string, string | undefined>).LOG_LEVEL
-    process.env.NODE_ENV = 'production'
-    process.env.LOG_LEVEL = 'error'
+    // Use vi.stubEnv to safely mock env vars in Vitest
+    vi.stubEnv('NODE_ENV', 'production')
+    vi.stubEnv('LOG_LEVEL', 'error')
 
     logger.warn('should not appear')
     expect(consoleErrorSpy).not.toHaveBeenCalled()
@@ -87,9 +88,6 @@ describe('logger', () => {
     expect(consoleErrorSpy).toHaveBeenCalled()
 
     // Restore
-    delete (process.env as Record<string, string | undefined>).NODE_ENV
-    delete (process.env as Record<string, string | undefined>).LOG_LEVEL
-    if (originalEnv !== undefined) process.env.NODE_ENV = originalEnv
-    if (originalLevel !== undefined) process.env.LOG_LEVEL = originalLevel
+    vi.unstubAllEnvs()
   })
 })
