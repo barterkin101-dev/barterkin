@@ -66,8 +66,8 @@
     "id": "10",
     "title": "Add Loading States + Skeleton Screens",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "COMPLETED: Added 19 new loading.tsx files across all route segments that were missing skeleton screens. Coverage now complete: Admin routes (contacts, disputes list+detail, listings, members list+detail, messages, tickets list+detail), Dashboard form pages (new listing, edit listing, edit profile dashboard+public, new ticket), Auth error page, Legal pages (guidelines, privacy, tos), Offline page. Also fixed pre-existing logger.test.ts TS2540 error (process.env read-only assignment) and runtime descriptor issue. Total: 39 loading.tsx files across the entire app. All 201 tests pass, TypeScript clean (0 project errors). Committed as [task-10] and pushed to origin main."
   },
   {
     "id": "11",
