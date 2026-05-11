@@ -15,6 +15,7 @@
 5. [Rate Limiting](#rate-limiting)
 6. [Error Handling](#error-handling)
 7. [Environment Variables](#environment-variables)
+8. [Infrastructure](#infrastructure)
 
 ---
 
@@ -708,5 +709,21 @@ Key tables:
 4. `pnpm dev` — http://localhost:3000
 5. `pnpm test` — verify unit tests pass
 6. `pnpm e2e` — verify E2E tests pass (requires dev server running)
+
+## Infrastructure
+
+Barterkin's defense-in-depth infrastructure is documented in `docs/infrastructure.md`. Key systems:
+
+| System | File | Purpose |
+|--------|------|---------|
+| Input validation + sanitization | `lib/utils/validation.ts` + `lib/utils/sanitize.ts` | Zod schemas + text cleaning on every server action |
+| Rate limiting (IP-based) | `lib/rate-limit-public.ts` | Public endpoint protection (magic link, OAuth, chatbot, reports) |
+| Rate limiting (user-based) | `lib/utils/rate-limit.ts` | Authenticated mutation protection (listings, messages, ratings, tickets, disputes) |
+| Structured logging | `lib/utils/logger.ts` + `lib/observability.ts` | Server + client loggers with trace ID correlation |
+| Health checks | `lib/health-check.ts` | `/api/health` (full) + `/api/health/simple` (edge ping) |
+
+See `docs/infrastructure.md` for implementation details, env vars, and testing.
+
+---
 
 See `README.md` for full setup instructions and `DEPLOY.md` for deployment runbook.

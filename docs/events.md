@@ -1,9 +1,13 @@
 # Analytics Events
 
+> **Last updated:** 2026-05-11  
+> **Project:** PostHog project id `387571` (US host: `https://us.i.posthog.com`)
+
 PostHog is the source of truth for product metrics on Barterkin. Events fired in this file MUST match the schema documented here — any drift between code and this doc is a bug.
 
-**Project:** PostHog project id `387571` (US host: `https://us.i.posthog.com`).
 **Firing pattern:** Server-side via `posthog-node` from server actions, client-side via `posthog-js` from client components. All events are non-blocking (wrapped in try/catch) and never throw.
+
+**Related docs:** `docs/API.md` (API routes + server actions), `docs/infrastructure.md` (logging, rate limiting, health checks)
 
 ---
 

@@ -104,6 +104,18 @@ The `vlrioprefvwkahryuuap` (us-east-2) project was auto-created when the Supabas
 
 After deletion, `pnpm supabase projects list` shows only `hfdcsickergdcdvejbcw`.
 
+## Security & Infrastructure
+
+Barterkin runs several defense-in-depth systems documented in `docs/infrastructure.md`:
+
+- **Input validation + sanitization** — Zod schemas + text sanitization on every server action
+- **Rate limiting** — User-based (authenticated mutations) + IP-based (public endpoints) via Upstash Redis
+- **Structured logging** — Server + client loggers with trace ID correlation
+- **Health checks** — `/api/health` (full dependency check) + `/api/health/simple` (edge ping)
+- **Error boundaries** — Graceful fallbacks on every route segment (`error.tsx` + `loading.tsx`)
+
+See `docs/infrastructure.md` for implementation details, env vars, and testing.
+
 ## Phase 6 DNS cutover procedure (reference)
 
 During Phases 1–5 the domain `barterkin.com` points at Netlify (legacy). When the new landing page ships in Phase 6:
