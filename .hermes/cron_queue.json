@@ -96,5 +96,12 @@
     "priority": "low",
     "status": "completed",
     "notes": "COMPLETED: Created docs/infrastructure.md (180+ lines) covering validation/sanitization, rate limiting (IP-based + user-based), structured logging/observability, and health checks. Updated README.md with new 'Security & Infrastructure' section. Updated docs/API.md with Infrastructure section in TOC and cross-reference table. Updated docs/events.md with 'Last updated' header and related docs links. Removed scripts/supabase-local-env.sh (contained local Supabase keys flagged by GitHub push protection). All changes committed as [task-14] and pushed to origin main."
+  },
+  {
+    "id": "15",
+    "title": "Add Open Graph Image Generation",
+    "priority": "medium",
+    "status": "completed",
+    "notes": "COMPLETED: Added dynamic Open Graph image generation for listings and member profiles. (1) app/(app)/listings/[id]/opengraph-image.tsx — generates 1200×630 OG image with category/condition/county badges, listing title, truncated description, seller name, and Barterkin brand logo. (2) app/(app)/m/[username]/opengraph-image.tsx — generates 1200×630 OG image with avatar (or fallback icon), display name, username, county, truncated bio, and Barterkin brand logo. Both use the brand green gradient (#1e4420 → #3a7032) and serif/sans-serif typography matching the site aesthetic. Also fixed pre-existing lint error in tests/e2e/dashboard-smoke.spec.ts (any → Page type, removed unused hasEnv). All 236 tests pass, TypeScript clean (project files), lint clean (project files). Committed as [task-15] and pushed to origin main."
   }
 ]
