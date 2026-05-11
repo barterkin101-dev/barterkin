@@ -70,8 +70,13 @@ describe('logger', () => {
   })
 
   it('respects LOG_LEVEL env in production', () => {
+    // Save original values
     const originalEnv = process.env.NODE_ENV
     const originalLevel = process.env.LOG_LEVEL
+
+    // Delete and re-set to avoid read-only / descriptor issues
+    delete (process.env as Record<string, string | undefined>).NODE_ENV
+    delete (process.env as Record<string, string | undefined>).LOG_LEVEL
     process.env.NODE_ENV = 'production'
     process.env.LOG_LEVEL = 'error'
 
@@ -81,7 +86,10 @@ describe('logger', () => {
     logger.error('should appear')
     expect(consoleErrorSpy).toHaveBeenCalled()
 
-    process.env.NODE_ENV = originalEnv
-    process.env.LOG_LEVEL = originalLevel
+    // Restore
+    delete (process.env as Record<string, string | undefined>).NODE_ENV
+    delete (process.env as Record<string, string | undefined>).LOG_LEVEL
+    if (originalEnv !== undefined) process.env.NODE_ENV = originalEnv
+    if (originalLevel !== undefined) process.env.LOG_LEVEL = originalLevel
   })
 })
