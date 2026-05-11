@@ -105,7 +105,7 @@ export function ProfileEditForm({
   return (
     <FormProvider {...form}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form action={formAction} onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <header className="space-y-2">
             <h1 className="font-serif text-3xl font-bold leading-[1.15] md:text-[32px]">Your profile</h1>
             <p className="text-base text-muted-foreground">Tell the Georgia community who you are and what you can trade.</p>
