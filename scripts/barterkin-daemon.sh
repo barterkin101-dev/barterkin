@@ -143,7 +143,7 @@ cmd_loop() {
     if [[ $((today % 4)) -eq 0 ]]; then
       if [[ -n "${TELEGRAM_BOT_TOKEN:-}" && -n "${TELEGRAM_GROUP_ID:-}" ]]; then
         log "Sending Telegram status update..."
-        python3 "$PROJECT_ROOT/scripts/telegram-bot.py" status >> "$LOG_DIR/daemon.log" 2>&1 || true
+        curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" -H "Content-Type: application/json" -d "{"chat_id":"${TELEGRAM_GROUP_ID}","text":"📊 Daemon: Task completed/failed. Check logs."}" >> "$LOG_DIR/daemon.log" 2>&1 || true
       fi
     fi
 

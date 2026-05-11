@@ -24,7 +24,7 @@ LOG_FILE="$LOG_DIR/task-$TIMESTAMP.log"
 # ─── Telegram Helpers ────────────────────────────────────────────────
 tg_notify() {
   if [[ -n "${TELEGRAM_BOT_TOKEN:-}" && -n "${TELEGRAM_GROUP_ID:-}" ]]; then
-    python3 scripts/telegram-bot.py status >> "$LOG_FILE" 2>&1 || true
+    curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage"       -H "Content-Type: application/json"       -d "{\"chat_id\":\"${TELEGRAM_GROUP_ID}\",\"text\":\"📊 Task completed. Check logs.\",\"parse_mode\":\"HTML\"}" >> "$LOG_FILE" 2>&1 || true
   fi
 }
 
@@ -32,7 +32,7 @@ tg_ask() {
   local task="${1:-unknown task}"
   local details="${2:-}"
   if [[ -n "${TELEGRAM_BOT_TOKEN:-}" && -n "${TELEGRAM_GROUP_ID:-}" ]]; then
-    python3 scripts/telegram-bot.py ask "$task" "$details" >> "$LOG_FILE" 2>&1 || true
+    curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage"       -H "Content-Type: application/json"       -d "{\"chat_id\":\"${TELEGRAM_GROUP_ID}\",\"text\":\"⚠️ Approval Required\n\nTask: ${task}\n${details}\n\nReply APPROVE or REJECT.\",\"parse_mode\":\"HTML\"}" >> "$LOG_FILE" 2>&1 || true
   fi
 }
 
