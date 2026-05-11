@@ -73,8 +73,8 @@
     "id": "11",
     "title": "Add Responsive / Mobile Polish",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "in_progress",
+    "notes": "Working on responsive/mobile polish. Auditing layout components, navigation, forms, and cards for mobile usability."
   },
   {
     "id": "12",
