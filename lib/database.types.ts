@@ -794,6 +794,51 @@ export type Database = {
         }
         Relationships: []
       }
+      waitlist: {
+        Row: {
+          id: string
+          email: string
+          source: string | null
+          county_id: number | null
+          joined_at: string
+          converted_at: string | null
+          converted_user_id: string | null
+        }
+        Insert: {
+          id?: string
+          email: string
+          source?: string | null
+          county_id?: number | null
+          joined_at?: string
+          converted_at?: string | null
+          converted_user_id?: string | null
+        }
+        Update: {
+          id?: string
+          email?: string
+          source?: string | null
+          county_id?: number | null
+          joined_at?: string
+          converted_at?: string | null
+          converted_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_county_id_fkey"
+            columns: ["county_id"]
+            isOneToOne: false
+            referencedRelation: "counties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "waitlist_converted_user_id_fkey"
+            columns: ["converted_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["owner_id"]
+          },
+        ]
+      }
       skills_offered: {
         Row: {
           created_at: string

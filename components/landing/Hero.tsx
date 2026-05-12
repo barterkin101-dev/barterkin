@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { FadeIn, Stagger, StaggerItem } from '@/components/ui/fade-in'
+import { WaitlistForm } from './WaitlistForm'
 
 export interface HeroStats {
   totalProfiles: number
@@ -82,26 +83,41 @@ export function Hero({ stats, isAuthed }: HeroProps) {
           </FadeIn>
 
           <FadeIn delay={0.3}>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href={primaryHref}
-                className={cn(
-                  buttonVariants({ size: 'lg' }),
-                  'h-12 min-w-[180px] bg-clay hover:bg-clay/90 text-sage-bg font-semibold'
-                )}
-              >
-                <Sprout className="mr-2 h-4 w-4" aria-hidden="true" />
-                {primaryLabel}
-              </Link>
-              <Link
-                href="/directory"
-                className={cn(
-                  buttonVariants({ variant: 'outline', size: 'lg' }),
-                  'h-12 min-w-[180px] border-sage-bg/30 text-sage-bg bg-transparent hover:bg-sage-bg/10'
-                )}
-              >
-                Browse the directory
-              </Link>
+            <div className="mt-8 flex flex-col gap-3">
+              {isAuthed ? (
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Link
+                    href={primaryHref}
+                    className={cn(
+                      buttonVariants({ size: 'lg' }),
+                      'h-12 min-w-[180px] bg-clay hover:bg-clay/90 text-sage-bg font-semibold'
+                    )}
+                  >
+                    <Sprout className="mr-2 h-4 w-4" aria-hidden="true" />
+                    {primaryLabel}
+                  </Link>
+                  <Link
+                    href="/directory"
+                    className={cn(
+                      buttonVariants({ variant: 'outline', size: 'lg' }),
+                      'h-12 min-w-[180px] border-sage-bg/30 text-sage-bg bg-transparent hover:bg-sage-bg/10'
+                    )}
+                  >
+                    Browse the directory
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <WaitlistForm />
+                  <p className="text-xs text-sage-bg/50">
+                    Or{' '}
+                    <Link href="/signup" className="underline underline-offset-2 hover:text-sage-bg/75">
+                      skip the line and sign up now
+                    </Link>
+                    {' '}· No spam, ever.
+                  </p>
+                </>
+              )}
             </div>
           </FadeIn>
 
