@@ -11,14 +11,14 @@
     "title": "Add Missing Environment Variables to Vercel",
     "priority": "high",
     "status": "blocked",
-    "notes": "BLOCKED: Same root cause as task #1 — no valid Vercel token to authenticate with Vercel API. Cannot list or set env vars without authentication. Unblocks when task #1 is resolved."
+    "notes": "BLOCKED: Same root cause as task #1 \u2014 no valid Vercel token to authenticate with Vercel API. Cannot list or set env vars without authentication. Unblocks when task #1 is resolved."
   },
   {
     "id": "3",
     "title": "Fix Supabase Auth / Session Handling",
     "priority": "high",
     "status": "completed",
-    "notes": "COMPLETED: Audited auth patterns across the codebase. The auth architecture is already well-structured: middleware uses getClaims() (fast, JWKS-verified) for routing decisions with a getUser() fallback for OAuth edge cases; server components and server actions use getUser() for identity/trust decisions; client components use getUser() via browser client. No getSession() misuse found. Added a request-scoped session cache utility (getCachedUser) in listings/[id]/page.tsx to deduplicate getUser() calls within the same request — can be extracted to lib/supabase/server.ts if adopted elsewhere. All typecheck, lint, and unit tests pass."
+    "notes": "COMPLETED: Audited auth patterns across the codebase. The auth architecture is already well-structured: middleware uses getClaims() (fast, JWKS-verified) for routing decisions with a getUser() fallback for OAuth edge cases; server components and server actions use getUser() for identity/trust decisions; client components use getUser() via browser client. No getSession() misuse found. Added a request-scoped session cache utility (getCachedUser) in listings/[id]/page.tsx to deduplicate getUser() calls within the same request \u2014 can be extracted to lib/supabase/server.ts if adopted elsewhere. All typecheck, lint, and unit tests pass."
   },
   {
     "id": "4",
@@ -32,28 +32,28 @@
     "title": "Add Rate Limiting to Public Endpoints",
     "priority": "high",
     "status": "completed",
-    "notes": "COMPLETED: Created lib/rate-limit-public.ts with IP-based rate limiting for public/unauthenticated endpoints. Uses Upstash Redis in production with in-memory Map fallback for dev. Added getClientIp() helper parsing X-Forwarded-For / X-Real-IP / CF-Connecting-IP headers. Added 6 convenience presets: limitAuthRequest (5/15min), limitOAuthCallback (20/5min), limitChatbotMessage (30/1min), limitReportSubmission (5/hr), limitBlockAction (10/hr), limitGeneralApi (100/1min). Integrated rate limiting into: auth.ts (magic link — Layer 1 before Postgres counter), chatbot.ts (sendChatMessage), contact.ts (blockMember + reportMember), app/auth/callback/route.ts (OAuth callback brute-force protection), app/api/test-email/route.ts (dev-only endpoint). Existing user-based rate limiting (lib/rate-limit.ts) already covers: createListing, sendMessage, submitRating, createTicket, createDispute. Added comprehensive unit tests (9 tests) in tests/unit/rate-limit-public.test.ts covering memory fallback, blocking, window reset, and all preset functions. All new tests pass. Lint clean (0 errors). Pushed to origin main."
+    "notes": "COMPLETED: Created lib/rate-limit-public.ts with IP-based rate limiting for public/unauthenticated endpoints. Uses Upstash Redis in production with in-memory Map fallback for dev. Added getClientIp() helper parsing X-Forwarded-For / X-Real-IP / CF-Connecting-IP headers. Added 6 convenience presets: limitAuthRequest (5/15min), limitOAuthCallback (20/5min), limitChatbotMessage (30/1min), limitReportSubmission (5/hr), limitBlockAction (10/hr), limitGeneralApi (100/1min). Integrated rate limiting into: auth.ts (magic link \u2014 Layer 1 before Postgres counter), chatbot.ts (sendChatMessage), contact.ts (blockMember + reportMember), app/auth/callback/route.ts (OAuth callback brute-force protection), app/api/test-email/route.ts (dev-only endpoint). Existing user-based rate limiting (lib/rate-limit.ts) already covers: createListing, sendMessage, submitRating, createTicket, createDispute. Added comprehensive unit tests (9 tests) in tests/unit/rate-limit-public.test.ts covering memory fallback, blocking, window reset, and all preset functions. All new tests pass. Lint clean (0 errors). Pushed to origin main."
   },
   {
     "id": "6",
     "title": "Add Health Check / Uptime Monitoring",
     "priority": "medium",
     "status": "completed",
-    "notes": "COMPLETED: Created lib/health-check.ts with dependency health checks for Supabase (REST HEAD), Upstash Redis (PING), and Resend (domain list). Two endpoints: GET /api/health (full check, returns 200/503 with no-cache headers) and GET /api/health/simple (lightweight edge ping for CDN/Vercel probes). Critical vs non-critical dependency classification — Supabase + Redis are critical, Resend is non-critical (degraded if it fails). Added 6 unit tests covering healthy, degraded, unhealthy, latency, and missing env var scenarios. All tests pass. Committed and pushed to origin main."
+    "notes": "COMPLETED: Created lib/health-check.ts with dependency health checks for Supabase (REST HEAD), Upstash Redis (PING), and Resend (domain list). Two endpoints: GET /api/health (full check, returns 200/503 with no-cache headers) and GET /api/health/simple (lightweight edge ping for CDN/Vercel probes). Critical vs non-critical dependency classification \u2014 Supabase + Redis are critical, Resend is non-critical (degraded if it fails). Added 6 unit tests covering healthy, degraded, unhealthy, latency, and missing env var scenarios. All tests pass. Committed and pushed to origin main."
   },
   {
     "id": "7",
     "title": "Add Error Boundary + Fallback UI",
     "priority": "medium",
     "status": "completed",
-    "notes": "COMPLETED: Audited and enhanced error boundary + loading state coverage across all route segments. The codebase already had 16 error.tsx and 14 loading.tsx files across route segments. Improvements made: (1) Added app/(auth)/login/error.tsx + loading.tsx — auth-specific error boundary and skeleton for sign-in card; (2) Added app/(auth)/signup/error.tsx + loading.tsx — same for sign-up flow; (3) Added app/(app)/profile/error.tsx + loading.tsx — profile page error boundary with skeleton for profile card + publish toggle; (4) Added app/(app)/m/[username]/error.tsx + loading.tsx — member profile error boundary with skeleton; (5) Added app/(onboarding)/onboarding/error.tsx + loading.tsx — onboarding wizard error boundary with step skeleton; (6) Added app/verify-pending/error.tsx + loading.tsx — email verification page error boundary. Also fixed 7 pre-existing failing unit tests: (a) getClientIp() now gracefully handles headers() outside request scope (returns 'unknown' for memory fallback), (b) validateAndSanitize() now includes field-specific error messages instead of generic 'Please fix the highlighted fields.' — tests expect 'empty' and '2000' in messages. All 22 test files pass (192 tests), TypeScript clean (0 errors), lint clean (0 errors). Total: 22 error.tsx + 20 loading.tsx files providing graceful fallbacks across every route segment. Committed as [task-7] and pushed to origin main."
+    "notes": "COMPLETED: Audited and enhanced error boundary + loading state coverage across all route segments. The codebase already had 16 error.tsx and 14 loading.tsx files across route segments. Improvements made: (1) Added app/(auth)/login/error.tsx + loading.tsx \u2014 auth-specific error boundary and skeleton for sign-in card; (2) Added app/(auth)/signup/error.tsx + loading.tsx \u2014 same for sign-up flow; (3) Added app/(app)/profile/error.tsx + loading.tsx \u2014 profile page error boundary with skeleton for profile card + publish toggle; (4) Added app/(app)/m/[username]/error.tsx + loading.tsx \u2014 member profile error boundary with skeleton; (5) Added app/(onboarding)/onboarding/error.tsx + loading.tsx \u2014 onboarding wizard error boundary with step skeleton; (6) Added app/verify-pending/error.tsx + loading.tsx \u2014 email verification page error boundary. Also fixed 7 pre-existing failing unit tests: (a) getClientIp() now gracefully handles headers() outside request scope (returns 'unknown' for memory fallback), (b) validateAndSanitize() now includes field-specific error messages instead of generic 'Please fix the highlighted fields.' \u2014 tests expect 'empty' and '2000' in messages. All 22 test files pass (192 tests), TypeScript clean (0 errors), lint clean (0 errors). Total: 22 error.tsx + 20 loading.tsx files providing graceful fallbacks across every route segment. Committed as [task-7] and pushed to origin main."
   },
   {
     "id": "8",
     "title": "Add Logging / Observability",
     "priority": "medium",
     "status": "completed",
-    "notes": "COMPLETED: Created structured logging infrastructure across the entire codebase. (1) lib/utils/logger.ts — server-side structured logger with 5 severity levels, trace ID correlation, pretty-print in dev / JSON in prod, component-scoped createLogger(). (2) lib/observability.ts — request/response logging helpers (logRequest, logResponse), error wrappers (withErrorLogging, withTiming), and logServerError for catch blocks. (3) lib/utils/client-logger.ts — browser-side structured logger for client components, async-imported to avoid server bundle. (4) Replaced ~45 raw console.* calls across lib/actions/* (13 files), lib/data/* (10 files), lib/chatbot/engine.ts, lib/utils/validation.ts, lib/utils/rate-limit.ts, app/auth/callback/route.ts, app/auth/confirm/route.ts, app/(app)/dashboard/page.tsx, components/listings/ImageUploader.tsx, components/profile/AvatarUploader.tsx. (5) Added 9 unit tests for logger covering traceId generation, level routing, context inclusion, error serialization, component scoping, and LOG_LEVEL env respect. (6) Fixed pre-existing TS error in observability.ts (traceId type mismatch). All 192 unit tests pass. TypeScript clean (0 project errors). Committed as [task-8] and pushed to origin main."
+    "notes": "COMPLETED: Created structured logging infrastructure across the entire codebase. (1) lib/utils/logger.ts \u2014 server-side structured logger with 5 severity levels, trace ID correlation, pretty-print in dev / JSON in prod, component-scoped createLogger(). (2) lib/observability.ts \u2014 request/response logging helpers (logRequest, logResponse), error wrappers (withErrorLogging, withTiming), and logServerError for catch blocks. (3) lib/utils/client-logger.ts \u2014 browser-side structured logger for client components, async-imported to avoid server bundle. (4) Replaced ~45 raw console.* calls across lib/actions/* (13 files), lib/data/* (10 files), lib/chatbot/engine.ts, lib/utils/validation.ts, lib/utils/rate-limit.ts, app/auth/callback/route.ts, app/auth/confirm/route.ts, app/(app)/dashboard/page.tsx, components/listings/ImageUploader.tsx, components/profile/AvatarUploader.tsx. (5) Added 9 unit tests for logger covering traceId generation, level routing, context inclusion, error serialization, component scoping, and LOG_LEVEL env respect. (6) Fixed pre-existing TS error in observability.ts (traceId type mismatch). All 192 unit tests pass. TypeScript clean (0 project errors). Committed as [task-8] and pushed to origin main."
   },
   {
     "id": "9",
@@ -74,21 +74,21 @@
     "title": "Add Responsive / Mobile Polish",
     "priority": "medium",
     "status": "completed",
-    "notes": "COMPLETED: Added comprehensive responsive/mobile polish across the entire app. (1) Viewport meta tag with proper initial-scale=1 for mobile browsers. (2) Responsive grid refinements: dashboard stats (sm:2 → lg:4), dashboard actions (sm:2 → lg:3), admin stats (md:2 → lg:4), admin links (md:3), directory grid (1 → md:2 → lg:3), listing detail (1 → lg:2). (3) Form stacking: all multi-column form grids (listing form, profile edit, bio wizard, ticket reply, dispute detail) use grid-cols-1 with sm:grid-cols-2 breakpoints. (4) Safe-area padding: reduced px-6 to px-4 on mobile for auth, app, and admin layouts with sm:px-6 breakpoints. (5) Touch targets: increased mobile nav hamburger to h-12 w-12 (48px), increased mobile menu links to py-3.5 for 44px+ touch targets. (6) Listing detail: image gallery uses full-width aspect-square on mobile, thumbnails are h-16 w-16 on small screens. (7) Messaging: conversation thread max-width adjusted to 85% on mobile for better readability, composer uses full-width on small screens. (8) Skeleton grids: all loading.tsx files match their page responsive breakpoints. (9) Fixed SelectTrigger w-[200px] to w-full sm:w-[200px] in listing form. All 201 tests pass, TypeScript clean (0 errors), lint clean (0 errors). Committed as [task-11] and pushed to origin main."
+    "notes": "COMPLETED: Added comprehensive responsive/mobile polish across the entire app. (1) Viewport meta tag with proper initial-scale=1 for mobile browsers. (2) Responsive grid refinements: dashboard stats (sm:2 \u2192 lg:4), dashboard actions (sm:2 \u2192 lg:3), admin stats (md:2 \u2192 lg:4), admin links (md:3), directory grid (1 \u2192 md:2 \u2192 lg:3), listing detail (1 \u2192 lg:2). (3) Form stacking: all multi-column form grids (listing form, profile edit, bio wizard, ticket reply, dispute detail) use grid-cols-1 with sm:grid-cols-2 breakpoints. (4) Safe-area padding: reduced px-6 to px-4 on mobile for auth, app, and admin layouts with sm:px-6 breakpoints. (5) Touch targets: increased mobile nav hamburger to h-12 w-12 (48px), increased mobile menu links to py-3.5 for 44px+ touch targets. (6) Listing detail: image gallery uses full-width aspect-square on mobile, thumbnails are h-16 w-16 on small screens. (7) Messaging: conversation thread max-width adjusted to 85% on mobile for better readability, composer uses full-width on small screens. (8) Skeleton grids: all loading.tsx files match their page responsive breakpoints. (9) Fixed SelectTrigger w-[200px] to w-full sm:w-[200px] in listing form. All 201 tests pass, TypeScript clean (0 errors), lint clean (0 errors). Committed as [task-11] and pushed to origin main."
   },
   {
     "id": "12",
     "title": "Add Analytics (PostHog / Plausible / GA)",
     "priority": "low",
     "status": "completed",
-    "notes": "COMPLETED: Wired all missing analytics events per docs/events.md. (1) signup_started — fires in auth.ts signUpAction when OTP email is successfully queued; (2) signup_completed — fires in auth.ts signUpAction on successful user creation (non-OTP path) and in app/auth/confirm/route.ts on email confirmation success; (3) profile_published — fires in lib/actions/profile.ts publishProfileAction when profile is published; (4) directory_filter_applied — fires in components/directory/DirectoryFilters.tsx on filter change (debounced 500ms), includes category + county dimensions; (5) contact_reported — fires in lib/actions/contact.ts reportMemberAction; (6) contact_blocked — fires in lib/actions/contact.ts blockMemberAction. Also added aliasUser on signup completion and setPersonProperties on profile publish. All events are non-blocking (wrapped in try/catch), never throw. All 201 tests pass, TypeScript clean (0 errors), lint clean (0 errors). Committed as [task-12] and pushed to origin main."
+    "notes": "COMPLETED: Wired all missing analytics events per docs/events.md. (1) signup_started \u2014 fires in auth.ts signUpAction when OTP email is successfully queued; (2) signup_completed \u2014 fires in auth.ts signUpAction on successful user creation (non-OTP path) and in app/auth/confirm/route.ts on email confirmation success; (3) profile_published \u2014 fires in lib/actions/profile.ts publishProfileAction when profile is published; (4) directory_filter_applied \u2014 fires in components/directory/DirectoryFilters.tsx on filter change (debounced 500ms), includes category + county dimensions; (5) contact_reported \u2014 fires in lib/actions/contact.ts reportMemberAction; (6) contact_blocked \u2014 fires in lib/actions/contact.ts blockMemberAction. Also added aliasUser on signup completion and setPersonProperties on profile publish. All events are non-blocking (wrapped in try/catch), never throw. All 201 tests pass, TypeScript clean (0 errors), lint clean (0 errors). Committed as [task-12] and pushed to origin main."
   },
   {
     "id": "13",
     "title": "Add E2E Tests (Playwright)",
     "priority": "low",
     "status": "blocked",
-    "notes": "BLOCKED: External dependency — Supabase service role key is invalid (401 Unauthorized). All remaining 56 E2E failures require createVerifiedPair() which depends on SUPABASE_SERVICE_ROLE_KEY. Fixes applied this run: (1) single-turnstile.spec.ts — fixed nested div counting logic that was over-counting Turnstile fallback messages (4 ancestors vs 1 leaf); (2) captcha-required.spec.ts — added .or() matcher to accept both 'protected by cloudflare turnstile' (prod) and 'Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY' (dev/test fallback). Result: 86 tests pass, 56 blocked on Supabase auth key, 25 skipped (fixme/marked), 4 did not run (iphone-se project). ACTION NEEDED: Rotate SUPABASE_SERVICE_ROLE_KEY in Supabase dashboard and update GitHub secret."
+    "notes": "BLOCKED: External dependency \u2014 Supabase service role key is invalid (401 Unauthorized). All remaining 56 E2E failures require createVerifiedPair() which depends on SUPABASE_SERVICE_ROLE_KEY. Fixes applied this run: (1) single-turnstile.spec.ts \u2014 fixed nested div counting logic that was over-counting Turnstile fallback messages (4 ancestors vs 1 leaf); (2) captcha-required.spec.ts \u2014 added .or() matcher to accept both 'protected by cloudflare turnstile' (prod) and 'Missing NEXT_PUBLIC_TURNSTILE_SITE_KEY' (dev/test fallback). Result: 86 tests pass, 56 blocked on Supabase auth key, 25 skipped (fixme/marked), 4 did not run (iphone-se project). ACTION NEEDED: Rotate SUPABASE_SERVICE_ROLE_KEY in Supabase dashboard and update GitHub secret."
   },
   {
     "id": "14",
@@ -102,6 +102,62 @@
     "title": "Add Open Graph Image Generation",
     "priority": "medium",
     "status": "completed",
-    "notes": "COMPLETED: Added dynamic Open Graph image generation for listings and member profiles. (1) app/(app)/listings/[id]/opengraph-image.tsx — generates 1200×630 OG image with category/condition/county badges, listing title, truncated description, seller name, and Barterkin brand logo. (2) app/(app)/m/[username]/opengraph-image.tsx — generates 1200×630 OG image with avatar (or fallback icon), display name, username, county, truncated bio, and Barterkin brand logo. Both use the brand green gradient (#1e4420 → #3a7032) and serif/sans-serif typography matching the site aesthetic. Also fixed pre-existing lint error in tests/e2e/dashboard-smoke.spec.ts (any → Page type, removed unused hasEnv). All 236 tests pass, TypeScript clean (project files), lint clean (project files). Committed as [task-15] and pushed to origin main."
+    "notes": "COMPLETED: Added dynamic Open Graph image generation for listings and member profiles. (1) app/(app)/listings/[id]/opengraph-image.tsx \u2014 generates 1200\u00d7630 OG image with category/condition/county badges, listing title, truncated description, seller name, and Barterkin brand logo. (2) app/(app)/m/[username]/opengraph-image.tsx \u2014 generates 1200\u00d7630 OG image with avatar (or fallback icon), display name, username, county, truncated bio, and Barterkin brand logo. Both use the brand green gradient (#1e4420 \u2192 #3a7032) and serif/sans-serif typography matching the site aesthetic. Also fixed pre-existing lint error in tests/e2e/dashboard-smoke.spec.ts (any \u2192 Page type, removed unused hasEnv). All 236 tests pass, TypeScript clean (project files), lint clean (project files). Committed as [task-15] and pushed to origin main."
+  },
+  {
+    "id": "16",
+    "title": "Build landing page conversion funnel — 'Get on the waitlist' CTA + email capture",
+    "priority": "critical",
+    "status": "completed",
+    "notes": "COMPLETED: Shipped hero waitlist CTA + capture funnel with Supabase-backed `waitlist` persistence, Resend confirmation email, PostHog `waitlist_joined` tracking, optional county attribution, and unit coverage. Commit: 70538bf."
+  },
+  {
+    "id": "17",
+    "title": "Add 'invite a friend' viral loop \u2014 every member gets a unique referral link + earns credits",
+    "priority": "high",
+    "status": "pending",
+    "notes": "Add `referral_code` column to profiles (8-char alphanumeric, unique). Add `/r/[code]` route that sets a cookie before redirecting to /signup. On successful onboarding, credit both inviter and invitee with 5 contact credits (use existing contact-credit system or add `bonus_credits` column). Add a 'Invite friends' card on the dashboard with a copy-link button. Acceptance: end-to-end referral flow works, tested with unit + e2e."
+  },
+  {
+    "id": "18",
+    "title": "Audit + fix SEO \u2014 sitemap, robots.txt, meta descriptions on every public page",
+    "priority": "high",
+    "status": "pending",
+    "notes": "Currently: JSON-LD on listing pages and OG images exist. Missing: dynamic sitemap.xml at /sitemap.xml (Next.js metadata route), robots.txt with proper directives, unique meta descriptions on /, /about, /how-it-works, /directory, /listing/[id], /m/[username]. Use Next.js generateMetadata. Acceptance: Google PageSpeed SEO score >95 on /, /directory, and one listing page. Submit sitemap to Google Search Console after deploy."
+  },
+  {
+    "id": "19",
+    "title": "Add 'admin: send broadcast' tool \u2014 email every member with a custom message",
+    "priority": "high",
+    "status": "pending",
+    "notes": "Add /admin/broadcast page (admin-only). Form: subject + markdown body + optional segment (all / verified-only / banned-excluded). Preview pane renders markdown. Send button triggers a background job that batches Resend sends at 10/sec with retry on rate-limit. Track sent/failed/bounced in a `broadcasts` table. Acceptance: can send a test broadcast to 1 email (use ADMIN_EMAIL), then a full send, with delivery stats visible afterward."
+  },
+  {
+    "id": "20",
+    "title": "Implement subscription billing v1 \u2014 Stripe + 'Premium' member tier with featured listings",
+    "priority": "high",
+    "status": "pending",
+    "notes": "Free tier: 3 listings, 10 contacts/mo. Premium ($9/mo): unlimited listings, featured placement, 100 contacts/mo, verified badge. Add Stripe customer portal. Use Stripe Checkout for upgrade. Webhook updates `profiles.tier` column. Gate features in server actions. Acceptance: full flow (Stripe test mode) \u2014 upgrade, see premium badge, downgrade, lose badge. Document in DEPLOY.md."
+  },
+  {
+    "id": "21",
+    "title": "Build 'discover' feed \u2014 algorithmic listing surfacing on dashboard (not just chronological)",
+    "priority": "medium",
+    "status": "pending",
+    "notes": "Currently dashboard shows raw chronological listings. Replace with a 'For You' tab that surfaces listings by: (1) member's stated skills/interests match listing tags, (2) county proximity, (3) recency boost (last 7d weighted 2x), (4) social signal (number of contacts). Use a SQL view or materialized view refreshed every 30min. Keep 'Latest' tab as the existing chronological. Acceptance: visible algorithm uplift in click-through tracked in PostHog after 1 week."
+  },
+  {
+    "id": "22",
+    "title": "Set up customer support inbox \u2014 Resend inbound webhook \u2192 ticket DB \u2192 /admin/support",
+    "priority": "medium",
+    "status": "pending",
+    "notes": "Currently no inbound email handling. Set up Resend inbound to a `support@barterkin.com` address (configure DNS + webhook endpoint at /api/webhooks/resend-inbound). On receive: parse + write to `support_tickets` table (from_email, subject, body, created_at, status). Build /admin/support page that lists tickets and lets admin reply (which sends via Resend outbound). Acceptance: send an email to support@barterkin.com, see it appear in /admin/support, reply from there, receive the reply in the original inbox."
+  },
+  {
+    "id": "23",
+    "title": "Re-attempt Vercel deploy fix \u2014 re-check if VERCEL_TOKEN secret has been added",
+    "priority": "high",
+    "status": "pending",
+    "notes": "Task #1 was blocked because VERCEL_TOKEN was missing. Re-test by hitting `gh api repos/barterkin101-dev/barterkin/actions/secrets --jq '.secrets[].name'` to list configured secrets. If VERCEL_TOKEN is now present, attempt a deploy: `cd /root/barterkin && pnpm install --frozen-lockfile && pnpm build && vercel deploy --prod --token $VERCEL_TOKEN`. If still missing, leave a 1-line nudge in the response asking Naeem to add it, then mark this task blocked-pending-human."
   }
 ]
