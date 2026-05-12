@@ -45,11 +45,11 @@ const TEAM = [
     placeholder: true,
   },
   {
-    name: 'Husband',
+    name: 'Ashley',
     role: 'Co-Creator',
-    bio: '', // TODO: Add husband\'s bio when ready
-    image: '/team/husband.jpg',
-    initial: 'H',
+    bio: '', // TODO: Add Ashley\'s bio when ready
+    image: '/team/ashley.jpg',
+    initial: 'A',
     icon: Users,
     placeholder: true,
   },
@@ -199,15 +199,15 @@ export default function BehindBarterkinPage() {
               You are part of this story too.
             </h2>
             <p className="mt-4 text-base text-sage-light leading-relaxed">
-              Every profile, every trade, every message sent makes Barterkin
-              what it is. The directory is only as strong as the neighbors who
-              show up.
+              Barterkin is not just a directory. It is a living network of
+              Georgians choosing trust over transactions. Add your skills and
+              become a thread in the fabric.
             </p>
             <a
-              href="/directory"
-              className="mt-8 inline-flex h-12 items-center justify-center rounded-lg bg-clay px-8 text-sm font-semibold text-sage-bg hover:bg-clay/90 transition-colors"
+              href="/signup"
+              className="mt-8 inline-flex items-center justify-center rounded-lg bg-clay px-7 py-3.5 text-sm font-bold text-sage-bg shadow-sm hover:bg-clay/90 transition-colors"
             >
-              Meet the community
+              Join the directory
             </a>
           </div>
         </FadeIn>

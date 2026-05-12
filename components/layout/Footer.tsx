@@ -33,6 +33,10 @@ export async function Footer() {
             About
           </Link>
           <span aria-hidden>·</span>
+          <Link href="/behind-barterkin" className="hover:underline hover:decoration-[var(--color-clay)]">
+            Team
+          </Link>
+          <span aria-hidden>·</span>
           <Link href="/legal/tos" className="hover:underline hover:decoration-[var(--color-clay)]">
             Terms
           </Link>
