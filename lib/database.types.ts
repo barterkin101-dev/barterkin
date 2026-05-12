@@ -609,6 +609,7 @@ export type Database = {
           is_published: boolean
           onboarding_completed_at: string | null
           owner_id: string
+          referral_code: string
           rating_avg: number | null
           rating_count: number
           search_text: string | null
@@ -632,6 +633,7 @@ export type Database = {
           is_published?: boolean
           onboarding_completed_at?: string | null
           owner_id: string
+          referral_code?: string
           rating_avg?: number | null
           rating_count?: number
           search_text?: string | null
@@ -655,6 +657,7 @@ export type Database = {
           is_published?: boolean
           onboarding_completed_at?: string | null
           owner_id?: string
+          referral_code?: string
           rating_avg?: number | null
           rating_count?: number
           search_text?: string | null

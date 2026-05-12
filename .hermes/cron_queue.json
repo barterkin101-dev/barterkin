@@ -115,8 +115,8 @@
     "id": "17",
     "title": "Add 'invite a friend' viral loop \u2014 every member gets a unique referral link + earns credits",
     "priority": "high",
-    "status": "pending",
-    "notes": "Add `referral_code` column to profiles (8-char alphanumeric, unique). Add `/r/[code]` route that sets a cookie before redirecting to /signup. On successful onboarding, credit both inviter and invitee with 5 contact credits (use existing contact-credit system or add `bonus_credits` column). Add a 'Invite friends' card on the dashboard with a copy-link button. Acceptance: end-to-end referral flow works, tested with unit + e2e."
+    "status": "in_progress",
+    "notes": "IN_PROGRESS: Added referral_code schema support, /r/[code] capture route, and dashboard invite-link copy UI. Remaining: award inviter/invitee credits on onboarding completion and cover the full flow with e2e."
   },
   {
     "id": "18",

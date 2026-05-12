@@ -2,10 +2,12 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
 import { getMyListings } from '@/lib/data/listings'
+import { buildReferralLink } from '@/lib/referrals'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ShoppingBag, MessageSquare, Star, Ticket, User } from 'lucide-react'
 import { ProfileCompletionBar } from '@/components/profile/ProfileCompletionBar'
+import { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -21,7 +23,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, county_id, category_id')
+    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, county_id, category_id, referral_code')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -53,6 +55,9 @@ export default async function DashboardPage() {
       }),
   ]) : [[], 0, 0]
   const activeListings = listings.filter((l) => l.status === 'active')
+  const referralLink = profile?.referral_code
+    ? buildReferralLink(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com', profile.referral_code)
+    : null
 
   return (
     <div className="space-y-8">
@@ -202,6 +207,13 @@ export default async function DashboardPage() {
             />
           </CardContent>
         </Card>
+      )}
+
+      {profile?.referral_code && (
+        <ReferralInviteCard
+          referralCode={profile.referral_code}
+          referralLink={referralLink ?? ''}
+        />
       )}
     </div>
   )
