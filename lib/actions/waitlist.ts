@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { WaitlistSchema, type JoinWaitlistResult } from '@/lib/schemas/waitlist'
 import { isDisposableEmail } from '@/lib/utils/disposable-email'
 import { validateAndSanitize } from '@/lib/utils/validation'
@@ -41,11 +41,9 @@ export async function joinWaitlist(
       error: 'Too many requests from this network. Please try again in a few minutes.',
     }
   }
-
-  const supabase = await createClient()
-
-  // Upsert into waitlist (idempotent — no error on duplicate)
-  const { error: insertErr } = await supabase
+  // Write behind the server admin client so the public anon key cannot insert
+  // raw rows directly into the waitlist table from the browser.
+  const { error: insertErr } = await supabaseAdmin
     .from('waitlist')
     .insert({ email, county_id: countyId ?? null, source: 'hero_cta' })
 

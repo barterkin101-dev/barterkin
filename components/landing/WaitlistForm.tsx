@@ -86,6 +86,11 @@ export function WaitlistForm() {
           Optional, but it helps us prioritize launches county by county.
         </p>
       </div>
+      {state?.error ? (
+        <p role="alert" className="text-sm text-red-200">
+          {state.error}
+        </p>
+      ) : null}
     </form>
   )
 }

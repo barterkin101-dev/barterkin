@@ -1,6 +1,15 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { captureEvent } from '@/lib/analytics'
 
+const { fromMock, insertMock } = vi.hoisted(() => {
+  const fromMock = vi.fn()
+  const insertMock = vi.fn(() => ({ error: null as { code: string; message: string } | null }))
+  fromMock.mockReturnValue({
+    insert: insertMock,
+  })
+  return { fromMock, insertMock }
+})
+
 // Mock server-only
 vi.mock('server-only', () => ({}))
 
@@ -46,26 +55,11 @@ vi.mock('resend', () => ({
   },
 }))
 
-// Mock supabase server
-const fromMock = vi.fn()
-const insertMock = vi.fn(() => ({ error: null as { code: string; message: string } | null }))
-const eqMock = vi.fn(() => ({ maybeSingle: vi.fn(() => ({ data: null, error: null })) }))
-const selectMock = vi.fn(() => ({ eq: eqMock }))
-
-fromMock.mockReturnValue({
-  insert: insertMock,
-  select: selectMock,
-})
-
-vi.mock('@/lib/supabase/server', () => ({
-  createClient: vi.fn(() =>
-    Promise.resolve({
-      auth: {
-        getUser: vi.fn(() => Promise.resolve({ data: { user: null }, error: null })),
-      },
-      from: fromMock,
-    }),
-  ),
+// Mock supabase admin client
+vi.mock('@/lib/supabase/admin', () => ({
+  supabaseAdmin: {
+    from: fromMock,
+  },
 }))
 
 import { joinWaitlist } from '@/lib/actions/waitlist'
