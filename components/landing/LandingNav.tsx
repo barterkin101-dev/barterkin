@@ -13,6 +13,7 @@ export function LandingNav() {
   const navLinks = [
     { href: '#how', label: 'How it works' },
     { href: '/directory', label: 'Directory' },
+    { href: '/about', label: 'About' },
     { href: '/login', label: 'Sign in' },
   ]
 
@@ -47,6 +48,12 @@ export function LandingNav() {
             className="text-sm text-sage-bg/80 hover:text-sage-bg"
           >
             Directory
+          </Link>
+          <Link
+            href="/about"
+            className="text-sm text-sage-bg/80 hover:text-sage-bg"
+          >
+            About
           </Link>
           <Link
             href="/login"

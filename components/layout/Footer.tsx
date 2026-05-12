@@ -29,6 +29,10 @@ export async function Footer() {
           © 2026 Barterkin · A Georgia community skills directory
         </div>
         <nav className="text-sm flex gap-4 md:justify-center flex-wrap">
+          <Link href="/about" className="hover:underline hover:decoration-[var(--color-clay)]">
+            About
+          </Link>
+          <span aria-hidden>·</span>
           <Link href="/legal/tos" className="hover:underline hover:decoration-[var(--color-clay)]">
             Terms
           </Link>

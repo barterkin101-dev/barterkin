@@ -1,0 +1,12 @@
+# Files in this list MUST NEVER be modified by automated agents (hermes daemon, kimi-agent, codex, etc).
+# Each line is a glob relative to project root.
+# Enforced by:
+#   1. scripts/lockdown.sh chattr +i (immutable bit)
+#   2. .git/hooks/pre-commit reject
+#   3. CLAUDE.md rule (read by hermes context-loader)
+
+scripts/telegram-bot.py
+scripts/barterkin-daemon.sh
+.hermes-do-not-touch
+/etc/systemd/system/barterkin-telegram-bot.service
+/etc/systemd/system/barterkin-agent.service

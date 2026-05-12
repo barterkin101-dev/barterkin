@@ -1,3 +1,18 @@
+# 🔒 AGENT PROTECTION RULES — READ FIRST
+
+The following files in this repo are **PERMANENTLY OFF-LIMITS** to any automated agent (hermes, kimi-agent, codex, autonomous daemons). They are protected by chattr +i, a pre-commit hook, and this notice.
+
+**DO NOT modify, refactor, simplify, revert, or 'clean up' these files:**
+- `scripts/telegram-bot.py` — production Telegram bot with Kimi streaming (see commit history if curious; do not edit)
+- `scripts/barterkin-daemon.sh` — autonomous task runner
+- `.hermes-do-not-touch` — this protection manifest
+- `/etc/systemd/system/barterkin-telegram-bot.service`
+- `/etc/systemd/system/barterkin-agent.service`
+
+If a task seems to require editing one of these, **STOP and post a Telegram message asking the human operator (Naeem) to authorize**. Do not edit them yourself even if you believe the change is a bug fix or simplification. The bot setup is intentional and any 'simplification' breaks production.
+
+---
+
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
