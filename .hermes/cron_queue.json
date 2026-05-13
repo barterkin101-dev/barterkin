@@ -151,8 +151,8 @@
     "title": "Set up customer support inbox — Resend inbound webhook → ticket DB → /admin/support",
     "priority": "medium",
     "status": "completed",
-    "notes": "COMPLETED: Fixed Resend inbound webhook signature verification to use svix (Resend's actual webhook provider) instead of custom HMAC. Added svix as direct dependency. Webhook now: (1) verifies svix-id/svix-timestamp/svix-signature headers when RESEND_WEBHOOK_SECRET is configured, (2) falls back to dev-mode acceptance with warning when secret is missing, (3) creates support_tickets row on email.received events, (4) sends auto-reply to customer via Resend, (5) returns proper HTTP status codes (401 invalid sig, 400 bad JSON/missing from, 503 admin client unavailable, 500 DB error, 200 success). Added 7 unit tests covering dev mode, invalid signature, ignored events, missing from, service unavailable, DB error, and default values. Admin UI (/admin/support + /admin/support/[id]) and DB schema were already in place from prior work. All 241 tests pass. Commit: 69b64e5."
-  }
+    "notes": "COMPLETED: Fixed Resend inbound webhook signature verification to use svix (Resend's actual webhook provider) instead of custom HMAC. Added svix as direct dependency. Webhook now: (1) verifies svix-id/svix-timestamp/svix-signature headers when RESEND_WEBHOOK_SECRET is configured, (2) falls back to dev-mode acceptance with warning when secret is missing, (3) creates support_tickets row on email.received events, (4) sends auto-reply to customer via Resend, (5) returns proper HTTP status codes (401 invalid sig, 400 bad JSON/missing from, 503 admin client unavailable, 500 DB error, 200 success). Added 7 unit tests covering dev mode, invalid signature, ignored events, missing from, service unavailable, DB error, and default values. Admin UI (/admin/support + /admin/support/[id]) and DB schema were already in place from prior work. All 241 tests pass. Commit: a72aa62."
+  },
   {
     "id": "23",
     "title": "Re-attempt Vercel deploy fix \u2014 re-check if VERCEL_TOKEN secret has been added",
