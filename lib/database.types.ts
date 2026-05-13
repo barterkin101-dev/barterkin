@@ -954,6 +954,56 @@ export type Database = {
           },
         ]
       }
+      trade_completions: {
+        Row: {
+          id: string
+          conversation_id: string
+          listing_id: string | null
+          initiator_profile_id: string
+          recipient_profile_id: string
+          initiator_marked_at: string | null
+          recipient_marked_at: string | null
+          completed_at: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          listing_id?: string | null
+          initiator_profile_id: string
+          recipient_profile_id: string
+          initiator_marked_at?: string | null
+          recipient_marked_at?: string | null
+          completed_at?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          listing_id?: string | null
+          initiator_profile_id?: string
+          recipient_profile_id?: string
+          initiator_marked_at?: string | null
+          recipient_marked_at?: string | null
+          completed_at?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_completions_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reports: {
         Row: {
           created_at: string
@@ -1452,6 +1502,13 @@ export type Database = {
         }[]
       }
       message_alert_payload: { Args: { p_message_id: string }; Returns: Json }
+      mark_trade_complete: {
+        Args: { p_conversation_id: string; p_profile_id: string }
+        Returns: {
+          status: string
+          completed_at: string | null
+        }[]
+      }
       profile_owner_email: { Args: { p_profile_id: string }; Returns: string }
       refresh_profile_search_text: {
         Args: { p_profile_id: string }
