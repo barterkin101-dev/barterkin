@@ -1,6 +1,6 @@
 'use server'
 
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { WaitlistSchema, type JoinWaitlistResult } from '@/lib/schemas/waitlist'
 import { isDisposableEmail } from '@/lib/utils/disposable-email'
 import { validateAndSanitize } from '@/lib/utils/validation'
@@ -41,11 +41,20 @@ export async function joinWaitlist(
       error: 'Too many requests from this network. Please try again in a few minutes.',
     }
   }
-  // Write behind the server admin client so the public anon key cannot insert
-  // raw rows directly into the waitlist table from the browser.
-  const { error: insertErr } = await supabaseAdmin
-    .from('waitlist')
-    .insert({ email, county_id: countyId ?? null, source: 'hero_cta' })
+  let insertErr: { code?: string } | null = null
+  try {
+    // Write behind the server admin client so the public anon key cannot insert
+    // raw rows directly into the waitlist table from the browser.
+    const admin = getSupabaseAdmin()
+    const result = await admin
+      .from('waitlist')
+      .insert({ email, county_id: countyId ?? null, source: 'hero_cta' })
+    insertErr = result.error
+  } catch (err) {
+    const log = createLogger('waitlist')
+    log.error('waitlist admin client unavailable', { error: err })
+    return { ok: false, error: 'Something went wrong. Please try again in a moment.' }
+  }
 
   if (insertErr) {
     // 23505 unique_violation = already on waitlist

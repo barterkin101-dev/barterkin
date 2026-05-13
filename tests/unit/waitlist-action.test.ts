@@ -1,13 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { captureEvent } from '@/lib/analytics'
 
-const { fromMock, insertMock } = vi.hoisted(() => {
+const { fromMock, insertMock, getSupabaseAdminMock } = vi.hoisted(() => {
   const fromMock = vi.fn()
   const insertMock = vi.fn(() => ({ error: null as { code: string; message: string } | null }))
+  const getSupabaseAdminMock = vi.fn(() => ({
+    from: fromMock,
+  }))
   fromMock.mockReturnValue({
     insert: insertMock,
   })
-  return { fromMock, insertMock }
+  return { fromMock, insertMock, getSupabaseAdminMock }
 })
 
 // Mock server-only
@@ -57,9 +60,7 @@ vi.mock('resend', () => ({
 
 // Mock supabase admin client
 vi.mock('@/lib/supabase/admin', () => ({
-  supabaseAdmin: {
-    from: fromMock,
-  },
+  getSupabaseAdmin: getSupabaseAdminMock,
 }))
 
 import { joinWaitlist } from '@/lib/actions/waitlist'
@@ -154,6 +155,20 @@ describe('joinWaitlist', () => {
 
     expect(result.ok).toBe(true)
     expect(result.alreadyJoined).toBe(true)
+  })
+
+  it('returns an inline error when the admin client is unavailable', async () => {
+    getSupabaseAdminMock.mockImplementationOnce(() => {
+      throw new Error('missing service role key')
+    })
+
+    const formData = new FormData()
+    formData.append('email', 'broken@example.com')
+
+    const result = await joinWaitlist(null, formData)
+
+    expect(result.ok).toBe(false)
+    expect(result.error).toContain('Something went wrong')
   })
 
   it('sends a confirmation email when RESEND_API_KEY is set', async () => {
