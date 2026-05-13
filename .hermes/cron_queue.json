@@ -548,9 +548,9 @@
   },
   {
     "id": "65",
-    "title": "Add dormant member re-engagement email \u2014 'We miss you' cron for 14+ day inactive users",
+    "title": "Add dormant member re-engagement email — 'We miss you' cron for 14+ day inactive users",
     "priority": "medium",
-    "status": "pending",
-    "notes": "Members who haven't logged in for 14+ days are churning silently. Add a cron endpoint at /api/cron/re-engage that: (1) finds profiles with last_login_at > 14 days ago and no email sent in last 7 days, (2) sends personalized Resend email with 'New listings in your county since you left' + direct login link, (3) records send in re_engagement_sends table to prevent spam, (4) PostHog re_engagement_sent event. Acceptance: 6 unit tests, gated by CRON_SECRET, respects unsubscribes, max 1 email per user per 7 days."
+    "status": "completed",
+    "notes": "COMPLETED: Added /api/cron/re-engage with CRON_SECRET auth, Resend 'we miss you' email, re_engagement_sends migration + send dedupe, county-matched listings since last login, unsubscribe gating via email_digest_enabled, PostHog re_engagement_sent tracking, and 6 unit tests. Commit: df1e53c."
   }
 ]
