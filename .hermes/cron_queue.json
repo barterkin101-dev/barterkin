@@ -565,7 +565,7 @@
     "title": "Add unread-message reminder banner on dashboard after 24h inactivity",
     "priority": "medium",
     "status": "completed",
-    "notes": "COMPLETED: Added a server-rendered dashboard reminder banner for unread conversations older than 24 hours, with thread deep-link CTA and unit coverage. Commit: pending."
+    "notes": "COMPLETED: Added a server-rendered dashboard reminder banner for unread conversations older than 24 hours, with thread deep-link CTA and unit coverage. Commit: 03f870f."
   },
   {
     "id": "68",
