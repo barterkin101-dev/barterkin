@@ -73,7 +73,7 @@ describe('ListingJsonLd', () => {
   })
 
   it('sets OutOfStock for inactive listings', () => {
-    const listing = makeListing({ status: 'sold' })
+    const listing = makeListing({ status: 'completed' })
     const { container } = render(<ListingJsonLd listing={listing} />)
     const script = container.querySelector('script[type="application/ld+json"]')!
     const data = JSON.parse(script.textContent!)
@@ -132,5 +132,13 @@ describe('ListingJsonLd', () => {
     const data = JSON.parse(container.querySelector('script')!.textContent!)
     // seller.url should not be present when no profile username
     expect(data.offers.seller.url).toBeUndefined()
+  })
+
+  it('computes deterministic priceValidUntil from created_at + 90 days', () => {
+    const listing = makeListing({ created_at: '2024-01-15T10:00:00Z' })
+    const { container } = render(<ListingJsonLd listing={listing} />)
+    const data = JSON.parse(container.querySelector('script')!.textContent!)
+    // 2024-01-15 + 90 days = 2024-04-14
+    expect(data.offers.priceValidUntil).toBe('2024-04-14')
   })
 })
