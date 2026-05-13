@@ -15,7 +15,8 @@
 //   }
 // }
 //
-// Auth: Resend sends a signed webhook. We verify via RESEND_WEBHOOK_SECRET.
+// Auth: Resend uses svix for webhook signature verification.
+// Headers: svix-id, svix-timestamp, svix-signature
 // If no secret is configured, we accept in dev mode with a warning log.
 
 export const runtime = 'nodejs'
@@ -41,46 +42,57 @@ interface ResendInboundPayload {
   }
 }
 
-function verifyWebhookSignature(
+async function verifyWebhookSignature(
   payload: string,
-  signature: string | null,
+  headers: Record<string, string | null>,
   secret: string | undefined,
-): boolean {
+): Promise<boolean> {
   if (!secret) {
     log.warn('RESEND_WEBHOOK_SECRET not configured — accepting webhook without verification (dev mode)')
     return true
   }
-  if (!signature) {
-    log.warn('Missing Resend-Signature header')
+
+  const svixId = headers['svix-id']
+  const svixTimestamp = headers['svix-timestamp']
+  const svixSignature = headers['svix-signature']
+
+  if (!svixId || !svixTimestamp || !svixSignature) {
+    log.warn('Missing svix webhook headers', {
+      context: { hasId: !!svixId, hasTimestamp: !!svixTimestamp, hasSignature: !!svixSignature },
+    })
     return false
   }
-  // Resend uses HMAC-SHA256 with the webhook secret
-  // The signature format is: t=<timestamp>,v1=<hex>
+
   try {
-    const { createHmac } = require('crypto')
-    const expected = createHmac('sha256', secret).update(payload).digest('hex')
-    // Extract v1 value from signature header
-    const match = signature.match(/v1=([a-f0-9]+)/)
-    if (!match) return false
-    const provided = match[1]
-    // Timing-safe comparison
-    if (expected.length !== provided.length) return false
-    let result = 0
-    for (let i = 0; i < expected.length; i++) {
-      result |= expected.charCodeAt(i) ^ provided.charCodeAt(i)
-    }
-    return result === 0
-  } catch {
+    // svix is a transitive dependency of resend
+    const { Webhook } = await import('svix')
+    const wh = new Webhook(secret)
+    wh.verify(payload, {
+      'svix-id': svixId,
+      'svix-timestamp': svixTimestamp,
+      'svix-signature': svixSignature,
+    })
+    return true
+  } catch (err) {
+    log.warn('Webhook signature verification failed', {
+      context: { error: String(err) },
+    })
     return false
   }
 }
 
 export async function POST(request: NextRequest) {
   const payloadText = await request.text()
-  const signature = request.headers.get('resend-signature')
   const secret = process.env.RESEND_WEBHOOK_SECRET
 
-  if (!verifyWebhookSignature(payloadText, signature, secret)) {
+  const headers: Record<string, string | null> = {
+    'svix-id': request.headers.get('svix-id'),
+    'svix-timestamp': request.headers.get('svix-timestamp'),
+    'svix-signature': request.headers.get('svix-signature'),
+  }
+
+  const verified = await verifyWebhookSignature(payloadText, headers, secret)
+  if (!verified) {
     log.warn('Invalid webhook signature')
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
   }
