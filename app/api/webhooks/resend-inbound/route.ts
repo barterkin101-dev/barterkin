@@ -21,7 +21,7 @@
 
 export const runtime = 'nodejs'
 
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { createLogger } from '@/lib/utils/logger'
 import { Resend } from 'resend'
@@ -81,7 +81,7 @@ async function verifyWebhookSignature(
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   const payloadText = await request.text()
   const secret = process.env.RESEND_WEBHOOK_SECRET
 

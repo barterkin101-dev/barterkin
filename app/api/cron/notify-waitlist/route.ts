@@ -77,7 +77,6 @@ export async function POST(request: Request) {
     const { data: waitlisters, error: fetchErr } = await admin
       .from('waitlist')
       .select('id, email, county_id')
-      .eq('notified_about_founding', false)
       .is('converted_user_id', null) // Only notify people who haven't signed up yet
       .order('joined_at', { ascending: true })
       .limit(BATCH_SIZE)
@@ -147,7 +146,6 @@ export async function POST(request: Request) {
         const { error: updateErr } = await admin
           .from('waitlist')
           .update({
-            notified_about_founding: true,
             notified_at: new Date().toISOString(),
           })
           .eq('id', waitlister.id)
@@ -173,7 +171,7 @@ export async function POST(request: Request) {
 
     // Track event
     if (sent.length > 0) {
-      void captureEvent('waitlist_founding_notified', {
+      void captureEvent('system', 'waitlist_founding_notified', {
         count: sent.length,
         slots_remaining: slotsRemaining,
       })

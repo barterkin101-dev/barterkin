@@ -54,19 +54,6 @@ export async function POST(request: NextRequest) {
       }
       default:
         log.debug('Unhandled Stripe webhook event', { context: { type: event.type } })
-    log.info('Profile upgraded after checkout', { context: { profile_id: profileId, tier } })
-
-    // Fire conversion-specific events for funnel tracking
-    if (tier === 'founding') {
-      captureEventFireAndForget(profileId, 'founding_converted', {
-        stripe_customer_id: session.customer as string,
-        subscription_id: session.subscription as string,
-      })
-    } else if (tier === 'premium') {
-      captureEventFireAndForget(profileId, 'premium_converted', {
-        stripe_customer_id: session.customer as string,
-        subscription_id: session.subscription as string,
-      })
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Webhook handler error'
@@ -114,7 +101,7 @@ async function handleInvoicePaymentSucceeded(
   invoice: Stripe.Invoice,
   supabase: Awaited<ReturnType<typeof createClient>>,
 ) {
-  const subscriptionId = invoice.subscription as string | null
+  const subscriptionId = (invoice as unknown as Record<string, unknown>).subscription as string | null
   if (!subscriptionId) return
 
   const { data: profile } = await supabase
@@ -141,7 +128,7 @@ async function handleInvoicePaymentFailed(
   invoice: Stripe.Invoice,
   supabase: Awaited<ReturnType<typeof createClient>>,
 ) {
-  const subscriptionId = invoice.subscription as string | null
+  const subscriptionId = (invoice as unknown as Record<string, unknown>).subscription as string | null
   if (!subscriptionId) return
 
   // Downgrade to free on payment failure (grace period handled by subscription_current_period_end)
@@ -200,13 +187,16 @@ async function syncSubscription(
     return
   }
 
+  const periodEnd =
+    subscription.items.data[0]?.current_period_end ?? null
+
   const { error } = await supabase
     .from('profiles')
     .update({
       tier,
       stripe_subscription_id: subscription.id,
-      subscription_current_period_end: subscription.current_period_end
-        ? new Date(subscription.current_period_end * 1000).toISOString()
+      subscription_current_period_end: periodEnd
+        ? new Date(periodEnd * 1000).toISOString()
         : null,
     })
     .eq('id', targetId)

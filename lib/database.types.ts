@@ -905,6 +905,8 @@ export type Database = {
           joined_at: string
           converted_at: string | null
           converted_user_id: string | null
+          notified_at: string | null
+          notified_about_founding: boolean
         }
         Insert: {
           id?: string
@@ -914,6 +916,8 @@ export type Database = {
           joined_at?: string
           converted_at?: string | null
           converted_user_id?: string | null
+          notified_at?: string | null
+          notified_about_founding?: boolean
         }
         Update: {
           id?: string
@@ -923,6 +927,8 @@ export type Database = {
           joined_at?: string
           converted_at?: string | null
           converted_user_id?: string | null
+          notified_at?: string | null
+          notified_about_founding?: boolean
         }
         Relationships: [
           {

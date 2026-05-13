@@ -108,11 +108,9 @@ describe('POST /api/cron/notify-waitlist', () => {
       if (table === 'waitlist') {
         return {
           select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              is: vi.fn().mockReturnValue({
-                order: vi.fn().mockReturnValue({
-                  limit: vi.fn().mockReturnValue({ data: [], error: null }),
-                }),
+            is: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockReturnValue({ data: [], error: null }),
               }),
             }),
           }),
@@ -147,11 +145,9 @@ describe('POST /api/cron/notify-waitlist', () => {
       if (table === 'waitlist') {
         return {
           select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              is: vi.fn().mockReturnValue({
-                order: vi.fn().mockReturnValue({
-                  limit: vi.fn().mockReturnValue({ data: waitlisters, error: null }),
-                }),
+            is: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockReturnValue({ data: waitlisters, error: null }),
               }),
             }),
           }),
@@ -186,7 +182,7 @@ describe('POST /api/cron/notify-waitlist', () => {
     )
 
     // Verify captureEvent was called
-    expect(captureEvent).toHaveBeenCalledWith('waitlist_founding_notified', {
+    expect(captureEvent).toHaveBeenCalledWith('system', 'waitlist_founding_notified', {
       count: 2,
       slots_remaining: 5,
     })
@@ -209,11 +205,9 @@ describe('POST /api/cron/notify-waitlist', () => {
       if (table === 'waitlist') {
         return {
           select: vi.fn().mockReturnValue({
-            eq: vi.fn().mockReturnValue({
-              is: vi.fn().mockReturnValue({
-                order: vi.fn().mockReturnValue({
-                  limit: vi.fn().mockReturnValue({ data: waitlisters, error: null }),
-                }),
+            is: vi.fn().mockReturnValue({
+              order: vi.fn().mockReturnValue({
+                limit: vi.fn().mockReturnValue({ data: waitlisters, error: null }),
               }),
             }),
           }),

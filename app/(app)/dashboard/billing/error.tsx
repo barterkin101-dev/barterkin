@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { createLogger } from '@/lib/utils/client-logger'
+import { clientLogger } from '@/lib/utils/client-logger'
 
 export default function BillingError({
   error,
@@ -11,8 +11,9 @@ export default function BillingError({
   reset: () => void
 }) {
   useEffect(() => {
-    const log = createLogger('billing-error')
-    log.error('Billing page error', { context: { message: error.message, digest: error.digest } })
+    clientLogger.error('billing-error', 'Billing page error', {
+      context: { message: error.message, digest: error.digest },
+    })
   }, [error])
 
   return (

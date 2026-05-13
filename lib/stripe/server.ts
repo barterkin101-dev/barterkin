@@ -13,7 +13,7 @@ function initStripe(): Stripe {
     throw new Error('Stripe is not configured.')
   }
   _stripe = new Stripe(secretKey, {
-    apiVersion: '2025-04-30.basil',
+    apiVersion: '2026-04-22.dahlia',
     typescript: true,
   })
   return _stripe

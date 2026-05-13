@@ -115,13 +115,12 @@ export async function createCheckoutSession(
       },
     })
 
-    captureEvent('checkout_session_created', {
-      profile_id: profile.id,
+    captureEvent(profile.id, 'checkout_session_created', {
       tier: requestedPlan,
     })
 
     if (requestedPlan === 'founding') {
-      captureEvent('founding_slot_claimed', {
+      captureEvent(profile.id, 'founding_slot_claimed', {
         profile_id: profile.id,
         slots_remaining_before: (foundingCount ?? 0),
       })
@@ -202,8 +201,8 @@ export async function syncSubscriptionFromStripe(
     .update({
       tier,
       stripe_subscription_id: subscription.id,
-      subscription_current_period_end: subscription.current_period_end
-        ? new Date(subscription.current_period_end * 1000).toISOString()
+      subscription_current_period_end: subscription.items.data[0]?.current_period_end
+        ? new Date(subscription.items.data[0]?.current_period_end * 1000).toISOString()
         : null,
     })
     .eq('id', profileId)
@@ -215,8 +214,7 @@ export async function syncSubscriptionFromStripe(
     throw new Error(`DB sync failed: ${error.message}`)
   }
 
-  captureEvent(isActive ? 'subscription_activated' : 'subscription_deactivated', {
-    profile_id: profileId,
+  captureEvent(profileId, isActive ? 'subscription_activated' : 'subscription_deactivated', {
     tier,
     stripe_status: status,
   })

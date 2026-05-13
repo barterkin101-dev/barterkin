@@ -112,8 +112,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    captureEvent('checkout_session_created', {
-      profile_id: profile.id,
+    captureEvent(profile.id, 'checkout_session_created', {
       tier: requestedPlan,
     })
 
