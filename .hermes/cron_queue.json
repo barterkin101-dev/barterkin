@@ -534,21 +534,21 @@
   },
   {
     "id": "63",
-    "title": "Add 'Recent Trades' social proof section to landing page — live activity feed",
+    "title": "Add 'Recent Trades' social proof section to landing page \u2014 live activity feed",
     "priority": "high",
-    "status": "in_progress",
-    "notes": "COMPLETED: Added PostHog `landing_social_proof_viewed` analytics event to RecentActivity component (fires once per mount, tracks item_count + has_activity). Added 5 unit tests in tests/unit/recent-activity.test.tsx. Fixed vitest.setup.ts to polyfill IntersectionObserver for Framer Motion viewport animations. Updated docs/events.md with event schema. All 308 tests pass. Commit: 5b87e6b."
+    "status": "completed",
+    "notes": "COMPLETED: Added PostHog landing_social_proof_viewed analytics event to RecentActivity component. Added 5 unit tests. Fixed vitest.setup.ts IntersectionObserver polyfill. Updated docs/events.md. All 308 tests pass. Commit: f8047ed."
   },
   {
     "id": "64",
-    "title": "Add credit-earning quests — daily login streak + first listing bonus + profile complete bonus",
+    "title": "Add credit-earning quests \u2014 daily login streak + first listing bonus + profile complete bonus",
     "priority": "high",
-    "status": "pending",
-    "notes": "Free users have no way to earn credits beyond referrals. Add a 'Quests' card to dashboard showing earnable credit bonuses: (1) Daily login streak — 1 credit/day, max 7-day streak multiplier; (2) First listing — 5 credits; (3) Complete profile — 3 credits; (4) First message sent — 2 credits. Track quest completion in a credit_ledger with source='quest_daily_login' etc. Add DB migration for quest tracking (profiles.last_login_at, profiles.login_streak). PostHog: quest_completed event. Acceptance: dashboard shows quest progress, credits auto-award on completion, streak resets after 48h gap."
+    "status": "in_progress",
+    "notes": "In progress: Wired automatic quest awards into real completion events. Creating a new listing now attempts idempotent `quest_first_listing`, and publishing a complete profile now attempts `quest_complete_profile`, both covered by new unit tests in tests/unit/quest-awards-actions.test.ts. Full suite passes (312 tests). Daily login streak plumbing + safe dashboard/UI exposure are still pending."
   },
   {
     "id": "65",
-    "title": "Add dormant member re-engagement email — 'We miss you' cron for 14+ day inactive users",
+    "title": "Add dormant member re-engagement email \u2014 'We miss you' cron for 14+ day inactive users",
     "priority": "medium",
     "status": "pending",
     "notes": "Members who haven't logged in for 14+ days are churning silently. Add a cron endpoint at /api/cron/re-engage that: (1) finds profiles with last_login_at > 14 days ago and no email sent in last 7 days, (2) sends personalized Resend email with 'New listings in your county since you left' + direct login link, (3) records send in re_engagement_sends table to prevent spam, (4) PostHog re_engagement_sent event. Acceptance: 6 unit tests, gated by CRON_SECRET, respects unsubscribes, max 1 email per user per 7 days."

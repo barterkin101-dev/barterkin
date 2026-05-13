@@ -6,6 +6,7 @@ import { captureEvent } from '@/lib/analytics'
 import { limitCreateListing } from '@/lib/rate-limit'
 import { validateAndSanitize } from '@/lib/utils/validation'
 import { createLogger } from '@/lib/utils/logger'
+import { awardQuest } from '@/lib/actions/quests'
 import type {
   SaveListingResult,
   DeleteListingResult,
@@ -190,6 +191,16 @@ export async function saveListing(
     listing_id: listing.id,
     has_images: values.images.length,
   })
+
+  if (!isUpdate) {
+    const questResult = await awardQuest('quest_first_listing')
+    if (!questResult.ok) {
+      const log = createLogger('listings')
+      log.warn('quest_first_listing award failed', {
+        context: { listingId: listing.id, error: questResult.error },
+      })
+    }
+  }
 
   return { ok: true, listingId: listing.id }
 }

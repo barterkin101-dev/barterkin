@@ -7,6 +7,7 @@ import { generateSlug } from '@/lib/utils/slug'
 import { validateAndSanitize } from '@/lib/utils/validation'
 import { createLogger } from '@/lib/utils/logger'
 import { captureEvent } from '@/lib/analytics'
+import { awardQuest } from '@/lib/actions/quests'
 import type {
   SaveProfileResult,
   SetPublishedResult,
@@ -283,6 +284,14 @@ export async function setPublished(
     method: 'toggle',
     profile_id: profileId,
   })
+
+  const questResult = await awardQuest('quest_complete_profile')
+  if (!questResult.ok) {
+    const log = createLogger('profile')
+    log.warn('quest_complete_profile award failed', {
+      context: { profileId, error: questResult.error },
+    })
+  }
 
   return { ok: true }
 }
