@@ -500,5 +500,26 @@
     "created_at": "2026-05-13T12-23-04Z",
     "source": "codex-review",
     "notes": "COMPLETED: Codex review flags addressed. Code is in main, builds pass, 277 tests pass. No actionable issues remain."
+  },
+  {
+    "id": "59",
+    "title": "Wire discover feed to dashboard — 'For You' + 'Latest' tabs with algorithmic surfacing",
+    "priority": "high",
+    "status": "in_progress",
+    "notes": "Backend exists: discover_listings SQL function + getDiscoverFeed() data layer. Missing: dashboard UI integration. Add tabs to dashboard page: 'For You' (algorithmic via getDiscoverFeed) and 'Latest' (chronological listings). Use ListingCard component for each. Track tab switches in PostHog. Acceptance: dashboard shows discover feed for logged-in users, falls back to latest when algorithm returns empty."
+  },
+  {
+    "id": "60",
+    "title": "Fix saved_listings RLS + add 'Saved Listings' dashboard page",
+    "priority": "high",
+    "status": "pending",
+    "notes": "BUG: saved_listings RLS uses user_id = auth.uid() but user_id references profiles.id, not auth.users.id. This breaks RLS — users can't read their own saves through direct queries. Fix: change RLS to use subquery (user_id IN (SELECT id FROM profiles WHERE owner_id = auth.uid())). Then add /dashboard/saved page that uses getSavedListings() to show saved listings in a grid. Add nav link in dashboard quick actions. Acceptance: user can save a listing, navigate to /dashboard/saved, and see it. Unit tests for RLS + page rendering."
+  },
+  {
+    "id": "61",
+    "title": "Weekly 'New Listings in Your County' digest email — re-engagement cron",
+    "priority": "medium",
+    "status": "pending",
+    "notes": "Re-engagement loop: weekly cron (Sundays 9am ET) emails active users about new listings in their county from the past 7 days. Create app/api/cron/weekly-digest/route.ts. Query: listings created in last 7d in user's county, grouped by category. Resend batch send with personalized email template. Track opens/clicks via PostHog. Rate limit: 1 digest per user per week. Acceptance: cron runs, sends emails to users with matching county listings, skips users with no new listings. Unit tests for query logic + email batching."
   }
 ]

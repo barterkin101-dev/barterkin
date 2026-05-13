@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
-import { getMyListings } from '@/lib/data/listings'
+import { getMyListings, getListings } from '@/lib/data/listings'
+import { getDiscoverFeed } from '@/lib/data/discover'
 import { buildReferralLink } from '@/lib/referrals'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,6 +10,7 @@ import { CreditCard, ShoppingBag, MessageSquare, Star, Ticket, User } from 'luci
 import { ProfileCompletionBar } from '@/components/profile/ProfileCompletionBar'
 import { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'
 import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'
+import { DiscoverFeedTabs } from '@/components/dashboard/DiscoverFeedTabs'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 
@@ -30,7 +32,7 @@ export default async function DashboardPage() {
     .eq('owner_id', user.id)
     .maybeSingle()
 
-  const [listings, messageCount, , referralCount, creditBalance, foundingCountResult] = profile ? await Promise.all([
+  const [listings, messageCount, , referralCount, creditBalance, foundingCountResult, discoverResult, latestResult] = profile ? await Promise.all([
     getMyListings(profile.id),
     supabase
       .from('conversation_participants')
@@ -88,7 +90,9 @@ export default async function DashboardPage() {
         }
         return count ?? 0
       }),
-  ]) : [[], 0, 0, 0, 0, 0]
+    getDiscoverFeed(profile.id),
+    getListings({ categoryId: undefined, countyId: undefined, condition: undefined, page: 1 }),
+  ]) : [[], 0, 0, 0, 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }]
   const activeListings = listings.filter((l) => l.status === 'active')
   const referralLink = profile?.referral_code
     ? buildReferralLink(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com', profile.referral_code)
@@ -270,6 +274,24 @@ export default async function DashboardPage() {
           credits={creditBalance}
           referralCount={referralCount}
         />
+      )}
+
+      {/* Discover feed — For You + Latest */}
+      {profile && (
+        <section className="space-y-4">
+          <header className="space-y-1">
+            <h2 className="font-serif text-2xl font-bold">Discover</h2>
+            <p className="text-sm text-muted-foreground">
+              Listings tailored for you and the freshest trades on Barterkin.
+            </p>
+          </header>
+          <DiscoverFeedTabs
+            forYouListings={discoverResult?.listings ?? []}
+            latestListings={latestResult?.listings ?? []}
+            forYouError={discoverResult?.error ?? null}
+            latestError={latestResult?.error ?? null}
+          />
+        </section>
       )}
     </div>
   )

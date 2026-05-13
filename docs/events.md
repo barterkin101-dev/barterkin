@@ -141,6 +141,20 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ---
 
+### `discover_tab_switched`
+
+**When fired:** When a user switches between "For You" and "Latest" tabs on the dashboard discover feed. Fires at most once per tab per session (deduplicated client-side).
+**Fires from:** `components/dashboard/DiscoverFeedTabs.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `tab` | string | Tab name: `for-you` or `latest` |
+| `for_you_count` | number | Number of listings in the "For You" tab at switch time |
+| `latest_count` | number | Number of listings in the "Latest" tab at switch time |
+
+---
+
 ### `test_event` *(Phase 1 wiring validation)*
 
 **When fired:** Home-page button click in dev/test environments.
@@ -164,6 +178,7 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 | `founding_slot_claimed` | ✅ Implemented | `lib/actions/billing.ts` | 7 |
 | `waitlist_founding_notified` | ✅ Implemented | `app/api/cron/notify-waitlist/route.ts` | 7 |
 | `listing_boosted` | ✅ Implemented | `lib/actions/listings.ts` | 7 |
+| `discover_tab_switched` | ✅ Implemented | `components/dashboard/DiscoverFeedTabs.tsx` | 7 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
 | `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |
 
