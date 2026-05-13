@@ -544,7 +544,7 @@
     "title": "Add credit-earning quests \u2014 daily login streak + first listing bonus + profile complete bonus",
     "priority": "high",
     "status": "completed",
-    "notes": "COMPLETED: Daily login streak now syncs on dashboard load, quest cards render server-fed progress with no client-side claiming, first-message quest auto-awards from messaging flows, and quest awarding now validates real eligibility server-side. Added shared quest helpers plus regression tests for streak status and server-side eligibility. pnpm test -- --run passed (315 passed). Commit: PENDING."
+    "notes": "COMPLETED: Daily login streak now syncs on dashboard load, quest cards render server-fed progress with no client-side claiming, first-message quest auto-awards from messaging flows, and quest awarding now validates real eligibility server-side. Added shared quest helpers plus regression tests for streak status and server-side eligibility. pnpm test -- --run passed (315 passed). Commit: 498a867."
   },
   {
     "id": "65",
