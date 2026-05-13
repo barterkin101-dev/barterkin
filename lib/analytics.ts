@@ -35,6 +35,30 @@ export async function captureEvent(
 }
 
 /**
+ * Fire a PostHog event without awaiting shutdown (fire-and-forget).
+ * Use for non-critical events where we don't need guaranteed delivery.
+ */
+export function captureEventFireAndForget(
+  distinctId: string,
+  event: string,
+  properties?: Record<string, unknown>,
+): void {
+  try {
+    const posthog = getPostHog()
+    if (!posthog) return
+    posthog.capture({
+      distinctId,
+      event,
+      properties,
+    })
+    // Intentionally don't await shutdown — let the process exit flush it
+    void posthog.shutdown().catch(() => {})
+  } catch {
+    // Never let analytics break the user flow.
+  }
+}
+
+/**
  * Server-side PostHog alias — links an anonymous distinct_id to a known user id.
  * Non-blocking, never throws.
  */

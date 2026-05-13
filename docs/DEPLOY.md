@@ -22,7 +22,7 @@
 | Variable | Source | Purpose |
 |----------|--------|---------|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase Project Settings → API | Supabase client URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase Project Settings → API | Supabase anon key |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase Project Settings → API | Supabase anon/publishable key used by app, middleware, and health checks |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase Project Settings → API | Server-side admin ops |
 | `STRIPE_SECRET_KEY` | Stripe Dashboard → Developers → API keys | Stripe backend |
 | `STRIPE_WEBHOOK_SECRET` | Stripe Dashboard → Webhooks → endpoint secret | Webhook verification |
@@ -65,7 +65,7 @@ supabase migration up
 
 Critical migrations for billing:
 - `20260513010000_referral_credits.sql` — credits column
-- `20260513020000_tier_columns.sql` — tier, stripe_customer_id, stripe_subscription_id, subscription_current_period_end
+- `20260513050000_stripe_billing.sql` — tier, stripe_customer_id, stripe_subscription_id, subscription_current_period_end
 
 ---
 

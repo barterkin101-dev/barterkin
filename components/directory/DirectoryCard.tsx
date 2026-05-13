@@ -27,9 +27,9 @@ export function DirectoryCard({ profile }: { profile: DirectoryProfile }) {
   return (
     <Link href={`/m/${profile.username}`} aria-label={ariaLabel} className="block">
       <Card className="relative bg-sage-pale ring-1 ring-sage-light rounded-lg p-6 min-h-[220px] hover:ring-1 hover:ring-sage-light hover:shadow-sm hover:-translate-y-0.5 motion-reduce:hover:translate-y-0 motion-reduce:transition-none transition-all border-0">
-        {profile.founding_member && (
+        {profile.founding_member || profile.tier === 'founding' ? (
           <FoundingMemberBadge className="absolute right-4 top-4" />
-        )}
+        ) : null}
         <div className="flex items-start gap-4">
           <Avatar className="h-16 w-16 border border-sage-light flex-shrink-0">
             <AvatarImage src={profile.avatar_url ?? undefined} alt="" />

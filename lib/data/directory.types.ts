@@ -37,6 +37,7 @@ export interface DirectoryProfile {
   display_name: string | null
   avatar_url: string | null
   founding_member: boolean
+  tier: string
   rating_avg: number | null
   rating_count: number
   counties: { name: string } | null

@@ -58,7 +58,7 @@ export function ProfileCard({
             <h1 className="font-serif text-2xl font-bold leading-[1.2] text-forest-deep">
               {profile.display_name ?? 'Member'}
             </h1>
-            {profile.founding_member && <FoundingMemberBadge />}
+            {profile.founding_member || profile.tier === 'founding' ? <FoundingMemberBadge /> : null}
             {/* 3-dot overflow menu (Block + Report) — hidden on own profile */}
             {showViewerActions && (
               <OverflowMenu

@@ -54,6 +54,19 @@ export async function POST(request: NextRequest) {
       }
       default:
         log.debug('Unhandled Stripe webhook event', { context: { type: event.type } })
+    log.info('Profile upgraded after checkout', { context: { profile_id: profileId, tier } })
+
+    // Fire conversion-specific events for funnel tracking
+    if (tier === 'founding') {
+      captureEventFireAndForget(profileId, 'founding_converted', {
+        stripe_customer_id: session.customer as string,
+        subscription_id: session.subscription as string,
+      })
+    } else if (tier === 'premium') {
+      captureEventFireAndForget(profileId, 'premium_converted', {
+        stripe_customer_id: session.customer as string,
+        subscription_id: session.subscription as string,
+      })
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Webhook handler error'

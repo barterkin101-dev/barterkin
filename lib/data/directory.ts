@@ -52,7 +52,7 @@ export async function getDirectoryRows(
     let q = supabase
       .from('profiles')
       .select(
-        `id, username, display_name, avatar_url, founding_member, rating_avg, rating_count,
+        `id, username, display_name, avatar_url, founding_member, tier, rating_avg, rating_count,
          counties!inner(name),
          categories!inner(name),
          skills_offered(skill_text, sort_order)`,
@@ -110,6 +110,7 @@ export async function getDirectoryRows(
         founding_member: Boolean(
           (row as { founding_member?: boolean }).founding_member,
         ),
+        tier: (row as { tier?: string }).tier ?? 'free',
         rating_avg: (row as { rating_avg?: number | null }).rating_avg ?? null,
         rating_count: (row as { rating_count?: number }).rating_count ?? 0,
         counties: row.counties

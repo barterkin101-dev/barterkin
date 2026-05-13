@@ -1,5 +1,7 @@
 # Barterkin Production Deploy Runbook
 
+This file is a short operator entrypoint. The current production billing runbook lives in [`docs/DEPLOY.md`](docs/DEPLOY.md), which is the source of truth for Stripe env vars, webhook setup, and billing migrations.
+
 ## Prerequisites
 
 - Vercel CLI: `npm i -g vercel`
@@ -14,6 +16,11 @@
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 SUPABASE_SERVICE_ROLE_KEY
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+STRIPE_PREMIUM_MONTHLY_PRICE_ID
+STRIPE_FOUNDING_MONTHLY_PRICE_ID
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 NEXT_PUBLIC_POSTHOG_KEY
 NEXT_PUBLIC_POSTHOG_HOST
 NEXT_PUBLIC_SITE_URL
@@ -78,6 +85,8 @@ npx vercel --prod
 ```
 
 ## First-Time v1.5 Setup (Supabase)
+
+For current billing-related migrations, follow [`docs/DEPLOY.md`](docs/DEPLOY.md#3-database-migrations). The legacy numbered migration list below predates the Stripe billing rollout.
 
 Run these in Supabase SQL Editor **in order**:
 

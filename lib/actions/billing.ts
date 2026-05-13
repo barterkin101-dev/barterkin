@@ -41,13 +41,16 @@ export async function createCheckoutSession(
   }
 
   const requestedPlan = (formData.get('plan') as string) === 'founding' ? 'founding' : 'premium'
+  let foundingCount: number | null = null
 
   // Check founding member limit
   if (requestedPlan === 'founding') {
-    const { count: foundingCount, error: countErr } = await supabase
+    const { count, error: countErr } = await supabase
       .from('profiles')
       .select('id', { count: 'exact', head: true })
       .eq('tier', 'founding')
+
+    foundingCount = count ?? null
 
     if (countErr) {
       log.error('founding member count failed', { context: { error: countErr.message } })
@@ -116,6 +119,13 @@ export async function createCheckoutSession(
       profile_id: profile.id,
       tier: requestedPlan,
     })
+
+    if (requestedPlan === 'founding') {
+      captureEvent('founding_slot_claimed', {
+        profile_id: profile.id,
+        slots_remaining_before: (foundingCount ?? 0),
+      })
+    }
 
     return { ok: true, url: session.url ?? undefined }
   } catch (err) {
