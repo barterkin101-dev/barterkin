@@ -25,7 +25,7 @@ export function ListingJsonLd({ listing }: ListingJsonLdProps) {
       priceCurrency: 'USD',
       availability: listing.status === 'active' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       // eslint-disable-next-line react-hooks/purity
-      priceValidUntil: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      priceValidUntil: new Date(new Date(listing.created_at).getTime() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       url: `${SITE_URL}/listings/${listing.id}`,
       seller: {
         '@type': 'Person',
