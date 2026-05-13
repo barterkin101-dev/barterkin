@@ -552,5 +552,26 @@
     "priority": "medium",
     "status": "completed",
     "notes": "COMPLETED: Added /api/cron/re-engage with CRON_SECRET auth, Resend 'we miss you' email, re_engagement_sends migration + send dedupe, county-matched listings since last login, unsubscribe gating via email_digest_enabled, PostHog re_engagement_sent tracking, and 6 unit tests. Commit: df1e53c."
+  },
+  {
+    "id": "66",
+    "title": "Add native share + analytics to dashboard referral invite card",
+    "priority": "high",
+    "status": "in_progress",
+    "notes": "IN PROGRESS: Queue was empty, so generated new growth/retention/revenue tasks from current product state. Shipping the growth task first by improving referral sharing UX on /dashboard and instrumenting invite copy/share behavior."
+  },
+  {
+    "id": "67",
+    "title": "Add unread-message reminder banner on dashboard after 24h inactivity",
+    "priority": "medium",
+    "status": "pending",
+    "notes": "PENDING: Retention task grounded in existing messaging + re-engagement infrastructure. Surface stale unread conversations in /dashboard before escalating to email."
+  },
+  {
+    "id": "68",
+    "title": "Add billing success state with upgrade confirmation + next-step CTA",
+    "priority": "high",
+    "status": "pending",
+    "notes": "PENDING: Monetization task grounded in existing Stripe billing flow. Improve post-checkout conversion confidence on /dashboard/billing with explicit success feedback and premium/founding next steps."
   }
 ]

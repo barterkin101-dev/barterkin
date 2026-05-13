@@ -87,6 +87,35 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ---
 
+### `referral_invite_copied`
+
+**When fired:** When a member copies their referral invite link from the dashboard.
+**Fires from:** `components/dashboard/ReferralInviteCard.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `referral_code` | string | The 8-char referral code being shared |
+| `referral_count` | number | How many successful referrals the member has at copy time |
+| `credits` | number | Current referral credit balance shown in the card |
+
+---
+
+### `referral_invite_shared`
+
+**When fired:** When a member successfully completes a native share flow for their referral link from the dashboard.
+**Fires from:** `components/dashboard/ReferralInviteCard.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `method` | string | Share mechanism, currently `native-share` |
+| `referral_code` | string | The 8-char referral code being shared |
+| `referral_count` | number | How many successful referrals the member has at share time |
+| `credits` | number | Current referral credit balance shown in the card |
+
+---
+
 ### `subscription_activated`
 
 **When fired:** After Stripe webhook confirms a successful subscription payment (checkout.session.completed).
@@ -213,6 +242,8 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 | `contact_reported` | ✅ Implemented | `lib/actions/contact.ts` | 5 |
 | `contact_blocked` | ✅ Implemented | `lib/actions/contact.ts` | 5 |
 | `referral_link_used` | ✅ Implemented | `app/auth/callback/route.ts`, `app/auth/confirm/route.ts` | 6 |
+| `referral_invite_copied` | ✅ Implemented | `components/dashboard/ReferralInviteCard.tsx` | 7 |
+| `referral_invite_shared` | ✅ Implemented | `components/dashboard/ReferralInviteCard.tsx` | 7 |
 | `subscription_activated` | ✅ Implemented | `app/api/stripe/webhook/route.ts` | 7 |
 | `founding_slot_claimed` | ✅ Implemented | `lib/actions/billing.ts` | 7 |
 | `waitlist_founding_notified` | ✅ Implemented | `app/api/cron/notify-waitlist/route.ts` | 7 |
