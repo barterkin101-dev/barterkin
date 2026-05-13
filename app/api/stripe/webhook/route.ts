@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getStripe, getWebhookSecret } from '@/lib/stripe/server'
 import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
+import { captureEvent } from '@/lib/analytics'
 import type Stripe from 'stripe'
 
 const log = createLogger('stripe-webhook')
@@ -95,6 +96,13 @@ async function handleCheckoutSessionCompleted(
   }
 
   log.info('Profile upgraded after checkout', { context: { profile_id: profileId, tier } })
+
+  // Track actual conversion (not just checkout initiation)
+  void captureEvent(profileId, 'subscription_activated', {
+    tier,
+    source: 'stripe_webhook',
+    event_type: 'checkout.session.completed',
+  })
 }
 
 async function handleInvoicePaymentSucceeded(

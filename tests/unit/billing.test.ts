@@ -28,6 +28,16 @@ vi.mock('@/lib/analytics', () => ({
   captureEvent: vi.fn(),
 }))
 
+const mockAdminFrom = vi.fn()
+const mockAdminSelect = vi.fn()
+const mockAdminEq = vi.fn()
+
+vi.mock('@/lib/supabase/admin', () => ({
+  getSupabaseAdmin: vi.fn(() => ({
+    from: mockAdminFrom,
+  })),
+}))
+
 const mockFrom = vi.fn()
 const mockSelect = vi.fn()
 const mockEq = vi.fn()
@@ -39,6 +49,9 @@ function resetChain() {
   mockSelect.mockReturnValue({ eq: mockEq })
   mockEq.mockReturnValue({ maybeSingle: mockMaybeSingle })
   mockUpdate.mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) })
+  mockAdminFrom.mockReturnValue({ select: mockAdminSelect })
+  mockAdminSelect.mockReturnValue({ eq: mockAdminEq })
+  mockAdminEq.mockReturnValue({ count: 0, error: null })
 }
 
 vi.mock('@/lib/supabase/server', () => ({
@@ -145,17 +158,15 @@ describe('billing actions', () => {
         error: null,
       })
 
-      // Second call: founding member count (select with count->eq returns {count,error})
-      const mockCountEq = vi.fn().mockResolvedValue({ count: 0, error: null })
-      const mockCountSelect = vi.fn().mockReturnValue({ eq: mockCountEq })
+      // Admin client: founding member count (select with count->eq returns {count,error})
+      mockAdminEq.mockResolvedValueOnce({ count: 0, error: null })
 
-      // Third call: update stripe_customer_id (update->eq)
+      // Second call (regular client): update stripe_customer_id (update->eq)
       const mockUpdateEq = vi.fn().mockResolvedValue({ error: null })
       const mockUpdate2 = vi.fn().mockReturnValue({ eq: mockUpdateEq })
 
       mockFrom
         .mockReturnValueOnce({ select: mockSelect, update: mockUpdate2 })
-        .mockReturnValueOnce({ select: mockCountSelect })
         .mockReturnValueOnce({ select: mockSelect, update: mockUpdate2 })
 
       mockStripeCustomersCreate.mockResolvedValueOnce({ id: 'cus_new' })
@@ -184,13 +195,8 @@ describe('billing actions', () => {
         error: null,
       })
 
-      // Second call: founding member count — sold out
-      const mockCountEq = vi.fn().mockResolvedValue({ count: 100, error: null })
-      const mockCountSelect = vi.fn().mockReturnValue({ eq: mockCountEq })
-
-      mockFrom
-        .mockReturnValueOnce({ select: mockSelect, update: mockUpdate })
-        .mockReturnValueOnce({ select: mockCountSelect })
+      // Admin client: founding member count — sold out
+      mockAdminEq.mockResolvedValueOnce({ count: 100, error: null })
 
       const fd = new FormData()
       fd.append('plan', 'founding')

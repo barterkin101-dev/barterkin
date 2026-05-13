@@ -8,7 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CreditCard, ShoppingBag, MessageSquare, Star, Ticket, User } from 'lucide-react'
 import { ProfileCompletionBar } from '@/components/profile/ProfileCompletionBar'
 import { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'
+import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
+import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -28,7 +30,7 @@ export default async function DashboardPage() {
     .eq('owner_id', user.id)
     .maybeSingle()
 
-  const [listings, messageCount, , referralCount, creditBalance] = profile ? await Promise.all([
+  const [listings, messageCount, , referralCount, creditBalance, foundingCountResult] = profile ? await Promise.all([
     getMyListings(profile.id),
     supabase
       .from('conversation_participants')
@@ -75,11 +77,24 @@ export default async function DashboardPage() {
         }
         return (data ?? []).reduce((sum, row) => sum + (row.amount ?? 0), 0)
       }),
-  ]) : [[], 0, 0, 0, 0]
+    supabase
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('tier', 'founding')
+      .then(({ count, error }) => {
+        if (error) {
+          const log = createLogger('dashboard')
+          log.error('founding count error', { context: { code: error.code } })
+        }
+        return count ?? 0
+      }),
+  ]) : [[], 0, 0, 0, 0, 0]
   const activeListings = listings.filter((l) => l.status === 'active')
   const referralLink = profile?.referral_code
     ? buildReferralLink(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com', profile.referral_code)
     : null
+  const foundingSlotsRemaining = Math.max(0, STRIPE_FOUNDING_MEMBER_LIMIT - foundingCountResult)
+  const showFoundingNudge = profile?.tier === 'free' && foundingSlotsRemaining > 0
 
   return (
     <div className="space-y-8">
@@ -227,6 +242,11 @@ export default async function DashboardPage() {
           </Link>
         </Card>
       </div>
+
+      {/* Founding member nudge for free users */}
+      {showFoundingNudge && (
+        <FoundingMemberNudge slotsRemaining={foundingSlotsRemaining} />
+      )}
 
       {/* Profile completion nudge */}
       {profile && (

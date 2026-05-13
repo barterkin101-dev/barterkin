@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getStripe, getPriceIds } from '@/lib/stripe/server'
 import { createLogger } from '@/lib/utils/logger'
 import { captureEvent } from '@/lib/analytics'
@@ -45,7 +46,7 @@ export async function createCheckoutSession(
 
   // Check founding member limit
   if (requestedPlan === 'founding') {
-    const { count, error: countErr } = await supabase
+    const { count, error: countErr } = await getSupabaseAdmin()
       .from('profiles')
       .select('id', { count: 'exact', head: true })
       .eq('tier', 'founding')

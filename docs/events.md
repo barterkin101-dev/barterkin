@@ -87,6 +87,20 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ---
 
+### `subscription_activated`
+
+**When fired:** After Stripe webhook confirms a successful subscription payment (checkout.session.completed).
+**Fires from:** `app/api/stripe/webhook/route.ts` → `handleCheckoutSessionCompleted()`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `tier` | string | Subscription tier: `premium` or `founding` |
+| `source` | string | Always `stripe_webhook` |
+| `event_type` | string | Stripe event type: `checkout.session.completed` |
+
+---
+
 ### `founding_slot_claimed`
 
 **When fired:** After a user successfully initiates a Stripe Checkout session for the Founding Member tier.
@@ -132,6 +146,7 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 | `contact_reported` | ✅ Implemented | `lib/actions/contact.ts` | 5 |
 | `contact_blocked` | ✅ Implemented | `lib/actions/contact.ts` | 5 |
 | `referral_link_used` | ✅ Implemented | `app/auth/callback/route.ts`, `app/auth/confirm/route.ts` | 6 |
+| `subscription_activated` | ✅ Implemented | `app/api/stripe/webhook/route.ts` | 7 |
 | `founding_slot_claimed` | ✅ Implemented | `lib/actions/billing.ts` | 7 |
 | `waitlist_founding_notified` | ✅ Implemented | `app/api/cron/notify-waitlist/route.ts` | 7 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
