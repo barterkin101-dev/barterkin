@@ -6,6 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { captureClientEvent } from '@/lib/analytics-client'
 
+export function buildReferralInviteMessage(referralLink: string): string {
+  return `I’m on Barterkin, a local skill-trading network for neighbors. Join with my invite link: ${referralLink}`
+}
+
 export function ReferralInviteCard({
   referralCode,
   referralLink,
@@ -18,21 +22,41 @@ export function ReferralInviteCard({
   referralCount: number
 }) {
   const [copied, setCopied] = useState(false)
+  const [messageCopied, setMessageCopied] = useState(false)
   const [sharePending, setSharePending] = useState(false)
+  const inviteMessage = buildReferralInviteMessage(referralLink)
 
-  async function handleCopy() {
+  async function copyText(value: string, copyTarget: 'link' | 'message') {
     try {
-      await navigator.clipboard.writeText(referralLink)
-      setCopied(true)
+      await navigator.clipboard.writeText(value)
+      if (copyTarget === 'link') {
+        setCopied(true)
+        window.setTimeout(() => setCopied(false), 2000)
+      } else {
+        setMessageCopied(true)
+        window.setTimeout(() => setMessageCopied(false), 2000)
+      }
       captureClientEvent('referral_invite_copied', {
         referral_code: referralCode,
         referral_count: referralCount,
         credits,
+        copy_target: copyTarget,
       })
-      window.setTimeout(() => setCopied(false), 2000)
     } catch {
-      setCopied(false)
+      if (copyTarget === 'link') {
+        setCopied(false)
+      } else {
+        setMessageCopied(false)
+      }
     }
+  }
+
+  async function handleCopy() {
+    await copyText(referralLink, 'link')
+  }
+
+  async function handleCopyMessage() {
+    await copyText(inviteMessage, 'message')
   }
 
   async function handleShare() {
@@ -46,7 +70,7 @@ export function ReferralInviteCard({
     try {
       await navigator.share({
         title: 'Join me on Barterkin',
-        text: 'Join me on Barterkin and trade skills with local members.',
+        text: inviteMessage,
         url: referralLink,
       })
 
@@ -102,6 +126,15 @@ export function ReferralInviteCard({
           <div className="mt-3 break-all text-sm text-muted-foreground">{referralLink}</div>
         </div>
 
+        <div className="rounded-lg border bg-background/80 p-4">
+          <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Suggested invite message
+          </div>
+          <p className="mt-2 text-sm text-foreground">
+            {inviteMessage}
+          </p>
+        </div>
+
         <div className="flex flex-col gap-3 sm:flex-row">
           <Button
             type="button"
@@ -115,6 +148,10 @@ export function ReferralInviteCard({
           <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={handleCopy}>
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             {copied ? 'Copied link' : 'Copy invite link'}
+          </Button>
+          <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={handleCopyMessage}>
+            {messageCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {messageCopied ? 'Copied message' : 'Copy invite message'}
           </Button>
         </div>
       </CardContent>

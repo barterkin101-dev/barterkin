@@ -89,7 +89,7 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ### `referral_invite_copied`
 
-**When fired:** When a member copies their referral invite link from the dashboard.
+**When fired:** When a member copies either their referral invite link or the prewritten invite message from the dashboard.
 **Fires from:** `components/dashboard/ReferralInviteCard.tsx`
 **Properties:**
 
@@ -98,6 +98,7 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 | `referral_code` | string | The 8-char referral code being shared |
 | `referral_count` | number | How many successful referrals the member has at copy time |
 | `credits` | number | Current referral credit balance shown in the card |
+| `copy_target` | string | What was copied: `link` or `message` |
 
 ---
 

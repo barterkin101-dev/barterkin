@@ -583,5 +583,32 @@
     "created_at": "2026-05-13T20-28-24Z",
     "source": "codex-review",
     "notes": "COMPLETED: Restored stale Supabase schema types for digest/re-engagement tables and RPCs, fixed the billing success error boundary to use the current logger/ErrorState API, and added null-safe reminder/test coverage. Commit: f89c3bd."
+  },
+  {
+    "id": "70",
+    "title": "Add prewritten referral invite message to dashboard for faster member sharing",
+    "priority": "high",
+    "status": "in_progress",
+    "created_at": "2026-05-13T21:16:25Z",
+    "source": "codex-fallback",
+    "notes": "In progress: adding copyable invite-message copy and analytics to the existing referral card to reduce sharing friction."
+  },
+  {
+    "id": "71",
+    "title": "Add dashboard site-updates recap card to pull members back into product changes",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-13T21:16:25Z",
+    "source": "codex-fallback",
+    "notes": "Pending: surface recent site updates on the dashboard with unread emphasis to improve retention and feature discovery."
+  },
+  {
+    "id": "72",
+    "title": "Add premium ROI proof block on billing page to improve upgrade conversion",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-13T21:16:25Z",
+    "source": "codex-fallback",
+    "notes": "Pending: clarify premium/founding value with concrete member outcomes and savings framing on the billing page."
   }
 ]
