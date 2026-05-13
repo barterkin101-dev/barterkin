@@ -69,6 +69,7 @@ vi.mock('@/lib/supabase/server', () => ({
 
 // Now import the billing actions after mocks are set up
 import { createCheckoutSession, createCustomerPortalSession } from '@/lib/actions/billing'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 describe('billing actions', () => {
   beforeEach(() => {
@@ -180,6 +181,11 @@ describe('billing actions', () => {
       const result = await createCheckoutSession(null, fd)
 
       expect(result.ok).toBe(true)
+      expect(getSupabaseAdmin).toHaveBeenCalledTimes(1)
+      expect(mockAdminFrom).toHaveBeenCalledWith('profiles')
+      expect(mockAdminSelect).toHaveBeenCalledWith('id', { count: 'exact', head: true })
+      expect(mockAdminEq).toHaveBeenCalledWith('tier', 'founding')
+      expect(mockFrom).toHaveBeenCalledTimes(2)
       expect(mockStripeCheckoutSessionsCreate).toHaveBeenCalledWith(
         expect.objectContaining({
           line_items: [{ price: 'price_founding_xxx', quantity: 1 }],
@@ -204,6 +210,12 @@ describe('billing actions', () => {
 
       expect(result.ok).toBe(false)
       expect(result.error).toContain('sold out')
+      expect(getSupabaseAdmin).toHaveBeenCalledTimes(1)
+      expect(mockAdminFrom).toHaveBeenCalledWith('profiles')
+      expect(mockAdminSelect).toHaveBeenCalledWith('id', { count: 'exact', head: true })
+      expect(mockAdminEq).toHaveBeenCalledWith('tier', 'founding')
+      expect(mockStripeCustomersCreate).not.toHaveBeenCalled()
+      expect(mockStripeCheckoutSessionsCreate).not.toHaveBeenCalled()
     })
   })
 

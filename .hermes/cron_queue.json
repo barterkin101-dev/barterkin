@@ -388,7 +388,7 @@
     "id": "47",
     "title": "Add credit-based listing boosts \u2014 spend credits to feature listings",
     "priority": "medium",
-    "status": "pending",
+    "status": "in_progress",
     "notes": "Monetization: members already earn credits via referrals. Let them spend credits to boost listings to the top of directory/search for 7 days. Add boosted_until column to listings. Sort boosted listings first in directory. Deduct credits on boost. Add unit tests."
   },
   {
@@ -416,9 +416,10 @@
     "title": "[codex-review FIX_FIRST] [task-45] fix billing unit tests \u2014 mock supabase chain for c (e2ef879b)",
     "description": "codex flagged issues in e2ef879b. Address concerns, recommit with [task-50 fix-e2ef879b] prefix.\n\nFIX_FIRST or NEEDS_USER_CALL, name the top 1\u20132 issues.\nwarning: Codex could not find system bubblewrap at /usr/bin/bwrap. Please install bubblewrap with your package manager. Codex will use the vendored bubblewrap in the meantime.\nmcp: klaviyo starting\nmcp: microsoft-clarity starting\nmcp: microsoft-clarity failed: MCP client for `microsoft-clarity` failed to start: MCP startup failed: handshaking with MCP server failed: connection closed: initialize response\nmcp: klaviyo failed: MCP client for `klaviyo` failed to start: MCP startup failed: handshaking with MCP server failed: connection closed: initialize response\nmcp startup: failed: microsoft-clarity, klaviyo\ncodex\nReviewing the billing test addition against the actual billing action implementation and surrounding test patterns first, then I\u2019ll check whether the new mocks really exercise the count-query path the commit claims to fix.\nexec\n/bin/bash -lc \"sed -n '1,260p' lib/actions/billing.ts\" in /root/barterkin succeeded in 0ms:\n'use server'\n\nimport { createClient } from '@/lib/supabase/server'\nimport { getStripe, getPriceIds } from '@/lib/stripe/server'\nimport { createLogger } from '@/lib/utils/logger'\nimport { captureEvent } from '@/lib/analytics'\nimport { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'\nimport type Stripe from 'stripe'\n\nconst log = createLogger('billing')\n\nexport interface CreateCheckoutResult {\n  ok: boolean\n  url?: string\n  error?: string\n}\n\nexport async function createCheckoutSession(\n  _prev: CreateCheckoutResult | null,\n  formData: FormData,\nexec\n/bin/bash -lc 'git show --stat --oneline e2ef879bd8fce7af4265fb6af7d3cb18d0cfcee5' in /root/barterkin succeeded in 0ms:\ne2ef879 [task-45] fix billing unit tests \u2014 mock supabase chain for count queries\n tests/unit/billing.test.ts | 231 +++++++++++++++++++++++++++++++++++++++++++++\n 1 file changed, 231 insertions(+)\nexec\n/bin/bash -lc \"rg -n \\\"createCheckoutSession|createCustomerPortalSession|founding|count:\\\" tests/unit lib -g '\"'!node_modu",
     "priority": "critical",
-    "status": "pending",
+    "status": "in_progress",
     "created_at": "2026-05-13T06-13-01Z",
-    "source": "codex-review"
+    "source": "codex-review",
+    "notes": "IN_PROGRESS: Tightening billing unit tests so founding-plan coverage proves createCheckoutSession uses getSupabaseAdmin() for the founding member count path and fails if it regresses to the user-scoped client."
   },
   {
     "id": "51",
