@@ -35,4 +35,12 @@ describe('WaitlistForm', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Too many requests from this network')
   })
+
+  it('renders the fallback success message when no confirmation email was sent', () => {
+    mockUseActionState.mockReturnValue([{ ok: true, confirmationSent: false }, vi.fn(), false])
+
+    render(<WaitlistForm />)
+
+    expect(screen.getByText("You're on the waitlist! We'll be in touch soon.")).toBeInTheDocument()
+  })
 })

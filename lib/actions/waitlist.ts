@@ -15,6 +15,7 @@ export async function joinWaitlist(
   _prev: JoinWaitlistResult | null,
   formData: FormData,
 ): Promise<JoinWaitlistResult> {
+  const log = createLogger('waitlist')
   const parsed = validateAndSanitize(WaitlistSchema, {
     email: formData.get('email'),
     countyId: formData.get('countyId'),
@@ -51,7 +52,6 @@ export async function joinWaitlist(
       .insert({ email, county_id: countyId ?? null, source: 'hero_cta' })
     insertErr = result.error
   } catch (err) {
-    const log = createLogger('waitlist')
     log.error('waitlist admin client unavailable', { error: err })
     return { ok: false, error: 'Something went wrong. Please try again in a moment.' }
   }
@@ -59,20 +59,20 @@ export async function joinWaitlist(
   if (insertErr) {
     // 23505 unique_violation = already on waitlist
     if (insertErr.code === '23505') {
-      return { ok: true, alreadyJoined: true }
+      return { ok: true, alreadyJoined: true, confirmationSent: false }
     }
-    const log = createLogger('waitlist')
     log.error('waitlist insert failed', { error: insertErr, context: { code: insertErr.code } })
     return { ok: false, error: 'Something went wrong. Please try again in a moment.' }
   }
 
   // Send confirmation email (non-blocking)
+  let confirmationSent = false
   try {
     const apiKey = process.env.RESEND_API_KEY
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com'
     if (apiKey) {
       const resend = new Resend(apiKey)
-      await resend.emails.send({
+      const result = await resend.emails.send({
         from: 'Barterkin <hello@barterkin.com>',
         to: [email],
         subject: "You're on the Barterkin waitlist",
@@ -106,9 +106,13 @@ export async function joinWaitlist(
 </body>
 </html>`,
       })
+      if (result?.error) {
+        log.error('waitlist confirmation email failed', { error: result.error })
+      } else {
+        confirmationSent = true
+      }
     }
   } catch (err) {
-    const log = createLogger('waitlist')
     log.error('waitlist confirmation email failed', { error: err, context: { code: (err as Error).name } })
     // Don't fail the user flow if email fails
   }
@@ -118,5 +122,5 @@ export async function joinWaitlist(
     county_id: countyId ?? null,
   })
 
-  return { ok: true }
+  return { ok: true, confirmationSent }
 }

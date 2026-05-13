@@ -85,6 +85,7 @@ describe('joinWaitlist', () => {
 
     expect(result.ok).toBe(true)
     expect(result.alreadyJoined).toBeUndefined()
+    expect(result.confirmationSent).toBe(true)
   })
 
   it('accepts a blank county and stores null county_id', async () => {
@@ -155,6 +156,7 @@ describe('joinWaitlist', () => {
 
     expect(result.ok).toBe(true)
     expect(result.alreadyJoined).toBe(true)
+    expect(result.confirmationSent).toBe(false)
   })
 
   it('returns an inline error when the admin client is unavailable', async () => {
@@ -195,6 +197,7 @@ describe('joinWaitlist', () => {
     const result = await joinWaitlist(null, formData)
 
     expect(result.ok).toBe(true)
+    expect(result.confirmationSent).toBe(false)
   })
 
   it('returns ok but skips email when RESEND_API_KEY is missing', async () => {
@@ -206,6 +209,22 @@ describe('joinWaitlist', () => {
     const result = await joinWaitlist(null, formData)
 
     expect(result.ok).toBe(true)
+    expect(result.confirmationSent).toBe(false)
     expect(sendMock).not.toHaveBeenCalled()
+  })
+
+  it('returns ok but does not claim confirmation when Resend returns an API error', async () => {
+    sendMock.mockResolvedValueOnce({
+      data: null,
+      error: { name: 'validation_error', message: 'from address not verified' },
+    })
+
+    const formData = new FormData()
+    formData.append('email', 'api-error@example.com')
+
+    const result = await joinWaitlist(null, formData)
+
+    expect(result.ok).toBe(true)
+    expect(result.confirmationSent).toBe(false)
   })
 })

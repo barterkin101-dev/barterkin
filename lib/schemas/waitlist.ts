@@ -15,4 +15,5 @@ export interface JoinWaitlistResult {
   ok: boolean
   error?: string
   alreadyJoined?: boolean
+  confirmationSent?: boolean
 }

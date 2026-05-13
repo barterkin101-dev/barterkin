@@ -23,7 +23,9 @@ export function WaitlistForm() {
         <p className="text-sm">
           {state.alreadyJoined
             ? "You're already on the list — we'll be in touch soon."
-            : "You're on the waitlist! Check your inbox for a confirmation."}
+            : state.confirmationSent
+              ? "You're on the waitlist! Check your inbox for a confirmation."
+              : "You're on the waitlist! We'll be in touch soon."}
         </p>
       </div>
     )
