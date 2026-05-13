@@ -389,8 +389,7 @@
     "title": "Add credit-based listing boosts \u2014 spend credits to feature listings",
     "priority": "medium",
     "status": "completed",
-    "notes": "COMPLETED: Aligned dashboard billing error fallback with the shared ErrorState pattern and added regression tests for both billing route fallbacks. Code commit: b6e0d6a.",
-    "notes": "Monetization: members already earn credits via referrals. Let them spend credits to boost listings to the top of directory/search for 7 days. Add boosted_until column to listings. Sort boosted listings first in directory. Deduct credits on boost. Add unit tests."
+    "notes": "COMPLETED: (1) Created `components/listings/BoostButton.tsx` \u2014 client component using useActionState to call boostListing action, shows disabled state when already boosted or insufficient credits, displays error inline, refreshes page on success; (2) Updated `app/(app)/dashboard/listings/page.tsx` \u2014 fetches profile.credits, shows BoostButton on each listing card, shows purple 'Boosted' badge when active, uses flex-wrap for responsive action row; (3) Updated `components/listings/ListingCard.tsx` \u2014 shows 'Featured' purple badge on boosted listings in public browse grid; (4) Added `tests/unit/listing-boost.test.ts` \u2014 10 tests covering: unauthenticated, missing listingId, profile not found, insufficient credits, listing not found, not owner, inactive listing, already boosted, happy path boost, re-boost after expiry; (5) Fixed `lib/database.types.ts` \u2014 added `boosted_until` to listings Row/Insert/Update; (6) Fixed `lib/data/discover.ts` \u2014 added `boosted_until: null` to discover feed row mapping; (7) Fixed `tests/unit/listing-json-ld.test.tsx` \u2014 added `boosted_until: null` to test fixture. All 276 tests pass, TypeScript clean (0 errors). Commit: afe5bdf."
   },
   {
     "id": "48",
