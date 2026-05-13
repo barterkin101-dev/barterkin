@@ -155,6 +155,19 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ---
 
+### `weekly_digest_sent`
+
+**When fired:** After the weekly digest cron successfully sends one or more digest emails.
+**Fires from:** `app/api/cron/weekly-digest/route.ts`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `count` | number | Number of members emailed in the batch |
+| `listings_total` | number | Total listings included across sent digests |
+
+---
+
 ### `test_event` *(Phase 1 wiring validation)*
 
 **When fired:** Home-page button click in dev/test environments.
@@ -179,6 +192,7 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 | `waitlist_founding_notified` | ✅ Implemented | `app/api/cron/notify-waitlist/route.ts` | 7 |
 | `listing_boosted` | ✅ Implemented | `lib/actions/listings.ts` | 7 |
 | `discover_tab_switched` | ✅ Implemented | `components/dashboard/DiscoverFeedTabs.tsx` | 7 |
+| `weekly_digest_sent` | ✅ Implemented | `app/api/cron/weekly-digest/route.ts` | 7 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
 | `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |
 
