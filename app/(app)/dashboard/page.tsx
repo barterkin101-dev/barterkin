@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
 import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
+import { getConversations } from '@/lib/data/messaging'
+import { getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
 import { buildReferralLink } from '@/lib/referrals'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,6 +14,7 @@ import { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'
 import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'
 import { DiscoverFeedTabs } from '@/components/dashboard/DiscoverFeedTabs'
 import { QuestCard } from '@/components/dashboard/QuestCard'
+import { UnreadMessageReminder } from '@/components/dashboard/UnreadMessageReminder'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
@@ -38,7 +41,7 @@ export default async function DashboardPage() {
   const needsDailyLoginSync = profile ? !isUtcDateToday(profile.last_login_at) : false
   const streakResult = needsDailyLoginSync ? await updateLoginStreak() : null
 
-  const [listings, messageCount, , referralCount, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions] = profile ? await Promise.all([
+  const [listings, messageCount, , referralCount, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations] = profile ? await Promise.all([
     getMyListings(profile.id),
     supabase
       .from('conversation_participants')
@@ -102,7 +105,8 @@ export default async function DashboardPage() {
       .from('quest_completions')
       .select('quest_key')
       .eq('profile_id', profile.id),
-  ]) : [[], 0, 0, 0, 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }, { data: [], error: null }]
+    getConversations(profile.id),
+  ]) : [[], 0, 0, 0, 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }, { data: [], error: null }, []]
   const activeListings = listings.filter((l) => l.status === 'active')
   const referralLink = profile?.referral_code
     ? buildReferralLink(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com', profile.referral_code)
@@ -125,6 +129,9 @@ export default async function DashboardPage() {
     completed: completedQuests.has(quest.key),
   }))
   const questStreak = streakResult?.ok ? (streakResult.streak ?? profile?.login_streak ?? 0) : (profile?.login_streak ?? 0)
+  const unreadMessageReminder = profile
+    ? getUnreadMessageReminder(conversations, profile.id)
+    : null
 
   return (
     <div className="space-y-8">
@@ -290,6 +297,10 @@ export default async function DashboardPage() {
       {/* Founding member nudge for free users */}
       {showFoundingNudge && (
         <FoundingMemberNudge slotsRemaining={foundingSlotsRemaining} />
+      )}
+
+      {unreadMessageReminder && (
+        <UnreadMessageReminder reminder={unreadMessageReminder} />
       )}
 
       {/* Profile completion nudge */}
