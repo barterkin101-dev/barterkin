@@ -582,6 +582,6 @@
     "status": "completed",
     "created_at": "2026-05-13T20-28-24Z",
     "source": "codex-review",
-    "notes": "COMPLETED: Restored stale Supabase schema types for digest/re-engagement tables and RPCs, fixed the billing success error boundary to use the current logger/ErrorState API, and added null-safe reminder/test coverage."
+    "notes": "COMPLETED: Restored stale Supabase schema types for digest/re-engagement tables and RPCs, fixed the billing success error boundary to use the current logger/ErrorState API, and added null-safe reminder/test coverage. Commit: f89c3bd."
   }
 ]
