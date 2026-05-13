@@ -17,7 +17,9 @@ export function getUnreadMessageReminder(
 ): UnreadMessageReminder | null {
   const cutoff = now.getTime() - TWENTY_FOUR_HOURS_MS
 
-  const staleUnreadConversations = conversations.filter((conversation) => {
+  const staleUnreadConversations = conversations.filter((conversation): conversation is ConversationRow & {
+    last_message: NonNullable<ConversationRow['last_message']>
+  } => {
     if (conversation.unread_count <= 0 || !conversation.last_message) {
       return false
     }

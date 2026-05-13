@@ -150,4 +150,28 @@ describe('getUnreadMessageReminder', () => {
       counterpartName: 'Alex',
     })
   })
+
+  it('skips unread conversations that have no last message payload', () => {
+    const result = getUnreadMessageReminder(
+      [
+        makeConversation({
+          id: 'conv-empty',
+          last_message: null,
+          unread_count: 4,
+        }),
+        makeConversation({
+          id: 'conv-valid',
+          unread_count: 1,
+        }),
+      ],
+      PROFILE_ID,
+      new Date('2026-05-13T09:00:00.000Z'),
+    )
+
+    expect(result).toMatchObject({
+      href: '/dashboard/messages/conv-valid',
+      unreadConversationCount: 1,
+      unreadMessageCount: 1,
+    })
+  })
 })

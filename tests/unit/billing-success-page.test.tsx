@@ -26,12 +26,12 @@ vi.mock('@/lib/analytics', () => ({
 }))
 
 vi.mock('@/lib/utils/client-logger', () => ({
-  createLogger: () => ({
+  clientLogger: {
     error: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     debug: vi.fn(),
-  }),
+  },
 }))
 
 async function renderPage(tier?: string) {
@@ -52,7 +52,7 @@ describe('billing success route fallbacks', () => {
   it('renders the error state with retry', () => {
     render(<BillingSuccessError error={new Error('boom')} reset={vi.fn()} />)
     expect(screen.getByText(/something went wrong/i)).toBeInTheDocument()
-    expect(screen.getByText(/we encountered an error loading this page/i)).toBeInTheDocument()
+    expect(screen.getByText(/couldn't load your billing confirmation/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /go back/i })).toBeInTheDocument()
   })
 

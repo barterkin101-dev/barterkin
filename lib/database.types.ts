@@ -255,6 +255,44 @@ export type Database = {
           },
         ]
       }
+      email_digests: {
+        Row: {
+          clicked_at: string | null
+          digest_type: string
+          id: string
+          listings_count: number
+          opened_at: string | null
+          profile_id: string
+          sent_at: string
+        }
+        Insert: {
+          clicked_at?: string | null
+          digest_type?: string
+          id?: string
+          listings_count?: number
+          opened_at?: string | null
+          profile_id: string
+          sent_at?: string
+        }
+        Update: {
+          clicked_at?: string | null
+          digest_type?: string
+          id?: string
+          listings_count?: number
+          opened_at?: string | null
+          profile_id?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_digests_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quest_completions: {
         Row: {
           id: string
@@ -682,6 +720,7 @@ export type Database = {
           created_at: string
           credits: number
           display_name: string | null
+          email_digest_enabled: boolean
           founding_member: boolean
           id: string
           is_published: boolean
@@ -713,6 +752,7 @@ export type Database = {
           created_at?: string
           credits?: number
           display_name?: string | null
+          email_digest_enabled?: boolean
           founding_member?: boolean
           id?: string
           is_published?: boolean
@@ -744,6 +784,7 @@ export type Database = {
           created_at?: string
           credits?: number
           display_name?: string | null
+          email_digest_enabled?: boolean
           founding_member?: boolean
           id?: string
           is_published?: boolean
@@ -830,6 +871,41 @@ export type Database = {
           {
             foreignKeyName: "ratings_rater_profile_id_fkey"
             columns: ["rater_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      re_engagement_sends: {
+        Row: {
+          clicked_at: string | null
+          id: string
+          listings_count: number
+          opened_at: string | null
+          profile_id: string
+          sent_at: string
+        }
+        Insert: {
+          clicked_at?: string | null
+          id?: string
+          listings_count?: number
+          opened_at?: string | null
+          profile_id: string
+          sent_at?: string
+        }
+        Update: {
+          clicked_at?: string | null
+          id?: string
+          listings_count?: number
+          opened_at?: string | null
+          profile_id?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "re_engagement_sends_profile_id_fkey"
+            columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1447,6 +1523,46 @@ export type Database = {
           price_estimate: string
           created_at: string
           score: number
+        }[]
+      }
+      get_re_engagement_listings: {
+        Args: { p_profile_id: string }
+        Returns: {
+          category_id: number | null
+          category_name: string | null
+          condition: string | null
+          county_id: number | null
+          county_name: string | null
+          created_at: string
+          description: string
+          id: string
+          price_estimate: string | null
+          profile_id: string
+          seller_avatar_url: string | null
+          seller_display_name: string | null
+          seller_username: string | null
+          title: string
+          trade_terms: string | null
+        }[]
+      }
+      get_weekly_digest_listings: {
+        Args: { p_profile_id: string }
+        Returns: {
+          category_id: number | null
+          category_name: string | null
+          condition: string | null
+          county_id: number | null
+          county_name: string | null
+          created_at: string
+          description: string
+          id: string
+          price_estimate: string | null
+          profile_id: string
+          seller_avatar_url: string | null
+          seller_display_name: string | null
+          seller_username: string | null
+          title: string
+          trade_terms: string | null
         }[]
       }
     }
