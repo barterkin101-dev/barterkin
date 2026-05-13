@@ -557,8 +557,8 @@
     "id": "66",
     "title": "Add native share + analytics to dashboard referral invite card",
     "priority": "high",
-    "status": "in_progress",
-    "notes": "IN PROGRESS: Queue was empty, so generated new growth/retention/revenue tasks from current product state. Shipping the growth task first by improving referral sharing UX on /dashboard and instrumenting invite copy/share behavior."
+    "status": "completed",
+    "notes": "COMPLETED: Added native-share CTA + clipboard fallback to the dashboard referral invite card, instrumented referral_invite_shared and referral_invite_copied analytics, documented the events, and added 4 unit tests. Commit: f6a216d."
   },
   {
     "id": "67",
