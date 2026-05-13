@@ -1,7 +1,9 @@
 'use server'
 
+import { Resend } from 'resend'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { captureEvent } from '@/lib/analytics'
 import { createLogger } from '@/lib/utils/logger'
 import { RatingSchema } from '@/lib/schemas/ratings'
@@ -10,6 +12,90 @@ import type {
   MarkTradeCompleteResult,
   SubmitTradeReviewResult,
 } from '@/lib/actions/trade-completions.types'
+import { TradeReviewRequestEmail } from '@/emails/trade-review-request'
+
+async function sendTradeReviewPrompts(conversationId: string) {
+  const log = createLogger('trade-completions')
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) {
+    log.warn('RESEND_API_KEY missing; trade review prompt skipped')
+    return
+  }
+
+  try {
+    const admin = getSupabaseAdmin()
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com'
+
+    const { data: completion, error: completionErr } = await admin
+      .from('trade_completions')
+      .select('conversation_id, listing_id, initiator_profile_id, recipient_profile_id')
+      .eq('conversation_id', conversationId)
+      .maybeSingle()
+
+    if (completionErr || !completion) {
+      log.warn('trade completion prompt lookup failed', {
+        context: { conversationId, code: completionErr?.code },
+      })
+      return
+    }
+
+    const profileIds = [completion.initiator_profile_id, completion.recipient_profile_id]
+    const { data: profiles, error: profilesErr } = await admin
+      .from('profiles')
+      .select('id, display_name, username')
+      .in('id', profileIds)
+
+    if (profilesErr || !profiles || profiles.length < 2) {
+      log.warn('trade completion prompt profile lookup failed', {
+        context: { conversationId, code: profilesErr?.code },
+      })
+      return
+    }
+
+    const byId = new Map(profiles.map((profile) => [profile.id, profile]))
+    const initiator = byId.get(completion.initiator_profile_id)
+    const recipient = byId.get(completion.recipient_profile_id)
+    if (!initiator || !recipient) return
+
+    const resend = new Resend(apiKey)
+    const pairs = [
+      {
+        recipientProfileId: initiator.id,
+        recipientDisplayName: initiator.display_name ?? initiator.username ?? 'there',
+        otherDisplayName: recipient.display_name ?? recipient.username ?? 'your trading partner',
+      },
+      {
+        recipientProfileId: recipient.id,
+        recipientDisplayName: recipient.display_name ?? recipient.username ?? 'there',
+        otherDisplayName: initiator.display_name ?? initiator.username ?? 'your trading partner',
+      },
+    ]
+
+    await Promise.all(pairs.map(async (pair) => {
+      const { data: email } = await admin.rpc('profile_owner_email', {
+        p_profile_id: pair.recipientProfileId,
+      })
+      if (!email) return
+
+      await resend.emails.send({
+        from: 'Barterkin <hello@barterkin.com>',
+        to: [email],
+        subject: `How did your trade with ${pair.otherDisplayName} go?`,
+        react: TradeReviewRequestEmail({
+          recipientDisplayName: pair.recipientDisplayName,
+          otherDisplayName: pair.otherDisplayName,
+          reviewUrl: `${siteUrl}/dashboard/messages/${conversationId}`,
+          siteUrl,
+        }),
+      })
+    }))
+  } catch (error) {
+    log.error('trade review prompt send failed', {
+      error,
+      context: { conversationId },
+    })
+  }
+}
 
 export async function markTradeComplete(
   _prev: MarkTradeCompleteResult | null,
@@ -77,6 +163,12 @@ export async function markTradeComplete(
     void captureEvent(user.id, 'trade_mutually_completed', {
       conversation_id: conversationId,
     })
+    void captureEvent(user.id, 'trade_completion_rate', {
+      conversation_id: conversationId,
+      listing_id: null,
+      completed: true,
+    })
+    await sendTradeReviewPrompts(conversationId)
   }
 
   return {

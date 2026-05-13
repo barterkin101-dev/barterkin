@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 
 export interface NotificationRow {
   id: string
-  type: 'message' | 'ticket' | 'dispute' | 'admin'
+  type: 'message' | 'ticket' | 'dispute' | 'admin' | 'trade'
   title: string
   body: string
   link: string | null
@@ -111,8 +111,89 @@ export async function getNotifications(profileId: string): Promise<{
     resource_id: d.id,
   }))
 
+  const { data: tradeCompletions, error: tradeErr } = await supabase
+    .from('trade_completions')
+    .select('conversation_id, initiator_profile_id, recipient_profile_id, completed_at')
+    .eq('status', 'completed')
+    .or(`initiator_profile_id.eq.${profileId},recipient_profile_id.eq.${profileId}`)
+    .order('completed_at', { ascending: false })
+
+  if (tradeErr) {
+    const log = createLogger('notifications')
+    log.warn('getNotifications trades error', { context: { code: tradeErr.code } })
+  }
+
+  const tradeNotifications: NotificationRow[] = []
+  const tradeProfileIds = [...new Set(
+    (tradeCompletions ?? []).flatMap((completion) => [
+      completion.initiator_profile_id,
+      completion.recipient_profile_id,
+    ]),
+  )]
+
+  const tradeProfileMap = new Map<string, { display_name: string | null; username: string | null }>()
+  if (tradeProfileIds.length > 0) {
+    const { data: tradeProfiles, error: tradeProfilesErr } = await supabase
+      .from('profiles')
+      .select('id, display_name, username')
+      .in('id', tradeProfileIds)
+
+    if (tradeProfilesErr) {
+      const log = createLogger('notifications')
+      log.warn('getNotifications trade profile lookup error', {
+        context: { code: tradeProfilesErr.code },
+      })
+    }
+
+    for (const profile of tradeProfiles ?? []) {
+      tradeProfileMap.set(profile.id, {
+        display_name: profile.display_name,
+        username: profile.username,
+      })
+    }
+  }
+
+  for (const completion of tradeCompletions ?? []) {
+    const rateeProfileId = completion.initiator_profile_id === profileId
+      ? completion.recipient_profile_id
+      : completion.initiator_profile_id
+
+    const { data: existingRating, error: ratingErr } = await supabase
+      .from('ratings')
+      .select('id')
+      .eq('rater_profile_id', profileId)
+      .eq('ratee_profile_id', rateeProfileId)
+      .eq('conversation_id', completion.conversation_id)
+      .maybeSingle()
+
+    if (ratingErr) {
+      const log = createLogger('notifications')
+      log.warn('getNotifications trade rating check error', { context: { code: ratingErr.code } })
+      continue
+    }
+
+    if (existingRating) continue
+
+    const otherProfileId = completion.initiator_profile_id === profileId
+      ? completion.recipient_profile_id
+      : completion.initiator_profile_id
+    const otherProfile = tradeProfileMap.get(otherProfileId)
+    const otherDisplayName = otherProfile?.display_name ?? otherProfile?.username ?? 'your trading partner'
+
+    tradeNotifications.push({
+      id: `trade-${completion.conversation_id}`,
+      type: 'trade',
+      title: 'Leave a trade review',
+      body: `Your trade with ${otherDisplayName} is complete. Leave a review while it’s fresh.`,
+      link: `/dashboard/messages/${completion.conversation_id}`,
+      is_read: false,
+      created_at: completion.completed_at ?? new Date(0).toISOString(),
+      resource_id: completion.conversation_id,
+    })
+  }
+
   // Combine, deduplicate, sort by created_at desc
-  const all = [...messageNotifications, ...ticketNotifications, ...disputeNotifications]
+  const all = [...messageNotifications, ...ticketNotifications, ...disputeNotifications, ...tradeNotifications]
   all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   const unreadCount = all.filter((n) => !n.is_read).length

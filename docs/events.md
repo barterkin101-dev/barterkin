@@ -238,6 +238,60 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ---
 
+### `trade_marked_complete`
+
+**When fired:** After a member marks a trade as complete (one-sided).
+**Fires from:** `lib/actions/trade-completions.ts` → `markTradeComplete()`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `conversation_id` | string | UUID of the conversation |
+| `status` | string | New status: `initiator_marked`, `recipient_marked`, or `completed` |
+
+---
+
+### `trade_mutually_completed`
+
+**When fired:** When the second party marks complete, triggering mutual completion.
+**Fires from:** `lib/actions/trade-completions.ts` → `markTradeComplete()`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `conversation_id` | string | UUID of the conversation |
+
+---
+
+### `trade_review_submitted`
+
+**When fired:** After a member submits a review for a mutually completed trade.
+**Fires from:** `lib/actions/trade-completions.ts` → `submitTradeReview()`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `conversation_id` | string | UUID of the conversation |
+| `ratee_profile_id` | string | UUID of the reviewed member |
+| `listing_id` | string \| null | UUID of the related listing, if any |
+| `score` | number | Rating score (1–5) |
+
+---
+
+### `trade_completion_rate`
+
+**When fired:** When a trade reaches mutual completion.
+**Fires from:** `lib/actions/trade-completions.ts` → `markTradeComplete()`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `conversation_id` | string | UUID of the conversation |
+| `listing_id` | string \| null | Listing attached to the conversation, if available |
+| `completed` | boolean | Always `true`; used as the completion numerator event |
+
+---
+
 ### `test_event` *(Phase 1 wiring validation)*
 
 **When fired:** Home-page button click in dev/test environments.
@@ -267,6 +321,10 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 | `weekly_digest_sent` | ✅ Implemented | `app/api/cron/weekly-digest/route.ts` | 7 |
 | `re_engagement_sent` | ✅ Implemented | `app/api/cron/re-engage/route.ts` | 7 |
 | `landing_social_proof_viewed` | ✅ Implemented | `components/landing/RecentActivity.tsx` | 7 |
+| `trade_marked_complete` | ✅ Implemented | `lib/actions/trade-completions.ts` | 8 |
+| `trade_mutually_completed` | ✅ Implemented | `lib/actions/trade-completions.ts` | 8 |
+| `trade_review_submitted` | ✅ Implemented | `lib/actions/trade-completions.ts` | 8 |
+| `trade_completion_rate` | ✅ Implemented | `lib/actions/trade-completions.ts` | 3 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
 | `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |
 

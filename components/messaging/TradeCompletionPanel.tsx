@@ -13,10 +13,11 @@ import type {
   SubmitTradeReviewResult,
 } from '@/lib/actions/trade-completions.types'
 
+type TradeActorStatus = 'idle' | 'marked' | 'waiting' | 'completed'
+
 interface TradeCompletionPanelProps {
   conversationId: string
-  tradeStatus: string | null // 'pending' | 'initiator_marked' | 'recipient_marked' | 'completed'
-  myProfileId: string
+  actorStatus: TradeActorStatus
   otherProfileId: string
   otherDisplayName: string
   listingId?: string | null
@@ -25,8 +26,7 @@ interface TradeCompletionPanelProps {
 
 export function TradeCompletionPanel({
   conversationId,
-  tradeStatus,
-  myProfileId,
+  actorStatus,
   otherProfileId,
   otherDisplayName,
   listingId,
@@ -42,13 +42,14 @@ export function TradeCompletionPanel({
     FormData
   >(submitTradeReview, null)
 
-  const effectiveStatus = markResult?.status ?? tradeStatus
-  const isCompleted = effectiveStatus === 'completed'
-  const iAlreadyMarked =
-    effectiveStatus === 'initiator_marked' || effectiveStatus === 'completed'
+  const effectiveActorStatus: TradeActorStatus = markResult?.status === 'completed'
+    ? 'completed'
+    : markResult?.status
+      ? 'marked'
+      : actorStatus
+  const isCompleted = effectiveActorStatus === 'completed'
 
-  // If no trade record yet, show the mark-complete button
-  if (!effectiveStatus || effectiveStatus === 'pending') {
+  if (effectiveActorStatus === 'idle') {
     return (
       <form action={markAction} className="border-t bg-muted/30 p-4">
         <input type="hidden" name="conversationId" value={conversationId} />
@@ -75,7 +76,33 @@ export function TradeCompletionPanel({
     )
   }
 
-  // One-sided: waiting for other party
+  if (effectiveActorStatus === 'waiting') {
+    return (
+      <form action={markAction} className="border-t bg-muted/30 p-4">
+        <input type="hidden" name="conversationId" value={conversationId} />
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium">{otherDisplayName} marked this trade complete.</p>
+            <p className="text-xs text-muted-foreground">
+              Confirm it to unlock reviews for both of you.
+            </p>
+          </div>
+          <Button type="submit" disabled={markPending} size="sm">
+            {markPending ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle className="mr-2 h-4 w-4" />
+            )}
+            Confirm Trade
+          </Button>
+        </div>
+        {markResult?.ok === false && (
+          <p className="mt-2 text-xs text-destructive">{markResult.error}</p>
+        )}
+      </form>
+    )
+  }
+
   if (!isCompleted) {
     return (
       <div className="border-t bg-muted/30 p-4">
@@ -89,7 +116,6 @@ export function TradeCompletionPanel({
     )
   }
 
-  // Mutually completed — show review form (if not already reviewed)
   if (isCompleted && !hasReviewed) {
     return (
       <form action={reviewAction} className="border-t bg-muted/30 p-4 space-y-3">
@@ -132,7 +158,6 @@ export function TradeCompletionPanel({
     )
   }
 
-  // Already reviewed or completed with no review needed
   return (
     <div className="border-t bg-muted/30 p-4">
       <div className="flex items-center gap-2 text-sm text-green-700">

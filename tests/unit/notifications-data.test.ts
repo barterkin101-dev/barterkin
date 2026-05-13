@@ -99,6 +99,20 @@ describe('getNotifications', () => {
         }
       }
 
+      if (table === 'trade_completions') {
+        return {
+          select: vi.fn(() => {
+            const chain = {
+              eq: vi.fn(() => chain),
+              or: vi.fn(() => chain),
+              order: vi.fn().mockResolvedValue({ data: [], error: null }),
+            }
+
+            return chain
+          }),
+        }
+      }
+
       throw new Error(`Unexpected table: ${table}`)
     })
 
