@@ -113,10 +113,10 @@
   },
   {
     "id": "17",
-    "title": "Add 'invite a friend' viral loop \u2014 every member gets a unique referral link + earns credits",
+    "title": "Add 'invite a friend' viral loop — every member gets a unique referral link + earns credits",
     "priority": "high",
-    "status": "in_progress",
-    "notes": "IN_PROGRESS: Added referral_code schema support, /r/[code] capture route, and dashboard invite-link copy UI. Remaining: award inviter/invitee credits on onboarding completion and cover the full flow with e2e."
+    "status": "completed",
+    "notes": "COMPLETED: Full referral viral loop shipped. (1) /r/[code] route validates + sets httpOnly cookie, redirects to /signup?ref=CODE; (2) OAuth callback (auth/callback) reads cookie, creates referrals row, fires referral_link_used event; (3) Magic link flow (auth/confirm) now captures ?ref= from URL — sendMagicLink appends ref to emailRedirectTo; (4) markOnboardingComplete calls award_referral_credits() RPC (idempotent, 2 credits to inviter, 1 to invitee); (5) Dashboard shows credit balance + referral count in stats grid and ReferralInviteCard; (6) docs/events.md updated with referral_link_used event schema. All 232 tests pass. Commit: 8042a9f."
   },
   {
     "id": "18",
