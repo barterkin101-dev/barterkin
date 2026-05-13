@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { ProfileFormSchema, isProfileComplete } from '@/lib/schemas/profile'
+import {
+  ProfileFormSchema,
+  isProfileComplete,
+  toProfileCompletenessInput,
+} from '@/lib/schemas/profile'
 
 // PROF-01, PROF-03, PROF-04, PROF-07, PROF-09
 describe('ProfileFormSchema', () => {
@@ -147,5 +151,35 @@ describe('isProfileComplete', () => {
 
   it('returns false when skillsOfferedCount is 0', () => {
     expect(isProfileComplete({ ...completeInput, skillsOfferedCount: 0 })).toBe(false)
+  })
+})
+
+describe('toProfileCompletenessInput', () => {
+  it('maps snake_case profile rows and counts skills_offered rows', () => {
+    expect(
+      toProfileCompletenessInput({
+        display_name: 'Kerry Smith',
+        avatar_url: 'https://example.com/a.webp',
+        county_id: 121,
+        category_id: 2,
+        skills_offered: [{ id: 'skill-1' }, { id: 'skill-2' }],
+      }),
+    ).toEqual({
+      displayName: 'Kerry Smith',
+      avatarUrl: 'https://example.com/a.webp',
+      countyId: 121,
+      categoryId: 2,
+      skillsOfferedCount: 2,
+    })
+  })
+
+  it('returns empty defaults when the profile row is missing', () => {
+    expect(toProfileCompletenessInput(null)).toEqual({
+      displayName: null,
+      avatarUrl: null,
+      countyId: null,
+      categoryId: null,
+      skillsOfferedCount: 0,
+    })
   })
 })

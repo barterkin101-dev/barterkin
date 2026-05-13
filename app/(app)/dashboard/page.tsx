@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ShoppingBag, MessageSquare, Star, Ticket, User } from 'lucide-react'
 import { ProfileCompletionBar } from '@/components/profile/ProfileCompletionBar'
 import { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'
+import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -23,7 +24,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, county_id, category_id, referral_code')
+    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, county_id, category_id, referral_code, skills_offered(id)')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -196,11 +197,7 @@ export default async function DashboardPage() {
           <CardContent className="p-6">
             <ProfileCompletionBar
               input={{
-                displayName: profile.display_name,
-                avatarUrl: profile.avatar_url,
-                countyId: profile.county_id,
-                categoryId: profile.category_id,
-                skillsOfferedCount: listings.length,
+                ...toProfileCompletenessInput(profile),
                 bio: profile.bio,
               }}
               showSteps={true}

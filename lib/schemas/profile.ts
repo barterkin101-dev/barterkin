@@ -60,6 +60,16 @@ export const ProfileFormSchema = z.object({
 
 export type ProfileFormValues = z.infer<typeof ProfileFormSchema>
 
+type SkillRowLike = { id?: string | number } | null | undefined
+
+export interface ProfileCompletenessSource {
+  display_name?: string | null
+  avatar_url?: string | null
+  county_id?: number | null
+  category_id?: number | null
+  skills_offered?: SkillRowLike[] | null
+}
+
 /**
  * Input shape for the completeness gate (PROF-12, GEO-01).
  * Skill count is passed in so the caller can decide whether to count
@@ -71,6 +81,18 @@ export interface ProfileCompletenessInput {
   countyId: number | null | undefined
   categoryId: number | null | undefined
   skillsOfferedCount: number
+}
+
+export function toProfileCompletenessInput(
+  profile: ProfileCompletenessSource | null | undefined,
+): ProfileCompletenessInput {
+  return {
+    displayName: profile?.display_name ?? null,
+    avatarUrl: profile?.avatar_url ?? null,
+    countyId: profile?.county_id ?? null,
+    categoryId: profile?.category_id ?? null,
+    skillsOfferedCount: profile?.skills_offered?.length ?? 0,
+  }
 }
 
 /**

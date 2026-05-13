@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { isProfileComplete, type ProfileCompletenessInput } from '@/lib/schemas/profile'
+import { isProfileComplete, toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { WizardLayout } from '@/components/onboarding/WizardLayout'
 import { StepProfile } from '@/components/onboarding/StepProfile'
 import { StepDirectory } from '@/components/onboarding/StepDirectory'
@@ -51,13 +51,7 @@ export default async function OnboardingPage({
   const parsed = parseInt(rawStep ?? '1', 10)
   const step = Math.max(1, Math.min(3, Number.isFinite(parsed) && parsed > 0 ? parsed : 1))
 
-  const completenessInput: ProfileCompletenessInput = {
-    displayName: profile?.display_name ?? null,
-    avatarUrl: profile?.avatar_url ?? null,
-    countyId: profile?.county_id ?? null,
-    categoryId: profile?.category_id ?? null,
-    skillsOfferedCount: profile?.skills_offered?.length ?? 0,
-  }
+  const completenessInput = toProfileCompletenessInput(profile)
   const profileComplete = isProfileComplete(completenessInput)
 
   return (

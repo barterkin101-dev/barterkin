@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { ProfileCard } from '@/components/profile/ProfileCard'
 import { PublishToggle } from '@/components/profile/PublishToggle'
 import type { ProfileWithRelations } from '@/lib/actions/profile.types'
+import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Your profile' }
@@ -66,13 +67,7 @@ export default async function OwnProfilePage() {
       <PublishToggle
         profileId={profile.id}
         isPublished={profile.is_published ?? false}
-        completeness={{
-          displayName: profile.display_name,
-          avatarUrl: profile.avatar_url,
-          countyId: profile.county_id,
-          categoryId: profile.category_id,
-          skillsOfferedCount: profile.skills_offered?.length ?? 0,
-        }}
+        completeness={toProfileCompletenessInput(profile)}
       />
 
       <ProfileCard profile={profile} />
