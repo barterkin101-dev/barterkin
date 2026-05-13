@@ -123,6 +123,7 @@ export async function getDiscoverFeed(profileId: string): Promise<DiscoverResult
       price_estimate: row.price_estimate,
       status: row.status,
       created_at: row.created_at,
+      boosted_until: null,
       images: imagesByListing[row.id] ?? [],
       profiles: profileMap[row.profile_id]
         ? {

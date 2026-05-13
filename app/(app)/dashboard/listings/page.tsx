@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Plus, Pause, Play, Trash2, Pencil } from 'lucide-react'
 import { deleteListingForm, toggleListingStatusForm } from '@/lib/actions/listings'
+import { BoostButton } from '@/components/listings/BoostButton'
 
 export default async function DashboardListingsPage() {
   const supabase = await createClient()
@@ -22,7 +23,7 @@ export default async function DashboardListingsPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id')
+    .select('id, credits')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -100,11 +101,16 @@ export default async function DashboardListingsPage() {
                     <Badge className={statusColors[listing.status] ?? ''}>
                       {listing.status}
                     </Badge>
+                    {listing.boosted_until && new Date(listing.boosted_until) > new Date() && (
+                      <Badge className="bg-purple-100 text-purple-800">
+                        Boosted
+                      </Badge>
+                    )}
                   </div>
                   <p className="mt-1 line-clamp-1 text-sm text-muted-foreground">
                     {listing.description}
                   </p>
-                  <div className="mt-2 flex items-center gap-2">
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
                     {listing.status === 'active' ? (
                       <form action={toggleListingStatusForm}>
                         <input type="hidden" name="listingId" value={listing.id} />
@@ -124,6 +130,11 @@ export default async function DashboardListingsPage() {
                         </Button>
                       </form>
                     ) : null}
+                    <BoostButton
+                      listingId={listing.id}
+                      isBoosted={Boolean(listing.boosted_until && new Date(listing.boosted_until) > new Date())}
+                      credits={profile?.credits ?? 0}
+                    />
                     <Link
                       href={`/dashboard/listings/${listing.id}/edit`}
                       className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}

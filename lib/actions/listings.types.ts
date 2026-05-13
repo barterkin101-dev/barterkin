@@ -14,3 +14,9 @@ export interface ToggleListingStatusResult {
   ok: boolean
   error?: string
 }
+
+export interface BoostListingResult {
+  ok: boolean
+  error?: string
+  boostedUntil?: string
+}

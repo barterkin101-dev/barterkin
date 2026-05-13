@@ -127,6 +127,20 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ---
 
+### `listing_boosted`
+
+**When fired:** After a user successfully spends credits to boost a listing.
+**Fires from:** `lib/actions/listings.ts` → `boostListing()`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `listing_id` | string | UUID of the boosted listing |
+| `cost` | number | Credits spent (default: 1) |
+| `duration_days` | number | Boost duration in days (default: 7) |
+
+---
+
 ### `test_event` *(Phase 1 wiring validation)*
 
 **When fired:** Home-page button click in dev/test environments.
@@ -149,6 +163,7 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 | `subscription_activated` | ✅ Implemented | `app/api/stripe/webhook/route.ts` | 7 |
 | `founding_slot_claimed` | ✅ Implemented | `lib/actions/billing.ts` | 7 |
 | `waitlist_founding_notified` | ✅ Implemented | `app/api/cron/notify-waitlist/route.ts` | 7 |
+| `listing_boosted` | ✅ Implemented | `lib/actions/listings.ts` | 7 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
 | `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |
 

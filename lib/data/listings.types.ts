@@ -22,6 +22,7 @@ export interface ListingRow {
   price_estimate: string | null
   status: string
   created_at: string
+  boosted_until: string | null
   images: ListingImage[]
   profiles: {
     id: string

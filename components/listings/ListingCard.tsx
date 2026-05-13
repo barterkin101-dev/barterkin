@@ -45,6 +45,13 @@ export function ListingCard({ listing, saved = false }: { listing: ListingRow; s
                 {conditionLabels[listing.condition] ?? listing.condition}
               </Badge>
             )}
+            {listing.boosted_until && new Date(listing.boosted_until) > new Date() && (
+              <Badge
+                className="absolute right-3 bottom-3 bg-purple-600 text-white border-purple-600"
+              >
+                Featured
+              </Badge>
+            )}
           </div>
           <CardContent className="p-4">
             <h3 className="line-clamp-1 font-semibold leading-tight group-hover:underline">

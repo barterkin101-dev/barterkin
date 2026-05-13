@@ -10,6 +10,7 @@ import type {
   SaveListingResult,
   DeleteListingResult,
   ToggleListingStatusResult,
+  BoostListingResult,
 } from '@/lib/actions/listings.types'
 
 // ============================================================================
@@ -306,4 +307,98 @@ export async function toggleListingStatus(
   revalidatePath('/listings')
   revalidatePath(`/listings/${listingId}`)
   return { ok: true }
+}
+
+// ============================================================================
+// boostListing — spend 1 credit to feature a listing for 7 days
+// ============================================================================
+const BOOST_COST = 1
+const BOOST_DURATION_DAYS = 7
+
+export async function boostListing(
+  _prev: BoostListingResult | null,
+  formData: FormData,
+): Promise<BoostListingResult> {
+  const supabase = await createClient()
+  const { data: { user }, error: authErr } = await supabase.auth.getUser()
+  if (authErr || !user) return { ok: false, error: 'Not authenticated.' }
+
+  const listingId = String(formData.get('listingId') ?? '')
+  if (!listingId) return { ok: false, error: 'Listing ID is required.' }
+
+  // Fetch profile id + credits
+  const { data: profile, error: profileErr } = await supabase
+    .from('profiles')
+    .select('id, credits')
+    .eq('owner_id', user.id)
+    .maybeSingle()
+  if (profileErr || !profile) {
+    return { ok: false, error: 'Profile not found.' }
+  }
+
+  if ((profile.credits ?? 0) < BOOST_COST) {
+    return { ok: false, error: `You need ${BOOST_COST} credit to boost a listing. Earn credits by inviting friends.` }
+  }
+
+  // Verify ownership
+  const { data: existing, error: existingErr } = await supabase
+    .from('listings')
+    .select('id, profile_id, status, boosted_until')
+    .eq('id', listingId)
+    .maybeSingle()
+  if (existingErr || !existing) {
+    return { ok: false, error: 'Listing not found.' }
+  }
+  if (existing.profile_id !== profile.id) {
+    return { ok: false, error: 'You can only boost your own listings.' }
+  }
+  if (existing.status !== 'active') {
+    return { ok: false, error: 'Only active listings can be boosted.' }
+  }
+
+  // Check if already boosted
+  const now = new Date()
+  if (existing.boosted_until && new Date(existing.boosted_until) > now) {
+    return { ok: false, error: 'This listing is already boosted.' }
+  }
+
+  // Atomically: deduct credit + set boosted_until
+  const boostedUntil = new Date(now.getTime() + BOOST_DURATION_DAYS * 24 * 60 * 60 * 1000)
+
+  // Deduct credit via ledger (triggers profiles.credits update)
+  const { error: ledgerErr } = await supabase
+    .from('credit_ledger')
+    .insert({
+      profile_id: profile.id,
+      amount: -BOOST_COST,
+      reason: 'listing_boost',
+    })
+  if (ledgerErr) {
+    const log = createLogger('listings')
+    log.error('boost credit deduction failed', { error: ledgerErr, context: { code: ledgerErr.code } })
+    return { ok: false, error: 'Could not deduct credits. Please try again.' }
+  }
+
+  // Set boosted_until
+  const { error: updateErr } = await supabase
+    .from('listings')
+    .update({ boosted_until: boostedUntil.toISOString() })
+    .eq('id', listingId)
+  if (updateErr) {
+    const log = createLogger('listings')
+    log.error('boost update failed', { error: updateErr, context: { code: updateErr.code } })
+    return { ok: false, error: 'Something went wrong boosting your listing.' }
+  }
+
+  revalidatePath('/dashboard/listings')
+  revalidatePath('/listings')
+  revalidatePath(`/listings/${listingId}`)
+
+  void captureEvent(user.id, 'listing_boosted', {
+    listing_id: listingId,
+    cost: BOOST_COST,
+    duration_days: BOOST_DURATION_DAYS,
+  })
+
+  return { ok: true, boostedUntil: boostedUntil.toISOString() }
 }

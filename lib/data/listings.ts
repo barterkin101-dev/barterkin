@@ -80,7 +80,7 @@ export async function getListings(
       let q = supabase
         .from('listings')
         .select(
-          `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at,
+          `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, boosted_until,
            profiles!inner(id, display_name, username, avatar_url),
            counties!left(name),
            categories!left(name)`,
@@ -90,6 +90,7 @@ export async function getListings(
       if (filters.countyId != null) q = q.eq('county_id', filters.countyId!)
       if (filters.condition != null) q = q.eq('condition', filters.condition!)
       return q
+        .order('boosted_until', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: false })
         .range(
           (filters.page - 1) * PAGE_SIZE,
@@ -135,10 +136,10 @@ export async function getListings(
 export async function getListingById(id: string): Promise<ListingRow | null> {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
+    const { data, error } = await supabase
     .from('listings')
     .select(
-      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at,
+      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, boosted_until,
        profiles!inner(id, display_name, username, avatar_url, accepting_contact),
        counties!left(name),
        categories!left(name)`,
@@ -163,7 +164,7 @@ export async function getMyListings(profileId: string): Promise<ListingRow[]> {
   const { data, error } = await supabase
     .from('listings')
     .select(
-      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at,
+      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, boosted_until,
        counties!left(name),
        categories!left(name)`,
     )

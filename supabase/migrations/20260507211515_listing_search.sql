@@ -40,6 +40,7 @@ returns table (
   status text,
   price_estimate text,
   created_at timestamptz,
+  boosted_until timestamptz,
   rank real
 )
 language sql
@@ -59,6 +60,7 @@ as $$
     l.status,
     l.price_estimate,
     l.created_at,
+    l.boosted_until,
     ts_rank(l.search_vector, websearch_to_tsquery('english', p_query)) as rank
   from public.listings l
   where l.status = 'active'
@@ -77,6 +79,7 @@ as $$
         and p.banned = false
     )
   order by
+    l.boosted_until desc nulls last,
     case when p_query is not null and p_query <> '' then ts_rank(l.search_vector, websearch_to_tsquery('english', p_query)) end desc nulls last,
     l.created_at desc
   limit p_page_size

@@ -424,6 +424,7 @@ export type Database = {
       }
       listings: {
         Row: {
+          boosted_until: string | null
           category_id: number | null
           condition: string | null
           county_id: number | null
@@ -439,6 +440,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          boosted_until?: string | null
           category_id?: number | null
           condition?: string | null
           county_id?: number | null
@@ -454,6 +456,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          boosted_until?: string | null
           category_id?: number | null
           condition?: string | null
           county_id?: number | null
