@@ -1,6 +1,7 @@
 import { type EmailOtpType } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import { type NextRequest } from 'next/server'
+import { getLandingHeroExperimentProperties } from '@/lib/ab-testing-shared'
 import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
 import { captureEvent } from '@/lib/analytics'
@@ -16,6 +17,7 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
   const _next = searchParams.get('next')
+  const experimentProperties = getLandingHeroExperimentProperties(searchParams.get('abv'))
   // T-2-01 open-redirect guard
   const next = (_next?.startsWith('/') && !_next?.startsWith('//')) ? _next : '/directory'
 
@@ -25,7 +27,10 @@ export async function GET(request: NextRequest) {
     if (!error) {
       const user = data?.user
       if (user) {
-        void captureEvent(user.id, 'signup_completed', { method: 'magic_link' })
+        void captureEvent(user.id, 'signup_completed', {
+          method: 'magic_link',
+          ...experimentProperties,
+        })
         // Capture referral if ?ref= present in URL
         await captureReferralFromQuery(request, supabase, user.id)
       }

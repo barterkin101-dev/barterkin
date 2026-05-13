@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { captureClientEvent } from '@/lib/analytics-client'
 
 // Google G logo SVG (Google brand guidelines permit use in sign-in buttons).
 function GoogleLogo() {
@@ -29,11 +30,24 @@ export function GoogleButton({ captchaToken }: GoogleButtonProps) {
   async function signIn() {
     if (!captchaToken) return
     const supabase = createClient()
+    const params = new URLSearchParams(window.location.search)
+    const landingHeroVariant = params.get('abv')
     // captchaToken is supported at runtime by Supabase Auth but not yet in the
     // TypeScript types for SignInWithOAuthCredentials.options in @supabase/auth-js@2.103.3.
     // Use Object.assign to pass it without triggering no-explicit-any lint.
+    const redirectUrl = new URL('/auth/callback', window.location.origin)
+    redirectUrl.searchParams.set('next', '/directory')
+    if (landingHeroVariant) {
+      redirectUrl.searchParams.set('abv', landingHeroVariant)
+      captureClientEvent('signup_started', {
+        method: 'google_oauth',
+        landing_experiment: 'landing_hero_copy',
+        landing_hero_variant: landingHeroVariant,
+        landing_hero_flag_key: 'landing-hero-copy',
+      })
+    }
     const oauthOptions: Parameters<typeof supabase.auth.signInWithOAuth>[0]['options'] = {
-      redirectTo: `${window.location.origin}/auth/callback?next=/directory`,
+      redirectTo: redirectUrl.toString(),
     }
     Object.assign(oauthOptions, { captchaToken })
     await supabase.auth.signInWithOAuth({

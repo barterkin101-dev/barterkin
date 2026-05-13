@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Sprout } from 'lucide-react'
 
+import { type LandingHeroVariant, LANDING_HERO_VARIANTS } from '@/lib/ab-testing-shared'
 import { Badge } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -16,6 +17,7 @@ export interface HeroStats {
 export interface HeroProps {
   stats: HeroStats
   isAuthed: boolean
+  variant: LandingHeroVariant
 }
 
 const MOSAIC = [
@@ -25,9 +27,29 @@ const MOSAIC = [
   { src: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80', alt: 'Farmers market produce', aspect: '4/3' },
 ]
 
-export function Hero({ stats, isAuthed }: HeroProps) {
+export function Hero({ stats, isAuthed, variant }: HeroProps) {
   const primaryHref = isAuthed ? '/profile' : '/signup'
   const primaryLabel = isAuthed ? 'Go to your profile' : 'Join the network'
+  const signupHref = `/signup?abv=${encodeURIComponent(variant)}`
+  const heroCopy = variant === LANDING_HERO_VARIANTS.control
+    ? {
+        heading: (
+          <>
+            Georgia&apos;s <em className="not-italic text-clay">community skills exchange</em>.
+          </>
+        ),
+        body:
+          'Find Georgians with skills to trade, from braiders to beekeepers to bakers. Offer what you make, swap for what you need, and keep the value local.',
+      }
+    : {
+        heading: (
+          <>
+            Trade skills with your <em className="not-italic text-clay">neighbors</em>. No cash needed.
+          </>
+        ),
+        body:
+          'From sourdough to plumbing to tutoring, Barterkin helps nearby Georgians swap useful skills directly without money or middlemen.',
+      }
 
   return (
     <section className="relative overflow-hidden bg-forest-deep">
@@ -68,16 +90,13 @@ export function Hero({ stats, isAuthed }: HeroProps) {
 
           <FadeIn delay={0.1}>
             <h1 className="font-serif text-4xl font-bold text-sage-bg leading-[1.08] sm:text-5xl lg:text-[3.4rem]">
-              Trade skills with your{' '}
-              <em className="not-italic text-clay">Georgia</em>{' '}
-              neighbors.
+              {heroCopy.heading}
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.2}>
             <p className="mt-6 max-w-md text-base text-sage-bg/75 leading-relaxed">
-              Bakers, plumbers, braiders, beekeepers — find people near you
-              offering what you need, and offer back what you make.{' '}
+              {heroCopy.body}{' '}
               <span className="text-sage-bg/90 font-medium">No money. No middlemen.</span>
             </p>
           </FadeIn>
@@ -108,10 +127,10 @@ export function Hero({ stats, isAuthed }: HeroProps) {
                 </div>
               ) : (
                 <>
-                  <WaitlistForm />
+                  <WaitlistForm heroVariant={variant} />
                   <p className="text-xs text-sage-bg/50">
                     Or{' '}
-                    <Link href="/signup" className="underline underline-offset-2 hover:text-sage-bg/75">
+                    <Link href={signupHref} className="underline underline-offset-2 hover:text-sage-bg/75">
                       skip the line and sign up now
                     </Link>
                     {' '}· No spam, ever.

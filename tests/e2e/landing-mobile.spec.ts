@@ -11,14 +11,14 @@ test.describe('landing mobile (LAND-03)', () => {
 
   test('hero primary CTA ≥ 44px tap target', async ({ page }) => {
     await page.goto('/')
-    const cta = page.getByRole('link', { name: /join the network/i }).first()
+    const cta = page.getByRole('button', { name: /join the waitlist/i })
     const box = await cta.boundingBox()
     expect(box?.height).toBeGreaterThanOrEqual(44)
   })
 
   test('hero secondary CTA ≥ 44px tap target', async ({ page }) => {
     await page.goto('/')
-    const cta = page.getByRole('link', { name: /browse the directory/i }).first()
+    const cta = page.getByRole('link', { name: /skip the line and sign up now/i }).first()
     const box = await cta.boundingBox()
     expect(box?.height).toBeGreaterThanOrEqual(44)
   })

@@ -1,5 +1,6 @@
 'use server'
 
+import { getLandingHeroExperimentProperties } from '@/lib/ab-testing-shared'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { WaitlistSchema, type JoinWaitlistResult } from '@/lib/schemas/waitlist'
 import { isDisposableEmail } from '@/lib/utils/disposable-email'
@@ -20,6 +21,9 @@ export async function joinWaitlist(
     email: formData.get('email'),
     countyId: formData.get('countyId'),
   })
+  const experimentProperties = getLandingHeroExperimentProperties(
+    formData.get('landingHeroVariant')?.toString(),
+  )
   if (!parsed.ok) {
     return { ok: false, error: 'Please enter a valid email address.' }
   }
@@ -120,6 +124,7 @@ export async function joinWaitlist(
   void captureEvent(email, 'waitlist_joined', {
     source: 'hero_cta',
     county_id: countyId ?? null,
+    ...experimentProperties,
   })
 
   return { ok: true, confirmationSent }

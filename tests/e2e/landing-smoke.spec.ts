@@ -1,11 +1,12 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('landing smoke (LAND-01, LAND-02, GEO-03)', () => {
-  test('landing page renders hero h1 with locked copy', async ({ page }) => {
+  test('landing page renders one of the hero experiment headlines', async ({ page }) => {
     await page.goto('/')
-    await expect(
-      page.getByRole('heading', { level: 1, name: /trade skills with your georgia neighbors/i }),
-    ).toBeVisible()
+    await expect(page.getByRole('heading', {
+      level: 1,
+      name: /georgia's community skills exchange|trade skills with your neighbors\. no cash needed\./i,
+    })).toBeVisible()
   })
 
   test('landing page shows honor-system copy (GEO-03)', async ({ page }) => {
@@ -13,18 +14,16 @@ test.describe('landing smoke (LAND-01, LAND-02, GEO-03)', () => {
     await expect(page.getByText(/georgia residents only/i).first()).toBeVisible()
   })
 
-  test('hero primary CTA links to /signup', async ({ page }) => {
+  test('hero primary CTA renders the waitlist submit button', async ({ page }) => {
     await page.goto('/')
-    await expect(
-      page.getByRole('link', { name: /join the network/i }).first(),
-    ).toHaveAttribute('href', '/signup')
+    await expect(page.getByRole('button', { name: /join the waitlist/i })).toBeVisible()
   })
 
-  test('hero secondary CTA links to /directory', async ({ page }) => {
+  test('hero signup link carries the assigned experiment variant', async ({ page }) => {
     await page.goto('/')
     await expect(
-      page.getByRole('link', { name: /browse the directory/i }).first(),
-    ).toHaveAttribute('href', '/directory')
+      page.getByRole('link', { name: /skip the line and sign up now/i }).first(),
+    ).toHaveAttribute('href', /\/signup\?abv=(georgia_community_skills_exchange|trade_skills_neighbors_no_cash)/)
   })
 
   test('how-it-works section renders 3 steps', async ({ page }) => {

@@ -107,6 +107,7 @@ describe('joinWaitlist', () => {
     const formData = new FormData()
     formData.append('email', 'county@example.com')
     formData.append('countyId', '13057')
+    formData.append('landingHeroVariant', 'trade_skills_neighbors_no_cash')
 
     const result = await joinWaitlist(null, formData)
 
@@ -122,6 +123,9 @@ describe('joinWaitlist', () => {
       {
         source: 'hero_cta',
         county_id: 13057,
+        landing_experiment: 'landing_hero_copy',
+        landing_hero_variant: 'trade_skills_neighbors_no_cash',
+        landing_hero_flag_key: 'landing-hero-copy',
       },
     )
   })

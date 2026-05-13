@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { getLandingHeroVariantAssignment } from '@/lib/ab-testing'
 import {
   getCountyCoverage,
   getFoundingMembers,
@@ -10,6 +11,7 @@ import { createClient } from '@/lib/supabase/server'
 
 import { CountyCoverage } from '@/components/landing/CountyCoverage'
 import { Hero } from '@/components/landing/Hero'
+import { LandingHeroExposure } from '@/components/landing/LandingHeroExposure'
 import { HowItWorks } from '@/components/landing/HowItWorks'
 import { FoundingMemberStrip } from '@/components/landing/FoundingMemberStrip'
 import { FoundingOfferCTA } from '@/components/landing/FoundingOfferCTA'
@@ -48,7 +50,15 @@ export default async function LandingPage() {
   // Three parallel data reads + one auth-claim read for the CTA-swap.
   const supabase = await createClient()
 
-  const [foundersResult, countyResult, statsResult, claimsResult, foundingCountResult, activityResult] =
+  const [
+    foundersResult,
+    countyResult,
+    statsResult,
+    claimsResult,
+    foundingCountResult,
+    activityResult,
+    heroAssignment,
+  ] =
     await Promise.all([
       getFoundingMembers(),
       getCountyCoverage(),
@@ -59,6 +69,7 @@ export default async function LandingPage() {
         .select('id', { count: 'exact', head: true })
         .eq('tier', 'founding'),
       getRecentActivity(),
+      getLandingHeroVariantAssignment(),
     ])
 
   const isAuthed = !!claimsResult.data?.claims?.sub
@@ -68,12 +79,14 @@ export default async function LandingPage() {
     <>
       <LandingNav />
       <main id="main">
+        <LandingHeroExposure variant={heroAssignment.variant} />
         <Hero
           stats={{
             totalProfiles: statsResult.totalProfiles,
             distinctCounties: statsResult.distinctCounties,
           }}
           isAuthed={isAuthed}
+          variant={heroAssignment.variant}
         />
         <FoundingOfferCTA slotsRemaining={foundingSlotsRemaining} isAuthed={isAuthed} />
         <HowItWorks />

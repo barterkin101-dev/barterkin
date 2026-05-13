@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -25,11 +25,30 @@ const LoginSchema = z.object({
 
 type LoginValues = z.infer<typeof LoginSchema>
 
+function getInitialQueryFields() {
+  if (typeof window === 'undefined') {
+    return {
+      email: '',
+      referralCode: '',
+      landingHeroVariant: '',
+    }
+  }
+
+  const params = new URLSearchParams(window.location.search)
+
+  return {
+    email: params.get('email') ?? '',
+    referralCode: params.get('ref') ?? '',
+    landingHeroVariant: params.get('abv') ?? '',
+  }
+}
+
 export function LoginForm({ captchaToken }: { captchaToken: string | null }) {
   const [state, formAction, pending] = useActionState<SendMagicLinkResult | null, FormData>(
     sendMagicLink,
     null,
   )
+  const [queryFields] = useState(getInitialQueryFields)
   const form = useForm<LoginValues>({
     resolver: zodResolver(LoginSchema),
     defaultValues: { email: '' },
@@ -37,10 +56,8 @@ export function LoginForm({ captchaToken }: { captchaToken: string | null }) {
 
   // Hydrate email from ?email= query param (used by ResendLinkButton on /verify-pending).
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const prefill = params.get('email')
-    if (prefill) form.setValue('email', prefill)
-  }, [form])
+    if (queryFields.email) form.setValue('email', queryFields.email)
+  }, [form, queryFields.email])
 
   // Success confirmation state — inline replacement of the form.
   if (state?.ok) {
@@ -94,7 +111,8 @@ export function LoginForm({ captchaToken }: { captchaToken: string | null }) {
         />
 
         <input type="hidden" name="cf-turnstile-response" value={captchaToken ?? ''} />
-        <input type="hidden" name="referral-code" value={new URLSearchParams(window.location.search).get('ref') ?? ''} />
+        <input type="hidden" name="referral-code" value={queryFields.referralCode} />
+        <input type="hidden" name="landingHeroVariant" value={queryFields.landingHeroVariant} />
 
         <Button
           type="submit"

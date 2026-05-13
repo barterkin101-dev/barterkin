@@ -5,10 +5,11 @@ import { CheckCircle, Loader2, Mail } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { type LandingHeroVariant } from '@/lib/ab-testing-shared'
 import georgiaCounties from '@/lib/data/georgia-counties.json'
 import { joinWaitlist, type JoinWaitlistResult } from '@/lib/actions/waitlist'
 
-export function WaitlistForm() {
+export function WaitlistForm({ heroVariant }: { heroVariant: LandingHeroVariant }) {
   const [state, formAction, isPending] = useActionState<JoinWaitlistResult | null, FormData>(
     joinWaitlist,
     null,
@@ -33,6 +34,7 @@ export function WaitlistForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-3">
+      <input type="hidden" name="landingHeroVariant" value={heroVariant} />
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1">
           <Mail

@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { getLandingHeroExperimentProperties } from '@/lib/ab-testing-shared'
 import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
 import { getClientIp, limitOAuthCallback } from '@/lib/rate-limit-public'
@@ -24,6 +25,7 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const nextParam = searchParams.get('next') ?? '/directory'
+  const experimentProperties = getLandingHeroExperimentProperties(searchParams.get('abv'))
   // T-2-01 open-redirect guard: only allow relative paths starting with '/'
   const next = (nextParam.startsWith('/') && !nextParam.startsWith('//')) ? nextParam : '/directory'
 
@@ -33,7 +35,10 @@ export async function GET(request: NextRequest) {
     if (!error) {
       const user = data?.user
       if (user) {
-        void captureEvent(user.id, 'signup_completed', { method: 'google_oauth' })
+        void captureEvent(user.id, 'signup_completed', {
+          method: 'google_oauth',
+          ...experimentProperties,
+        })
         // Capture referral if cookie present
         await captureReferral(request, supabase, user.id)
       }

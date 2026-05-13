@@ -1,6 +1,7 @@
 'use server'
 
 import { headers } from 'next/headers'
+import { getLandingHeroExperimentProperties } from '@/lib/ab-testing-shared'
 import { createClient } from '@/lib/supabase/server'
 import { isDisposableEmail } from '@/lib/utils/disposable-email'
 import { checkSignupRateLimit } from '@/lib/utils/rate-limit'
@@ -23,6 +24,9 @@ export async function sendMagicLink(
     return { ok: false, error: 'Please enter a valid email.' }
   }
   const { email, captchaToken } = parsed.data
+  const experimentProperties = getLandingHeroExperimentProperties(
+    formData.get('landingHeroVariant')?.toString(),
+  )
 
   if (isDisposableEmail(email)) {
     return {
@@ -60,16 +64,23 @@ export async function sendMagicLink(
   // Build email redirect URL with referral code if present
   const referralCode = formData.get('referral-code') as string | null
   const normalizedRef = referralCode ? referralCode.trim().toUpperCase() : null
-  const baseRedirect = `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/auth/confirm`
-  const emailRedirectTo = normalizedRef
-    ? `${baseRedirect}?ref=${encodeURIComponent(normalizedRef)}`
-    : baseRedirect
+  const landingHeroVariant = experimentProperties.landing_hero_variant
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+  const emailRedirectUrl = new URL('/auth/confirm', siteUrl)
+
+  if (normalizedRef) {
+    emailRedirectUrl.searchParams.set('ref', normalizedRef)
+  }
+
+  if (landingHeroVariant) {
+    emailRedirectUrl.searchParams.set('abv', landingHeroVariant)
+  }
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
       captchaToken,
-      emailRedirectTo,
+      emailRedirectTo: emailRedirectUrl.toString(),
       shouldCreateUser: true,
     },
   })
@@ -82,7 +93,10 @@ export async function sendMagicLink(
     return { ok: false, error: 'Something went wrong. Please try again in a moment.' }
   }
 
-  void captureEvent(email, 'signup_started', { method: 'magic_link' })
+  void captureEvent(email, 'signup_started', {
+    method: 'magic_link',
+    ...experimentProperties,
+  })
 
   return { ok: true }
 }

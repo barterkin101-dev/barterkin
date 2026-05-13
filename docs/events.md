@@ -18,8 +18,16 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 ### `signup_started`
 
 **When fired:** After a magic link OTP email is successfully queued (Supabase returns success).
-**Fires from:** `lib/actions/auth.ts` → `sendMagicLink()`
-**Properties:** None (PostHog auto-includes `$host`, `$lib`, `distinct_id`).
+Google OAuth also fires this event client-side when the user launches Google sign-in from the landing-page hero experiment.
+**Fires from:** `lib/actions/auth.ts` → `sendMagicLink()`, `components/auth/GoogleButton.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `method` | string | Signup method: `magic_link` or `google_oauth` |
+| `landing_experiment` | string | Present only for landing-page experiment traffic. Currently `landing_hero_copy`. |
+| `landing_hero_variant` | string | Present only for landing-page experiment traffic. Variant key assigned on landing. |
+| `landing_hero_flag_key` | string | Present only for landing-page experiment traffic. Currently `landing-hero-copy`. |
 
 ---
 
@@ -30,6 +38,14 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 - OTP path: after email confirmation succeeds in `app/auth/confirm/route.ts`
 **Fires from:** `lib/actions/auth.ts` + `app/auth/confirm/route.ts`
 **Side effects:** `aliasUser()` called to link anonymous ID to user ID.
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `method` | string | Signup method: `magic_link` or `google_oauth` |
+| `landing_experiment` | string | Present only for landing-page experiment traffic. Currently `landing_hero_copy`. |
+| `landing_hero_variant` | string | Present only for landing-page experiment traffic. Variant key assigned on landing. |
+| `landing_hero_flag_key` | string | Present only for landing-page experiment traffic. Currently `landing-hero-copy`. |
 
 ---
 
@@ -235,6 +251,36 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 |----------|------|-------------|
 | `item_count` | number | How many activity items are displayed |
 | `has_activity` | boolean | Whether there is any activity in the last 24h |
+
+---
+
+### `landing_hero_variant_viewed`
+
+**When fired:** When the landing hero mounts with a server-assigned experiment variant.
+**Fires from:** `components/landing/LandingHeroExposure.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `landing_experiment` | string | Currently `landing_hero_copy` |
+| `landing_hero_variant` | string | Variant key assigned to the session |
+| `landing_hero_flag_key` | string | Currently `landing-hero-copy` |
+
+---
+
+### `waitlist_joined`
+
+**When fired:** After a visitor successfully joins the landing-page waitlist.
+**Fires from:** `lib/actions/waitlist.ts`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `source` | string | Currently `hero_cta` |
+| `county_id` | number \| null | Optional county selected on the waitlist form |
+| `landing_experiment` | string | Currently `landing_hero_copy` |
+| `landing_hero_variant` | string | Variant key assigned on the landing page |
+| `landing_hero_flag_key` | string | Currently `landing-hero-copy` |
 
 ---
 
