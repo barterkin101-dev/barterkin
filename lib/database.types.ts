@@ -899,6 +899,124 @@ export type Database = {
         }
         Relationships: []
       }
+      site_updates: {
+        Row: {
+          id: string
+          title: string
+          body: string
+          category: string
+          published_at: string
+          created_by: string | null
+          is_published: boolean
+        }
+        Insert: {
+          id?: string
+          title: string
+          body: string
+          category?: string
+          published_at?: string
+          created_by?: string | null
+          is_published?: boolean
+        }
+        Update: {
+          id?: string
+          title?: string
+          body?: string
+          category?: string
+          published_at?: string
+          created_by?: string | null
+          is_published?: boolean
+        }
+        Relationships: []
+      }
+      site_update_reads: {
+        Row: {
+          profile_id: string
+          update_id: string
+          read_at: string
+        }
+        Insert: {
+          profile_id: string
+          update_id: string
+          read_at?: string
+        }
+        Update: {
+          profile_id?: string
+          update_id?: string
+          read_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_update_reads_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feature_requests: {
+        Row: {
+          id: string
+          profile_id: string
+          title: string
+          description: string
+          category: string
+          status: string
+          votes: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          profile_id: string
+          title: string
+          description: string
+          category?: string
+          status?: string
+          votes?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          profile_id?: string
+          title?: string
+          description?: string
+          category?: string
+          status?: string
+          votes?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_requests_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feature_request_votes: {
+        Row: {
+          profile_id: string
+          feature_request_id: string
+          created_at: string
+        }
+        Insert: {
+          profile_id: string
+          feature_request_id: string
+          created_at?: string
+        }
+        Update: {
+          profile_id?: string
+          feature_request_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       waitlist: {
         Row: {
           id: string

@@ -6,8 +6,11 @@ import { ArrowRight, Menu, X } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { LogoutButton } from '@/components/auth/LogoutButton'
 import { NotificationBell } from './NotificationBell'
+import { SiteUpdateBell } from './SiteUpdateBell'
+import { FeatureRequestButton } from './FeatureRequestButton'
 import { cn } from '@/lib/utils'
 import type { NotificationRow } from '@/lib/data/notifications'
+import type { SiteUpdateRow } from '@/lib/data/site-updates'
 
 export function NavLinks({
   displayName,
@@ -16,6 +19,8 @@ export function NavLinks({
   showFinishSetup,
   notifications,
   notificationUnreadCount = 0,
+  siteUpdates,
+  siteUpdateUnreadCount = 0,
 }: {
   displayName?: string | null
   avatarUrl?: string | null
@@ -23,6 +28,8 @@ export function NavLinks({
   showFinishSetup?: boolean
   notifications?: NotificationRow[]
   notificationUnreadCount?: number
+  siteUpdates?: SiteUpdateRow[]
+  siteUpdateUnreadCount?: number
 }) {
   const pathname = usePathname()
   const isDirectory = pathname.startsWith('/directory')
@@ -128,10 +135,15 @@ export function NavLinks({
           </div>
           <span>Your profile</span>
         </Link>
+        <SiteUpdateBell
+          updates={siteUpdates ?? []}
+          unreadCount={siteUpdateUnreadCount}
+        />
         <NotificationBell
           notifications={notifications ?? []}
           unreadCount={notificationUnreadCount}
         />
+        <FeatureRequestButton />
         <LogoutButton />
       </div>
 

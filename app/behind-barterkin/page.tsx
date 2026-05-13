@@ -38,7 +38,7 @@ const TEAM = [
   {
     name: 'Naeem',
     role: 'Co-Creator',
-    bio: '', // TODO: Add Naeem\'s bio when ready
+    bio: 'Naeem is a systems thinker and builder who believes technology should serve community first. He architects the platform, handles operations, and ensures Barterkin stays fast, secure, and aligned with its mission of connecting Georgians through trade.',
     image: '/team/naeem.jpg',
     initial: 'N',
     icon: Heart,
@@ -47,7 +47,7 @@ const TEAM = [
   {
     name: 'Ashley',
     role: 'Co-Creator',
-    bio: '', // TODO: Add Ashley\'s bio when ready
+    bio: 'Ashley brings the voice and vision of Barterkin to life. She shapes the member experience, leads outreach, and makes sure the platform feels welcoming to every Georgian who wants to trade skills and build local connections.',
     image: '/team/ashley.jpg',
     initial: 'A',
     icon: Users,

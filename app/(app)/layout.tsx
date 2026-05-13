@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { Toaster } from '@/components/ui/sonner'
 import { AppNav } from '@/components/layout/AppNav'
 import { getNotifications } from '@/lib/data/notifications'
+import { getSiteUpdates } from '@/lib/data/site-updates'
 
 export const metadata: Metadata = {
   title: { default: 'Barterkin', template: '%s -- Barterkin' },
@@ -24,6 +25,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   let showFinishSetup = false
   let notifications: Awaited<ReturnType<typeof getNotifications>>['notifications'] = []
   let notificationUnreadCount = 0
+  let siteUpdates: Awaited<ReturnType<typeof getSiteUpdates>>['updates'] = []
+  let siteUpdateUnreadCount = 0
 
   if (userId) {
     const { data: profile } = await supabase
@@ -70,6 +73,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       const notifResult = await getNotifications(profile.id)
       notifications = notifResult.notifications
       notificationUnreadCount = notifResult.unreadCount
+
+      // Fetch site updates
+      const updatesResult = await getSiteUpdates(profile.id)
+      siteUpdates = updatesResult.updates
+      siteUpdateUnreadCount = updatesResult.unreadCount
     }
   }
 
@@ -82,6 +90,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         showFinishSetup={showFinishSetup}
         notifications={notifications}
         notificationUnreadCount={notificationUnreadCount}
+        siteUpdates={siteUpdates}
+        siteUpdateUnreadCount={siteUpdateUnreadCount}
       />
       <main className="mx-auto max-w-5xl px-6 py-12 md:py-16">
         {children}

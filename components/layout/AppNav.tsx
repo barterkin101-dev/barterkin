@@ -9,6 +9,8 @@ export function AppNav({
   showFinishSetup,
   notifications,
   notificationUnreadCount,
+  siteUpdates,
+  siteUpdateUnreadCount,
 }: {
   displayName?: string | null
   avatarUrl?: string | null
@@ -16,6 +18,8 @@ export function AppNav({
   showFinishSetup?: boolean
   notifications?: import('@/lib/data/notifications').NotificationRow[]
   notificationUnreadCount?: number
+  siteUpdates?: import('@/lib/data/site-updates').SiteUpdateRow[]
+  siteUpdateUnreadCount?: number
 }) {
   return (
     <nav className="border-b border-sage-light bg-sage-pale">
@@ -38,6 +42,8 @@ export function AppNav({
           showFinishSetup={showFinishSetup}
           notifications={notifications}
           notificationUnreadCount={notificationUnreadCount}
+          siteUpdates={siteUpdates}
+          siteUpdateUnreadCount={siteUpdateUnreadCount}
         />
       </div>
     </nav>

@@ -168,6 +168,19 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ---
 
+### `landing_social_proof_viewed`
+
+**When fired:** When the RecentActivity section mounts on the landing page.
+**Fires from:** `components/landing/RecentActivity.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `item_count` | number | How many activity items are displayed |
+| `has_activity` | boolean | Whether there is any activity in the last 24h |
+
+---
+
 ### `test_event` *(Phase 1 wiring validation)*
 
 **When fired:** Home-page button click in dev/test environments.
@@ -193,6 +206,7 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 | `listing_boosted` | ✅ Implemented | `lib/actions/listings.ts` | 7 |
 | `discover_tab_switched` | ✅ Implemented | `components/dashboard/DiscoverFeedTabs.tsx` | 7 |
 | `weekly_digest_sent` | ✅ Implemented | `app/api/cron/weekly-digest/route.ts` | 7 |
+| `landing_social_proof_viewed` | ✅ Implemented | `components/landing/RecentActivity.tsx` | 7 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
 | `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |
 

@@ -5,6 +5,7 @@ import {
   getFoundingMembers,
   getStatCounts,
 } from '@/lib/data/landing'
+import { getRecentActivity } from '@/lib/data/landing-activity'
 import { createClient } from '@/lib/supabase/server'
 
 import { CountyCoverage } from '@/components/landing/CountyCoverage'
@@ -14,6 +15,7 @@ import { FoundingMemberStrip } from '@/components/landing/FoundingMemberStrip'
 import { FoundingOfferCTA } from '@/components/landing/FoundingOfferCTA'
 import { LandingNav } from '@/components/landing/LandingNav'
 import { SecondaryCTA } from '@/components/landing/SecondaryCTA'
+import { RecentActivity } from '@/components/landing/RecentActivity'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,7 +48,7 @@ export default async function LandingPage() {
   // Three parallel data reads + one auth-claim read for the CTA-swap.
   const supabase = await createClient()
 
-  const [foundersResult, countyResult, statsResult, claimsResult, foundingCountResult] =
+  const [foundersResult, countyResult, statsResult, claimsResult, foundingCountResult, activityResult] =
     await Promise.all([
       getFoundingMembers(),
       getCountyCoverage(),
@@ -56,6 +58,7 @@ export default async function LandingPage() {
         .from('profiles')
         .select('id', { count: 'exact', head: true })
         .eq('tier', 'founding'),
+      getRecentActivity(),
     ])
 
   const isAuthed = !!claimsResult.data?.claims?.sub
@@ -74,6 +77,7 @@ export default async function LandingPage() {
         />
         <FoundingOfferCTA slotsRemaining={foundingSlotsRemaining} isAuthed={isAuthed} />
         <HowItWorks />
+        <RecentActivity items={activityResult.items} />
         <FoundingMemberStrip profiles={foundersResult.profiles} />
         <CountyCoverage counties={countyResult.counties} />
         <SecondaryCTA />
