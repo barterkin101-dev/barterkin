@@ -5,6 +5,7 @@ import { createLogger } from '@/lib/utils/logger'
 
 /**
  * markOnboardingComplete — writes profiles.onboarding_completed_at = now() for the current user.
+ * Also triggers referral credit award if the user signed up via a referral link.
  *
  * D-11: called during Step 3 server-component render. Reaching Step 3 = wizard done,
  * regardless of whether the user has sent a contact request.
@@ -38,5 +39,24 @@ export async function markOnboardingComplete(): Promise<{ ok: boolean }> {
     log.error('markOnboardingComplete update failed', { context: { code: error.code } })
     return { ok: false }
   }
+
+  // Award referral credits (non-blocking, best-effort)
+  try {
+    // Get profile id for this user
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('owner_id', user.id)
+      .maybeSingle()
+
+    if (profile?.id) {
+      await supabase.rpc('award_referral_credits', { p_invitee_id: profile.id })
+    }
+  } catch (err) {
+    const log = createLogger('onboarding')
+    log.error('referral credit award failed', { error: err })
+    // Don't fail the onboarding flow if credit award fails
+  }
+
   return { ok: true }
 }

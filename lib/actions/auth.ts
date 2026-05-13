@@ -56,11 +56,20 @@ export async function sendMagicLink(
   }
 
   const supabase = await createClient()
+
+  // Build email redirect URL with referral code if present
+  const referralCode = formData.get('referral-code') as string | null
+  const normalizedRef = referralCode ? referralCode.trim().toUpperCase() : null
+  const baseRedirect = `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/auth/confirm`
+  const emailRedirectTo = normalizedRef
+    ? `${baseRedirect}?ref=${encodeURIComponent(normalizedRef)}`
+    : baseRedirect
+
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
       captchaToken,
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/auth/confirm`,
+      emailRedirectTo,
       shouldCreateUser: true,
     },
   })

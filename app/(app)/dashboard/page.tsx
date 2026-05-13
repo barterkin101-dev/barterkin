@@ -28,7 +28,7 @@ export default async function DashboardPage() {
     .eq('owner_id', user.id)
     .maybeSingle()
 
-  const [listings, messageCount, ticketCount] = profile ? await Promise.all([
+  const [listings, messageCount, _ticketCount, referralCount] = profile ? await Promise.all([
     getMyListings(profile.id),
     supabase
       .from('conversation_participants')
@@ -54,7 +54,30 @@ export default async function DashboardPage() {
 
         return count ?? 0
       }),
-  ]) : [[], 0, 0]
+    supabase
+      .from('referrals')
+      .select('id', { count: 'exact', head: true })
+      .eq('inviter_id', profile.id)
+      .then(({ count, error }) => {
+        if (error) {
+          const log = createLogger('dashboard')
+    log.error('referral count error', { context: { code: error.code } })
+        }
+        return count ?? 0
+      }),
+    supabase
+      .from('credit_ledger')
+      .select('amount')
+      .eq('profile_id', profile.id)
+      .then(({ data, error }) => {
+        if (error) {
+          const log = createLogger('dashboard')
+          log.error('credit balance error', { context: { code: error.code } })
+          return 0
+        }
+        return (data ?? []).reduce((sum, row) => sum + (row.amount ?? 0), 0)
+      }),
+  ]) : [[], 0, 0, 0, 0]
   const activeListings = listings.filter((l) => l.status === 'active')
   const referralLink = profile?.referral_code
     ? buildReferralLink(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com', profile.referral_code)
@@ -106,10 +129,10 @@ export default async function DashboardPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Tickets</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Credits</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{ticketCount}</div>
+            <div className="text-2xl font-bold">{creditBalance}</div>
           </CardContent>
         </Card>
       </div>
@@ -210,6 +233,8 @@ export default async function DashboardPage() {
         <ReferralInviteCard
           referralCode={profile.referral_code}
           referralLink={referralLink ?? ''}
+          credits={creditBalance}
+          referralCount={referralCount}
         />
       )}
     </div>

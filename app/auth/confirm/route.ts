@@ -4,6 +4,7 @@ import { type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
 import { captureEvent } from '@/lib/analytics'
+import { normalizeReferralCode } from '@/lib/referrals'
 
 /**
  * AUTH-02: Magic-link verification.
@@ -25,6 +26,8 @@ export async function GET(request: NextRequest) {
       const user = data?.user
       if (user) {
         void captureEvent(user.id, 'signup_completed', { method: 'magic_link' })
+        // Capture referral if ?ref= present in URL
+        await captureReferralFromQuery(request, supabase, user.id)
       }
       redirect(next)
     }
@@ -38,4 +41,58 @@ export async function GET(request: NextRequest) {
   }
 
   redirect(`/auth/error?reason=missing_token`)
+}
+
+/**
+ * Read ?ref= from URL and create referrals row if valid.
+ * Non-blocking — failures are logged but don't break auth flow.
+ */
+async function captureReferralFromQuery(
+  request: NextRequest,
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+) {
+  const refParam = request.nextUrl.searchParams.get('ref')
+  const normalized = normalizeReferralCode(refParam)
+  if (!normalized) return
+
+  try {
+    // Look up inviter by referral code
+    const { data: inviter } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('referral_code', normalized)
+      .maybeSingle()
+
+    if (!inviter) return
+
+    // Get invitee profile id
+    const { data: invitee } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('owner_id', userId)
+      .maybeSingle()
+
+    if (!invitee || invitee.id === inviter.id) return
+
+    // Create referral record (idempotent — unique on invitee_id)
+    await supabase
+      .from('referrals')
+      .insert({
+        inviter_id: inviter.id,
+        invitee_id: invitee.id,
+        invitee_referral_code: normalized,
+      })
+      .select()
+      .maybeSingle()
+
+    // Track referral usage
+    void captureEvent(userId, 'referral_link_used', {
+      referral_code: normalized,
+      method: 'magic_link',
+    })
+  } catch (err) {
+    const log = createLogger('auth')
+    log.error('referral capture failed', { error: err })
+  }
 }

@@ -213,6 +213,48 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_ledger: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          profile_id: string
+          reason: string
+          referral_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          profile_id: string
+          reason: string
+          referral_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          profile_id?: string
+          reason?: string
+          referral_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_ledger_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "credit_ledger_referral_id_fkey"
+            columns: ["referral_id"]
+            isOneToOne: false
+            referencedRelation: "referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       disposable_email_domains: {
         Row: {
           domain: string
@@ -603,6 +645,7 @@ export type Database = {
           category_id: number | null
           county_id: number | null
           created_at: string
+          credits: number
           display_name: string | null
           founding_member: boolean
           id: string
@@ -627,6 +670,7 @@ export type Database = {
           category_id?: number | null
           county_id?: number | null
           created_at?: string
+          credits?: number
           display_name?: string | null
           founding_member?: boolean
           id?: string
@@ -651,6 +695,7 @@ export type Database = {
           category_id?: number | null
           county_id?: number | null
           created_at?: string
+          credits?: number
           display_name?: string | null
           founding_member?: boolean
           id?: string
@@ -732,6 +777,48 @@ export type Database = {
           {
             foreignKeyName: "ratings_rater_profile_id_fkey"
             columns: ["rater_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          credited_at: string | null
+          id: string
+          invitee_id: string
+          invitee_referral_code: string
+          inviter_id: string
+        }
+        Insert: {
+          created_at?: string
+          credited_at?: string | null
+          id?: string
+          invitee_id: string
+          invitee_referral_code: string
+          inviter_id: string
+        }
+        Update: {
+          created_at?: string
+          credited_at?: string | null
+          id?: string
+          invitee_id?: string
+          invitee_referral_code?: string
+          inviter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_invitee_id_fkey"
+            columns: ["invitee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_inviter_id_fkey"
+            columns: ["inviter_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1075,6 +1162,7 @@ export type Database = {
       ticket_alert_payload: { Args: { p_ticket_id: string }; Returns: Json }
       update_webhook_secret: { Args: never; Returns: undefined }
       utc_day: { Args: { ts: string }; Returns: string }
+      award_referral_credits: { Args: { p_invitee_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

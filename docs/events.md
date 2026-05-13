@@ -72,6 +72,19 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ---
 
+### `referral_link_used`
+
+**When fired:** After a new user successfully signs up via a referral link (referral record created in `referrals` table).
+**Fires from:** `app/auth/callback/route.ts` (OAuth path), `app/auth/confirm/route.ts` (magic link path)
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `referral_code` | string | The 8-char referral code used |
+| `method` | string | Signup method: `google_oauth` or `magic_link` |
+
+---
+
 ### `test_event` *(Phase 1 wiring validation)*
 
 **When fired:** Home-page button click in dev/test environments.
@@ -90,6 +103,7 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 | `directory_filter_applied` | ✅ Implemented | `components/directory/DirectoryFilters.tsx` | 4 |
 | `contact_reported` | ✅ Implemented | `lib/actions/contact.ts` | 5 |
 | `contact_blocked` | ✅ Implemented | `lib/actions/contact.ts` | 5 |
+| `referral_link_used` | ✅ Implemented | `app/auth/callback/route.ts`, `app/auth/confirm/route.ts` | 6 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
 | `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |
 

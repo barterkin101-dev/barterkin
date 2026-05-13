@@ -37,7 +37,8 @@ export function LoginForm({ captchaToken }: { captchaToken: string | null }) {
 
   // Hydrate email from ?email= query param (used by ResendLinkButton on /verify-pending).
   useEffect(() => {
-    const prefill = new URLSearchParams(window.location.search).get('email')
+    const params = new URLSearchParams(window.location.search)
+    const prefill = params.get('email')
     if (prefill) form.setValue('email', prefill)
   }, [form])
 
@@ -93,6 +94,7 @@ export function LoginForm({ captchaToken }: { captchaToken: string | null }) {
         />
 
         <input type="hidden" name="cf-turnstile-response" value={captchaToken ?? ''} />
+        <input type="hidden" name="referral-code" value={new URLSearchParams(window.location.search).get('ref') ?? ''} />
 
         <Button
           type="submit"

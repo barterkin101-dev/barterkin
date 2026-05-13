@@ -8,9 +8,13 @@ import { Button } from '@/components/ui/button'
 export function ReferralInviteCard({
   referralCode,
   referralLink,
+  credits,
+  referralCount,
 }: {
   referralCode: string
   referralLink: string
+  credits: number
+  referralCount: number
 }) {
   const [copied, setCopied] = useState(false)
 
@@ -36,6 +40,21 @@ export function ReferralInviteCard({
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-lg border bg-background/80 p-3 text-center">
+            <div className="text-2xl font-bold text-primary">{credits}</div>
+            <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Credits
+            </div>
+          </div>
+          <div className="rounded-lg border bg-background/80 p-3 text-center">
+            <div className="text-2xl font-bold text-primary">{referralCount}</div>
+            <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Friends joined
+            </div>
+          </div>
+        </div>
+
         <div className="rounded-lg border bg-background/80 p-4">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Your referral code
