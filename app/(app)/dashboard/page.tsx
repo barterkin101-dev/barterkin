@@ -28,7 +28,7 @@ export default async function DashboardPage() {
     .eq('owner_id', user.id)
     .maybeSingle()
 
-  const [listings, messageCount, _ticketCount, referralCount] = profile ? await Promise.all([
+  const [listings, messageCount, , referralCount, creditBalance] = profile ? await Promise.all([
     getMyListings(profile.id),
     supabase
       .from('conversation_participants')
@@ -37,9 +37,8 @@ export default async function DashboardPage() {
       .then(({ count, error }) => {
         if (error) {
           const log = createLogger('dashboard')
-    log.error('message count error', { context: { code: error.code } })
+          log.error('message count error', { context: { code: error.code } })
         }
-
         return count ?? 0
       }),
     supabase
@@ -49,9 +48,8 @@ export default async function DashboardPage() {
       .then(({ count, error }) => {
         if (error) {
           const log = createLogger('dashboard')
-    log.error('ticket count error', { context: { code: error.code } })
+          log.error('ticket count error', { context: { code: error.code } })
         }
-
         return count ?? 0
       }),
     supabase
@@ -61,7 +59,7 @@ export default async function DashboardPage() {
       .then(({ count, error }) => {
         if (error) {
           const log = createLogger('dashboard')
-    log.error('referral count error', { context: { code: error.code } })
+          log.error('referral count error', { context: { code: error.code } })
         }
         return count ?? 0
       }),

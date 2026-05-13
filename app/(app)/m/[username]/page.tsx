@@ -25,14 +25,33 @@ export async function generateMetadata({
   const supabase = await createClient()
   const { data } = await supabase
     .from('profiles')
-    .select('display_name')
+    .select('display_name, bio, county_id, counties(name)')
     .eq('username', username)
     .maybeSingle()
-  const name = data?.display_name
+  const name = data?.display_name ?? username
+  const county = (data?.counties as { name?: string } | null)?.name ?? 'Georgia'
+  const bio = data?.bio ?? ''
+  const description = bio
+    ? `${bio.slice(0, 120)}${bio.length > 120 ? '…' : ''} — ${county}`
+    : `${name} is offering skills to trade on Barterkin in ${county}.`
   return {
-    title: name ? `${name} -- Barterkin` : 'Member -- Barterkin',
-    // PROF-14 + D-09: auth-gated, so don't encourage indexing
-    robots: { index: false, follow: false },
+    title: `${name} — Barterkin`,
+    description,
+    alternates: { canonical: `/m/${username}` },
+    openGraph: {
+      title: `${name} — Barterkin`,
+      description,
+      url: `/m/${username}`,
+      siteName: 'Barterkin',
+      type: 'profile',
+      locale: 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${name} — Barterkin`,
+      description,
+    },
+    robots: { index: true, follow: true },
   }
 }
 

@@ -1,10 +1,34 @@
 import { Suspense } from 'react'
+import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getListings, PAGE_SIZE } from '@/lib/data/listings'
 import { ListingGrid } from '@/components/listings/ListingGrid'
 import { ListingFilters } from '@/components/listings/ListingFilters'
 import { DirectoryPagination } from '@/components/directory/DirectoryPagination'
 import { Skeleton } from '@/components/ui/skeleton'
+
+export const metadata: Metadata = {
+  title: 'Browse Listings — Barterkin',
+  description:
+    'Discover what Georgians are trading. Browse listings by category, county, and condition — from handmade goods to professional services.',
+  alternates: { canonical: '/listings' },
+  openGraph: {
+    title: 'Browse Listings — Barterkin',
+    description:
+      'Discover what Georgians are trading. Browse listings by category, county, and condition — from handmade goods to professional services.',
+    url: '/listings',
+    siteName: 'Barterkin',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Browse Listings — Barterkin',
+    description:
+      'Discover what Georgians are trading. Browse listings by category, county, and condition — from handmade goods to professional services.',
+  },
+  robots: { index: true, follow: true },
+}
 
 interface ListingsPageProps {
   searchParams: Promise<{

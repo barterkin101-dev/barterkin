@@ -12,7 +12,23 @@ export const metadata: Metadata = {
   title: 'Directory',
   description:
     'Find Georgia residents offering skills to trade — woodworking, cooking, music, tech, and more. One community, 159 counties.',
-  robots: { index: false, follow: false },
+  alternates: { canonical: '/directory' },
+  openGraph: {
+    title: 'Directory — Barterkin',
+    description:
+      'Find Georgia residents offering skills to trade — woodworking, cooking, music, tech, and more. One community, 159 counties.',
+    url: '/directory',
+    siteName: 'Barterkin',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Directory — Barterkin',
+    description:
+      'Find Georgia residents offering skills to trade — woodworking, cooking, music, tech, and more. One community, 159 counties.',
+  },
+  robots: { index: true, follow: true },
 }
 
 export default async function DirectoryPage({

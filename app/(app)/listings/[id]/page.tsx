@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getListingById } from '@/lib/data/listings'
@@ -24,6 +25,46 @@ const conditionLabels: Record<string, string> = {
 }
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({
+  params,
+}: ListingDetailPageProps): Promise<Metadata> {
+  const { id } = await params
+  const listing = await getListingById(id)
+  if (!listing) {
+    return {
+      title: 'Listing not found — Barterkin',
+      robots: { index: false, follow: false },
+    }
+  }
+
+  const title = listing.title
+  const category = listing.categories?.name ?? ''
+  const county = listing.counties?.name ?? 'Georgia'
+  const description = listing.description
+    ? `${listing.description.slice(0, 150)}${listing.description.length > 150 ? '…' : ''} — ${county}`
+    : `${title} — available for trade on Barterkin in ${county}.`
+
+  return {
+    title: `${title} — Barterkin`,
+    description,
+    alternates: { canonical: `/listings/${id}` },
+    openGraph: {
+      title: `${title} — Barterkin`,
+      description,
+      url: `/listings/${id}`,
+      siteName: 'Barterkin',
+      type: 'website',
+      locale: 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${title} — Barterkin`,
+      description,
+    },
+    robots: { index: true, follow: true },
+  }
+}
 
 export default async function ListingDetailPage({ params }: ListingDetailPageProps) {
   const { id } = await params

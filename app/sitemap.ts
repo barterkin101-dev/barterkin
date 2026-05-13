@@ -6,6 +6,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.barterkin.com'
 // Static routes that should always appear in the sitemap
 const STATIC_ROUTES = [
   '',
+  '/about',
+  '/behind-barterkin',
   '/directory',
   '/listings',
   '/login',
