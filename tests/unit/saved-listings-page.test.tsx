@@ -25,7 +25,6 @@ vi.mock('@/components/listings/ListingGrid', () => ({
 import { createClient } from '@/lib/supabase/server'
 import { getSavedListings } from '@/lib/actions/saved-listings'
 
-const mockCreateClient = vi.mocked(createClient)
 const mockGetSavedListings = vi.mocked(getSavedListings)
 
 async function renderPage() {
@@ -35,18 +34,18 @@ async function renderPage() {
 
 describe('/dashboard/saved', () => {
   it('shows sign-in prompt when unauthenticated', async () => {
-    mockCreateClient.mockResolvedValue({
+    vi.mocked(createClient).mockResolvedValue({
       auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null } }) },
-    } as unknown as ReturnType<typeof createClient>)
+    } as never)
 
     await renderPage()
     expect(screen.getByText(/Please sign in/i)).toBeInTheDocument()
   })
 
   it('shows empty state when no saved listings', async () => {
-    mockCreateClient.mockResolvedValue({
+    vi.mocked(createClient).mockResolvedValue({
       auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'u1' } } }) },
-    } as unknown as ReturnType<typeof createClient>)
+    } as never)
 
     mockGetSavedListings.mockResolvedValue({ ok: true, savedListings: [] })
 
@@ -56,9 +55,9 @@ describe('/dashboard/saved', () => {
   })
 
   it('shows error state when getSavedListings fails', async () => {
-    mockCreateClient.mockResolvedValue({
+    vi.mocked(createClient).mockResolvedValue({
       auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'u1' } } }) },
-    } as unknown as ReturnType<typeof createClient>)
+    } as never)
 
     mockGetSavedListings.mockResolvedValue({ ok: false, error: 'DB error' })
 
@@ -68,9 +67,9 @@ describe('/dashboard/saved', () => {
   })
 
   it('renders listing grid when saved listings exist', async () => {
-    mockCreateClient.mockResolvedValue({
+    vi.mocked(createClient).mockResolvedValue({
       auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'u1' } } }) },
-    } as unknown as ReturnType<typeof createClient>)
+    } as never)
 
     mockGetSavedListings.mockResolvedValue({
       ok: true,
