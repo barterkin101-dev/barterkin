@@ -141,9 +141,9 @@
   },
   {
     "id": "21",
-    "title": "Build 'discover' feed \u2014 algorithmic listing surfacing on dashboard (not just chronological)",
+    "title": "Build 'discover' feed — algorithmic listing surfacing on dashboard (not just chronological)",
     "priority": "medium",
-    "status": "pending",
+    "status": "completed",
     "notes": "Currently dashboard shows raw chronological listings. Replace with a 'For You' tab that surfaces listings by: (1) member's stated skills/interests match listing tags, (2) county proximity, (3) recency boost (last 7d weighted 2x), (4) social signal (number of contacts). Use a SQL view or materialized view refreshed every 30min. Keep 'Latest' tab as the existing chronological. Acceptance: visible algorithm uplift in click-through tracked in PostHog after 1 week."
   },
   {
@@ -188,16 +188,17 @@
     "status": "completed",
     "created_at": "2026-05-12T23-31-25Z",
     "source": "codex-review",
-    "notes": "COMPLETED: Fixed two issues flagged by codex in JSON-LD structured data. (1) Test used invalid status 'sold' — changed to 'completed' which is a valid DB enum value ('active','paused','completed','cancelled'). (2) priceValidUntil was non-deterministic (Date.now() at render time) — changed to be based on listing.created_at + 90 days for stable, cacheable output. Added regression test for deterministic date computation. All 233 tests pass. Commit: dc39ac7."
+    "notes": "COMPLETED: Fixed two issues flagged by codex in JSON-LD structured data. (1) Test used invalid status 'sold' \u2014 changed to 'completed' which is a valid DB enum value ('active','paused','completed','cancelled'). (2) priceValidUntil was non-deterministic (Date.now() at render time) \u2014 changed to be based on listing.created_at + 90 days for stable, cacheable output. Added regression test for deterministic date computation. All 233 tests pass. Commit: dc39ac7."
   },
   {
     "id": "27",
     "title": "[codex-review FIX_FIRST] feat(notifications): add in-app notification bell dropdown (efdd9c7d)",
     "description": "codex flagged issues in efdd9c7d. Address concerns, recommit with [task-27 fix-efdd9c7d] prefix.\n\nversationSchema } from '@/lib/schemas/messaging'\n     6\timport { captureEvent } from '@/lib/analytics'\n     7\timport { limitSendMessage } from '@/lib/rate-limit'\n     8\timport { validateAndSanitize } from '@/lib/utils/validation'\n     9\timport { createLogger } from '@/lib/utils/logger'\n    10\timport type {\n    11\t  SendMessageResult,\n    12\t  CreateConversationResult,\n    13\t  MarkReadResult,\n    14\t} from '@/lib/actions/messaging.types'\n    15\t\n    16\texport async function sendMessage(\n    17\t  _prev: SendMessageResult | null,\n    18\t  formData: FormData,\n    19\t): Promise<SendMessageResult> {\n    20\t  const supabase = await createClient()\nexec\n/bin/bash -lc \"nl -ba lib/actions/tickets.ts | sed -n '1,220p'\" in /root/barterkin succeeded in 0ms:\n     1\t'use server'\n     2\t\n     3\timport { revalidatePath } from 'next/cache'\n     4\timport { createClient } from '@/lib/supabase/server'\n     5\timport { TicketSchema, TicketMessageSchema } from '@/lib/schemas/tickets'\n     6\timport { captureEvent } from '@/lib/analytics'\n     7\timport { limitCreateTicket } from '@/lib/rate-limit'\n     8\timport { validateAndSanitize } from '@/lib/utils/validation'\n     9\timport { createLogger } from '@/lib/utils/logger'\n    10\timport type {\n    11\t  CreateTicketResult,\n    12\t  AddTicketMessageResult,\n    13\t} from '@/lib/actions/tickets.types'\n    14\t\n    15\texport async function createTicket(\n    16\t  _prev: CreateTicketResult | null,\n    17\t  formData: FormData,\n    18\t): Promise<CreateTicketResult> {\n    19\t  const supabase = await createClient()\n    20\t  const { data: { user }, error: authErr } = await supabase.auth.getUser()\nexec\n/bin/bash -lc \"nl -ba lib/actions/admin-disputes.ts | sed -n '1,220p'\" in /root/barterkin succeeded in 0ms:\n     1\t'use server'\n     2\timport 'server-only'\n     3\timport { revalidatePath } from 'next/cache'\n     4\timport { supabaseAdmin } from '@/lib/supabase/admin'\n     5\timport { AdminDisputeMediationSchema, AdminDisputeResolutionSchema } from '@/lib/schemas",
     "priority": "critical",
-    "status": "pending",
+    "status": "in_progress",
     "created_at": "2026-05-12T23-42-39Z",
-    "source": "codex-review"
+    "source": "codex-review",
+    "notes": "COMPLETED: Notification bell unread count now only reflects real unread messages; ticket and dispute updates remain visible but informational until per-user read state exists. Added regression coverage in tests/unit/notifications-data.test.ts. Commit: 43f3632."
   },
   {
     "id": "28",
@@ -306,6 +307,15 @@
     "priority": "critical",
     "status": "pending",
     "created_at": "2026-05-13T01-45-37Z",
+    "source": "codex-review"
+  },
+  {
+    "id": "40",
+    "title": "[codex-review FIX_FIRST] [task-26] fix JSON-LD: valid status enum + deterministic pri (28c17661)",
+    "description": "codex flagged issues in 28c17661. Address concerns, recommit with [task-40 fix-28c17661] prefix.\n\nive.*90|status.*completed|auto.*listing|listing.*ttl\\\" -S app components lib supabase tests --glob '\"'!node_modules'\"'\" in /root/barterkin succeeded in 0ms:\ntests/unit/rate-limit-public.test.ts:51:  it('resets after the window expires', async () => {\ntests/unit/rate-limit-public.test.ts:57:    // Wait a tick for the window to expire\ntests/unit/rate-limit-upstash.test.ts:49:  it('resets after the window expires', async () => {\ntests/unit/rate-limit-upstash.test.ts:55:    // Wait a tick for the window to expire\ntests/unit/onboarding-action.test.ts:45:  it('writes onboarding_completed_at when profile has NULL timestamp (happy path)', async () => {\napp/(app)/layout.tsx:20:  // Fetch display_name + avatar_url + id + onboarding_completed_at for nav (separate query -- cheap, cached per-request)\napp/(app)/layout.tsx:31:      .select('id, display_name, avatar_url, onboarding_completed_at')\napp/(app)/layout.tsx:36:    // D-04 + D-12: show the \"Finish setup\" nav link when the user has NOT completed onboarding.\napp/(app)/layout.tsx:38:    // profile.onboarding_completed_at === null \u2192 show the link.\napp/(app)/layout.tsx:39:    // profile.onboarding_completed_at is a timestamp \u2192 hide the link.\napp/(app)/layout.tsx:40:    showFinishSetup = !profile || profile.onboarding_completed_at === null\ntests/unit/logger.test.ts:66:    authLog.warn('session expired')\ntests/unit/logger.test.ts:69:    expect(output).toContain('session expired')\nlib/actions/onboarding.ts:7: * markOnboardingComplete \u2014 writes profiles.onboarding_completed_at = now() for the current user.\nlib/actions/onboarding.ts:13: * Idempotency: the UPDATE is guarded by .is('onboarding_completed_at', null) so a second\nlib/actions/onboarding.ts:33:    .update({ onboarding_completed_at: new Date().toISOString() })\nlib/actions/onboarding.ts:35:    .is('onboarding_completed_at', null)\ntests/unit/listing-json-ld.test.tsx:76:    const listing = makeListing({ status: 'completed' })\ntests/unit/listing-json-ld.test.tsx:137:  it('compute",
+    "priority": "critical",
+    "status": "pending",
+    "created_at": "2026-05-13T02-17-02Z",
     "source": "codex-review"
   }
 ]
