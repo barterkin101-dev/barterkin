@@ -168,6 +168,19 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ---
 
+### `re_engagement_sent`
+
+**When fired:** After the dormant-member re-engagement cron successfully sends one or more emails.
+**Fires from:** `app/api/cron/re-engage/route.ts`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `count` | number | Number of dormant members emailed in the batch |
+| `listings_total` | number | Total listings included across sent emails |
+
+---
+
 ### `landing_social_proof_viewed`
 
 **When fired:** When the RecentActivity section mounts on the landing page.
@@ -206,6 +219,7 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 | `listing_boosted` | ✅ Implemented | `lib/actions/listings.ts` | 7 |
 | `discover_tab_switched` | ✅ Implemented | `components/dashboard/DiscoverFeedTabs.tsx` | 7 |
 | `weekly_digest_sent` | ✅ Implemented | `app/api/cron/weekly-digest/route.ts` | 7 |
+| `re_engagement_sent` | ✅ Implemented | `app/api/cron/re-engage/route.ts` | 7 |
 | `landing_social_proof_viewed` | ✅ Implemented | `components/landing/RecentActivity.tsx` | 7 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
 | `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |
