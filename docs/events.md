@@ -9,6 +9,8 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 **Related docs:** `docs/API.md` (API routes + server actions), `docs/infrastructure.md` (logging, rate limiting, health checks)
 
+**Last updated:** 2026-05-13
+
 ---
 
 ## Implemented Events
@@ -98,6 +100,19 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ---
 
+### `waitlist_founding_notified`
+
+**When fired:** After the cron job successfully emails waitlisters about founding slot availability.
+**Fires from:** `app/api/cron/notify-waitlist/route.ts`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `count` | number | How many waitlisters were emailed |
+| `slots_remaining` | number | How many founding slots were available at send time |
+
+---
+
 ### `test_event` *(Phase 1 wiring validation)*
 
 **When fired:** Home-page button click in dev/test environments.
@@ -118,6 +133,7 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 | `contact_blocked` | ✅ Implemented | `lib/actions/contact.ts` | 5 |
 | `referral_link_used` | ✅ Implemented | `app/auth/callback/route.ts`, `app/auth/confirm/route.ts` | 6 |
 | `founding_slot_claimed` | ✅ Implemented | `lib/actions/billing.ts` | 7 |
+| `waitlist_founding_notified` | ✅ Implemented | `app/api/cron/notify-waitlist/route.ts` | 7 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
 | `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |
 
