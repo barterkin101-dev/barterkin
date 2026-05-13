@@ -136,7 +136,7 @@
     "id": "20",
     "title": "Implement subscription billing v1 \u2014 Stripe + 'Premium' member tier with featured listings",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "notes": "Free tier: 3 listings, 10 contacts/mo. Premium ($9/mo): unlimited listings, featured placement, 100 contacts/mo, verified badge. Add Stripe customer portal. Use Stripe Checkout for upgrade. Webhook updates `profiles.tier` column. Gate features in server actions. Acceptance: full flow (Stripe test mode) \u2014 upgrade, see premium badge, downgrade, lose badge. Document in DEPLOY.md."
   },
   {
@@ -168,7 +168,7 @@
     "status": "pending",
     "created_at": "2026-05-12T23-31-25Z",
     "source": "codex-review",
-    "notes": "COMPLETED: Hardened waitlist signups by moving writes to the server admin client, revoking direct client INSERT access via a follow-up migration, and restoring visible error messages in the landing form. Commit: c47a031."
+    "notes": "COMPLETED: Hardened waitlist signups by moving writes to the server admin client, revoking direct client INSERT access via a follow-up migration, restoring visible error messages in the landing form, and catching missing admin-client env failures so the form returns an inline error instead of a hard 500. Added regression coverage for admin-client init failure. Commit: d6f63e5."
   },
   {
     "id": "25",
