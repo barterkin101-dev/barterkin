@@ -1085,6 +1085,86 @@ export type Database = {
           },
         ]
       }
+      support_tickets: {
+        Row: {
+          id: string
+          from_email: string
+          from_name: string | null
+          subject: string
+          body_text: string
+          body_html: string | null
+          status: string
+          priority: string
+          source: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          from_email: string
+          from_name?: string | null
+          subject: string
+          body_text: string
+          body_html?: string | null
+          status?: string
+          priority?: string
+          source?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          from_email?: string
+          from_name?: string | null
+          subject?: string
+          body_text?: string
+          body_html?: string | null
+          status?: string
+          priority?: string
+          source?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      support_replies: {
+        Row: {
+          id: string
+          support_ticket_id: string
+          body: string
+          sent_to: string
+          sent_via: string
+          sent_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          support_ticket_id: string
+          body: string
+          sent_to: string
+          sent_via?: string
+          sent_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          support_ticket_id?: string
+          body?: string
+          sent_to?: string
+          sent_via?: string
+          sent_at?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_replies_ticket_fkey"
+            columns: ["support_ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1163,6 +1243,23 @@ export type Database = {
       update_webhook_secret: { Args: never; Returns: undefined }
       utc_day: { Args: { ts: string }; Returns: string }
       award_referral_credits: { Args: { p_invitee_id: string }; Returns: boolean }
+      discover_listings: {
+        Args: { p_viewer_profile_id: string; p_limit?: number }
+        Returns: {
+          id: string
+          profile_id: string
+          title: string
+          description: string
+          category_id: number
+          county_id: number
+          condition: string
+          trade_terms: string
+          status: string
+          price_estimate: string
+          created_at: string
+          score: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
