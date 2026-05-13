@@ -131,6 +131,11 @@ describe('billing API routes', () => {
       expect(res.status).toBe(200)
       expect(json.ok).toBe(true)
       expect(json.url).toBe('https://checkout.stripe.com/test')
+      expect(mockStripeCheckoutSessionsCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success_url: 'https://barterkin.com/dashboard/billing/success?tier=premium',
+        }),
+      )
       expect(mockStripeCustomersCreate).toHaveBeenCalledWith(
         expect.objectContaining({
           email: 'test@example.com',
@@ -193,6 +198,7 @@ describe('billing API routes', () => {
       expect(mockStripeCheckoutSessionsCreate).toHaveBeenCalledWith(
         expect.objectContaining({
           line_items: [{ price: 'price_founding_xxx', quantity: 1 }],
+          success_url: 'https://barterkin.com/dashboard/billing/success?tier=founding',
           metadata: expect.objectContaining({ tier: 'founding' }),
         }),
       )

@@ -130,6 +130,20 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 
 ---
 
+### `billing_success_viewed`
+
+**When fired:** When the member lands on `/dashboard/billing/success` after Stripe Checkout, including temporary webhook-processing states.
+**Fires from:** `app/(app)/dashboard/billing/success/page.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `expected_tier` | string | Tier requested in the Stripe success redirect: `premium` or `founding` |
+| `actual_tier` | string | Tier currently reflected on the profile row when the page renders |
+| `status` | string | `active` when the tier is synced, `processing` while waiting on webhook sync |
+
+---
+
 ### `founding_slot_claimed`
 
 **When fired:** After a user successfully initiates a Stripe Checkout session for the Founding Member tier.

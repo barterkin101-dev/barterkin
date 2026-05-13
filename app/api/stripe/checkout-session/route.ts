@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${siteUrl}/dashboard/billing?success=1`,
+      success_url: `${siteUrl}/dashboard/billing/success?tier=${requestedPlan}`,
       cancel_url: `${siteUrl}/dashboard/billing?canceled=1`,
       metadata: {
         profile_id: profile.id,
