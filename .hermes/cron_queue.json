@@ -588,10 +588,10 @@
     "id": "70",
     "title": "Add prewritten referral invite message to dashboard for faster member sharing",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-13T21:16:25Z",
     "source": "codex-fallback",
-    "notes": "In progress: adding copyable invite-message copy and analytics to the existing referral card to reduce sharing friction."
+    "notes": "COMPLETED: Added a suggested referral invite message with one-click copy, reused it in native share text, and tracked copy_target analytics for link vs message copies. Commit: d61945d."
   },
   {
     "id": "71",
