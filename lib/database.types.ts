@@ -255,6 +255,38 @@ export type Database = {
           },
         ]
       }
+      quest_completions: {
+        Row: {
+          id: string
+          profile_id: string
+          quest_key: string
+          credits_awarded: number
+          awarded_at: string
+        }
+        Insert: {
+          id?: string
+          profile_id: string
+          quest_key: string
+          credits_awarded: number
+          awarded_at?: string
+        }
+        Update: {
+          id?: string
+          profile_id?: string
+          quest_key?: string
+          credits_awarded?: number
+          awarded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quest_completions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       disposable_email_domains: {
         Row: {
           domain: string
@@ -653,6 +685,8 @@ export type Database = {
           founding_member: boolean
           id: string
           is_published: boolean
+          last_login_at: string | null
+          login_streak: number
           onboarding_completed_at: string | null
           owner_id: string
           referral_code: string
@@ -682,6 +716,8 @@ export type Database = {
           founding_member?: boolean
           id?: string
           is_published?: boolean
+          last_login_at?: string | null
+          login_streak?: number
           onboarding_completed_at?: string | null
           owner_id: string
           referral_code?: string
@@ -711,6 +747,8 @@ export type Database = {
           founding_member?: boolean
           id?: string
           is_published?: boolean
+          last_login_at?: string | null
+          login_streak?: number
           onboarding_completed_at?: string | null
           owner_id?: string
           referral_code?: string
@@ -1379,6 +1417,18 @@ export type Database = {
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
       ticket_alert_payload: { Args: { p_ticket_id: string }; Returns: Json }
+      award_quest_credit: {
+        Args: { p_profile_id: string; p_quest_key: string; p_credits: number }
+        Returns: boolean
+      }
+      update_login_streak: {
+        Args: { p_profile_id: string }
+        Returns: {
+          credits_earned: number
+          is_new_day: boolean
+          streak: number
+        }[]
+      }
       update_webhook_secret: { Args: never; Returns: undefined }
       utc_day: { Args: { ts: string }; Returns: string }
       award_referral_credits: { Args: { p_invitee_id: string }; Returns: boolean }

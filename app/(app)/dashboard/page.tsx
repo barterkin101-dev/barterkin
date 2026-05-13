@@ -11,8 +11,11 @@ import { ProfileCompletionBar } from '@/components/profile/ProfileCompletionBar'
 import { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'
 import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'
 import { DiscoverFeedTabs } from '@/components/dashboard/DiscoverFeedTabs'
+import { QuestCard } from '@/components/dashboard/QuestCard'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
+import { QUESTS, isUtcDateToday } from '@/lib/quests'
+import { updateLoginStreak } from '@/lib/actions/quests'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -28,11 +31,14 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, county_id, category_id, referral_code, tier, skills_offered(id)')
+    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, county_id, category_id, referral_code, tier, last_login_at, login_streak, skills_offered(id)')
     .eq('owner_id', user.id)
     .maybeSingle()
 
-  const [listings, messageCount, , referralCount, creditBalance, foundingCountResult, discoverResult, latestResult] = profile ? await Promise.all([
+  const needsDailyLoginSync = profile ? !isUtcDateToday(profile.last_login_at) : false
+  const streakResult = needsDailyLoginSync ? await updateLoginStreak() : null
+
+  const [listings, messageCount, , referralCount, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions] = profile ? await Promise.all([
     getMyListings(profile.id),
     supabase
       .from('conversation_participants')
@@ -92,13 +98,33 @@ export default async function DashboardPage() {
       }),
     getDiscoverFeed(profile.id),
     getListings({ categoryId: undefined, countyId: undefined, condition: undefined, page: 1 }),
-  ]) : [[], 0, 0, 0, 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }]
+    supabase
+      .from('quest_completions')
+      .select('quest_key')
+      .eq('profile_id', profile.id),
+  ]) : [[], 0, 0, 0, 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }, { data: [], error: null }]
   const activeListings = listings.filter((l) => l.status === 'active')
   const referralLink = profile?.referral_code
     ? buildReferralLink(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com', profile.referral_code)
     : null
   const foundingSlotsRemaining = Math.max(0, STRIPE_FOUNDING_MEMBER_LIMIT - foundingCountResult)
   const showFoundingNudge = profile?.tier === 'free' && foundingSlotsRemaining > 0
+  const completedQuests = new Set((questCompletions.data ?? []).map((row) => row.quest_key))
+  const checkedInToday = Boolean(
+    profile && (
+      isUtcDateToday(profile.last_login_at)
+      || (needsDailyLoginSync && streakResult?.ok)
+    ),
+  )
+  if (checkedInToday) {
+    completedQuests.add('quest_daily_login')
+  }
+  const questStatuses = QUESTS.map((quest) => ({
+    key: quest.key,
+    credits: quest.credits,
+    completed: completedQuests.has(quest.key),
+  }))
+  const questStreak = streakResult?.ok ? (streakResult.streak ?? profile?.login_streak ?? 0) : (profile?.login_streak ?? 0)
 
   return (
     <div className="space-y-8">
@@ -287,6 +313,15 @@ export default async function DashboardPage() {
           referralLink={referralLink ?? ''}
           credits={creditBalance}
           referralCount={referralCount}
+        />
+      )}
+
+      {/* Quests card */}
+      {profile && (
+        <QuestCard
+          quests={questStatuses}
+          streak={questStreak}
+          credits={creditBalance}
         />
       )}
 

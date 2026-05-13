@@ -19,10 +19,15 @@ vi.mock('@/lib/rate-limit', () => ({
   limitSendMessage: vi.fn().mockResolvedValue({ success: true, limit: 60, remaining: 59, reset: 0 }),
 }))
 
+vi.mock('@/lib/actions/quests', () => ({
+  awardQuest: vi.fn().mockResolvedValue({ ok: true, awarded: true, credits: 2 }),
+}))
+
 // Import mocked modules AFTER vi.mock declarations
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { limitSendMessage } from '@/lib/rate-limit'
+import { awardQuest } from '@/lib/actions/quests'
 
 import {
   sendMessage,
@@ -220,6 +225,7 @@ describe('sendMessage', () => {
     )
     expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith('/dashboard/messages')
     expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith(`/dashboard/messages/${CONV_UUID}`)
+    expect(vi.mocked(awardQuest)).toHaveBeenCalledWith('quest_first_message')
   })
 
   it('returns unknown error on insert failure', async () => {
@@ -411,6 +417,7 @@ describe('createConversation', () => {
       { conversation_id: CONV_UUID, profile_id: VALID_UUID },
       { conversation_id: CONV_UUID, profile_id: OTHER_UUID },
     ])
+    expect(vi.mocked(awardQuest)).toHaveBeenCalledWith('quest_first_message')
   })
 
   it('returns error when conversation insert fails', async () => {

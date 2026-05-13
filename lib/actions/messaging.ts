@@ -7,6 +7,7 @@ import { captureEvent } from '@/lib/analytics'
 import { limitSendMessage } from '@/lib/rate-limit'
 import { validateAndSanitize } from '@/lib/utils/validation'
 import { createLogger } from '@/lib/utils/logger'
+import { awardQuest } from '@/lib/actions/quests'
 import type {
   SendMessageResult,
   CreateConversationResult,
@@ -84,6 +85,14 @@ export async function sendMessage(
   void captureEvent(user.id, 'message_sent', {
     conversation_id: values.conversationId,
   })
+
+  const questResult = await awardQuest('quest_first_message')
+  if (!questResult.ok && questResult.error !== 'Quest requirements not met yet.') {
+    const log = createLogger('messaging')
+    log.warn('quest_first_message award failed', {
+      context: { conversationId: values.conversationId, error: questResult.error },
+    })
+  }
 
   return { ok: true, messageId: message.id }
 }
@@ -197,6 +206,14 @@ export async function createConversation(
     conversation_id: conversationId,
     listing_id: values.listingId ?? null,
   })
+
+  const questResult = await awardQuest('quest_first_message')
+  if (!questResult.ok && questResult.error !== 'Quest requirements not met yet.') {
+    const log = createLogger('messaging')
+    log.warn('quest_first_message award failed', {
+      context: { conversationId, error: questResult.error },
+    })
+  }
 
   return { ok: true, conversationId }
 }
