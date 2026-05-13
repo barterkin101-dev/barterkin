@@ -605,7 +605,7 @@
     "title": "Add landing page A/B test framework — hero copy variants with PostHog feature flags",
     "description": "We have a strong landing page but no data on what copy converts best. Add: (1) PostHog feature flag integration for server-rendered A/B tests (lib/ab-testing.ts), (2) two hero headline variants: current 'Georgia's community skills exchange' vs 'Trade skills with your neighbors — no cash needed', (3) track conversion rate (waitlist join or signup) per variant in PostHog, (4) expose variant assignment in analytics for funnel analysis. No external deps beyond existing PostHog. Acceptance: 50/50 traffic split, conversion event tagged with variant, admin can see results in PostHog dashboard.",
     "priority": "medium",
-    "status": "in_progress",
-    "notes": "In progress: wiring server-side landing hero variant assignment into waitlist and signup conversion analytics."
+    "status": "completed",
+    "notes": "COMPLETED: Added server-side landing hero variant assignment with PostHog flag lookup + deterministic fallback, propagated variant into waitlist and signup conversion analytics, and documented/tested the flow. Commit: 494f9ea."
   }
 ]
