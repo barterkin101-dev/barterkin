@@ -657,6 +657,10 @@ export type Database = {
           rating_count: number
           search_text: string | null
           search_vector: unknown
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_current_period_end: string | null
+          tier: string
           tiktok_handle: string | null
           updated_at: string
           username: string | null
@@ -682,6 +686,10 @@ export type Database = {
           rating_count?: number
           search_text?: string | null
           search_vector?: unknown
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_current_period_end?: string | null
+          tier?: string
           tiktok_handle?: string | null
           updated_at?: string
           username?: string | null
@@ -707,6 +715,10 @@ export type Database = {
           rating_count?: number
           search_text?: string | null
           search_vector?: unknown
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_current_period_end?: string | null
+          tier?: string
           tiktok_handle?: string | null
           updated_at?: string
           username?: string | null

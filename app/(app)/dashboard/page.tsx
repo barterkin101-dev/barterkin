@@ -5,7 +5,7 @@ import { getMyListings } from '@/lib/data/listings'
 import { buildReferralLink } from '@/lib/referrals'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ShoppingBag, MessageSquare, Star, Ticket, User } from 'lucide-react'
+import { CreditCard, ShoppingBag, MessageSquare, Star, Ticket, User } from 'lucide-react'
 import { ProfileCompletionBar } from '@/components/profile/ProfileCompletionBar'
 import { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
@@ -24,7 +24,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, county_id, category_id, referral_code, skills_offered(id)')
+    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, county_id, category_id, referral_code, tier, skills_offered(id)')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -210,6 +210,22 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </Link>
+
+        <Card className="transition-colors hover:bg-muted/50">
+          <Link href="/dashboard/billing">
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <CreditCard className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Billing</h3>
+                <p className="text-sm text-muted-foreground">
+                  {profile?.tier === 'founding' ? 'Founding member' : profile?.tier === 'premium' ? 'Premium active' : 'Upgrade to premium'}
+                </p>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
       </div>
 
       {/* Profile completion nudge */}
