@@ -572,6 +572,6 @@
     "title": "Add billing success state with upgrade confirmation + next-step CTA",
     "priority": "high",
     "status": "completed",
-    "notes": "COMPLETED: Added /dashboard/billing/success with active + processing states, analytics, Stripe success redirect wiring, and billing regression tests. Commit SHA queued for metadata sync."
+    "notes": "COMPLETED: Added /dashboard/billing/success with active + processing states, analytics, Stripe success redirect wiring, and billing regression tests. Commit: c1d5ad8."
   }
 ]
