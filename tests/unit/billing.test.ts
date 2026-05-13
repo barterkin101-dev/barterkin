@@ -1,14 +1,15 @@
 /**
- * Billing server actions — unit tests
- * Tests createCheckoutSession, createCustomerPortalSession, and tier gating.
+ * Billing API routes — unit tests
+ * Tests /api/stripe/checkout-session and /api/stripe/customer-portal.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { NextRequest } from 'next/server'
 
 // Set env vars BEFORE any module imports that read them
 process.env.STRIPE_SECRET_KEY = 'sk_test_xxx'
 process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID = 'price_test_xxx'
-process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_xxx'
+process.env.STRIPE_WEBHOOK_SECRET = 'whsec_xxx'
 process.env.NEXT_PUBLIC_SITE_URL = 'https://barterkin.com'
 
 // Mock Stripe before importing modules that use it
@@ -67,22 +68,27 @@ vi.mock('@/lib/supabase/server', () => ({
   ),
 }))
 
-// Now import the billing actions after mocks are set up
-import { createCheckoutSession, createCustomerPortalSession } from '@/lib/actions/billing'
+// Import route handlers after mocks are set up
+import { POST as checkoutPOST } from '@/app/api/stripe/checkout-session/route'
+import { POST as portalPOST } from '@/app/api/stripe/customer-portal/route'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
-describe('billing actions', () => {
+function makeRequest(body?: Record<string, unknown>): NextRequest {
+  return new NextRequest('https://barterkin.com/api/stripe/checkout-session', {
+    method: 'POST',
+    body: body ? JSON.stringify(body) : undefined,
+    headers: { 'content-type': 'application/json' },
+  })
+}
+
+describe('billing API routes', () => {
   beforeEach(() => {
     vi.resetAllMocks()
     resetChain()
   })
 
-  afterEach(() => {
-    // Keep env vars set for subsequent tests
-  })
-
-  describe('createCheckoutSession', () => {
-    it('returns error when not authenticated', async () => {
+  describe('POST /api/stripe/checkout-session', () => {
+    it('returns 401 when not authenticated', async () => {
       const { createClient } = await import('@/lib/supabase/server')
       vi.mocked(createClient).mockResolvedValueOnce({
         auth: {
@@ -91,23 +97,23 @@ describe('billing actions', () => {
         from: mockFrom,
       } as unknown as Awaited<ReturnType<typeof createClient>>)
 
-      const result = await createCheckoutSession(null, new FormData())
-      expect(result.ok).toBe(false)
-      expect(result.error).toBe('Not authenticated.')
+      const res = await checkoutPOST(makeRequest())
+      expect(res.status).toBe(401)
+      expect(await res.json()).toEqual({ ok: false, error: 'Not authenticated.' })
     })
 
-    it('returns error when already subscribed', async () => {
+    it('returns 409 when already subscribed', async () => {
       mockMaybeSingle.mockResolvedValueOnce({
         data: { id: 'prof-1', display_name: 'Test', stripe_customer_id: 'cus_1', tier: 'premium' },
         error: null,
       })
 
-      const result = await createCheckoutSession(null, new FormData())
-      expect(result.ok).toBe(false)
-      expect(result.error).toContain('already have an active subscription')
+      const res = await checkoutPOST(makeRequest())
+      expect(res.status).toBe(409)
+      expect(await res.json()).toEqual({ ok: false, error: 'Already subscribed.' })
     })
 
-    it('creates checkout session for free user', async () => {
+    it('creates checkout session for free user (premium default)', async () => {
       mockMaybeSingle.mockResolvedValueOnce({
         data: { id: 'prof-1', display_name: 'Test', stripe_customer_id: null, tier: 'free' },
         error: null,
@@ -119,11 +125,12 @@ describe('billing actions', () => {
         url: 'https://checkout.stripe.com/test',
       })
 
-      const fd = new FormData()
-      const result = await createCheckoutSession(null, fd)
+      const res = await checkoutPOST(makeRequest())
+      const json = await res.json()
 
-      expect(result.ok).toBe(true)
-      expect(result.url).toBe('https://checkout.stripe.com/test')
+      expect(res.status).toBe(200)
+      expect(json.ok).toBe(true)
+      expect(json.url).toBe('https://checkout.stripe.com/test')
       expect(mockStripeCustomersCreate).toHaveBeenCalledWith(
         expect.objectContaining({
           email: 'test@example.com',
@@ -143,26 +150,24 @@ describe('billing actions', () => {
         url: 'https://checkout.stripe.com/test',
       })
 
-      const fd = new FormData()
-      const result = await createCheckoutSession(null, fd)
+      const res = await checkoutPOST(makeRequest())
+      const json = await res.json()
 
-      expect(result.ok).toBe(true)
+      expect(res.status).toBe(200)
+      expect(json.ok).toBe(true)
       expect(mockStripeCustomersCreate).not.toHaveBeenCalled()
     })
 
-    it('creates founding member checkout when plan=founding and slots available', async () => {
+    it('creates founding member checkout when priceId=founding and slots available', async () => {
       process.env.STRIPE_FOUNDING_MONTHLY_PRICE_ID = 'price_founding_xxx'
 
-      // First call: profile lookup (select->eq->maybeSingle)
       mockMaybeSingle.mockResolvedValueOnce({
         data: { id: 'prof-1', display_name: 'Test', stripe_customer_id: null, tier: 'free' },
         error: null,
       })
 
-      // Admin client: founding member count (select with count->eq returns {count,error})
       mockAdminEq.mockResolvedValueOnce({ count: 0, error: null })
 
-      // Second call (regular client): update stripe_customer_id (update->eq)
       const mockUpdateEq = vi.fn().mockResolvedValue({ error: null })
       const mockUpdate2 = vi.fn().mockReturnValue({ eq: mockUpdateEq })
 
@@ -176,16 +181,15 @@ describe('billing actions', () => {
         url: 'https://checkout.stripe.com/test',
       })
 
-      const fd = new FormData()
-      fd.append('plan', 'founding')
-      const result = await createCheckoutSession(null, fd)
+      const res = await checkoutPOST(makeRequest({ priceId: 'founding' }))
+      const json = await res.json()
 
-      expect(result.ok).toBe(true)
+      expect(res.status).toBe(200)
+      expect(json.ok).toBe(true)
       expect(getSupabaseAdmin).toHaveBeenCalledTimes(1)
       expect(mockAdminFrom).toHaveBeenCalledWith('profiles')
       expect(mockAdminSelect).toHaveBeenCalledWith('id', { count: 'exact', head: true })
       expect(mockAdminEq).toHaveBeenCalledWith('tier', 'founding')
-      expect(mockFrom).toHaveBeenCalledTimes(2)
       expect(mockStripeCheckoutSessionsCreate).toHaveBeenCalledWith(
         expect.objectContaining({
           line_items: [{ price: 'price_founding_xxx', quantity: 1 }],
@@ -195,21 +199,19 @@ describe('billing actions', () => {
     })
 
     it('rejects founding member checkout when slots are sold out', async () => {
-      // First call: profile lookup
       mockMaybeSingle.mockResolvedValueOnce({
         data: { id: 'prof-1', display_name: 'Test', stripe_customer_id: null, tier: 'free' },
         error: null,
       })
 
-      // Admin client: founding member count — sold out
       mockAdminEq.mockResolvedValueOnce({ count: 100, error: null })
 
-      const fd = new FormData()
-      fd.append('plan', 'founding')
-      const result = await createCheckoutSession(null, fd)
+      const res = await checkoutPOST(makeRequest({ priceId: 'founding' }))
+      const json = await res.json()
 
-      expect(result.ok).toBe(false)
-      expect(result.error).toContain('sold out')
+      expect(res.status).toBe(409)
+      expect(json.ok).toBe(false)
+      expect(json.error).toContain('sold out')
       expect(getSupabaseAdmin).toHaveBeenCalledTimes(1)
       expect(mockAdminFrom).toHaveBeenCalledWith('profiles')
       expect(mockAdminSelect).toHaveBeenCalledWith('id', { count: 'exact', head: true })
@@ -219,16 +221,30 @@ describe('billing actions', () => {
     })
   })
 
-  describe('createCustomerPortalSession', () => {
-    it('returns error when no stripe customer', async () => {
+  describe('POST /api/stripe/customer-portal', () => {
+    it('returns 401 when not authenticated', async () => {
+      const { createClient } = await import('@/lib/supabase/server')
+      vi.mocked(createClient).mockResolvedValueOnce({
+        auth: {
+          getUser: vi.fn(() => Promise.resolve({ data: { user: null }, error: new Error('auth') })),
+        },
+        from: mockFrom,
+      } as unknown as Awaited<ReturnType<typeof createClient>>)
+
+      const res = await portalPOST()
+      expect(res.status).toBe(401)
+      expect(await res.json()).toEqual({ ok: false, error: 'Not authenticated.' })
+    })
+
+    it('returns 404 when no stripe customer', async () => {
       mockMaybeSingle.mockResolvedValueOnce({
         data: { id: 'prof-1', stripe_customer_id: null },
         error: null,
       })
 
-      const result = await createCustomerPortalSession(null)
-      expect(result.ok).toBe(false)
-      expect(result.error).toContain('No billing account')
+      const res = await portalPOST()
+      expect(res.status).toBe(404)
+      expect(await res.json()).toEqual({ ok: false, error: 'No billing account found.' })
     })
 
     it('creates portal session for existing customer', async () => {
@@ -241,9 +257,12 @@ describe('billing actions', () => {
         url: 'https://billing.stripe.com/test',
       })
 
-      const result = await createCustomerPortalSession(null)
-      expect(result.ok).toBe(true)
-      expect(result.url).toBe('https://billing.stripe.com/test')
+      const res = await portalPOST()
+      const json = await res.json()
+
+      expect(res.status).toBe(200)
+      expect(json.ok).toBe(true)
+      expect(json.url).toBe('https://billing.stripe.com/test')
     })
   })
 })

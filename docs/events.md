@@ -104,7 +104,7 @@ PostHog is the source of truth for product metrics on Barterkin. Events fired in
 ### `founding_slot_claimed`
 
 **When fired:** After a user successfully initiates a Stripe Checkout session for the Founding Member tier.
-**Fires from:** `lib/actions/billing.ts` → `createCheckoutSession()`
+**Fires from:** `app/api/stripe/checkout-session/route.ts` → `POST()`
 **Properties:**
 
 | Property | Type | Description |
