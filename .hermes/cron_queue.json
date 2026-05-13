@@ -120,7 +120,7 @@
   },
   {
     "id": "18",
-    "title": "Audit + fix SEO — sitemap, robots.txt, meta descriptions on every public page",
+    "title": "Audit + fix SEO \u2014 sitemap, robots.txt, meta descriptions on every public page",
     "priority": "high",
     "status": "completed",
     "notes": "COMPLETED: Fixed critical SEO blockers. (1) Directory page: changed robots from noindex to index+follow, added canonical, OG, Twitter tags; (2) Member profiles (/m/[username]): changed from noindex to index+follow, added generateMetadata with bio-derived description, county, OG/Twitter tags; (3) Listings browse (/listings): added full metadata (title, description, canonical, OG, Twitter); (4) Listing detail (/listings/[id]): added generateMetadata with title, description from listing content, canonical, OG, Twitter; (5) Sitemap: added /about and /behind-barterkin to static routes. Build passes, 232 tests pass. Commit: 2ae667e."
@@ -175,9 +175,10 @@
     "title": "[codex-review FIX_FIRST] feat: add Behind Barterkin page with team bios (f2803003)",
     "description": "codex flagged issues in f2803003. Address concerns, recommit with [task-25 fix-f2803003] prefix.\n\n=========================================================\n    13\texport async function toggleSaveListing(\n    14\t  _prev: SaveListingToggleResult | null,\n    15\t  formData: FormData,\n    16\t): Promise<SaveListingToggleResult> {\n    17\t  const supabase = await createClient()\n    18\t  const { data: { user }, error: authErr } = await supabase.auth.getUser()\n    19\t  if (authErr || !user) {\n    20\t    return { ok: false, error: 'Not authenticated.' }\nexec\n/bin/bash -lc 'rg -n \"''^export default function AboutPage|''^export default function BehindBarterkinPage|AvatarImage|AvatarFallback|SaveListingButton|MessageHandler|_ALLOWED_CHAT|run_shell|write_file|git_commit|read_file\" /root/barterkin/app/'\"'(app)'/about/page.tsx /root/barterkin/app/'(app)'/behind-barterkin/page.tsx /root/barterkin/components/listings/SaveListingButton.tsx /root/barterkin/scripts/telegram-bot.py\" in /root/barterkin succeeded in 0ms:\n/root/barterkin/scripts/telegram-bot.py:31:    MessageHandler,\n/root/barterkin/scripts/telegram-bot.py:258:_ALLOWED_CHAT = int(os.environ.get('TELEGRAM_GROUP_ID', '0') or '0')\n/root/barterkin/scripts/telegram-bot.py:272:            \"name\": \"run_shell\",\n/root/barterkin/scripts/telegram-bot.py:287:            \"name\": \"read_file\",\n/root/barterkin/scripts/telegram-bot.py:302:            \"name\": \"write_file\",\n/root/barterkin/scripts/telegram-bot.py:344:            \"name\": \"git_commit\",\n/root/barterkin/scripts/telegram-bot.py:373:async def _tool_run_shell(args):\n/root/barterkin/scripts/telegram-bot.py:395:async def _tool_read_file(args):\n/root/barterkin/scripts/telegram-bot.py:408:async def _tool_write_file(args):\n/root/barterkin/scripts/telegram-bot.py:447:async def _tool_git_commit(args):\n/root/barterkin/scripts/telegram-bot.py:458:    'run_shell': _tool_run_shell,\n/root/barterkin/scripts/telegram-bot.py:459:    'read_file': _tool_read_file,\n/root/barterkin/scripts/telegram-bot.py:460:    'write_file': _tool_write_file,\n/root/barterkin/scripts/telegram-bot.py:463:    'git_c",
     "priority": "critical",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-12T23-31-25Z",
-    "source": "codex-review"
+    "source": "codex-review",
+    "notes": "COMPLETED: Moved /about and /behind-barterkin out of the authenticated (app) route group so both URLs render as public marketing pages instead of inheriting the member layout. Tests: pnpm test -- --run passed."
   },
   {
     "id": "26",
@@ -295,6 +296,15 @@
     "priority": "critical",
     "status": "pending",
     "created_at": "2026-05-13T01-35-13Z",
+    "source": "codex-review"
+  },
+  {
+    "id": "39",
+    "title": "[codex-review FIX_FIRST] [task-18] fix SEO \u2014 indexable directory/profiles/listings, g (2ae667ea)",
+    "description": "codex flagged issues in 2ae667ea. Address concerns, recommit with [task-39 fix-2ae667ea] prefix.\n\nrofiles, categories, counties)\n\n-- ============================================================================\n-- SECTION 1: listings table\n-- ============================================================================\ncreate table public.listings (\n  id            uuid primary key default gen_random_uuid(),\n  profile_id    uuid not null references public.profiles(id) on delete cascade,\n  title         text not null check (char_length(title) between 5 and 120),\n  description   text not null check (char_length(description) between 20 and 2000),\n  category_id   int references public.categories(id),\n  county_id     int references public.counties(id),\n  condition     text check (condition in ('new','like-new','good','fair','for-parts')),\n  trade_terms   text check (trade_terms is null or char_length(trade_terms) <= 200),\n  status        text not null default 'active' check (status in ('active','paused','completed','cancelled')),\n  price_estimate text,\n  created_at    timestamptz not null default now(),\n  updated_at    timestamptz not null default now()\nexec\n/bin/bash -lc \"sed -n '1,180p' 'supabase/migrations/20260507211515_listing_search.sql'\" in /root/barterkin succeeded in 0ms:\n-- Phase 1 \u2014 Listing Full-Text Search\n-- Depends on: 011_listings.sql\n\n-- ============================================================================\n-- SECTION 1: Full-text search on listings\n-- ============================================================================\n\n-- Add generated search vector (same pattern as profiles in 003_profile_tables.sql)\nalter table public.listings add column search_vector tsvector\n  generated always as (\n    to_tsvector('english',\n      coalesce(title, '') || ' ' ||\n      coalesce(description, '') || ' ' ||\n      coalesce(trade_terms, '')\n    )\n  ) stored;\n\ncreate index listings_search_vector_gin on public.listings using gin(search_vector);\n\n-- ============================================================================\nexec\n/bin/bash -lc 'rg -n \"login|sig",
+    "priority": "critical",
+    "status": "pending",
+    "created_at": "2026-05-13T01-45-37Z",
     "source": "codex-review"
   }
 ]
