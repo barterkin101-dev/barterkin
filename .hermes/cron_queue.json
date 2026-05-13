@@ -519,8 +519,8 @@
     "id": "61",
     "title": "Weekly 'New Listings in Your County' digest email \u2014 re-engagement cron",
     "priority": "medium",
-    "status": "in_progress",
-    "notes": "Building: app/api/cron/weekly-digest/route.ts + lib/data/digest.ts query + Resend email template + PostHog tracking + unit tests."
+    "status": "completed",
+    "notes": "COMPLETED: Added gated Node cron route at app/api/cron/weekly-digest/route.ts using lib/data/digest.ts to fetch eligible profiles, resolve owner emails, send personalized Resend digests, record weekly send dedupe, and emit weekly_digest_sent analytics. Added emails/weekly-digest.tsx plus 6 unit tests in tests/unit/weekly-digest-cron.test.ts. pnpm test -- --run passed (303 tests). Commit: be1f5d5."
   },
   {
     "id": "62",
