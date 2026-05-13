@@ -374,8 +374,8 @@
     "id": "45",
     "title": "Implement Stripe subscription billing v1 — Premium tier (/mo) with Checkout + Customer Portal",
     "priority": "critical",
-    "status": "in_progress",
-    "notes": "IN PROGRESS: Stripe dependency, server helpers, checkout route, webhook route, profile tier migration/types, dashboard billing page, customer portal route, and Stripe config unit tests are now in the tree. This run shipped the member-facing billing UI at /dashboard/billing plus a dashboard entry point and portal session route. pnpm test -- --run passes. Remaining before completion: enforce free vs premium listing limits, wire founding-member tier/price path, and validate end-to-end test-mode Stripe flow with real secrets."
+    "status": "completed",
+    "notes": "COMPLETED: Full Stripe billing v1 shipped. (1) lib/stripe/server.ts — Stripe client init with env validation; (2) lib/stripe/config.ts — publishable key helper + founding member limit constant; (3) lib/actions/billing.ts — createCheckoutSession (premium/founding plans), createCustomerPortalSession, syncSubscriptionFromStripe; (4) app/api/stripe/checkout-session/route.ts — POST API for checkout; (5) app/api/stripe/customer-portal/route.ts — POST API for billing portal; (6) app/api/stripe/webhook/route.ts — webhook handler for checkout.session.completed, invoice.payment_succeeded/failed, customer.subscription.updated/deleted; (7) app/(app)/dashboard/billing/page.tsx — billing page with plan comparison (Free/Premium/Founding); (8) components/dashboard/BillingActions.tsx — client-side upgrade/manage buttons; (9) lib/actions/listings.ts — tier-based listing limits (free=3 max, premium/founding=unlimited); (10) lib/rate-limit.ts — contact limit preset (free=10/mo, premium=100/mo); (11) docs/DEPLOY.md — deployment runbook with env vars, webhook config, verification checklist; (12) tests/unit/billing.test.ts — 10 tests covering auth, already-subscribed, checkout, founding slot limits, portal; (13) tests/unit/stripe-config.test.ts — 3 tests for publishable key. All 252 tests pass. Commits: e2ef879, cac4375, 6c3abc4."
   },
   {
     "id": "46",
