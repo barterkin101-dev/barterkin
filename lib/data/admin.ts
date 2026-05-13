@@ -1,6 +1,7 @@
 import 'server-only'
 import { createLogger } from '@/lib/utils/logger'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 
 // ============================================================================
 // Phase 8 Admin Dashboard — service-role data layer
@@ -307,20 +308,37 @@ export interface RevenueEvent {
 
 export async function getRevenueStats(): Promise<RevenueStats> {
   const [
-    tierCounts,
+    payingMembers,
+    publishedPayingCount,
     publishedCount,
     foundingCountResult,
     recentSubs,
+    premiumCountResult,
+    freeCountResult,
   ] = await Promise.all([
-    // Count by tier
+    // All paying members
     supabaseAdmin
       .from('profiles')
-      .select('tier', { count: 'exact' })
+      .select('id', { count: 'exact', head: true })
       .in('tier', ['premium', 'founding'])
       .then(({ count, error }) => {
         if (error) {
           const log = createLogger('admin')
-          log.error('getRevenueStats tier count error', { context: { code: error.code } })
+          log.error('getRevenueStats paying count error', { context: { code: error.code } })
+        }
+        return count ?? 0
+      }),
+    // Published paying members for free -> paid conversion rate
+    supabaseAdmin
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_published', true)
+      .eq('banned', false)
+      .in('tier', ['premium', 'founding'])
+      .then(({ count, error }) => {
+        if (error) {
+          const log = createLogger('admin')
+          log.error('getRevenueStats published paying count error', { context: { code: error.code } })
         }
         return count ?? 0
       }),
@@ -352,8 +370,8 @@ export async function getRevenueStats(): Promise<RevenueStats> {
     // Recent subscription changes (profiles with stripe_subscription_id, ordered by updated_at)
     supabaseAdmin
       .from('profiles')
-      .select('id, display_name, tier, updated_at')
-      .not('stripe_subscription_id', 'is', null)
+      .select('id, display_name, tier, updated_at, stripe_subscription_id, subscription_current_period_end')
+      .or('stripe_subscription_id.not.is.null,tier.in.(premium,founding)')
       .order('updated_at', { ascending: false })
       .limit(20)
       .then(({ data, error }) => {
@@ -366,40 +384,49 @@ export async function getRevenueStats(): Promise<RevenueStats> {
           id: row.id as string,
           display_name: (row.display_name as string | null) ?? null,
           tier: row.tier as string,
-          event_type: 'upgrade' as const,
+          event_type: row.tier === 'free' ? 'cancel' as const : 'upgrade' as const,
           occurred_at: row.updated_at as string,
         }))
       }),
+    supabaseAdmin
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('tier', 'premium')
+      .then(({ count, error }) => {
+        if (error) {
+          const log = createLogger('admin')
+          log.error('getRevenueStats premium count error', { context: { code: error.code } })
+        }
+        return count ?? 0
+      }),
+    supabaseAdmin
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('tier', 'free')
+      .then(({ count, error }) => {
+        if (error) {
+          const log = createLogger('admin')
+          log.error('getRevenueStats free count error', { context: { code: error.code } })
+        }
+        return count ?? 0
+      }),
   ])
 
-  // Get premium count separately for breakdown
-  const { count: premiumCount } = await supabaseAdmin
-    .from('profiles')
-    .select('id', { count: 'exact', head: true })
-    .eq('tier', 'premium')
-
-  // Get free count
-  const { count: freeCount } = await supabaseAdmin
-    .from('profiles')
-    .select('id', { count: 'exact', head: true })
-    .eq('tier', 'free')
-
-  const payingMembers = tierCounts
   const conversionRate = publishedCount > 0
-    ? Math.round((payingMembers / publishedCount) * 1000) / 10
+    ? Math.round((publishedPayingCount / publishedCount) * 1000) / 10
     : 0
 
   // MRR estimate: premium × $9 + founding × $5
-  const mrr = ((premiumCount ?? 0) * 9) + ((foundingCountResult ?? 0) * 5)
+  const mrr = (premiumCountResult * 9) + (foundingCountResult * 5)
 
   return {
     mrr,
     payingMembers,
-    premiumCount: premiumCount ?? 0,
-    foundingCount: foundingCountResult ?? 0,
-    freeCount: freeCount ?? 0,
+    premiumCount: premiumCountResult,
+    foundingCount: foundingCountResult,
+    freeCount: freeCountResult,
     conversionRate,
-    foundingSlotsRemaining: Math.max(0, 100 - (foundingCountResult ?? 0)),
+    foundingSlotsRemaining: Math.max(0, STRIPE_FOUNDING_MEMBER_LIMIT - foundingCountResult),
     recentEvents: recentSubs,
   }
 }

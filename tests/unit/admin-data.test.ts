@@ -135,13 +135,14 @@ d('Phase 8 — admin data layer', () => {
     }
   }, 60_000)
 
-  it('module exports 5 data functions', async () => {
+  it('module exports 6 data functions', async () => {
     const mod = await import('@/lib/data/admin')
     expect(typeof mod.getAdminStats).toBe('function')
     expect(typeof mod.getAdminMembers).toBe('function')
     expect(typeof mod.getAdminMemberById).toBe('function')
     expect(typeof mod.getAdminContacts).toBe('function')
     expect(typeof mod.getAdminConversations).toBe('function')
+    expect(typeof mod.getRevenueStats).toBe('function')
   })
 
   it('ADMIN-01 — getAdminStats returns non-negative integers for all counts', async () => {
