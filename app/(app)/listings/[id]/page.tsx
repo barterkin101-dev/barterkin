@@ -217,6 +217,7 @@ async function isOwnListing(
 // Session cache: deduplicate getUser() calls within the same request (Next.js request-scoped)
 const _sessionCache = new WeakMap<object, { user: Awaited<ReturnType<Awaited<ReturnType<typeof createClient>>['auth']['getUser']>>['data']['user'] | null }>()
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function getCachedUser(supabase: Awaited<ReturnType<typeof createClient>>) {
   // Use the cookie store as a stable key for the request scope
   const cookieStore = await import('next/headers').then(m => m.cookies())

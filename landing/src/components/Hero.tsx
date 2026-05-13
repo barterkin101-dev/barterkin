@@ -132,6 +132,7 @@ export function Hero() {
               animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
               transition={{ delay: img.delay, duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={img.src}
                 alt={img.alt}

@@ -74,6 +74,7 @@ export function HowItWorks() {
               transition={{ delay: i * 0.12, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="aspect-[4/3] overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={step.src}
                   alt={step.alt}

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { getMyListings } from '@/lib/data/listings'
 import { Button, buttonVariants } from '@/components/ui/button'
@@ -76,9 +77,11 @@ export default async function DashboardListingsPage() {
               <CardContent className="flex items-start gap-4 p-4">
                 <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-muted">
                   {listing.images[0] ? (
-                    <img
+                    <Image
                       src={listing.images[0].url}
                       alt={listing.title}
+                      width={64}
+                      height={64}
                       className="h-full w-full object-cover"
                     />
                   ) : (

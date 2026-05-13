@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { runHealthChecks, type HealthReport } from '@/lib/health-check'
+import { runHealthChecks } from '@/lib/health-check'
 
 describe('runHealthChecks', () => {
   const originalEnv = { ...process.env }

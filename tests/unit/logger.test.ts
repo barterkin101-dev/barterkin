@@ -70,13 +70,6 @@ describe('logger', () => {
   })
 
   it('respects LOG_LEVEL env in production', () => {
-    // Save original values
-    const originalEnv = process.env.NODE_ENV
-    const originalLevel = process.env.LOG_LEVEL
-
-    // Delete and re-set to avoid read-only / descriptor issues
-    delete (process.env as Record<string, string | undefined>).NODE_ENV
-    delete (process.env as Record<string, string | undefined>).LOG_LEVEL
     // Use vi.stubEnv to safely mock env vars in Vitest
     vi.stubEnv('NODE_ENV', 'production')
     vi.stubEnv('LOG_LEVEL', 'error')

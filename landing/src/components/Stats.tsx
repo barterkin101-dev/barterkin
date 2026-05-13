@@ -22,6 +22,7 @@ function StatValue({ value }: { value: string }) {
 export function Stats() {
   return (
     <section className="relative py-32 md:py-44 overflow-hidden">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1920&q=70&auto=format&fit=crop"
         alt=""
