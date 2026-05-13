@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { captureEvent } from '@/lib/analytics'
 
-const { fromMock, insertMock, getSupabaseAdminMock } = vi.hoisted(() => {
+const { insertMock, getSupabaseAdminMock } = vi.hoisted(() => {
   const fromMock = vi.fn()
   const insertMock = vi.fn(() => ({ error: null as { code: string; message: string } | null }))
   const getSupabaseAdminMock = vi.fn(() => ({

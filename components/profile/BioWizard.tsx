@@ -66,6 +66,7 @@ export function BioWizard({ profile }: BioWizardProps) {
   })
 
   const currentPrompt = prompts[step]
+  // eslint-disable-next-line react-hooks/incompatible-library
   const bioValue = form.watch('bio')
   const isComplete = bioValue && bioValue.trim().length >= 20
 
