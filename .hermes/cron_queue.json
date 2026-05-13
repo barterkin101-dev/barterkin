@@ -589,8 +589,8 @@
     "title": "Add admin revenue dashboard — MRR, paying members, conversion funnel, churn risk",
     "description": "Build an admin /admin/revenue page that surfaces subscription metrics from the existing Stripe + profiles data. Show: (1) current MRR (monthly recurring revenue) from active subscriptions, (2) paying member count by tier (premium vs founding), (3) free→paid conversion rate (published profiles with tier != 'free' / total published profiles), (4) founding slots remaining, (5) recent subscription events (upgrades, downgrades, cancellations) from Stripe webhook log. Use existing getAdminStats + new getRevenueStats() in lib/data/admin.ts. No new external deps. Acceptance: page renders real data, responsive, loading/error states, admin-only access.",
     "priority": "high",
-    "status": "in_progress",
-    "notes": "Starting: building revenue data layer + admin page."
+    "status": "completed",
+    "notes": "COMPLETED: Added /admin/revenue with MRR, paying-member tier breakdown, published free-to-paid conversion, founding slot inventory, recent Stripe-synced subscription events, loading/error states, nav link, and unit coverage. Commit: 88296b6."
   },
   {
     "id": "71",
