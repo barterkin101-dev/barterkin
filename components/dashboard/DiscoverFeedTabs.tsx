@@ -1,9 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import posthog from 'posthog-js'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ListingGrid } from '@/components/listings/ListingGrid'
+import { captureClientEvent } from '@/lib/analytics-client'
 import type { ListingRow } from '@/lib/data/listings.types'
 
 interface DiscoverFeedTabsProps {
@@ -24,7 +24,7 @@ export function DiscoverFeedTabs({
   const handleValueChange = (value: string) => {
     if (!trackedRef.current.has(value)) {
       trackedRef.current.add(value)
-      posthog.capture('discover_tab_switched', {
+      captureClientEvent('discover_tab_switched', {
         tab: value,
         for_you_count: forYouListings.length,
         latest_count: latestListings.length,

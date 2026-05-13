@@ -6,10 +6,8 @@ import type { ListingRow } from '@/lib/data/listings.types'
 
 const mockCapture = vi.fn()
 
-vi.mock('posthog-js', () => ({
-  default: {
-    capture: (...args: unknown[]) => mockCapture(...args),
-  },
+vi.mock('@/lib/analytics-client', () => ({
+  captureClientEvent: (...args: unknown[]) => mockCapture(...args),
 }))
 
 function makeListing(overrides?: Partial<ListingRow>): ListingRow {

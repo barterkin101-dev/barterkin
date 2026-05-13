@@ -512,22 +512,22 @@
     "id": "60",
     "title": "Fix saved_listings RLS + add 'Saved Listings' dashboard page",
     "priority": "high",
-    "status": "pending",
-    "notes": "BUG: saved_listings RLS uses user_id = auth.uid() but user_id references profiles.id, not auth.users.id. This breaks RLS \u2014 users can't read their own saves through direct queries. Fix: change RLS to use subquery (user_id IN (SELECT id FROM profiles WHERE owner_id = auth.uid())). Then add /dashboard/saved page that uses getSavedListings() to show saved listings in a grid. Add nav link in dashboard quick actions. Acceptance: user can save a listing, navigate to /dashboard/saved, and see it. Unit tests for RLS + page rendering."
+    "status": "completed",
+    "notes": "COMPLETED: RLS policies were already correct (used subquery pattern). Fixed TypeScript errors in tests/unit/saved-listings-page.test.tsx by aligning mock pattern with other tests (as never cast). Added loading.tsx and error.tsx fallbacks for /dashboard/saved route. Removed unused Button import from saved/page.tsx. All 289 tests pass, TypeScript clean (0 errors), lint clean (0 errors). Commit: 2eef1ac."
   },
   {
     "id": "61",
     "title": "Weekly 'New Listings in Your County' digest email \u2014 re-engagement cron",
     "priority": "medium",
-    "status": "pending",
-    "notes": "Re-engagement loop: weekly cron (Sundays 9am ET) emails active users about new listings in their county from the past 7 days. Create app/api/cron/weekly-digest/route.ts. Query: listings created in last 7d in user's county, grouped by category. Resend batch send with personalized email template. Track opens/clicks via PostHog. Rate limit: 1 digest per user per week. Acceptance: cron runs, sends emails to users with matching county listings, skips users with no new listings. Unit tests for query logic + email batching."
+    "status": "in_progress",
+    "notes": "Building: app/api/cron/weekly-digest/route.ts + lib/data/digest.ts query + Resend email template + PostHog tracking + unit tests."
   },
   {
     "id": "62",
     "title": "[codex-review FIX_FIRST] [task-59] Wire discover feed to dashboard \u2014 'For You' + 'Lat (d506cbf1)",
     "description": "codex flagged issues in d506cbf1. Address concerns, recommit with [task-62 fix-d506cbf1] prefix.\n\n{\n./tests/unit/discover-feed-tabs.test.tsx:137:    expect(mockCapture).toHaveBeenNthCalledWith(2, 'discover_tab_switched', {\n./pnpm-lock.yaml:74:      posthog-js:\n./pnpm-lock.yaml:6058:  posthog-js@1.369.3:\n./pnpm-lock.yaml:13114:  posthog-js@1.369.3:\n./lib/analytics.ts:26:    posthog.capture({\ncodex\nI found a second likely issue area in the analytics contract: the docs say client events should go through the shared client wrapper and be non-throwing. I\u2019m comparing this new component with the existing pattern to see whether it bypasses those guarantees.\nexec\n/bin/bash -lc \"sed -n '1,240p' 'lib/analytics-client.ts'\" in /root/barterkin exited 2 in 0ms:\nsed: can't read lib/analytics-client.ts: No such file or directory\nexec\n/bin/bash -lc \"sed -n '1,220p' 'docs/events.md'\" in /root/barterkin succeeded in 0ms:\n# Analytics Events\n\n> **Last updated:** 2026-05-11  \n> **Project:** PostHog project id `387571` (US host: `https://us.i.posthog.com`)\n\nPostHog is the source of truth for product metrics on Barterkin. Events fired in this file MUST match the schema documented here \u2014 any drift between code and this doc is a bug.\n\n**Firing pattern:** Server-side via `posthog-node` from server actions, client-side via `posthog-js` from client components. All events are non-blocking (wrapped in try/catch) and never throw.\n\n**Related docs:** `docs/API.md` (API routes + server actions), `docs/infrastructure.md` (logging, rate limiting, health checks)\n\n**Last updated:** 2026-05-13\n\n---\n\n## Implemented Events\n\n### `signup_started`\n\n**When fired:** After a magic link OTP email is successfully queued (Supabase returns success).\nexec\n/bin/bash -lc \"sed -n '1,240p' 'components/directory/DirectoryFilters.tsx'\" in /root/barterkin succeeded in 0ms:\n'use client'\nimport * as React from 'react'\nimport { useRouter, usePathname, useSearchParams } from 'next/navigation'\nimport posthog from 'posthog-js'\nimport { Button } from '@/components/ui/button'\nimport { DirectoryCategoryFilter } from './DirectoryCa",
     "priority": "critical",
-    "status": "pending",
+    "status": "in_progress",
     "created_at": "2026-05-13T13-56-07Z",
     "source": "codex-review"
   }
