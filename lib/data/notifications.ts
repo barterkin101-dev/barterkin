@@ -80,7 +80,8 @@ export async function getNotifications(profileId: string): Promise<{
     title: 'Ticket update',
     body: `${t.subject} — ${t.status}`,
     link: `/dashboard/tickets/${t.id}`,
-    is_read: false,
+    // Tickets do not have per-user read tracking yet, so keep these informational.
+    is_read: true,
     created_at: t.updated_at,
     resource_id: t.id,
   }))
@@ -104,7 +105,8 @@ export async function getNotifications(profileId: string): Promise<{
     title: 'Dispute update',
     body: `${d.reason.slice(0, 60)}${d.reason.length > 60 ? '...' : ''} — ${d.status}`,
     link: `/dashboard/disputes/${d.id}`,
-    is_read: false,
+    // Disputes also lack read receipts, so avoid a permanently stale unread badge.
+    is_read: true,
     created_at: d.updated_at,
     resource_id: d.id,
   }))
