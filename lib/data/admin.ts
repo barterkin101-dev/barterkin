@@ -282,3 +282,124 @@ export async function getAdminConversations(): Promise<AdminConversationRow[]> {
     message_count: messageCountByConv[c.id] ?? 0,
   }))
 }
+
+// ---------------------------------------------------------------------------
+// Revenue Dashboard — subscription metrics (REV-01)
+// ---------------------------------------------------------------------------
+export interface RevenueStats {
+  mrr: number
+  payingMembers: number
+  premiumCount: number
+  foundingCount: number
+  freeCount: number
+  conversionRate: number // 0-100
+  foundingSlotsRemaining: number
+  recentEvents: RevenueEvent[]
+}
+
+export interface RevenueEvent {
+  id: string
+  display_name: string | null
+  tier: string
+  event_type: 'upgrade' | 'downgrade' | 'cancel'
+  occurred_at: string
+}
+
+export async function getRevenueStats(): Promise<RevenueStats> {
+  const [
+    tierCounts,
+    publishedCount,
+    foundingCountResult,
+    recentSubs,
+  ] = await Promise.all([
+    // Count by tier
+    supabaseAdmin
+      .from('profiles')
+      .select('tier', { count: 'exact' })
+      .in('tier', ['premium', 'founding'])
+      .then(({ count, error }) => {
+        if (error) {
+          const log = createLogger('admin')
+          log.error('getRevenueStats tier count error', { context: { code: error.code } })
+        }
+        return count ?? 0
+      }),
+    // Total published (for conversion rate denominator)
+    supabaseAdmin
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_published', true)
+      .eq('banned', false)
+      .then(({ count, error }) => {
+        if (error) {
+          const log = createLogger('admin')
+          log.error('getRevenueStats published count error', { context: { code: error.code } })
+        }
+        return count ?? 0
+      }),
+    // Founding members count
+    supabaseAdmin
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('tier', 'founding')
+      .then(({ count, error }) => {
+        if (error) {
+          const log = createLogger('admin')
+          log.error('getRevenueStats founding count error', { context: { code: error.code } })
+        }
+        return count ?? 0
+      }),
+    // Recent subscription changes (profiles with stripe_subscription_id, ordered by updated_at)
+    supabaseAdmin
+      .from('profiles')
+      .select('id, display_name, tier, updated_at')
+      .not('stripe_subscription_id', 'is', null)
+      .order('updated_at', { ascending: false })
+      .limit(20)
+      .then(({ data, error }) => {
+        if (error) {
+          const log = createLogger('admin')
+          log.error('getRevenueStats recent subs error', { context: { code: error.code } })
+          return []
+        }
+        return (data ?? []).map((row: Record<string, unknown>) => ({
+          id: row.id as string,
+          display_name: (row.display_name as string | null) ?? null,
+          tier: row.tier as string,
+          event_type: 'upgrade' as const,
+          occurred_at: row.updated_at as string,
+        }))
+      }),
+  ])
+
+  // Get premium count separately for breakdown
+  const { count: premiumCount } = await supabaseAdmin
+    .from('profiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('tier', 'premium')
+
+  // Get free count
+  const { count: freeCount } = await supabaseAdmin
+    .from('profiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('tier', 'free')
+
+  const payingMembers = tierCounts
+  const conversionRate = publishedCount > 0
+    ? Math.round((payingMembers / publishedCount) * 1000) / 10
+    : 0
+
+  // MRR estimate: premium × $9 + founding × $5
+  const mrr = ((premiumCount ?? 0) * 9) + ((foundingCountResult ?? 0) * 5)
+
+  return {
+    mrr,
+    payingMembers,
+    premiumCount: premiumCount ?? 0,
+    foundingCount: foundingCountResult ?? 0,
+    freeCount: freeCount ?? 0,
+    conversionRate,
+    foundingSlotsRemaining: Math.max(0, 100 - (foundingCountResult ?? 0)),
+    recentEvents: recentSubs,
+  }
+}
