@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getStripe, getPriceIds } from '@/lib/stripe/server'
 import { createLogger } from '@/lib/utils/logger'
 import { captureEvent } from '@/lib/analytics'
+import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import type Stripe from 'stripe'
 
 const log = createLogger('billing')
@@ -39,6 +40,24 @@ export async function createCheckoutSession(
     return { ok: false, error: 'You already have an active subscription.' }
   }
 
+  const requestedPlan = (formData.get('plan') as string) === 'founding' ? 'founding' : 'premium'
+
+  // Check founding member limit
+  if (requestedPlan === 'founding') {
+    const { count: foundingCount, error: countErr } = await supabase
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('tier', 'founding')
+
+    if (countErr) {
+      log.error('founding member count failed', { context: { error: countErr.message } })
+    }
+
+    if ((foundingCount ?? 0) >= STRIPE_FOUNDING_MEMBER_LIMIT) {
+      return { ok: false, error: 'Founding member slots are sold out. Choose Premium instead.' }
+    }
+  }
+
   const returnUrl = formData.get('returnUrl') as string | null
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com'
   const successUrl = `${siteUrl}/dashboard/billing?success=1`
@@ -47,6 +66,11 @@ export async function createCheckoutSession(
   try {
     const stripe = getStripe()
     const priceIds = getPriceIds()
+
+    const selectedPriceId =
+      requestedPlan === 'founding' && priceIds.foundingMonthly
+        ? priceIds.foundingMonthly
+        : priceIds.premiumMonthly
 
     // Create Stripe customer if not exists
     let customerId = profile.stripe_customer_id
@@ -68,7 +92,7 @@ export async function createCheckoutSession(
       mode: 'subscription',
       line_items: [
         {
-          price: priceIds.premiumMonthly,
+          price: selectedPriceId,
           quantity: 1,
         },
       ],
@@ -77,19 +101,20 @@ export async function createCheckoutSession(
       metadata: {
         profile_id: profile.id,
         user_id: user.id,
-        tier: 'premium',
+        tier: requestedPlan,
       },
       subscription_data: {
         metadata: {
           profile_id: profile.id,
           user_id: user.id,
+          tier: requestedPlan,
         },
       },
     })
 
     captureEvent('checkout_session_created', {
       profile_id: profile.id,
-      tier: 'premium',
+      tier: requestedPlan,
     })
 
     return { ok: true, url: session.url ?? undefined }

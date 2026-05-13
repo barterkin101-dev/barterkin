@@ -77,10 +77,10 @@ export async function saveListing(
   }
   const values = parsed.data
 
-  // Fetch profile id
+  // Fetch profile id + tier for listing limits
   const { data: profile, error: profileErr } = await supabase
     .from('profiles')
-    .select('id')
+    .select('id, tier')
     .eq('owner_id', user.id)
     .maybeSingle()
   if (profileErr || !profile) {
@@ -91,6 +91,25 @@ export async function saveListing(
 
   const listingId = formData.get('listingId')
   const isUpdate = listingId && String(listingId) !== ''
+
+  // Tier-based listing limits: free = 3 max, premium/founding = unlimited
+  if (!isUpdate && profile.tier === 'free') {
+    const { count, error: countErr } = await supabase
+      .from('listings')
+      .select('id', { count: 'exact', head: true })
+      .eq('profile_id', profile.id)
+      .neq('status', 'cancelled')
+    if (countErr) {
+      const log = createLogger('listings')
+      log.error('listing count failed', { error: countErr, context: { code: countErr.code } })
+    }
+    if ((count ?? 0) >= 3) {
+      return {
+        ok: false,
+        error: 'Free members can create up to 3 listings. Upgrade to Premium for unlimited listings.',
+      }
+    }
+  }
 
   // Rate limit on create only
   if (!isUpdate) {

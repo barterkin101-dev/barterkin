@@ -81,8 +81,14 @@ describe('sendMessage', () => {
   })
 
   it('returns rate limit error when limit exceeded', async () => {
-    const { getUserMock } = makeSupabaseMock()
+    const { getUserMock, fromMock } = makeSupabaseMock()
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
+
+    const maybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const eq = vi.fn().mockReturnValue({ maybeSingle })
+    const select = vi.fn().mockReturnValue({ eq })
+    fromMock.mockReturnValue({ select })
+
     vi.mocked(limitSendMessage).mockResolvedValue({ success: false, limit: 60, remaining: 0, reset: 0 })
 
     const fd = new FormData()
@@ -93,8 +99,13 @@ describe('sendMessage', () => {
   })
 
   it('returns validation error for empty message', async () => {
-    const { getUserMock } = makeSupabaseMock()
+    const { getUserMock, fromMock } = makeSupabaseMock()
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
+
+    const maybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const eq = vi.fn().mockReturnValue({ maybeSingle })
+    const select = vi.fn().mockReturnValue({ eq })
+    fromMock.mockReturnValue({ select })
 
     const fd = new FormData()
     fd.set('conversationId', CONV_UUID)
@@ -105,8 +116,13 @@ describe('sendMessage', () => {
   })
 
   it('returns validation error for message too long', async () => {
-    const { getUserMock } = makeSupabaseMock()
+    const { getUserMock, fromMock } = makeSupabaseMock()
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
+
+    const maybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const eq = vi.fn().mockReturnValue({ maybeSingle })
+    const select = vi.fn().mockReturnValue({ eq })
+    fromMock.mockReturnValue({ select })
 
     const fd = new FormData()
     fd.set('conversationId', CONV_UUID)

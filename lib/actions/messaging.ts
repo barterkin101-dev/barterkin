@@ -21,6 +21,16 @@ export async function sendMessage(
   const { data: { user }, error: authErr } = await supabase.auth.getUser()
   if (authErr || !user) return { ok: false, error: 'Not authenticated.' }
 
+  // Fetch sender profile (needed for both rate limit tier + participant check)
+  const { data: senderProfile, error: senderErr } = await supabase
+    .from('profiles')
+    .select('id, tier')
+    .eq('owner_id', user.id)
+    .maybeSingle()
+  if (senderErr || !senderProfile) {
+    return { ok: false, error: 'Profile not found.' }
+  }
+
   const rateLimit = await limitSendMessage(user.id)
   if (!rateLimit.success) {
     return { ok: false, error: 'Rate limit exceeded. Please slow down.' }
@@ -34,16 +44,6 @@ export async function sendMessage(
     return { ok: false, error: parsed.error, fieldErrors: parsed.fieldErrors }
   }
   const values = parsed.data
-
-  // Get sender profile
-  const { data: senderProfile, error: senderErr } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('owner_id', user.id)
-    .maybeSingle()
-  if (senderErr || !senderProfile) {
-    return { ok: false, error: 'Profile not found.' }
-  }
 
   // Verify participant
   const { data: participant, error: participantErr } = await supabase

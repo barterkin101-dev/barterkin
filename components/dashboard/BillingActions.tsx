@@ -2,19 +2,27 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { LoaderCircle } from 'lucide-react'
+import { LoaderCircle, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
-type BillingActionType = 'checkout' | 'portal' | null
+type BillingActionType = 'checkout-premium' | 'checkout-founding' | 'portal' | null
 
 export function BillingActions({
   canManageBilling,
+  tier,
+  foundingAvailable,
 }: {
   canManageBilling: boolean
+  tier: string
+  foundingAvailable: boolean
 }) {
   const [pendingAction, setPendingAction] = useState<BillingActionType>(null)
 
-  async function startBillingFlow(endpoint: string, action: Exclude<BillingActionType, null>) {
+  async function startBillingFlow(
+    endpoint: string,
+    action: Exclude<BillingActionType, null>,
+    body?: Record<string, unknown>,
+  ) {
     try {
       setPendingAction(action)
       const response = await fetch(endpoint, {
@@ -22,7 +30,7 @@ export function BillingActions({
         headers: {
           'content-type': 'application/json',
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify(body ?? {}),
       })
 
       const payload = await response.json().catch(() => null) as
@@ -40,31 +48,65 @@ export function BillingActions({
     }
   }
 
-  const checkoutPending = pendingAction === 'checkout'
+  const isPaid = tier === 'premium' || tier === 'founding'
+  const premiumPending = pendingAction === 'checkout-premium'
+  const foundingPending = pendingAction === 'checkout-founding'
   const portalPending = pendingAction === 'portal'
+  const anyPending = pendingAction !== null
 
+  // Paid users only see portal
+  if (isPaid) {
+    return (
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Button
+          type="button"
+          size="lg"
+          variant="outline"
+          disabled={!canManageBilling || anyPending}
+          onClick={() => startBillingFlow('/api/stripe/customer-portal', 'portal')}
+        >
+          {portalPending ? <LoaderCircle className="size-4 animate-spin" /> : null}
+          Manage Billing
+        </Button>
+      </div>
+    )
+  }
+
+  // Free users see upgrade options
   return (
-    <div className="flex flex-col gap-3 sm:flex-row">
+    <div className="flex flex-col gap-3">
       <Button
         type="button"
         size="lg"
-        disabled={pendingAction !== null}
-        onClick={() => startBillingFlow('/api/stripe/checkout-session', 'checkout')}
+        disabled={anyPending}
+        onClick={() =>
+          startBillingFlow('/api/stripe/checkout-session', 'checkout-premium', {
+            priceId: 'premium',
+          })
+        }
       >
-        {checkoutPending ? <LoaderCircle className="size-4 animate-spin" /> : null}
-        {canManageBilling ? 'Change Plan' : 'Upgrade to Premium'}
+        {premiumPending ? <LoaderCircle className="size-4 animate-spin" /> : null}
+        Upgrade to Premium — $9/mo
       </Button>
 
-      <Button
-        type="button"
-        size="lg"
-        variant="outline"
-        disabled={!canManageBilling || pendingAction !== null}
-        onClick={() => startBillingFlow('/api/stripe/customer-portal', 'portal')}
-      >
-        {portalPending ? <LoaderCircle className="size-4 animate-spin" /> : null}
-        Manage Billing
-      </Button>
+      {foundingAvailable && (
+        <Button
+          type="button"
+          size="lg"
+          variant="outline"
+          className="border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
+          disabled={anyPending}
+          onClick={() =>
+            startBillingFlow('/api/stripe/checkout-session', 'checkout-founding', {
+              priceId: 'founding',
+            })
+          }
+        >
+          {foundingPending ? <LoaderCircle className="size-4 animate-spin" /> : null}
+          <Zap className="mr-2 size-4" />
+          Claim Founding Member — $5/mo
+        </Button>
+      )}
     </div>
   )
 }

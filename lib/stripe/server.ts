@@ -3,21 +3,24 @@ import { createLogger } from '@/lib/utils/logger'
 
 const log = createLogger('stripe')
 
-const secretKey = process.env.STRIPE_SECRET_KEY
+let _stripe: Stripe | null = null
 
-export const stripe = secretKey
-  ? new Stripe(secretKey, {
-      apiVersion: '2025-04-30.basil',
-      typescript: true,
-    })
-  : null
-
-export function getStripe(): Stripe {
-  if (!stripe) {
+function initStripe(): Stripe {
+  if (_stripe) return _stripe
+  const secretKey = process.env.STRIPE_SECRET_KEY
+  if (!secretKey) {
     log.error('Stripe not initialized: STRIPE_SECRET_KEY missing')
     throw new Error('Stripe is not configured.')
   }
-  return stripe
+  _stripe = new Stripe(secretKey, {
+    apiVersion: '2025-04-30.basil',
+    typescript: true,
+  })
+  return _stripe
+}
+
+export function getStripe(): Stripe {
+  return initStripe()
 }
 
 /** Price IDs — set in environment, validated at runtime. */
