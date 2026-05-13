@@ -148,11 +148,11 @@
   },
   {
     "id": "22",
-    "title": "Set up customer support inbox \u2014 Resend inbound webhook \u2192 ticket DB \u2192 /admin/support",
+    "title": "Set up customer support inbox — Resend inbound webhook → ticket DB → /admin/support",
     "priority": "medium",
-    "status": "pending",
-    "notes": "Currently no inbound email handling. Set up Resend inbound to a `support@barterkin.com` address (configure DNS + webhook endpoint at /api/webhooks/resend-inbound). On receive: parse + write to `support_tickets` table (from_email, subject, body, created_at, status). Build /admin/support page that lists tickets and lets admin reply (which sends via Resend outbound). Acceptance: send an email to support@barterkin.com, see it appear in /admin/support, reply from there, receive the reply in the original inbox."
-  },
+    "status": "in_progress",
+    "notes": "Starting: examining existing support infrastructure, then building Resend inbound webhook + admin support page."
+  }
   {
     "id": "23",
     "title": "Re-attempt Vercel deploy fix \u2014 re-check if VERCEL_TOKEN secret has been added",
@@ -319,6 +319,24 @@
     "priority": "critical",
     "status": "pending",
     "created_at": "2026-05-13T02-17-02Z",
+    "source": "codex-review"
+  },
+  {
+    "id": "41",
+    "title": "[codex-review FIX_FIRST] [fix] zod v4 issues + support inbox type errors (2eb51381)",
+    "description": "codex flagged issues in 2eb51381. Address concerns, recommit with [task-41 fix-2eb51381] prefix.\n\nct('id', { count: 'exact', head: true }),\nlib/data/admin.ts:101:    supabaseAdmin.from('support_tickets').select('id', { count: 'exact', head: true }),\nlib/data/admin.ts:102:    supabaseAdmin.from('support_tickets').select('id', { count: 'exact', head: true }).eq('status', 'open'),\nlib/data/admin.ts:282:    message_count: messageCountByConv[c.id] ?? 0,\nexec\n/bin/bash -lc \"nl -ba 'app/(admin)/admin/support/page.tsx' | sed -n '1,230p'\" in /root/barterkin succeeded in 0ms:\n     1\timport type { Metadata } from 'next'\n     2\timport Link from 'next/link'\n     3\timport { Inbox, Clock, CheckCircle, AlertCircle, MessageSquare } from 'lucide-react'\n     4\timport { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'\n     5\timport { Badge } from '@/components/ui/badge'\n     6\timport { listSupportTickets } from '@/lib/actions/admin-support'\n     7\t\n     8\texport const metadata: Metadata = {\n     9\t  title: 'Support Inbox',\n    10\t}\n    11\t\n    12\tconst statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {\n    13\t  open: { label: 'Open', variant: 'default', icon: <Inbox className=\"h-3 w-3\" /> },\n    14\t  in_progress: { label: 'In Progress', variant: 'secondary', icon: <Clock className=\"h-3 w-3\" /> },\n    15\t  waiting: { label: 'Waiting', variant: 'outline', icon: <AlertCircle className=\"h-3 w-3\" /> },\n    16\t  resolved: { label: 'Resolved', variant: 'secondary', icon: <CheckCircle className=\"h-3 w-3\" /> },\n    17\t  closed: { label: 'Closed', variant: 'outline', icon: <CheckCircle className=\"h-3 w-3\" /> },\n    18\t}\n    19\t\n    20\tconst priorityConfig: Record<string, { label: string; className: string }> = {\nexec\n/bin/bash -lc \"nl -ba 'app/(admin)/admin/support/[id]/page.tsx' | sed -n '1,220p'\" in /root/barterkinexec\n/bin/bash -lc \"nl -ba 'lib/actions/admin-support.ts' | sed -n '80,280p'\" in /root/barterkin succeeded in 0ms:\n     1\timport type { Metadata } from 'ne",
+    "priority": "critical",
+    "status": "pending",
+    "created_at": "2026-05-13T03-38-54Z",
+    "source": "codex-review"
+  },
+  {
+    "id": "42",
+    "title": "[codex-review FIX_FIRST] [task-17] complete referral credits + discover feed + suppor (9fed64c4)",
+    "description": "codex flagged issues in 9fed64c4. Address concerns, recommit with [task-42 fix-9fed64c4] prefix.\n\ne \u2014 legacy webhook retired')\n  })\n})\n succeeded in 138ms:\n/**\n * Phase 8 \u2014 ADMIN-01 + ADMIN-05 + ADMIN-06 \u2014 admin data layer contract\n *\n * Tests the admin data layer against a live Supabase instance.\n * Skipped when SUPABASE_SERVICE_ROLE_KEY is not available.\n *\n * NOTE: contact_requests table was retired and replaced by conversations/messages.\n * This test file now seeds conversations + messages and tests getAdminConversations.\n */\nimport { afterAll, beforeAll, describe, expect, it } from 'vitest'\n\nconst hasAdmin = Boolean(\n  process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,\n)\nconst d = hasAdmin ? describe : describe.skip\n\nd('Phase 8 \u2014 admin data layer', () => {\n  // eslint-disable-next-line @typescript-eslint/no-explicit-any\n  let admin: any\n  const fixtureUserIds: string[] = []\nexec\n/bin/bash -lc \"rg -n \\\"getDiscoverFeed\\\\(\\\" app lib -S\" in /root/barterkinexec\n/bin/bash -lc \"sed -n '1,220p' 'app/(app)/dashboard/page.tsx'\" in /root/barterkin succeeded in 5ms:\nimport Link from 'next/link'\nimport { createClient } from '@/lib/supabase/server'\nimport { createLogger } from '@/lib/utils/logger'\nimport { getMyListings } from '@/lib/data/listings'\nimport { buildReferralLink } from '@/lib/referrals'\n\nimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'\nimport { ShoppingBag, MessageSquare, Star, Ticket, User } from 'lucide-react'\nimport { ProfileCompletionBar } from '@/components/profile/ProfileCompletionBar'\nimport { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'\nimport { toProfileCompletenessInput } from '@/lib/schemas/profile'\n\nexport default async function DashboardPage() {\n  const supabase = await createClient()\n  const { data: { user } } = await supabase.auth.getUser()\n\n  if (!user) {\n    return (\n      <div className=\"py-16 text-center\">\n        <p className=\"text-muted-foreground\">Please sign in to view your dashboard.</p>\n succeeded in 16ms:\nlib/data/discover.ts:24:export async function",
+    "priority": "critical",
+    "status": "pending",
+    "created_at": "2026-05-13T03-38-54Z",
     "source": "codex-review"
   }
 ]
