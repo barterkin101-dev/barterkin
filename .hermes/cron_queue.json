@@ -454,7 +454,7 @@
   {
     "id": "54",
     "title": "[codex-review FIX_FIRST] [task-48 codex-fallback] tighten deploy doc regression cover (01e408ee)",
-    "description": "codex flagged issues in 01e408ee. Address concerns, recommit with [task-54 fix-01e408ee] prefix.\n\nerkin succeeded in 0ms:\n     1\timport { NextResponse } from 'next/server'\n     2\timport { Resend } from 'resend'\n     3\timport { getSupabaseAdmin } from '@/lib/supabase/admin'\n     4\timport { createLogger } from '@/lib/utils/logger'\n     5\timport { captureEvent } from '@/lib/analytics'\n     6\timport { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'\n     7\t\n     8\t// Node runtime — resend SDK uses Node APIs.\n     9\texport const runtime = 'nodejs'\n     9\t\n     10\t// ============================================================================\n     10\t// Cron endpoint: notify waitlist about founding member slot availability\n     11\t// ============================================================================\n     11\t// Designed to be called by a cron job (Vercel Cron, GitHub Actions, or manual\n     12\t// invocation). Emails waitlisters when founding slots are available.\n     13\t//\n     14\t// Logic:\n     15\t//   1. Check if founding slots are available (> 0 remaining)\n     16\t//   2. Find waitlisters who haven't been notified about founding\n     17\t//   3. Send personalized email with direct link to claim founding slot\n succeeded in 0ms:\n     1\timport 'server-only'\n     1\timport { PostHog } from 'posthog-node'\n     2\t\n     3\tfunction getPostHog(): PostHog | null {\n     3\t  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY\n     4\t  if (!key) return null\n     5\t  return new PostHog(key, {\n     6\t    host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com',\n     7\t    flushAt: 1,\n     8\t    flushInterval: 0,\n     9\t  })\n     10\t}\n     10\t\n     11\t/**\n     12\t * Server-side PostHog capture — non-blocking, never throws.\n     13\t * Always await shutdown() to flush the event before the request returns.\n     14\t */\n     15\texport async function captureEvent(\n     15\... [truncated]",
+    "description": "codex flagged issues in 01e408ee. Address concerns, recommit with [task-54 fix-01e408ee] prefix.",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-13T10-20-07Z",
@@ -597,8 +597,8 @@
     "title": "Add 'Trade Completed' flow — members mark trades as done + leave reviews",
     "description": "Currently members can message and rate each other, but there's no explicit 'trade completed' milestone. Add: (1) a 'Mark Trade Complete' button in the conversation thread that both parties can click, (2) when both mark complete, trigger a review request email + in-app nudge, (3) track trade_completion_rate metric in PostHog. This increases engagement (retention) and gives us a core activation metric. Use existing conversations/messages infrastructure. Acceptance: both parties can mark complete, review prompt fires after mutual completion, unit tests cover edge cases (one-sided, already completed, non-participant).",
     "priority": "high",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "COMPLETED: Added mutual-completion review emails, unread in-app trade review prompts, correct per-user trade completion states in message threads, and PostHog trade_completion_rate tracking. Commit: 37f54d9."
   },
   {
     "id": "72",
