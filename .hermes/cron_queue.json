@@ -381,8 +381,8 @@
     "id": "46",
     "title": "Add founding member launch offer — $5/mo lifetime for first 100 members",
     "priority": "high",
-    "status": "in_progress",
-    "notes": "IN PROGRESS: The billing infrastructure already supports founding member tier (STRIPE_FOUNDING_MONTHLY_PRICE_ID, tier='founding', limit=100). Need to: (1) add founding member badge to profile cards, (2) add founding member CTA to landing page, (3) add PostHog tracking for founding conversions, (4) add waitlist pre-notification when founding slots open."
+    "status": "completed",
+    "notes": "COMPLETED: (1) Added `subscription_activated` PostHog event in Stripe webhook handler (`app/api/stripe/webhook/route.ts`) — fires on actual payment success with tier info; (2) Added `FoundingMemberNudge` component to dashboard (`components/dashboard/FoundingMemberNudge.tsx`) — shows progress bar + urgency messaging for free users when founding slots remain; (3) Enhanced landing page `FoundingOfferCTA` with visual progress bar showing slots claimed vs total, urgency text when ≤10 slots left; (4) Updated `docs/events.md` with `subscription_activated` event schema; (5) Fixed pre-existing billing test failures by mocking `getSupabaseAdmin` in `tests/unit/billing.test.ts`. All 263 tests pass. Commit: b9982ea."
   },
   {
     "id": "47",
