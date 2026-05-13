@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Users, Mail, UserPlus, ShoppingBag, Ticket, AlertTriangle, MessageCircle } from 'lucide-react'
+import { Users, Mail, UserPlus, ShoppingBag, Ticket, AlertTriangle, MessageCircle, HeadphonesIcon } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card'
 import { getAdminStats } from '@/lib/data/admin'
 
@@ -100,6 +100,25 @@ export default async function AdminHomePage() {
               </p>
               <CardDescription className="text-sm text-forest-mid">
                 Manage marketplace listings
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/admin/support">
+          <Card className="bg-sage-pale ring-1 ring-sage-light transition-colors hover:bg-sage-light/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm uppercase tracking-wide text-forest-mid font-bold">
+                Support Inbox
+              </CardTitle>
+              <HeadphonesIcon className="h-4 w-4 text-forest-mid" aria-hidden="true" />
+            </CardHeader>
+            <CardContent className="space-y-1">
+              <p className="text-[32px] font-bold text-clay font-sans leading-[1.15]">
+                {stats.openSupportTickets}
+              </p>
+              <CardDescription className="text-sm text-forest-mid">
+                {stats.totalSupportTickets} total · {stats.openSupportTickets} open
               </CardDescription>
             </CardContent>
           </Card>

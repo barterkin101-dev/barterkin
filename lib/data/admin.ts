@@ -18,6 +18,8 @@ export interface AdminStats {
   totalDisputes: number
   totalConversations: number
   totalMessages: number
+  totalSupportTickets: number
+  openSupportTickets: number
 }
 
 export interface AdminMemberRow {
@@ -83,6 +85,8 @@ export async function getAdminStats(): Promise<AdminStats> {
     totalTickets,
     totalDisputes,
     totalConversations,
+    totalSupportTickets,
+    openSupportTickets,
   ] = await Promise.all([
     supabaseAdmin.from('profiles').select('id', { count: 'exact', head: true }),
     supabaseAdmin.from('messages').select('id', { count: 'exact', head: true }),
@@ -94,6 +98,8 @@ export async function getAdminStats(): Promise<AdminStats> {
     supabaseAdmin.from('tickets').select('id', { count: 'exact', head: true }),
     supabaseAdmin.from('disputes').select('id', { count: 'exact', head: true }),
     supabaseAdmin.from('conversations').select('id', { count: 'exact', head: true }),
+    supabaseAdmin.from('support_tickets').select('id', { count: 'exact', head: true }),
+    supabaseAdmin.from('support_tickets').select('id', { count: 'exact', head: true }).eq('status', 'open'),
   ])
 
   if (totalMembers.error) {
@@ -116,6 +122,8 @@ export async function getAdminStats(): Promise<AdminStats> {
     totalDisputes: totalDisputes.count ?? 0,
     totalConversations: totalConversations.count ?? 0,
     totalMessages: totalMessages.count ?? 0,
+    totalSupportTickets: totalSupportTickets.count ?? 0,
+    openSupportTickets: openSupportTickets.count ?? 0,
   }
 }
 

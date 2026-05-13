@@ -168,7 +168,7 @@ export async function replyToTicket(
 
   const parsed = ReplySchema.safeParse(raw)
   if (!parsed.success) {
-    const msg = parsed.error.errors.map((e) => e.message).join('; ')
+    const msg = parsed.error.issues.map((e) => e.message).join('; ')
     return { ok: false, error: msg }
   }
 
@@ -248,7 +248,7 @@ export async function updateTicketStatus(
 
   const parsed = StatusSchema.safeParse({ ticketId, status })
   if (!parsed.success) {
-    const msg = parsed.error.errors.map((e) => e.message).join('; ')
+    const msg = parsed.error.issues.map((e) => e.message).join('; ')
     return { ok: false, error: msg }
   }
 
