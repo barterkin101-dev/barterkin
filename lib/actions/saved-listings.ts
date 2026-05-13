@@ -115,7 +115,12 @@ export async function getSavedListings(): Promise<GetSavedListingsResult> {
         created_at,
         profile_id,
         county_id,
-        category_id
+        category_id,
+        boosted_until,
+        images (id, url, sort_order),
+        profiles (id, display_name, username, avatar_url, accepting_contact),
+        counties (name),
+        categories (name)
       )
     `)
     .eq('user_id', profile.id)
@@ -126,7 +131,7 @@ export async function getSavedListings(): Promise<GetSavedListingsResult> {
     return { ok: false, error: 'Failed to fetch saved listings.' }
   }
 
-  return { ok: true, savedListings: data ?? [] }
+  return { ok: true, savedListings: (data ?? []) as unknown as GetSavedListingsResult['savedListings'] }
 }
 
 // ============================================================================

@@ -1,3 +1,5 @@
+import type { ListingRow } from '@/lib/data/listings.types'
+
 export interface SaveListingToggleResult {
   ok: boolean
   saved?: boolean
@@ -10,19 +12,7 @@ export interface GetSavedListingsResult {
   savedListings?: Array<{
     id: string
     created_at: string
-    listing: {
-      id: string
-      title: string
-      description: string
-      status: string
-      condition: string | null
-      price_estimate: string | null
-      trade_terms: string | null
-      created_at: string
-      profile_id: string
-      county_id: number | null
-      category_id: number | null
-    } | null
+    listing: ListingRow | null
   }>
   error?: string
 }

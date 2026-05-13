@@ -6,7 +6,7 @@ import { getDiscoverFeed } from '@/lib/data/discover'
 import { buildReferralLink } from '@/lib/referrals'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CreditCard, ShoppingBag, MessageSquare, Star, Ticket, User } from 'lucide-react'
+import { CreditCard, ShoppingBag, MessageSquare, Star, Ticket, User, Heart } from 'lucide-react'
 import { ProfileCompletionBar } from '@/components/profile/ProfileCompletionBar'
 import { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'
 import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'
@@ -167,6 +167,20 @@ export default async function DashboardPage() {
                 <p className="text-sm text-muted-foreground">
                   {listings.length} total · {activeListings.length} active
                 </p>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="transition-colors hover:bg-muted/50">
+          <Link href="/dashboard/saved">
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <Heart className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Saved Listings</h3>
+                <p className="text-sm text-muted-foreground">View your saved items</p>
               </div>
             </CardContent>
           </Link>

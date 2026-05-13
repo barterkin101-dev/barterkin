@@ -17,21 +17,21 @@ create policy "Users can view own saved listings"
   on public.saved_listings
   for select
   to authenticated
-  using (user_id = auth.uid());
+  using (user_id in (select id from public.profiles where owner_id = auth.uid()));
 
 -- Users can only insert their own saved listings
 create policy "Users can save listings"
   on public.saved_listings
   for insert
   to authenticated
-  with check (user_id = auth.uid());
+  with check (user_id in (select id from public.profiles where owner_id = auth.uid()));
 
 -- Users can only delete their own saved listings
 create policy "Users can unsave listings"
   on public.saved_listings
   for delete
   to authenticated
-  using (user_id = auth.uid());
+  using (user_id in (select id from public.profiles where owner_id = auth.uid()));
 
 -- Index for fast lookup by user
 create index if not exists idx_saved_listings_user_id
