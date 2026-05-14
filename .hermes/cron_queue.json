@@ -168,10 +168,10 @@
     "title": "Add visual referral milestone progress bar to dashboard invite card — growth/acquisition",
     "description": "Turn the referral milestone copy on the dashboard into a more motivating progress module with a visual progress bar toward the next tracked milestone and a compact published-referral count label. Keep existing share analytics intact and add unit tests for zero-progress, mid-progress, and fully-cleared milestone states. Acceptance: members see a progress bar whenever a next milestone exists, the progress math matches converted referrals, milestone-cleared state renders cleanly, and tests pass.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-14T14:00:00Z",
     "source": "cron-self-generated",
-    "notes": "Picked as top queue item for this run."
+    "notes": "Added next-milestone progress visuals to the dashboard referral card and covered zero, mid, and cleared milestone states in unit tests. Commit: 74a91dd."
   },
   {
     "id": "109",
