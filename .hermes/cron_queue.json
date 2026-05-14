@@ -12,8 +12,8 @@
     "title": "Add browser push notification opt-in for new messages — retention loop",
     "description": "Add a OneSignal or web-push notification system that prompts members to enable browser notifications after their 2nd login. Send push when a new message arrives in a conversation. Store subscription in profiles.push_subscription (JSONB). Gate: only show opt-in to published profiles, respect browser permission state. Track opt-in rate in PostHog. Acceptance: push prompt shows after 2nd login, new message triggers push, subscription persists, unit tests cover opt-in logic and push send.",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "blocked",
+    "notes": "Blocked: browser push delivery cannot be completed from repo state alone; missing VAPID/OneSignal credentials, subscription schema, and deployment wiring."
   },
   {
     "id": "81",
@@ -22,5 +22,29 @@
     "priority": "high",
     "status": "completed",
     "notes": "Moved referral conversion rewards to profile publish, added referral_converted tracking plus pending/converted dashboard state and quest coverage. Commit: 630549f."
+  },
+  {
+    "id": "82",
+    "title": "Add SMS + email referral share actions to dashboard invite card — acquisition",
+    "description": "Expand the existing ReferralInviteCard so members can share their invite link through prefilled SMS and email actions in one tap. Track each share method in PostHog via referral_invite_shared. Acceptance: SMS and email buttons render on the dashboard card, generated URLs are stable and encoded, analytics fires with method=sms/email, and unit tests cover URL generation and click behavior.",
+    "priority": "high",
+    "status": "in_progress",
+    "notes": "Implementing dashboard referral share shortcuts on top of the existing invite card."
+  },
+  {
+    "id": "83",
+    "title": "Add dashboard comeback CTA for stale listings with no saves in 14 days — retention",
+    "description": "Show a dashboard reminder when a member has active listings older than 14 days with zero saves. Encourage them to refresh photos or rewrite the title to improve discovery. Acceptance: reminder only appears when criteria match, links to the edit screen for the oldest stale listing, and unit tests cover visibility logic.",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "84",
+    "title": "Add premium annual savings callout on billing page — monetization",
+    "description": "Surface a clear annual-plan savings comparison on /dashboard/billing so free members see the monthly equivalent and total saved versus month-to-month. Acceptance: savings callout renders for upgrade flows, copy uses live plan amounts from config, and unit tests cover the math and rendering states.",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
   }
 ]

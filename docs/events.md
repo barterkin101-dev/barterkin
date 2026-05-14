@@ -120,13 +120,13 @@ Google OAuth also fires this event client-side when the user launches Google sig
 
 ### `referral_invite_shared`
 
-**When fired:** When a member successfully completes a native share flow for their referral link from the dashboard.
+**When fired:** When a member shares their referral link from the dashboard via native share or a channel shortcut.
 **Fires from:** `components/dashboard/ReferralInviteCard.tsx`
 **Properties:**
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `method` | string | Share mechanism, currently `native-share` |
+| `method` | string | Share mechanism, currently `native-share`, `x`, `facebook`, `whatsapp`, `sms`, or `email` |
 | `referral_code` | string | The 8-char referral code being shared |
 | `referral_count` | number | How many successful referrals the member has at share time |
 | `credits` | number | Current referral credit balance shown in the card |

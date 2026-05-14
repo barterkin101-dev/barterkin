@@ -35,6 +35,23 @@ export function buildWhatsAppReferralShareUrl(referralLink: string): string {
   return `https://wa.me/?${params.toString()}`
 }
 
+export function buildEmailReferralShareUrl(referralLink: string): string {
+  const params = new URLSearchParams({
+    subject: 'Join me on Barterkin',
+    body: buildReferralInviteMessage(referralLink),
+  })
+
+  return `mailto:?${params.toString()}`
+}
+
+export function buildSmsReferralShareUrl(referralLink: string): string {
+  const params = new URLSearchParams({
+    body: buildReferralInviteMessage(referralLink),
+  })
+
+  return `sms:?${params.toString()}`
+}
+
 export function ReferralInviteCard({
   referralCode,
   referralLink,
@@ -114,13 +131,17 @@ export function ReferralInviteCard({
     }
   }
 
-  function handleChannelShare(channel: 'x' | 'facebook' | 'whatsapp') {
+  function handleChannelShare(channel: 'x' | 'facebook' | 'whatsapp' | 'email' | 'sms') {
     const shareUrl =
       channel === 'x'
         ? buildXReferralShareUrl(referralLink)
         : channel === 'facebook'
           ? buildFacebookReferralShareUrl(referralLink)
-          : buildWhatsAppReferralShareUrl(referralLink)
+          : channel === 'whatsapp'
+            ? buildWhatsAppReferralShareUrl(referralLink)
+            : channel === 'email'
+              ? buildEmailReferralShareUrl(referralLink)
+              : buildSmsReferralShareUrl(referralLink)
 
     window.open(shareUrl, '_blank', 'noopener,noreferrer')
     captureClientEvent('referral_invite_shared', {
@@ -223,6 +244,24 @@ export function ReferralInviteCard({
           >
             <Share2 className="h-4 w-4" />
             Share on WhatsApp
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => handleChannelShare('sms')}
+          >
+            <Share2 className="h-4 w-4" />
+            Share by SMS
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => handleChannelShare('email')}
+          >
+            <Share2 className="h-4 w-4" />
+            Share by email
           </Button>
           <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={handleCopy}>
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}

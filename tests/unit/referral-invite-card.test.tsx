@@ -2,8 +2,10 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  buildEmailReferralShareUrl,
   buildFacebookReferralShareUrl,
   buildReferralInviteMessage,
+  buildSmsReferralShareUrl,
   buildWhatsAppReferralShareUrl,
   buildXReferralShareUrl,
   ReferralInviteCard,
@@ -40,7 +42,7 @@ describe('ReferralInviteCard', () => {
     window.open = mockOpen
   })
 
-  it('builds stable X, Facebook, and WhatsApp share URLs', () => {
+  it('builds stable share URLs for all supported referral channels', () => {
     expect(buildXReferralShareUrl('https://barterkin.com/r/ABCDEFGH')).toBe(
       'https://twitter.com/intent/tweet?text=I%27m+on+Barterkin%2C+a+local+skill-trading+network+for+neighbors.+Join+with+my+invite+link%3A+https%3A%2F%2Fbarterkin.com%2Fr%2FABCDEFGH&url=https%3A%2F%2Fbarterkin.com%2Fr%2FABCDEFGH',
     )
@@ -49,6 +51,12 @@ describe('ReferralInviteCard', () => {
     )
     expect(buildWhatsAppReferralShareUrl('https://barterkin.com/r/ABCDEFGH')).toBe(
       'https://wa.me/?text=I%27m+on+Barterkin%2C+a+local+skill-trading+network+for+neighbors.+Join+with+my+invite+link%3A+https%3A%2F%2Fbarterkin.com%2Fr%2FABCDEFGH',
+    )
+    expect(buildEmailReferralShareUrl('https://barterkin.com/r/ABCDEFGH')).toBe(
+      'mailto:?subject=Join+me+on+Barterkin&body=I%27m+on+Barterkin%2C+a+local+skill-trading+network+for+neighbors.+Join+with+my+invite+link%3A+https%3A%2F%2Fbarterkin.com%2Fr%2FABCDEFGH',
+    )
+    expect(buildSmsReferralShareUrl('https://barterkin.com/r/ABCDEFGH')).toBe(
+      'sms:?body=I%27m+on+Barterkin%2C+a+local+skill-trading+network+for+neighbors.+Join+with+my+invite+link%3A+https%3A%2F%2Fbarterkin.com%2Fr%2FABCDEFGH',
     )
   })
 
@@ -224,6 +232,46 @@ describe('ReferralInviteCard', () => {
       referral_code: 'ABCDEFGH',
       referral_count: 8,
       credits: 6,
+    })
+  })
+
+  it('opens SMS and email share actions and tracks their channels', async () => {
+    render(
+      <ReferralInviteCard
+        referralCode="ABCDEFGH"
+        referralLink="https://barterkin.com/r/ABCDEFGH"
+        credits={9}
+        convertedReferralCount={6}
+        pendingReferralCount={1}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /share by sms/i }))
+    await userEvent.click(screen.getByRole('button', { name: /share by email/i }))
+
+    expect(mockOpen).toHaveBeenNthCalledWith(
+      1,
+      buildSmsReferralShareUrl('https://barterkin.com/r/ABCDEFGH'),
+      '_blank',
+      'noopener,noreferrer',
+    )
+    expect(mockOpen).toHaveBeenNthCalledWith(
+      2,
+      buildEmailReferralShareUrl('https://barterkin.com/r/ABCDEFGH'),
+      '_blank',
+      'noopener,noreferrer',
+    )
+    expect(mockCapture).toHaveBeenNthCalledWith(1, 'referral_invite_shared', {
+      method: 'sms',
+      referral_code: 'ABCDEFGH',
+      referral_count: 6,
+      credits: 9,
+    })
+    expect(mockCapture).toHaveBeenNthCalledWith(2, 'referral_invite_shared', {
+      method: 'email',
+      referral_code: 'ABCDEFGH',
+      referral_count: 6,
+      credits: 9,
     })
   })
 
