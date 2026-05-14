@@ -68,7 +68,7 @@
     "title": "Add premium contact-limit comparison card on dashboard — monetization",
     "description": "Surface a compact dashboard card for free members showing their monthly contact limit versus Premium, with a direct billing CTA. Acceptance: card appears only for free members, uses live plan/contact-limit values, links to /dashboard/billing, and unit tests cover rendering states and copy.",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "Added a free-tier dashboard contact-limit comparison card using live plan values, wired it to billing, and covered the copy in unit tests. Commit: ebe4a0c."
   }
 ]
