@@ -3,9 +3,11 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { LoaderCircle, Zap } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
 type BillingActionType = 'checkout-premium' | 'checkout-founding' | 'portal' | null
+type PremiumInterval = 'annual' | 'monthly'
 
 export function BillingActions({
   canManageBilling,
@@ -17,6 +19,7 @@ export function BillingActions({
   foundingAvailable: boolean
 }) {
   const [pendingAction, setPendingAction] = useState<BillingActionType>(null)
+  const [premiumInterval, setPremiumInterval] = useState<PremiumInterval>('annual')
 
   async function startBillingFlow(
     endpoint: string,
@@ -75,18 +78,57 @@ export function BillingActions({
   // Free users see upgrade options
   return (
     <div className="flex flex-col gap-3">
+      <div className="rounded-xl border border-primary/15 bg-primary/5 p-1">
+        <div className="grid grid-cols-2 gap-1">
+          <button
+            type="button"
+            className={cn(
+              'rounded-lg px-4 py-3 text-left transition',
+              premiumInterval === 'annual'
+                ? 'bg-background shadow-sm ring-1 ring-primary/15'
+                : 'text-muted-foreground hover:bg-background/70',
+            )}
+            onClick={() => setPremiumInterval('annual')}
+            disabled={anyPending}
+          >
+            <span className="block text-sm font-semibold text-foreground">Annual</span>
+            <span className="block text-xs text-muted-foreground">$90/year</span>
+            <span className="mt-1 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
+              Save $18
+            </span>
+          </button>
+          <button
+            type="button"
+            className={cn(
+              'rounded-lg px-4 py-3 text-left transition',
+              premiumInterval === 'monthly'
+                ? 'bg-background shadow-sm ring-1 ring-primary/15'
+                : 'text-muted-foreground hover:bg-background/70',
+            )}
+            onClick={() => setPremiumInterval('monthly')}
+            disabled={anyPending}
+          >
+            <span className="block text-sm font-semibold text-foreground">Monthly</span>
+            <span className="block text-xs text-muted-foreground">$9/month</span>
+            <span className="mt-1 inline-flex px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+              Flexible billing
+            </span>
+          </button>
+        </div>
+      </div>
+
       <Button
         type="button"
         size="lg"
         disabled={anyPending}
         onClick={() =>
           startBillingFlow('/api/stripe/checkout-session', 'checkout-premium', {
-            priceId: 'premium',
+            priceId: premiumInterval === 'annual' ? 'annual' : 'premium',
           })
         }
       >
         {premiumPending ? <LoaderCircle className="size-4 animate-spin" /> : null}
-        Upgrade to Premium — $9/mo
+        {premiumInterval === 'annual' ? 'Upgrade to Premium Annual — $90/yr' : 'Upgrade to Premium — $9/mo'}
       </Button>
 
       {foundingAvailable && (

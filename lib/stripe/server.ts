@@ -26,6 +26,7 @@ export function getStripe(): Stripe {
 /** Price IDs — set in environment, validated at runtime. */
 export function getPriceIds() {
   const premiumMonthly = process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID
+  const premiumAnnual = process.env.STRIPE_PREMIUM_ANNUAL_PRICE_ID
   const foundingMonthly = process.env.STRIPE_FOUNDING_MONTHLY_PRICE_ID
 
   if (!premiumMonthly) {
@@ -35,6 +36,7 @@ export function getPriceIds() {
 
   return {
     premiumMonthly,
+    premiumAnnual: premiumAnnual ?? null,
     foundingMonthly: foundingMonthly ?? premiumMonthly,
   }
 }

@@ -62,7 +62,7 @@ export default async function BillingPage() {
           </Badge>
         </div>
         <p className="max-w-3xl text-base text-muted-foreground">
-          Upgrade to premium to remove listing caps and unlock paid member benefits.
+          Upgrade to Premium to remove listing caps and unlock paid member benefits. Annual billing saves two months compared with paying monthly.
         </p>
       </header>
 
@@ -81,10 +81,10 @@ export default async function BillingPage() {
           <CardHeader>
             <CardTitle>Plan comparison</CardTitle>
             <CardDescription>
-              Choose the plan that fits your barter needs. Founding member slots are limited.
+              Choose monthly, annual, or founding access. Annual Premium is the best value, and founding member slots are limited.
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <CardContent className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {/* Free */}
             <div className="rounded-xl border bg-muted/20 p-5">
               <div className="mb-4 flex items-center justify-between gap-3">
@@ -114,10 +114,10 @@ export default async function BillingPage() {
             <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
-                  <h2 className="font-semibold">Premium</h2>
+                  <h2 className="font-semibold">Premium Monthly</h2>
                   <p className="text-sm text-muted-foreground">$9/month</p>
                 </div>
-                {tier === 'premium' ? <Badge>Current</Badge> : <Badge variant="secondary">Popular</Badge>}
+                {tier === 'premium' ? <Badge>Current</Badge> : <Badge variant="outline">Flexible</Badge>}
               </div>
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
@@ -131,6 +131,31 @@ export default async function BillingPage() {
                 <li className="flex items-start gap-2">
                   <ShieldCheck className="mt-0.5 size-4 text-primary" />
                   Premium badge on profile
+                </li>
+              </ul>
+            </div>
+
+            {/* Premium Annual */}
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="font-semibold">Premium Annual</h2>
+                  <p className="text-sm text-muted-foreground">$90/year</p>
+                </div>
+                <Badge className="bg-emerald-600">Best value</Badge>
+              </div>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <Sparkles className="mt-0.5 size-4 text-emerald-600" />
+                  Everything in Premium Monthly
+                </li>
+                <li className="flex items-start gap-2">
+                  <Sparkles className="mt-0.5 size-4 text-emerald-600" />
+                  Save $18 per year
+                </li>
+                <li className="flex items-start gap-2">
+                  <ShieldCheck className="mt-0.5 size-4 text-emerald-600" />
+                  One checkout for the full year
                 </li>
               </ul>
             </div>
@@ -175,8 +200,8 @@ export default async function BillingPage() {
               {isPaid
                 ? 'Manage your subscription or change plans.'
                 : foundingAvailable
-                  ? 'Upgrade to Premium or claim a Founding Member slot.'
-                  : 'Upgrade to Premium — founding slots are sold out.'}
+                  ? 'Choose annual Premium by default, switch to monthly if you prefer, or claim a Founding Member slot.'
+                  : 'Choose annual Premium by default or switch to monthly — founding slots are sold out.'}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

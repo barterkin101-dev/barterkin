@@ -12,7 +12,7 @@ const log = createLogger('stripe-checkout-api')
  * POST /api/stripe/checkout-session
  * Creates a Stripe Checkout session for subscription upgrade.
  * Auth: requires authenticated user.
- * Body: { priceId?: 'premium' | 'founding' }
+ * Body: { priceId?: 'premium' | 'annual' | 'founding' }
  */
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -42,7 +42,12 @@ export async function POST(request: NextRequest) {
     // empty body is fine — defaults to premium
   }
 
-  const requestedPlan = body.priceId === 'founding' ? 'founding' : 'premium'
+  const requestedPlan =
+    body.priceId === 'founding'
+      ? 'founding'
+      : body.priceId === 'annual'
+        ? 'annual'
+        : 'premium'
 
   // Check founding member limit
   if (requestedPlan === 'founding') {
@@ -70,9 +75,21 @@ export async function POST(request: NextRequest) {
     const priceIds = getPriceIds()
 
     const selectedPriceId =
-      requestedPlan === 'founding' && priceIds.foundingMonthly
+      requestedPlan === 'founding'
         ? priceIds.foundingMonthly
-        : priceIds.premiumMonthly
+        : requestedPlan === 'annual'
+          ? priceIds.premiumAnnual
+          : priceIds.premiumMonthly
+
+    if (!selectedPriceId) {
+      return NextResponse.json(
+        { ok: false, error: 'Annual billing is not configured yet.' },
+        { status: 503 },
+      )
+    }
+
+    const requestedTier = requestedPlan === 'founding' ? 'founding' : 'premium'
+    const billingInterval = requestedPlan === 'annual' ? 'annual' : 'monthly'
 
     let customerId = profile.stripe_customer_id
     if (!customerId) {
@@ -97,24 +114,27 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${siteUrl}/dashboard/billing/success?tier=${requestedPlan}`,
+      success_url: `${siteUrl}/dashboard/billing/success?tier=${requestedTier}&billing=${billingInterval}`,
       cancel_url: `${siteUrl}/dashboard/billing?canceled=1`,
       metadata: {
         profile_id: profile.id,
         user_id: user.id,
-        tier: requestedPlan,
+        tier: requestedTier,
+        billing_interval: billingInterval,
       },
       subscription_data: {
         metadata: {
           profile_id: profile.id,
           user_id: user.id,
-          tier: requestedPlan,
+          tier: requestedTier,
+          billing_interval: billingInterval,
         },
       },
     })
 
     captureEvent(profile.id, 'checkout_session_created', {
-      tier: requestedPlan,
+      tier: requestedTier,
+      billing_interval: billingInterval,
     })
 
     return NextResponse.json({ ok: true, url: session.url })

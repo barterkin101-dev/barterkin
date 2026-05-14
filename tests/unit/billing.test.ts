@@ -9,6 +9,7 @@ import { NextRequest } from 'next/server'
 // Set env vars BEFORE any module imports that read them
 process.env.STRIPE_SECRET_KEY = 'sk_test_xxx'
 process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID = 'price_test_xxx'
+process.env.STRIPE_PREMIUM_ANNUAL_PRICE_ID = 'price_annual_xxx'
 process.env.STRIPE_WEBHOOK_SECRET = 'whsec_xxx'
 process.env.NEXT_PUBLIC_SITE_URL = 'https://barterkin.com'
 
@@ -133,7 +134,11 @@ describe('billing API routes', () => {
       expect(json.url).toBe('https://checkout.stripe.com/test')
       expect(mockStripeCheckoutSessionsCreate).toHaveBeenCalledWith(
         expect.objectContaining({
-          success_url: 'https://barterkin.com/dashboard/billing/success?tier=premium',
+          success_url: 'https://barterkin.com/dashboard/billing/success?tier=premium&billing=monthly',
+          metadata: expect.objectContaining({
+            tier: 'premium',
+            billing_interval: 'monthly',
+          }),
         }),
       )
       expect(mockStripeCustomersCreate).toHaveBeenCalledWith(
@@ -142,6 +147,62 @@ describe('billing API routes', () => {
           metadata: { profile_id: 'prof-1', user_id: 'user-1' },
         }),
       )
+    })
+
+    it('creates annual premium checkout when priceId=annual', async () => {
+      mockMaybeSingle.mockResolvedValueOnce({
+        data: { id: 'prof-1', display_name: 'Test', stripe_customer_id: null, tier: 'free' },
+        error: null,
+      })
+
+      mockStripeCustomersCreate.mockResolvedValueOnce({ id: 'cus_new' })
+      mockStripeCheckoutSessionsCreate.mockResolvedValueOnce({
+        id: 'sess_annual',
+        url: 'https://checkout.stripe.com/annual',
+      })
+
+      const res = await checkoutPOST(makeRequest({ priceId: 'annual' }))
+      const json = await res.json()
+
+      expect(res.status).toBe(200)
+      expect(json.ok).toBe(true)
+      expect(json.url).toBe('https://checkout.stripe.com/annual')
+      expect(mockStripeCheckoutSessionsCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          line_items: [{ price: 'price_annual_xxx', quantity: 1 }],
+          success_url: 'https://barterkin.com/dashboard/billing/success?tier=premium&billing=annual',
+          metadata: expect.objectContaining({
+            tier: 'premium',
+            billing_interval: 'annual',
+          }),
+          subscription_data: expect.objectContaining({
+            metadata: expect.objectContaining({
+              tier: 'premium',
+              billing_interval: 'annual',
+            }),
+          }),
+        }),
+      )
+    })
+
+    it('returns 503 when annual billing is requested without an annual Stripe price', async () => {
+      const existingAnnual = process.env.STRIPE_PREMIUM_ANNUAL_PRICE_ID
+      delete process.env.STRIPE_PREMIUM_ANNUAL_PRICE_ID
+
+      mockMaybeSingle.mockResolvedValueOnce({
+        data: { id: 'prof-1', display_name: 'Test', stripe_customer_id: null, tier: 'free' },
+        error: null,
+      })
+
+      const res = await checkoutPOST(makeRequest({ priceId: 'annual' }))
+      const json = await res.json()
+
+      expect(res.status).toBe(503)
+      expect(json).toEqual({ ok: false, error: 'Annual billing is not configured yet.' })
+      expect(mockStripeCustomersCreate).not.toHaveBeenCalled()
+      expect(mockStripeCheckoutSessionsCreate).not.toHaveBeenCalled()
+
+      process.env.STRIPE_PREMIUM_ANNUAL_PRICE_ID = existingAnnual
     })
 
     it('reuses existing stripe customer', async () => {
@@ -198,8 +259,8 @@ describe('billing API routes', () => {
       expect(mockStripeCheckoutSessionsCreate).toHaveBeenCalledWith(
         expect.objectContaining({
           line_items: [{ price: 'price_founding_xxx', quantity: 1 }],
-          success_url: 'https://barterkin.com/dashboard/billing/success?tier=founding',
-          metadata: expect.objectContaining({ tier: 'founding' }),
+          success_url: 'https://barterkin.com/dashboard/billing/success?tier=founding&billing=monthly',
+          metadata: expect.objectContaining({ tier: 'founding', billing_interval: 'monthly' }),
         }),
       )
     })

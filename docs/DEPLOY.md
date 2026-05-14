@@ -26,7 +26,8 @@
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase Project Settings → API | Server-side admin ops |
 | `STRIPE_SECRET_KEY` | Stripe Dashboard → Developers → API keys | Stripe backend |
 | `STRIPE_WEBHOOK_SECRET` | Stripe Dashboard → Webhooks → endpoint secret | Webhook verification |
-| `STRIPE_PREMIUM_MONTHLY_PRICE_ID` | Stripe Dashboard → Products → Premium | Checkout price ID |
+| `STRIPE_PREMIUM_MONTHLY_PRICE_ID` | Stripe Dashboard → Products → Premium Monthly | Checkout price ID |
+| `STRIPE_PREMIUM_ANNUAL_PRICE_ID` | Stripe Dashboard → Products → Premium Annual | Checkout price ID |
 | `STRIPE_FOUNDING_MONTHLY_PRICE_ID` | Stripe Dashboard → Products → Founding | Checkout price ID (optional) |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe Dashboard → Developers → API keys | Stripe frontend (publishable) |
 | `RESEND_API_KEY` | Resend Dashboard → API Keys | Transactional email |
