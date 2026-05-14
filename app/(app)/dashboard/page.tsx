@@ -27,6 +27,7 @@ import { ContactLimitComparisonCard } from '@/components/dashboard/ContactLimitC
 import { ProfileViewsSnapshotCard } from '@/components/dashboard/ProfileViewsSnapshotCard'
 import { OnboardingReturnReminder } from '@/components/dashboard/OnboardingReturnReminder'
 import { ZeroListingLaunchReminder } from '@/components/dashboard/ZeroListingLaunchReminder'
+import { AnnualUpgradeSavingsCard } from '@/components/dashboard/AnnualUpgradeSavingsCard'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
@@ -34,6 +35,8 @@ import { updateLoginStreak } from '@/lib/actions/quests'
 import { getProfileViewsSnapshot } from '@/lib/data/profile-views'
 import { getDashboardListingCapUpsellProps } from '@/lib/dashboard-listing-cap-upsell'
 import { getPremiumAnnualSavings, formatUsdFromCents, BILLING_PLAN_AMOUNTS } from '@/lib/stripe/config'
+import { getPremiumBillingInterval } from '@/lib/data/billing'
+import { getDashboardAnnualUpgradeSavingsProps } from '@/lib/dashboard-annual-upgrade-savings'
 
 export default async function DashboardPage() {
   const cookieStore = await cookies()
@@ -50,7 +53,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, email_digest_enabled, county_id, category_id, referral_code, tier, last_login_at, login_streak, onboarding_completed_at, skills_offered(id)')
+    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, email_digest_enabled, county_id, category_id, referral_code, tier, stripe_subscription_id, last_login_at, login_streak, onboarding_completed_at, skills_offered(id)')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -134,6 +137,14 @@ export default async function DashboardPage() {
     : null
   const showContactLimitUpsell = contactLimitStatus?.isNearLimit || contactLimitStatus?.isAtLimit || false
   const listingCapUpsell = getDashboardListingCapUpsellProps(profile?.tier, listings)
+  const premiumBillingInterval = await getPremiumBillingInterval(
+    profile?.tier,
+    profile?.stripe_subscription_id,
+  )
+  const annualUpgradeSavingsCard = getDashboardAnnualUpgradeSavingsProps(
+    profile?.tier,
+    premiumBillingInterval,
+  )
   const completedQuests = new Set((questCompletions.data ?? []).map((row) => row.quest_key))
   const convertedReferralCount = referralRows.filter((row) => Boolean(row.credited_at)).length
   const pendingReferralCount = referralRows.length - convertedReferralCount
@@ -377,6 +388,10 @@ export default async function DashboardPage() {
 
       {listingCapUpsell && (
         <ListingCapUpsell {...listingCapUpsell} />
+      )}
+
+      {annualUpgradeSavingsCard && (
+        <AnnualUpgradeSavingsCard {...annualUpgradeSavingsCard} />
       )}
 
       {profile?.tier === 'free' && (
