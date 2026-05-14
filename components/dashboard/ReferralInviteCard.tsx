@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Copy, Check, Share2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 import { captureClientEvent } from '@/lib/analytics-client'
 
 export function buildReferralInviteMessage(referralLink: string): string {
@@ -144,6 +145,20 @@ function getReferralMilestoneCopy(convertedReferralCount: number) {
   }
 }
 
+function getReferralMilestoneProgress(convertedReferralCount: number) {
+  const milestones = [1, 3, 5]
+  const nextMilestone = milestones.find((milestone) => convertedReferralCount < milestone)
+
+  if (!nextMilestone) {
+    return null
+  }
+
+  return {
+    value: Math.round((convertedReferralCount / nextMilestone) * 100),
+    label: `${convertedReferralCount} of ${nextMilestone} published referrals`,
+  }
+}
+
 function getReferralMessageVariant(pendingReferralCount: number) {
   if (pendingReferralCount > 0) {
     return {
@@ -188,6 +203,7 @@ export function ReferralInviteCard({
   const inviteMessage = messageVariant.message(referralLink)
   const momentumCopy = getReferralMomentumCopy(convertedReferralCount, pendingReferralCount)
   const milestoneCopy = getReferralMilestoneCopy(convertedReferralCount)
+  const milestoneProgress = getReferralMilestoneProgress(convertedReferralCount)
 
   async function copyText(value: string, copyTarget: 'link' | 'message') {
     try {
@@ -345,6 +361,15 @@ export function ReferralInviteCard({
           </div>
           <p className="mt-2 text-base font-semibold text-foreground">{milestoneCopy.title}</p>
           <p className="mt-2 text-sm text-muted-foreground">{milestoneCopy.body}</p>
+          {milestoneProgress ? (
+            <div className="mt-4 space-y-2">
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{milestoneProgress.label}</span>
+                <span>{milestoneProgress.value}%</span>
+              </div>
+              <Progress value={milestoneProgress.value} className="h-2" />
+            </div>
+          ) : null}
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">

@@ -158,8 +158,37 @@
     "title": "Add annual savings breakout to dashboard billing CTAs — revenue/monetization",
     "description": "Strengthen dashboard upgrade surfaces by adding a compact annual-vs-monthly savings breakout anywhere we already link to `/dashboard/billing`, starting with the listing-cap and contact-limit nudges. Acceptance: copy uses live Stripe-config-derived values, free members see the savings context before clicking through, and unit tests cover the rendered math.",
     "priority": "medium",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-14T13:00:00Z",
+    "source": "cron-self-generated",
+    "notes": "Added annual savings breakout to ContactLimitUpsell, ContactLimitComparisonCard, and wired live Stripe config values through the dashboard page. Unit tests updated and passing. Commit: 65480dd."
+  },
+  {
+    "id": "108",
+    "title": "Add visual referral milestone progress bar to dashboard invite card — growth/acquisition",
+    "description": "Turn the referral milestone copy on the dashboard into a more motivating progress module with a visual progress bar toward the next tracked milestone and a compact published-referral count label. Keep existing share analytics intact and add unit tests for zero-progress, mid-progress, and fully-cleared milestone states. Acceptance: members see a progress bar whenever a next milestone exists, the progress math matches converted referrals, milestone-cleared state renders cleanly, and tests pass.",
+    "priority": "high",
+    "status": "in_progress",
+    "created_at": "2026-05-14T14:00:00Z",
+    "source": "cron-self-generated",
+    "notes": "Picked as top queue item for this run."
+  },
+  {
+    "id": "109",
+    "title": "Add zero-listing dashboard launch CTA for onboarded members — retention/engagement",
+    "description": "Show a dashboard reminder card for members who completed onboarding but still have zero active listings, pushing them into `/listings/new` with concrete copy about publishing their first offer and earning quest credits. Acceptance: only eligible members see it, CTA deep-links to listing creation, quest-credit copy is accurate, and tests cover visibility rules.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-14T14:00:00Z",
+    "source": "cron-self-generated"
+  },
+  {
+    "id": "110",
+    "title": "Add annual-upgrade savings card for monthly premium members on dashboard billing surfaces — revenue/monetization",
+    "description": "Show monthly Premium members a compact dashboard card that quantifies annual-plan savings and links directly to `/dashboard/billing` to switch plans. Acceptance: only monthly premium members see it, savings math uses live Stripe config values, click tracking is added, and tests cover visibility plus copy.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-14T14:00:00Z",
     "source": "cron-self-generated"
   }
 ]

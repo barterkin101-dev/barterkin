@@ -429,6 +429,8 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('Next milestone')).toBeInTheDocument()
     expect(screen.getByText('1 more published referral reaches 1 total')).toBeInTheDocument()
     expect(screen.getByText('That milestone unlocks 10 referral credits in total.')).toBeInTheDocument()
+    expect(screen.getByText('0 of 1 published referrals')).toBeInTheDocument()
+    expect(screen.getByText('0%')).toBeInTheDocument()
   })
 
   it('shows the next referral milestone after early conversions', () => {
@@ -447,6 +449,8 @@ describe('ReferralInviteCard', () => {
     expect(
       screen.getByText('That milestone unlocks 30 referral credits in total once those invites publish.'),
     ).toBeInTheDocument()
+    expect(screen.getByText('1 of 3 published referrals')).toBeInTheDocument()
+    expect(screen.getByText('33%')).toBeInTheDocument()
   })
 
   it('shows a completed milestone state after the tracked milestones are cleared', () => {
@@ -465,5 +469,6 @@ describe('ReferralInviteCard', () => {
     expect(
       screen.getByText(/keep sharing your link to stack more referral credits/i),
     ).toBeInTheDocument()
+    expect(screen.queryByText(/published referrals/i)).not.toBeInTheDocument()
   })
 })
