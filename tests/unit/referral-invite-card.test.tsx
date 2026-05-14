@@ -400,6 +400,11 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('Best next move')).toBeInTheDocument()
     expect(screen.getByText('Follow up with your 2 pending invites today')).toBeInTheDocument()
     expect(screen.getByText(/use whatsapp, sms, or email below while your invite is still warm/i)).toBeInTheDocument()
+    expect(screen.getByText('Invite conversion')).toBeInTheDocument()
+    expect(screen.getByText('3 of 5 tracked invites have published')).toBeInTheDocument()
+    expect(screen.getByText(/proof the pitch works/i)).toBeInTheDocument()
+    expect(screen.getByText('60% of tracked invites published')).toBeInTheDocument()
+    expect(screen.getAllByText('60%')).toHaveLength(2)
   })
 
   it('shows a next-invite prompt when no referrals are pending', () => {
@@ -438,6 +443,7 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('0%')).toBeInTheDocument()
     expect(screen.getByText('Start with your warmest first invite')).toBeInTheDocument()
     expect(screen.getByText(/pick one friend, neighbor, or past collaborator/i)).toBeInTheDocument()
+    expect(screen.queryByText('Invite conversion')).not.toBeInTheDocument()
   })
 
   it('shows the next referral milestone after early conversions', () => {
@@ -476,6 +482,11 @@ describe('ReferralInviteCard', () => {
     expect(
       screen.getByText(/keep sharing your link to stack more referral credits/i),
     ).toBeInTheDocument()
+    expect(screen.getByText('Invite conversion')).toBeInTheDocument()
+    expect(screen.getByText('All 6 tracked invites have already published')).toBeInTheDocument()
+    expect(screen.getByText(/message angle is converting cleanly/i)).toBeInTheDocument()
+    expect(screen.getByText('6 of 6 tracked invites published')).toBeInTheDocument()
+    expect(screen.getByText('100%')).toBeInTheDocument()
     expect(screen.queryByText(/published referrals/i)).not.toBeInTheDocument()
   })
 })

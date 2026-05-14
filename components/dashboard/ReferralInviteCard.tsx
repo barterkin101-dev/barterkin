@@ -159,6 +159,43 @@ function getReferralMilestoneProgress(convertedReferralCount: number) {
   }
 }
 
+function getReferralConversionSnapshot(
+  convertedReferralCount: number,
+  pendingReferralCount: number,
+) {
+  const totalTrackedInvites = convertedReferralCount + pendingReferralCount
+
+  if (totalTrackedInvites === 0) {
+    return null
+  }
+
+  const conversionRate = Math.round((convertedReferralCount / totalTrackedInvites) * 100)
+
+  if (pendingReferralCount === 0) {
+    return {
+      eyebrow: 'Invite conversion',
+      title:
+        convertedReferralCount === 1
+          ? 'Your 1 tracked invite has already published'
+          : `All ${convertedReferralCount} tracked invites have already published`,
+      body: 'Keep sharing with similar people while this message angle is converting cleanly.',
+      value: conversionRate,
+      label: `${convertedReferralCount} of ${totalTrackedInvites} tracked invites published`,
+    }
+  }
+
+  return {
+    eyebrow: 'Invite conversion',
+    title: `${convertedReferralCount} of ${totalTrackedInvites} tracked invites have published`,
+    body:
+      conversionRate >= 50
+        ? 'You already have proof the pitch works. Follow up with the remaining invites before they cool off.'
+        : 'A quick follow-up can lift this conversion rate. Start with the warmest pending invite first.',
+    value: conversionRate,
+    label: `${conversionRate}% of tracked invites published`,
+  }
+}
+
 function getReferralNextStepCopy(convertedReferralCount: number, pendingReferralCount: number) {
   if (pendingReferralCount > 0) {
     return {
@@ -234,6 +271,7 @@ export function ReferralInviteCard({
   const momentumCopy = getReferralMomentumCopy(convertedReferralCount, pendingReferralCount)
   const milestoneCopy = getReferralMilestoneCopy(convertedReferralCount)
   const milestoneProgress = getReferralMilestoneProgress(convertedReferralCount)
+  const conversionSnapshot = getReferralConversionSnapshot(convertedReferralCount, pendingReferralCount)
   const nextStepCopy = getReferralNextStepCopy(convertedReferralCount, pendingReferralCount)
 
   async function copyText(value: string, copyTarget: 'link' | 'message') {
@@ -393,6 +431,23 @@ export function ReferralInviteCard({
           <p className="mt-2 text-base font-semibold text-foreground">{nextStepCopy.title}</p>
           <p className="mt-2 text-sm text-muted-foreground">{nextStepCopy.body}</p>
         </div>
+
+        {conversionSnapshot ? (
+          <div className="rounded-lg border border-sky-200 bg-sky-50/80 p-4">
+            <div className="text-xs font-medium uppercase tracking-[0.18em] text-sky-800">
+              {conversionSnapshot.eyebrow}
+            </div>
+            <p className="mt-2 text-base font-semibold text-foreground">{conversionSnapshot.title}</p>
+            <p className="mt-2 text-sm text-muted-foreground">{conversionSnapshot.body}</p>
+            <div className="mt-4 space-y-2">
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{conversionSnapshot.label}</span>
+                <span>{conversionSnapshot.value}%</span>
+              </div>
+              <Progress value={conversionSnapshot.value} className="h-2" />
+            </div>
+          </div>
+        ) : null}
 
         <div className="rounded-lg border border-sage/20 bg-background/90 p-4">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
