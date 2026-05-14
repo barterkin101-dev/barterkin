@@ -217,8 +217,9 @@ export function getZeroListingLaunchReminder(
 export function getSecondListingExpansionReminder(
   onboardingCompletedAt: string | null | undefined,
   listings: ListingRow[],
+  startedConversationCount: number,
 ): SecondListingExpansionReminder | null {
-  if (!onboardingCompletedAt) {
+  if (!onboardingCompletedAt || startedConversationCount === 0) {
     return null
   }
 

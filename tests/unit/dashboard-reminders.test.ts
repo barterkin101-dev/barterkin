@@ -482,7 +482,7 @@ describe('getFirstTradeProgressReminder', () => {
 
 describe('getSecondListingExpansionReminder', () => {
   it('returns null when onboarding is incomplete', () => {
-    expect(getSecondListingExpansionReminder(null, [makeListing()])).toBeNull()
+    expect(getSecondListingExpansionReminder(null, [makeListing()], 1)).toBeNull()
   })
 
   it('returns null when the member has zero active listings', () => {
@@ -490,6 +490,17 @@ describe('getSecondListingExpansionReminder', () => {
       getSecondListingExpansionReminder(
         '2026-05-14T12:00:00.000Z',
         [makeListing({ status: 'paused' })],
+        1,
+      ),
+    ).toBeNull()
+  })
+
+  it('returns null before the member has started a first conversation', () => {
+    expect(
+      getSecondListingExpansionReminder(
+        '2026-05-14T12:00:00.000Z',
+        [makeListing({ title: 'Vintage camera bundle' })],
+        0,
       ),
     ).toBeNull()
   })
@@ -502,6 +513,7 @@ describe('getSecondListingExpansionReminder', () => {
           makeListing({ id: 'listing-1', title: 'Camera kit' }),
           makeListing({ id: 'listing-2', title: 'Ceramic wheel' }),
         ],
+        1,
       ),
     ).toBeNull()
   })
@@ -514,6 +526,7 @@ describe('getSecondListingExpansionReminder', () => {
           makeListing({ title: 'Vintage camera bundle' }),
           makeListing({ id: 'listing-paused', status: 'paused', title: 'Old guitar amp' }),
         ],
+        2,
       ),
     ).toEqual({
       href: '/dashboard/listings/new',

@@ -217,6 +217,7 @@ export default async function DashboardPage() {
     ? getSecondListingExpansionReminder(
       profile.onboarding_completed_at,
       listings,
+      startedConversationCount,
     )
     : null
   const firstContactLaunchReminder = profile
