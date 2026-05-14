@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
+import { createClient } from '@/lib/supabase/server'
 import { parseSearchParams } from '@/lib/data/directory-params'
 import { getDirectoryRows, PAGE_SIZE } from '@/lib/data/directory'
+import { getContactLimitStatus } from '@/lib/data/contact-limit'
+import { getBrowseUpgradeBannerProps } from '@/lib/browse-upgrade-banner'
 import { DirectoryFilters } from '@/components/directory/DirectoryFilters'
 import { ActiveFilterChips } from '@/components/directory/ActiveFilterChips'
 import { DirectoryResultCounter } from '@/components/directory/DirectoryResultCounter'
 import { DirectoryGrid } from '@/components/directory/DirectoryGrid'
 import { DirectoryPagination } from '@/components/directory/DirectoryPagination'
 import { BlockedToast } from '@/components/directory/BlockedToast'
+import { BrowseUpgradeBanner } from '@/components/browse/BrowseUpgradeBanner'
 
 export const metadata: Metadata = {
   title: 'Directory',
@@ -36,10 +40,27 @@ export default async function DirectoryPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
+  const supabase = await createClient()
   const rawParams = await searchParams
   const filters = parseSearchParams(rawParams)
-  const { profiles, totalCount, error } = await getDirectoryRows(filters)
+  const { data: { user } } = await supabase.auth.getUser()
+  const [directoryResult, profileResult] = await Promise.all([
+    getDirectoryRows(filters),
+    user
+      ? supabase
+        .from('profiles')
+        .select('id, tier')
+        .eq('owner_id', user.id)
+        .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ])
+  const { profiles, totalCount, error } = directoryResult
   const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE))
+  const profile = profileResult.data
+  const contactLimitStatus = profile?.tier === 'free'
+    ? await getContactLimitStatus(profile.id, profile.tier)
+    : null
+  const browseUpgradeBanner = getBrowseUpgradeBannerProps('directory', profile?.tier, contactLimitStatus)
 
   const blockedName = typeof rawParams.blocked === 'string' ? rawParams.blocked : undefined
   const blockedError = rawParams.blocked_error === '1'
@@ -55,6 +76,8 @@ export default async function DirectoryPage({
           Browse Georgians by skill, category, and county.
         </p>
       </header>
+
+      {browseUpgradeBanner && <BrowseUpgradeBanner {...browseUpgradeBanner} />}
 
       <div className="mt-8 space-y-4">
         <DirectoryFilters

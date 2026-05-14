@@ -2,6 +2,9 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { getListings, PAGE_SIZE } from '@/lib/data/listings'
+import { getContactLimitStatus } from '@/lib/data/contact-limit'
+import { getBrowseUpgradeBannerProps } from '@/lib/browse-upgrade-banner'
+import { BrowseUpgradeBanner } from '@/components/browse/BrowseUpgradeBanner'
 import { ListingGrid } from '@/components/listings/ListingGrid'
 import { ListingFilters } from '@/components/listings/ListingFilters'
 import { DirectoryPagination } from '@/components/directory/DirectoryPagination'
@@ -52,15 +55,28 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
   }
 
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
   // Fetch filter options
-  const [{ data: categories }, { data: counties }] = await Promise.all([
+  const [{ data: categories }, { data: counties }, profileResult] = await Promise.all([
     supabase.from('categories').select('id, name').order('id'),
     supabase.from('counties').select('id, name').order('name'),
+    user
+      ? supabase
+        .from('profiles')
+        .select('id, tier')
+        .eq('owner_id', user.id)
+        .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
   ])
 
   const { listings, totalCount, error } = await getListings(filters)
   const totalPages = Math.ceil(totalCount / PAGE_SIZE)
+  const profile = profileResult.data
+  const contactLimitStatus = profile?.tier === 'free'
+    ? await getContactLimitStatus(profile.id, profile.tier)
+    : null
+  const browseUpgradeBanner = getBrowseUpgradeBannerProps('listings', profile?.tier, contactLimitStatus)
 
   return (
     <div className="space-y-8">
@@ -72,6 +88,8 @@ export default async function ListingsPage({ searchParams }: ListingsPageProps) 
           Discover what Georgians are trading. Find something you need or list what you have.
         </p>
       </header>
+
+      {browseUpgradeBanner && <BrowseUpgradeBanner {...browseUpgradeBanner} />}
 
       <ListingFilters
         categories={categories ?? []}
