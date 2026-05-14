@@ -192,5 +192,35 @@
     "created_at": "2026-05-14T14:00:00Z",
     "source": "cron-self-generated",
     "notes": "Added a monthly-Premium-only annual savings card on the dashboard with Stripe-backed interval gating, PostHog impression/click tracking, and regression coverage. Commit: aeaaf7a."
+  },
+  {
+    "id": "111",
+    "title": "Add next-step action panel to dashboard referral card — growth/acquisition",
+    "description": "Improve the dashboard referral card with a dedicated 'best next move' panel that changes based on referral state: pending invites should push follow-up behavior, converted-only state should push one fresh invite, and zero-referral state should coach the first warm invite. Keep existing share analytics intact and add unit tests for each state. Acceptance: the panel renders state-specific copy, existing share/copy flows still work, and tests pass.",
+    "priority": "high",
+    "status": "completed",
+    "created_at": "2026-05-14T14:30:00Z",
+    "source": "cron-self-generated",
+    "notes": "Added a stateful 'Best next move' panel to the dashboard referral card for pending, converted-only, and first-invite states, with unit coverage. Commit: 992cd27."
+  },
+  {
+    "id": "112",
+    "title": "Add second-listing expansion reminder for single-listing members — retention/engagement",
+    "description": "Show a dashboard reminder for members who have exactly one active listing and completed onboarding, nudging them to publish a second listing so they appear in more search contexts. Acceptance: only eligible members see it, CTA deep-links to `/listings/new`, copy references broader trade coverage, and tests cover visibility rules.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-14T14:30:00Z",
+    "source": "cron-self-generated",
+    "notes": ""
+  },
+  {
+    "id": "113",
+    "title": "Add founding-plan annual savings comparison to free-member nudge — revenue/monetization",
+    "description": "Strengthen the free-member founding upsell by quantifying the monthly Premium comparison and annualized savings directly inside `FoundingMemberNudge`. Acceptance: copy uses live plan values, founding urgency remains intact, and unit tests cover the savings math and urgent/non-urgent states.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-14T14:30:00Z",
+    "source": "cron-self-generated",
+    "notes": ""
   }
 ]
