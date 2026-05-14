@@ -61,7 +61,7 @@
     "status": "completed",
     "created_at": "2026-05-14T09-28-01Z",
     "source": "codex-review",
-    "notes": "Added a follow-up migration that moves login streak progression to UTC calendar days and explicitly restricts referral/streak RPC execution to authenticated + service_role; added regression coverage. Commit: pending."
+    "notes": "Added a follow-up migration that moves login streak progression to UTC calendar days and explicitly restricts referral/streak RPC execution to authenticated + service_role; added regression coverage. Commit: 2f5158d."
   },
   {
     "id": "98",
