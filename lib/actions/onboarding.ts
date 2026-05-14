@@ -1,6 +1,8 @@
 'use server'
 
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
+import { ONBOARDING_SKIP_COOKIE_NAME } from '@/lib/onboarding-skip'
 import { createLogger } from '@/lib/utils/logger'
 
 /**
@@ -38,6 +40,9 @@ export async function markOnboardingComplete(): Promise<{ ok: boolean }> {
     log.error('markOnboardingComplete update failed', { context: { code: error.code } })
     return { ok: false }
   }
+
+  const cookieStore = await cookies()
+  cookieStore.delete(ONBOARDING_SKIP_COOKIE_NAME)
 
   return { ok: true }
 }

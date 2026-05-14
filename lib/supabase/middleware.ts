@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import type { Database } from '@/lib/database.types'
+import { hasSkippedOnboarding, ONBOARDING_SKIP_COOKIE_NAME } from '@/lib/onboarding-skip'
 
 // AUTH-09: authed users bounced away from these paths
 const AUTH_GROUP_PATHS = ['/login', '/signup']
@@ -147,6 +148,10 @@ export async function updateSession(request: NextRequest) {
     !isAdminPath &&
     !isAlwaysAllowedPath
   ) {
+    const skippedOnboarding = hasSkippedOnboarding(
+      request.cookies.get(ONBOARDING_SKIP_COOKIE_NAME)?.value,
+    )
+
     // Use claims.sub (JWKS-verified) — NOT getUser() — consistent with admin guard pattern.
     // The anon client + user cookie satisfies the "Owners see own profile" RLS SELECT policy
     // (verified against 003_profile_tables.sql line 291-293).
@@ -158,7 +163,10 @@ export async function updateSession(request: NextRequest) {
 
     // NULL onboarding_completed_at OR no profile row yet → redirect to /onboarding.
     // RESEARCH Open Question 2: new user with no profile row is still a wizard candidate.
-    if (!onboardingProfile || onboardingProfile.onboarding_completed_at === null) {
+    if (
+      (!onboardingProfile || onboardingProfile.onboarding_completed_at === null)
+      && !skippedOnboarding
+    ) {
       const url = request.nextUrl.clone()
       url.pathname = '/onboarding'
       url.search = ''

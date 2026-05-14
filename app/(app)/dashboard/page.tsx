@@ -1,12 +1,14 @@
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
 import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
 import { getConversations } from '@/lib/data/messaging'
-import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder } from '@/lib/data/dashboard-reminders'
+import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { buildReferralLink } from '@/lib/referrals'
+import { hasSkippedOnboarding, ONBOARDING_SKIP_COOKIE_NAME } from '@/lib/onboarding-skip'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CreditCard, ShoppingBag, MessageSquare, Star, Ticket, User, Heart } from 'lucide-react'
@@ -23,6 +25,7 @@ import { DigestOptOutReminder } from '@/components/dashboard/DigestOptOutReminde
 import { FirstTradeProgressReminder } from '@/components/dashboard/FirstTradeProgressReminder'
 import { ContactLimitComparisonCard } from '@/components/dashboard/ContactLimitComparisonCard'
 import { ProfileViewsSnapshotCard } from '@/components/dashboard/ProfileViewsSnapshotCard'
+import { OnboardingReturnReminder } from '@/components/dashboard/OnboardingReturnReminder'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
@@ -31,6 +34,7 @@ import { getProfileViewsSnapshot } from '@/lib/data/profile-views'
 import { getDashboardListingCapUpsellProps } from '@/lib/dashboard-listing-cap-upsell'
 
 export default async function DashboardPage() {
+  const cookieStore = await cookies()
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -44,7 +48,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, email_digest_enabled, county_id, category_id, referral_code, tier, last_login_at, login_streak, skills_offered(id)')
+    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, email_digest_enabled, county_id, category_id, referral_code, tier, last_login_at, login_streak, onboarding_completed_at, skills_offered(id)')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -181,6 +185,10 @@ export default async function DashboardPage() {
   const digestOptOutReminder = getDigestOptOutReminder(
     profile?.email_digest_enabled,
     profile?.is_published,
+  )
+  const onboardingReturnReminder = getOnboardingReturnReminder(
+    profile?.onboarding_completed_at,
+    hasSkippedOnboarding(cookieStore.get(ONBOARDING_SKIP_COOKIE_NAME)?.value),
   )
   const profileViewsSnapshot = profile?.is_published
     ? await getProfileViewsSnapshot(profile.id)
@@ -383,6 +391,10 @@ export default async function DashboardPage() {
 
       {digestOptOutReminder && (
         <DigestOptOutReminder href={digestOptOutReminder.href} />
+      )}
+
+      {onboardingReturnReminder && (
+        <OnboardingReturnReminder reminder={onboardingReturnReminder} />
       )}
 
       {profile && profileViewsSnapshot && (

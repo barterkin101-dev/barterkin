@@ -24,7 +24,7 @@ export function WizardLayout({
       <Separator className="bg-sage-light" />
       <CardFooter className="justify-center py-4">
         <Link
-          href="/directory"
+          href="/onboarding/skip"
           className="text-sm text-forest-mid underline-offset-4 hover:underline"
         >
           Skip for now

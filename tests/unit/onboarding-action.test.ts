@@ -5,8 +5,17 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(),
 }))
 
+const { mockCookies } = vi.hoisted(() => ({
+  mockCookies: vi.fn(),
+}))
+
+vi.mock('next/headers', () => ({
+  cookies: mockCookies,
+}))
+
 import { createClient } from '@/lib/supabase/server'
 import { markOnboardingComplete } from '@/lib/actions/onboarding'
+import { ONBOARDING_SKIP_COOKIE_NAME } from '@/lib/onboarding-skip'
 
 type MockClient = {
   auth: { getUser: ReturnType<typeof vi.fn> }
@@ -40,6 +49,9 @@ function buildClient(opts: {
 describe('markOnboardingComplete() (D-11)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockCookies.mockResolvedValue({
+      delete: vi.fn(),
+    })
   })
 
   it('writes onboarding_completed_at when profile has NULL timestamp (happy path)', async () => {
@@ -52,6 +64,8 @@ describe('markOnboardingComplete() (D-11)', () => {
     const result = await markOnboardingComplete()
     expect(result).toEqual({ ok: true })
     expect(client.from).toHaveBeenCalledWith('profiles')
+    const cookieStore = await mockCookies.mock.results[0]?.value
+    expect(cookieStore.delete).toHaveBeenCalledWith(ONBOARDING_SKIP_COOKIE_NAME)
   })
 
   it('is idempotent — returns ok:true when .is(null) predicate matches zero rows', async () => {

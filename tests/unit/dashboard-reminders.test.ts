@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getDigestOptOutReminder, getFirstTradeProgressReminder, getStaleListingReminder, getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
+import { getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getStaleListingReminder, getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
 
@@ -297,6 +297,22 @@ describe('getDigestOptOutReminder', () => {
   it('returns a reminder when published and emailDigestEnabled is false', () => {
     const result = getDigestOptOutReminder(false, true)
     expect(result).toEqual({ href: '/profile/edit' })
+  })
+})
+
+describe('getOnboardingReturnReminder', () => {
+  it('returns a reminder when onboarding is incomplete and the member explicitly skipped setup', () => {
+    expect(getOnboardingReturnReminder(null, true)).toEqual({
+      href: '/onboarding?step=1',
+    })
+  })
+
+  it('returns null when onboarding is incomplete but the member never skipped setup', () => {
+    expect(getOnboardingReturnReminder(null, false)).toBeNull()
+  })
+
+  it('returns null after onboarding is complete even if the skip cookie still exists', () => {
+    expect(getOnboardingReturnReminder('2026-05-14T12:00:00.000Z', true)).toBeNull()
   })
 })
 

@@ -25,6 +25,10 @@ export interface DigestOptOutReminder {
   href: string
 }
 
+export interface OnboardingReturnReminder {
+  href: string
+}
+
 export interface FirstTradeProgressReminder {
   conversationCount: number
   href: string
@@ -121,6 +125,17 @@ export function getDigestOptOutReminder(
   if (isPublished && emailDigestEnabled === false) {
     return { href: '/profile/edit' }
   }
+  return null
+}
+
+export function getOnboardingReturnReminder(
+  onboardingCompletedAt: string | null | undefined,
+  skippedOnboarding: boolean,
+): OnboardingReturnReminder | null {
+  if (!onboardingCompletedAt && skippedOnboarding) {
+    return { href: '/onboarding?step=1' }
+  }
+
   return null
 }
 
