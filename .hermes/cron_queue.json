@@ -1,98 +1,26 @@
 [
   {
-    "id": "79",
-    "title": "Add dynamic sitemap.xml for SEO — index all public listings + profiles",
-    "description": "The sitemap.ts exists but doesn't include category pages, county pages, or paginated listing URLs. Expand it to include /listings?category=, /listings?county=, and /directory?category= routes. Add lastModified from the most recently updated item in each group. This drives organic discovery (growth). Acceptance: sitemap includes all dynamic route variants, passes Google Search Console validation, unit test covers URL count and structure.",
+    "id": "91",
+    "title": "Add first-trade completion quest with credit reward — retention/gamification",
+    "description": "Add a new quest `quest_first_trade` worth 15 credits, awarded automatically when a member marks their first trade as mutually completed. Update `lib/quests.ts` with the new quest def, wire it into the trade completion flow in `lib/actions/trade-completions.ts`, and add unit tests covering the award logic (idempotent, only on first trade). Track completion in PostHog. Acceptance: quest appears in dashboard QuestCard, credits awarded on first mutual trade completion, no duplicate awards, tests pass.",
     "priority": "high",
     "status": "completed",
-    "notes": "Expanded sitemap with grouped category/county/directory URLs plus paginated listing pages and unit coverage. Commit: 2ca5899."
+    "notes": "Added the quest_first_trade reward to mutual trade completion, surfaced it in quests, and covered eligibility + award behavior in unit tests. Commit: 9087cd5."
   },
   {
-    "id": "80",
-    "title": "Add browser push notification opt-in for new messages — retention loop",
-    "description": "Add a OneSignal or web-push notification system that prompts members to enable browser notifications after their 2nd login. Send push when a new message arrives in a conversation. Store subscription in profiles.push_subscription (JSONB). Gate: only show opt-in to published profiles, respect browser permission state. Track opt-in rate in PostHog. Acceptance: push prompt shows after 2nd login, new message triggers push, subscription persists, unit tests cover opt-in logic and push send.",
-    "priority": "medium",
-    "status": "blocked",
-    "notes": "Blocked: browser push delivery cannot be completed from repo state alone; missing VAPID/OneSignal credentials, subscription schema, and deployment wiring."
-  },
-  {
-    "id": "81",
-    "title": "Add referral reward credits on successful invite conversion — viral monetization",
-    "description": "When a referred user signs up AND publishes their profile, auto-award the inviter 10 credits. Add a 'Referral converted' quest (quest_referral_converted) worth 10 credits. Track conversion in PostHog (referral_converted). Show pending vs converted referrals in the dashboard ReferralInviteCard. Acceptance: credits awarded on profile publish (not just signup), quest completion tracked, dashboard shows conversion count, unit tests cover award logic and edge cases (duplicate, self-referral).",
+    "id": "92",
+    "title": "Add directory upgrade banner when free members hit contact limit — monetization",
+    "description": "Show a sticky banner on /directory and /listings for free members who have exhausted their monthly contact limit. Banner surfaces Premium pricing, savings math, and a direct CTA to /dashboard/billing. Use live contact-limit status from `lib/data/contact-limit.ts`. Track impression and click in PostHog. Acceptance: banner only shows for free members at limit, uses live plan values, links to billing, unit tests cover visibility logic and CTA.",
     "priority": "high",
-    "status": "completed",
-    "notes": "Moved referral conversion rewards to profile publish, added referral_converted tracking plus pending/converted dashboard state and quest coverage. Commit: 630549f."
+    "status": "pending",
+    "notes": ""
   },
   {
-    "id": "82",
-    "title": "Add SMS + email referral share actions to dashboard invite card — acquisition",
-    "description": "Expand the existing ReferralInviteCard so members can share their invite link through prefilled SMS and email actions in one tap. Track each share method in PostHog via referral_invite_shared. Acceptance: SMS and email buttons render on the dashboard card, generated URLs are stable and encoded, analytics fires with method=sms/email, and unit tests cover URL generation and click behavior.",
-    "priority": "high",
-    "status": "completed",
-    "notes": "Added one-tap SMS and email referral sharing with analytics + unit coverage. Commit: ed69b6e."
-  },
-  {
-    "id": "83",
-    "title": "Add dashboard comeback CTA for stale listings with no saves in 14 days — retention",
-    "description": "Show a dashboard reminder when a member has active listings older than 14 days with zero saves. Encourage them to refresh photos or rewrite the title to improve discovery. Acceptance: reminder only appears when criteria match, links to the edit screen for the oldest stale listing, and unit tests cover visibility logic.",
+    "id": "93",
+    "title": "Add listing feature/boost credit sink for premium members — monetization/engagement",
+    "description": "Let premium members spend 5 credits to 'feature' a listing for 7 days. Featured listings get a visual badge and a small ranking boost in discover/directory. Add `featured_until` timestamp to listings table, a 'Feature this listing' action in the listing edit flow, and deduct credits via the existing credit ledger. Gate to premium members only. Acceptance: feature action visible only to premium, credits deducted, badge renders on featured listings, ranking boost applied, unit tests cover gating and credit deduction.",
     "priority": "medium",
-    "status": "completed",
-    "notes": "Added a stale-listing dashboard CTA that targets the oldest active zero-save listing older than 14 days, with unit coverage. Commit: fbc8b9f."
-  },
-  {
-    "id": "84",
-    "title": "Add premium annual savings callout on billing page — monetization",
-    "description": "Surface a clear annual-plan savings comparison on /dashboard/billing so free members see the monthly equivalent and total saved versus month-to-month. Acceptance: savings callout renders for upgrade flows, copy uses live plan amounts from config, and unit tests cover the math and rendering states.",
-    "priority": "medium",
-    "status": "completed",
-    "notes": "Added shared billing price config plus annual savings callouts and coverage for math/rendering states. Commit: 0fce923."
-  },
-  {
-    "id": "85",
-    "title": "Add Telegram referral share action to dashboard invite card — acquisition",
-    "description": "Expand ReferralInviteCard with a one-tap Telegram share action using the existing referral invite copy. Track the channel in PostHog via referral_invite_shared. Acceptance: Telegram button renders on the dashboard card, generated share URL is stable and encoded, analytics fires with method=telegram, and unit tests cover URL generation and click behavior.",
-    "priority": "high",
-    "status": "completed",
-    "notes": "Added Telegram referral sharing to the dashboard invite card with analytics + unit coverage. Commit: 01c13d7."
-  },
-  {
-    "id": "86",
-    "title": "Add dashboard digest re-enable reminder for members who opted out — retention",
-    "description": "Show a dashboard reminder to published members who have email_digest_enabled=false so they can re-enable weekly digest emails from profile settings. Acceptance: reminder only appears when digests are off, explains the value clearly, links to profile settings, and unit tests cover visibility logic.",
-    "priority": "medium",
-    "status": "completed",
-    "notes": "Added a dashboard digest opt-in reminder for published members with digests disabled, wired to profile settings with unit coverage. Commit: 7be4493."
-  },
-  {
-    "id": "87",
-    "title": "Add premium contact-limit comparison card on dashboard — monetization",
-    "description": "Surface a compact dashboard card for free members showing their monthly contact limit versus Premium, with a direct billing CTA. Acceptance: card appears only for free members, uses live plan/contact-limit values, links to /dashboard/billing, and unit tests cover rendering states and copy.",
-    "priority": "medium",
-    "status": "completed",
-    "notes": "Added a free-tier dashboard contact-limit comparison card using live plan values, wired it to billing, and covered the copy in unit tests. Commit: ebe4a0c."
-  },
-  {
-    "id": "88",
-    "title": "Add LinkedIn referral share action to dashboard invite card — acquisition",
-    "description": "Expand `ReferralInviteCard` with a one-tap LinkedIn share action using the member's referral link. Track the channel in PostHog via `referral_invite_shared`. Acceptance: LinkedIn button renders on the dashboard card, generated share URL is stable and encoded, analytics fires with method=linkedin, and unit tests cover URL generation and click behavior.",
-    "priority": "high",
-    "status": "completed",
-    "notes": "Added LinkedIn referral sharing to the dashboard invite card with analytics + unit coverage. Commit: 9ca5d2f."
-  },
-  {
-    "id": "89",
-    "title": "Add profile views snapshot card to dashboard — retention",
-    "description": "Surface a compact dashboard card showing a member's last-7-days profile views versus the prior 7 days, with an encouragement CTA when views dip. Acceptance: card appears only for published profiles, uses live profile view data, includes positive/negative trend copy, and unit tests cover empty, rising, and declining states.",
-    "priority": "medium",
-    "status": "completed",
-    "notes": "Added first-party profile view tracking plus a published-profile dashboard snapshot card with trend coverage. Commit: 8b352b8."
-  },
-  {
-    "id": "90",
-    "title": "Add billing page founding-member deadline callout — monetization",
-    "description": "Add a concise urgency panel on `/dashboard/billing` highlighting the founding-member annual savings window before it ends. Acceptance: panel only renders for free members in upgrade flow, uses live billing config values, links to checkout CTA, and unit tests cover copy and visibility states.",
-    "priority": "medium",
-    "status": "completed",
-    "notes": "Added a founding-pricing urgency callout on the billing page with live savings math, CTA anchor wiring, and free-member visibility coverage. Commit: 2b03e56."
+    "status": "pending",
+    "notes": ""
   }
 ]
