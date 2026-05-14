@@ -36,8 +36,8 @@
     "title": "Add dashboard comeback CTA for stale listings with no saves in 14 days — retention",
     "description": "Show a dashboard reminder when a member has active listings older than 14 days with zero saves. Encourage them to refresh photos or rewrite the title to improve discovery. Acceptance: reminder only appears when criteria match, links to the edit screen for the oldest stale listing, and unit tests cover visibility logic.",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "Added a stale-listing dashboard CTA that targets the oldest active zero-save listing older than 14 days, with unit coverage. Commit: fbc8b9f."
   },
   {
     "id": "84",
