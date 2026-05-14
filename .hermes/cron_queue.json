@@ -88,10 +88,10 @@
     "title": "Add weekly digest win-back CTA for opted-out members — retention/engagement",
     "description": "Turn the existing digest opt-out reminder into a stronger re-subscribe card with a preview of what members miss, a one-click enable action, and PostHog tracking. Acceptance: only opted-out members see it, action updates preferences, and tests cover visibility plus success state.",
     "priority": "medium",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-14T12:00:00Z",
     "source": "cron-self-generated",
-    "notes": "Grounded in the existing dashboard digest reminder and weekly digest cron."
+    "notes": "Upgraded the digest opt-out dashboard reminder into a one-click win-back card with enable action, success state, and PostHog tracking. Commit: 0ab7a39."
   },
   {
     "id": "101",
