@@ -20,7 +20,7 @@
     "title": "Add referral reward credits on successful invite conversion — viral monetization",
     "description": "When a referred user signs up AND publishes their profile, auto-award the inviter 10 credits. Add a 'Referral converted' quest (quest_referral_converted) worth 10 credits. Track conversion in PostHog (referral_converted). Show pending vs converted referrals in the dashboard ReferralInviteCard. Acceptance: credits awarded on profile publish (not just signup), quest completion tracked, dashboard shows conversion count, unit tests cover award logic and edge cases (duplicate, self-referral).",
     "priority": "high",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "Moved referral conversion rewards to profile publish, added referral_converted tracking plus pending/converted dashboard state and quest coverage. Commit: 630549f."
   }
 ]
