@@ -5,7 +5,7 @@ import { createLogger } from '@/lib/utils/logger'
 import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
 import { getConversations } from '@/lib/data/messaging'
-import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder } from '@/lib/data/dashboard-reminders'
+import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { buildReferralLink } from '@/lib/referrals'
 import { hasSkippedOnboarding, ONBOARDING_SKIP_COOKIE_NAME } from '@/lib/onboarding-skip'
@@ -26,6 +26,7 @@ import { FirstTradeProgressReminder } from '@/components/dashboard/FirstTradePro
 import { ContactLimitComparisonCard } from '@/components/dashboard/ContactLimitComparisonCard'
 import { ProfileViewsSnapshotCard } from '@/components/dashboard/ProfileViewsSnapshotCard'
 import { OnboardingReturnReminder } from '@/components/dashboard/OnboardingReturnReminder'
+import { ZeroListingLaunchReminder } from '@/components/dashboard/ZeroListingLaunchReminder'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
@@ -191,6 +192,13 @@ export default async function DashboardPage() {
     profile?.onboarding_completed_at,
     hasSkippedOnboarding(cookieStore.get(ONBOARDING_SKIP_COOKIE_NAME)?.value),
   )
+  const zeroListingLaunchReminder = profile
+    ? getZeroListingLaunchReminder(
+      profile.onboarding_completed_at,
+      listings,
+      completedQuests.has('quest_first_listing'),
+    )
+    : null
   const profileViewsSnapshot = profile?.is_published
     ? await getProfileViewsSnapshot(profile.id)
     : null
@@ -398,6 +406,10 @@ export default async function DashboardPage() {
 
       {onboardingReturnReminder && (
         <OnboardingReturnReminder reminder={onboardingReturnReminder} />
+      )}
+
+      {zeroListingLaunchReminder && (
+        <ZeroListingLaunchReminder reminder={zeroListingLaunchReminder} />
       )}
 
       {profile && profileViewsSnapshot && (

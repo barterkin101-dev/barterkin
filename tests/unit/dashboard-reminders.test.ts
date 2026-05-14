@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getStaleListingReminder, getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
+import { getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getStaleListingReminder, getUnreadMessageReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
 
@@ -313,6 +313,48 @@ describe('getOnboardingReturnReminder', () => {
 
   it('returns null after onboarding is complete even if the skip cookie still exists', () => {
     expect(getOnboardingReturnReminder('2026-05-14T12:00:00.000Z', true)).toBeNull()
+  })
+})
+
+describe('getZeroListingLaunchReminder', () => {
+  it('returns null when onboarding is incomplete', () => {
+    expect(getZeroListingLaunchReminder(null, [], false)).toBeNull()
+  })
+
+  it('returns null when the member already has an active listing', () => {
+    expect(
+      getZeroListingLaunchReminder(
+        '2026-05-14T12:00:00.000Z',
+        [makeListing({ status: 'active' })],
+        false,
+      ),
+    ).toBeNull()
+  })
+
+  it('returns a first-listing reward reminder when the member is onboarded and has never listed', () => {
+    expect(
+      getZeroListingLaunchReminder(
+        '2026-05-14T12:00:00.000Z',
+        [],
+        false,
+      ),
+    ).toEqual({
+      href: '/dashboard/listings/new',
+      rewardCredits: 5,
+    })
+  })
+
+  it('keeps the launch CTA but drops first-listing reward copy when prior inactive listings exist', () => {
+    expect(
+      getZeroListingLaunchReminder(
+        '2026-05-14T12:00:00.000Z',
+        [makeListing({ status: 'paused' })],
+        true,
+      ),
+    ).toEqual({
+      href: '/dashboard/listings/new',
+      rewardCredits: null,
+    })
   })
 })
 

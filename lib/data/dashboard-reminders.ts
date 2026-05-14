@@ -36,6 +36,11 @@ export interface FirstTradeProgressReminder {
   rewardCredits: number
 }
 
+export interface ZeroListingLaunchReminder {
+  href: string
+  rewardCredits: number | null
+}
+
 export function getUnreadMessageReminder(
   conversations: ConversationRow[],
   currentProfileId: string,
@@ -170,6 +175,30 @@ export function getFirstTradeProgressReminder(
     conversationCount: activeConversations.length,
     href: `/dashboard/messages/${topConversation.id}`,
     counterpartName,
+    rewardCredits,
+  }
+}
+
+export function getZeroListingLaunchReminder(
+  onboardingCompletedAt: string | null | undefined,
+  listings: ListingRow[],
+  hasCompletedFirstListingQuest: boolean,
+): ZeroListingLaunchReminder | null {
+  if (!onboardingCompletedAt) {
+    return null
+  }
+
+  const activeListingCount = listings.filter((listing) => listing.status === 'active').length
+  if (activeListingCount > 0) {
+    return null
+  }
+
+  const rewardCredits = !hasCompletedFirstListingQuest && listings.length === 0
+    ? (QUESTS.find((quest) => quest.key === 'quest_first_listing')?.credits ?? 5)
+    : null
+
+  return {
+    href: '/dashboard/listings/new',
     rewardCredits,
   }
 }
