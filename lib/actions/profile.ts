@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { ProfileFormSchema } from '@/lib/schemas/profile'
@@ -13,6 +14,7 @@ import { decryptPhoneNumber, encryptPhoneNumber } from '@/lib/utils/phone-encryp
 import type {
   SaveProfileResult,
   SetPublishedResult,
+  UpdateDigestPreferenceResult,
 } from '@/lib/actions/profile.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/database.types'
@@ -342,6 +344,57 @@ export async function setPublished(
       context: { profileId, error: questResult.error },
     })
   }
+
+  return { ok: true }
+}
+
+export async function enableWeeklyDigestFromDashboard(
+  _prev: UpdateDigestPreferenceResult | null,
+  _formData: FormData,
+): Promise<UpdateDigestPreferenceResult> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+  if (authError || !user) return { ok: false, error: 'Not authenticated.' }
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('id, email_digest_enabled')
+    .eq('owner_id', user.id)
+    .maybeSingle()
+
+  if (profileError) {
+    const log = createLogger('profile')
+    log.error('load digest preference failed', { error: profileError, context: { code: profileError.code } })
+    return { ok: false, error: 'Something went wrong. Please try again.' }
+  }
+
+  if (!profile) {
+    return { ok: false, error: 'Profile not found.' }
+  }
+
+  if (profile.email_digest_enabled !== true) {
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ email_digest_enabled: true })
+      .eq('id', profile.id)
+      .eq('owner_id', user.id)
+
+    if (updateError) {
+      const log = createLogger('profile')
+      log.error('enable digest failed', { error: updateError, context: { code: updateError.code } })
+      return { ok: false, error: 'Something went wrong. Please try again.' }
+    }
+
+    await captureEvent(user.id, 'weekly_digest_reenabled', {
+      source: 'dashboard_reminder',
+    })
+  }
+
+  revalidatePath('/dashboard')
+  revalidatePath('/profile/edit')
 
   return { ok: true }
 }

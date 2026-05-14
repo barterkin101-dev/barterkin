@@ -28,6 +28,11 @@ export interface PhoneVerificationResult {
   verified?: boolean
 }
 
+export interface UpdateDigestPreferenceResult {
+  ok: boolean
+  error?: string
+}
+
 export type ProfileRow = Database['public']['Tables']['profiles']['Row']
 export type SkillOfferedRow = Database['public']['Tables']['skills_offered']['Row']
 export type SkillWantedRow = Database['public']['Tables']['skills_wanted']['Row']

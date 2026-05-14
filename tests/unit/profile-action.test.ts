@@ -6,8 +6,18 @@ vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(),
 }))
 
+vi.mock('next/cache', () => ({
+  revalidatePath: vi.fn(),
+}))
+
+vi.mock('@/lib/analytics', () => ({
+  captureEvent: vi.fn(),
+}))
+
 import { createClient } from '@/lib/supabase/server'
-import { saveProfile } from '@/lib/actions/profile'
+import { captureEvent } from '@/lib/analytics'
+import { revalidatePath } from 'next/cache'
+import { enableWeeklyDigestFromDashboard, saveProfile } from '@/lib/actions/profile'
 
 function buildProfileFormData(overrides?: { emailDigestEnabled?: 'true' | 'false' | null }) {
   const fd = new FormData()
@@ -196,5 +206,73 @@ describe('saveProfile', () => {
       }),
       { onConflict: 'owner_id' },
     )
+  })
+})
+
+describe('enableWeeklyDigestFromDashboard', () => {
+  it('turns the digest back on, revalidates, and tracks the restore event', async () => {
+    const getUserMock = vi.fn().mockResolvedValue({
+      data: { user: { id: 'user-1' } },
+      error: null,
+    })
+    const maybeSingleMock = vi.fn().mockResolvedValue({
+      data: { id: 'profile-1', email_digest_enabled: false },
+      error: null,
+    })
+    const eqOwnerMock = vi.fn().mockReturnValue({ maybeSingle: maybeSingleMock })
+    const selectMock = vi.fn().mockReturnValue({ eq: eqOwnerMock })
+    const eqUpdateOwnerMock = vi.fn().mockResolvedValue({ error: null })
+    const eqUpdateIdMock = vi.fn().mockReturnValue({ eq: eqUpdateOwnerMock })
+    const updateMock = vi.fn().mockReturnValue({ eq: eqUpdateIdMock })
+    const fromMock = vi.fn().mockImplementation(() => ({
+      select: selectMock,
+      update: updateMock,
+    }))
+
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { getUser: getUserMock },
+      from: fromMock,
+    } as never)
+
+    const result = await enableWeeklyDigestFromDashboard(null, new FormData())
+
+    expect(result).toEqual({ ok: true })
+    expect(updateMock).toHaveBeenCalledWith({ email_digest_enabled: true })
+    expect(vi.mocked(captureEvent)).toHaveBeenCalledWith(
+      'user-1',
+      'weekly_digest_reenabled',
+      { source: 'dashboard_reminder' },
+    )
+    expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith('/dashboard')
+    expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith('/profile/edit')
+  })
+
+  it('returns success without writing when the digest is already enabled', async () => {
+    const getUserMock = vi.fn().mockResolvedValue({
+      data: { user: { id: 'user-1' } },
+      error: null,
+    })
+    const maybeSingleMock = vi.fn().mockResolvedValue({
+      data: { id: 'profile-1', email_digest_enabled: true },
+      error: null,
+    })
+    const eqOwnerMock = vi.fn().mockReturnValue({ maybeSingle: maybeSingleMock })
+    const selectMock = vi.fn().mockReturnValue({ eq: eqOwnerMock })
+    const updateMock = vi.fn()
+    const fromMock = vi.fn().mockImplementation(() => ({
+      select: selectMock,
+      update: updateMock,
+    }))
+
+    vi.mocked(createClient).mockResolvedValue({
+      auth: { getUser: getUserMock },
+      from: fromMock,
+    } as never)
+
+    const result = await enableWeeklyDigestFromDashboard(null, new FormData())
+
+    expect(result).toEqual({ ok: true })
+    expect(updateMock).not.toHaveBeenCalled()
+    expect(vi.mocked(captureEvent)).not.toHaveBeenCalled()
   })
 })
