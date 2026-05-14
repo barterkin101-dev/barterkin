@@ -26,7 +26,6 @@ export function FoundingMemberNudge({
   const foundingAnnualized = foundingMonthlyCents * 12
   const versusPremiumMonthly = (premiumMonthlyCents * 12) - foundingAnnualized
   const versusPremiumAnnual = premiumAnnualCents - foundingAnnualized
-  const bestSavingsCents = Math.max(versusPremiumMonthly, versusPremiumAnnual)
 
   const fmt = (cents: number) =>
     new Intl.NumberFormat('en-US', {
@@ -52,10 +51,8 @@ export function FoundingMemberNudge({
               </h3>
             </div>
             <p className="text-sm text-amber-800/70 max-w-md">
-              Lock in Premium forever at {fmt(foundingMonthlyCents)}/month
-              {bestSavingsCents > 0
-                ? ` — save ${fmt(bestSavingsCents)} every year vs Premium.`
-                : '.'}
+              Lock in Premium forever at {fmt(foundingMonthlyCents)}/month for {fmt(foundingAnnualized)} a year.
+              {' '}That saves {fmt(versusPremiumMonthly)} versus Premium Monthly and {fmt(versusPremiumAnnual)} versus Premium Annual.
               {' '}Exclusive founding member badge on your profile.
             </p>
             <div className="space-y-1">

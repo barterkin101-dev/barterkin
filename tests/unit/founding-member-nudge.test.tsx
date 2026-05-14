@@ -33,7 +33,7 @@ describe('FoundingMemberNudge', () => {
     expect(screen.getByText(/25 founding slots left/)).toBeInTheDocument()
   })
 
-  it('shows live pricing and annual savings math', () => {
+  it('shows live pricing and both premium savings comparisons', () => {
     render(
       <FoundingMemberNudge
         slotsRemaining={15}
@@ -43,8 +43,8 @@ describe('FoundingMemberNudge', () => {
       />,
     )
     expect(screen.getByText(/\$5\/month/)).toBeInTheDocument()
-    // Best savings vs premium: max((900*12)-6000, 9000-6000) = max(4800, 3000) cents = $48
-    expect(screen.getByText(/save \$48 every year vs Premium/)).toBeInTheDocument()
+    expect(screen.getByText(/\$60 a year/)).toBeInTheDocument()
+    expect(screen.getByText(/saves \$48 versus Premium Monthly and \$30 versus Premium Annual/)).toBeInTheDocument()
   })
 
   it('shows singular slot when one remains', () => {
