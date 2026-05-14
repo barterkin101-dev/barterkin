@@ -26,15 +26,17 @@ import { SkillRowList } from '@/components/profile/SkillRowList'
 import { CountyCombobox } from '@/components/profile/CountyCombobox'
 import { CategoryPicker } from '@/components/profile/CategoryPicker'
 import { AvatarUploader } from '@/components/profile/AvatarUploader'
-import { PhoneVerifiedBadge } from '@/components/profile/PhoneVerifiedBadge'
+import { PhoneVerificationControls } from '@/components/profile/PhoneVerificationControls'
 
 export function ProfileEditForm({
   userId,
   defaultValues,
+  initialPhoneNumber,
   returnTo,
 }: {
   userId: string
   defaultValues: ProfileWithRelations | null
+  initialPhoneNumber?: string
   returnTo?: string
 }) {
   const router = useRouter()
@@ -57,7 +59,7 @@ export function ProfileEditForm({
       availability: defaultValues?.availability ?? '',
       acceptingContact: defaultValues?.accepting_contact ?? true,
       tiktokHandle: defaultValues?.tiktok_handle ?? '',
-      phoneNumber: '',
+      phoneNumber: initialPhoneNumber ?? '',
     },
   })
 
@@ -181,10 +183,7 @@ export function ProfileEditForm({
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex items-center gap-2">
-                    <FormLabel>Phone number</FormLabel>
-                    {defaultValues?.phone_verified ? <PhoneVerifiedBadge className="text-xs" /> : null}
-                  </div>
+                  <FormLabel>Phone number</FormLabel>
                   <FormControl>
                     <Input
                       inputMode="tel"
@@ -196,6 +195,10 @@ export function ProfileEditForm({
                   <FormDescription>
                     Used only for SMS verification. Saving a new number clears any existing phone-verification badge until you verify it.
                   </FormDescription>
+                  <PhoneVerificationControls
+                    phoneNumber={field.value ?? ''}
+                    initiallyVerified={Boolean(defaultValues?.phone_verified)}
+                  />
                   <FormMessage />
                 </FormItem>
               )}

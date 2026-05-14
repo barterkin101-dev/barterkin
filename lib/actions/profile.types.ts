@@ -13,6 +13,21 @@ export interface SetPublishedResult {
   missingFields?: Array<'displayName' | 'avatarUrl' | 'countyId' | 'categoryId' | 'skillsOffered'>
 }
 
+export interface PhoneVerificationResult {
+  ok: boolean
+  error?: string
+  code?:
+    | 'unauthorized'
+    | 'invalid_phone'
+    | 'invalid_code'
+    | 'not_found'
+    | 'misconfigured'
+    | 'rate_limited'
+    | 'provider_error'
+  maskedPhoneNumber?: string | null
+  verified?: boolean
+}
+
 export type ProfileRow = Database['public']['Tables']['profiles']['Row']
 export type SkillOfferedRow = Database['public']['Tables']['skills_offered']['Row']
 export type SkillWantedRow = Database['public']['Tables']['skills_wanted']['Row']

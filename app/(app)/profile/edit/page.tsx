@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { ProfileEditForm } from '@/components/profile/ProfileEditForm'
 import type { ProfileWithRelations } from '@/lib/actions/profile.types'
 import { safeReturnTo } from '@/lib/utils/returnTo'
+import { decryptPhoneNumber } from '@/lib/utils/phone-encryption'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Edit profile' }
@@ -23,6 +24,15 @@ export default async function ProfileEditPage({
     .eq('owner_id', user.id)
     .maybeSingle()
 
+  const initialPhoneNumber = (() => {
+    if (!data?.phone_number) return ''
+    try {
+      return decryptPhoneNumber(data.phone_number)
+    } catch {
+      return ''
+    }
+  })()
+
   // D-06 + T-9-03: validate returnTo. Relative paths only; anything else → undefined (toast in place).
   const { returnTo } = await searchParams
   const validReturnTo = safeReturnTo(returnTo)
@@ -32,6 +42,7 @@ export default async function ProfileEditPage({
       <ProfileEditForm
         userId={user.id}
         defaultValues={(data as ProfileWithRelations) ?? null}
+        initialPhoneNumber={initialPhoneNumber}
         returnTo={validReturnTo}
       />
     </div>
