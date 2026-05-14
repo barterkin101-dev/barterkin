@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { MessageCircle, MapPin, ArrowLeft } from 'lucide-react'
 import { MessageButton } from '@/components/messaging/MessageButton'
 import { ListingJsonLd } from '@/components/seo/ListingJsonLd'
+import { ListingShareActions } from '@/components/listings/ListingShareActions'
 
 interface ListingDetailPageProps {
   params: Promise<{ id: string }>
@@ -70,6 +71,8 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
   const { id } = await params
   const listing = await getListingById(id)
   if (!listing) notFound()
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com'
+  const shareUrl = new URL(`/listings/${listing.id}`, siteUrl).toString()
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -203,6 +206,12 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                 </div>
               ) : null}
             </div>
+
+            <ListingShareActions
+              listingId={listing.id}
+              title={listing.title}
+              shareUrl={shareUrl}
+            />
 
             {listing.profiles && (
               <Card>
