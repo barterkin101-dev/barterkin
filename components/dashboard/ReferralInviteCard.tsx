@@ -10,6 +10,10 @@ export function buildReferralInviteMessage(referralLink: string): string {
   return `I'm on Barterkin, a local skill-trading network for neighbors. Join with my invite link: ${referralLink}`
 }
 
+export function buildReferralFollowUpMessage(referralLink: string): string {
+  return `Quick follow-up: your Barterkin invite is still live if you want to join my local skill-trading circle. Here's the link again: ${referralLink}`
+}
+
 export function buildXReferralShareUrl(referralLink: string): string {
   const params = new URLSearchParams({
     text: buildReferralInviteMessage(referralLink),
@@ -27,9 +31,12 @@ export function buildFacebookReferralShareUrl(referralLink: string): string {
   return `https://www.facebook.com/sharer/sharer.php?${params.toString()}`
 }
 
-export function buildWhatsAppReferralShareUrl(referralLink: string): string {
+export function buildWhatsAppReferralShareUrl(
+  referralLink: string,
+  message: string = buildReferralInviteMessage(referralLink),
+): string {
   const params = new URLSearchParams({
-    text: buildReferralInviteMessage(referralLink),
+    text: message,
   })
 
   return `https://wa.me/?${params.toString()}`
@@ -52,18 +59,24 @@ export function buildLinkedInReferralShareUrl(referralLink: string): string {
   return `https://www.linkedin.com/sharing/share-offsite/?${params.toString()}`
 }
 
-export function buildEmailReferralShareUrl(referralLink: string): string {
+export function buildEmailReferralShareUrl(
+  referralLink: string,
+  message: string = buildReferralInviteMessage(referralLink),
+): string {
   const params = new URLSearchParams({
     subject: 'Join me on Barterkin',
-    body: buildReferralInviteMessage(referralLink),
+    body: message,
   })
 
   return `mailto:?${params.toString()}`
 }
 
-export function buildSmsReferralShareUrl(referralLink: string): string {
+export function buildSmsReferralShareUrl(
+  referralLink: string,
+  message: string = buildReferralInviteMessage(referralLink),
+): string {
   const params = new URLSearchParams({
-    body: buildReferralInviteMessage(referralLink),
+    body: message,
   })
 
   return `sms:?${params.toString()}`
@@ -101,6 +114,30 @@ function getReferralMomentumCopy(convertedReferralCount: number, pendingReferral
   }
 }
 
+function getReferralMessageVariant(pendingReferralCount: number) {
+  if (pendingReferralCount > 0) {
+    return {
+      label: 'Suggested follow-up message',
+      message: buildReferralFollowUpMessage,
+      whatsappLabel: 'Follow up on WhatsApp',
+      smsLabel: 'Follow up by SMS',
+      emailLabel: 'Follow up by email',
+      copyLabel: 'Copy follow-up message',
+      copiedLabel: 'Copied follow-up',
+    }
+  }
+
+  return {
+    label: 'Suggested invite message',
+    message: buildReferralInviteMessage,
+    whatsappLabel: 'Share on WhatsApp',
+    smsLabel: 'Share by SMS',
+    emailLabel: 'Share by email',
+    copyLabel: 'Copy invite message',
+    copiedLabel: 'Copied message',
+  }
+}
+
 export function ReferralInviteCard({
   referralCode,
   referralLink,
@@ -117,7 +154,8 @@ export function ReferralInviteCard({
   const [copied, setCopied] = useState(false)
   const [messageCopied, setMessageCopied] = useState(false)
   const [sharePending, setSharePending] = useState(false)
-  const inviteMessage = buildReferralInviteMessage(referralLink)
+  const messageVariant = getReferralMessageVariant(pendingReferralCount)
+  const inviteMessage = messageVariant.message(referralLink)
   const momentumCopy = getReferralMomentumCopy(convertedReferralCount, pendingReferralCount)
 
   async function copyText(value: string, copyTarget: 'link' | 'message') {
@@ -190,14 +228,14 @@ export function ReferralInviteCard({
         : channel === 'facebook'
           ? buildFacebookReferralShareUrl(referralLink)
         : channel === 'whatsapp'
-            ? buildWhatsAppReferralShareUrl(referralLink)
+            ? buildWhatsAppReferralShareUrl(referralLink, inviteMessage)
             : channel === 'telegram'
               ? buildTelegramReferralShareUrl(referralLink)
             : channel === 'linkedin'
               ? buildLinkedInReferralShareUrl(referralLink)
             : channel === 'email'
-              ? buildEmailReferralShareUrl(referralLink)
-              : buildSmsReferralShareUrl(referralLink)
+              ? buildEmailReferralShareUrl(referralLink, inviteMessage)
+              : buildSmsReferralShareUrl(referralLink, inviteMessage)
 
     window.open(shareUrl, '_blank', 'noopener,noreferrer')
     captureClientEvent('referral_invite_shared', {
@@ -255,7 +293,7 @@ export function ReferralInviteCard({
 
         <div className="rounded-lg border bg-background/80 p-4">
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Suggested invite message
+            {messageVariant.label}
           </div>
           <p className="mt-2 text-sm text-foreground">
             {inviteMessage}
@@ -289,7 +327,7 @@ export function ReferralInviteCard({
             onClick={() => handleChannelShare('whatsapp')}
           >
             <Share2 className="h-4 w-4" />
-            Share on WhatsApp
+            {messageVariant.whatsappLabel}
           </Button>
           <Button
             type="button"
@@ -298,7 +336,7 @@ export function ReferralInviteCard({
             onClick={() => handleChannelShare('sms')}
           >
             <Share2 className="h-4 w-4" />
-            Share by SMS
+            {messageVariant.smsLabel}
           </Button>
           <Button
             type="button"
@@ -343,7 +381,7 @@ export function ReferralInviteCard({
             onClick={() => handleChannelShare('email')}
           >
             <Share2 className="h-4 w-4" />
-            Share by email
+            {messageVariant.emailLabel}
           </Button>
           <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={handleCopy}>
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -351,7 +389,7 @@ export function ReferralInviteCard({
           </Button>
           <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={handleCopyMessage}>
             {messageCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-            {messageCopied ? 'Copied message' : 'Copy invite message'}
+            {messageCopied ? messageVariant.copiedLabel : messageVariant.copyLabel}
           </Button>
         </div>
       </CardContent>

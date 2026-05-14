@@ -102,5 +102,33 @@
     "created_at": "2026-05-14T12:00:00Z",
     "source": "cron-self-generated",
     "notes": "Added a dashboard listing-cap upgrade nudge for free members one slot from the limit, with live pricing and PostHog tracking. Commit: 4a0218e."
+  },
+  {
+    "id": "102",
+    "title": "Add referral follow-up CTA state to dashboard invite card — growth/acquisition",
+    "description": "When members already have pending referrals, switch the dashboard invite card from cold-invite copy to follow-up copy and relabel the top private share CTAs around follow-up behavior. Preserve existing analytics and add unit tests for the pending-follow-up state. Acceptance: pending referrals show follow-up wording, WhatsApp/SMS CTAs are relabeled for follow-up, copy-message uses the follow-up text, tests pass.",
+    "priority": "high",
+    "status": "completed",
+    "created_at": "2026-05-14T12:30:00Z",
+    "source": "cron-self-generated",
+    "notes": "Switched pending-referral dashboard invite states to follow-up copy, relabeled private share CTAs, and added unit coverage. Commit: PENDING_SHA."
+  },
+  {
+    "id": "103",
+    "title": "Add first-trade progress reminder to active conversations — retention/engagement",
+    "description": "Surface a lightweight dashboard or inbox reminder for members who have active conversations but have not yet completed the `quest_first_trade` quest. Point them back into their warmest conversation and explain the 15-credit reward. Acceptance: only eligible members see it, links deep-link into messages, quest reward copy is accurate, and tests cover visibility logic.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-14T12:30:00Z",
+    "source": "cron-self-generated"
+  },
+  {
+    "id": "104",
+    "title": "Add low-contact-count upgrade nudge after free-member outreach — revenue/monetization",
+    "description": "After a free member sends a contact request and has 1 or fewer monthly contacts left, show a post-send upgrade nudge with the exact remaining count and a direct CTA to billing. Acceptance: only free members near exhaustion see it, remaining-contact math uses live data, analytics are tracked, and tests cover the visibility thresholds.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-14T12:30:00Z",
+    "source": "cron-self-generated"
   }
 ]

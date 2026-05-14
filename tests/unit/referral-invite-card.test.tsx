@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   buildEmailReferralShareUrl,
   buildFacebookReferralShareUrl,
+  buildReferralFollowUpMessage,
   buildLinkedInReferralShareUrl,
   buildReferralInviteMessage,
   buildSmsReferralShareUrl,
@@ -120,6 +121,31 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByRole('button', { name: /copied message/i })).toBeInTheDocument()
   })
 
+  it('switches to follow-up copy and private CTA labels when referrals are pending', async () => {
+    mockWriteText.mockResolvedValue(undefined)
+
+    render(
+      <ReferralInviteCard
+        referralCode="ABCDEFGH"
+        referralLink="https://barterkin.com/r/ABCDEFGH"
+        credits={2}
+        convertedReferralCount={1}
+        pendingReferralCount={2}
+      />,
+    )
+
+    expect(screen.getByText(/suggested follow-up message/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /follow up on whatsapp/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /follow up by sms/i })).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: /copy follow-up message/i }))
+
+    expect(mockWriteText).toHaveBeenCalledWith(
+      buildReferralFollowUpMessage('https://barterkin.com/r/ABCDEFGH'),
+    )
+    expect(screen.getByRole('button', { name: /copied follow-up/i })).toBeInTheDocument()
+  })
+
   it('uses native share when available and tracks successful shares', async () => {
     mockShare.mockResolvedValue(undefined)
 
@@ -142,7 +168,7 @@ describe('ReferralInviteCard', () => {
 
     expect(mockShare).toHaveBeenCalledWith({
       title: 'Join me on Barterkin',
-      text: buildReferralInviteMessage('https://barterkin.com/r/ABCDEFGH'),
+      text: buildReferralFollowUpMessage('https://barterkin.com/r/ABCDEFGH'),
       url: 'https://barterkin.com/r/ABCDEFGH',
     })
     expect(mockCapture).toHaveBeenCalledWith('referral_invite_shared', {
@@ -280,18 +306,24 @@ describe('ReferralInviteCard', () => {
       />,
     )
 
-    await userEvent.click(screen.getByRole('button', { name: /share by sms/i }))
-    await userEvent.click(screen.getByRole('button', { name: /share by email/i }))
+    await userEvent.click(screen.getByRole('button', { name: /follow up by sms/i }))
+    await userEvent.click(screen.getByRole('button', { name: /follow up by email/i }))
 
     expect(mockOpen).toHaveBeenNthCalledWith(
       1,
-      buildSmsReferralShareUrl('https://barterkin.com/r/ABCDEFGH'),
+      buildSmsReferralShareUrl(
+        'https://barterkin.com/r/ABCDEFGH',
+        buildReferralFollowUpMessage('https://barterkin.com/r/ABCDEFGH'),
+      ),
       '_blank',
       'noopener,noreferrer',
     )
     expect(mockOpen).toHaveBeenNthCalledWith(
       2,
-      buildEmailReferralShareUrl('https://barterkin.com/r/ABCDEFGH'),
+      buildEmailReferralShareUrl(
+        'https://barterkin.com/r/ABCDEFGH',
+        buildReferralFollowUpMessage('https://barterkin.com/r/ABCDEFGH'),
+      ),
       '_blank',
       'noopener,noreferrer',
     )
