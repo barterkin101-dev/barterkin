@@ -405,6 +405,12 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText(/proof the pitch works/i)).toBeInTheDocument()
     expect(screen.getByText('60% of tracked invites published')).toBeInTheDocument()
     expect(screen.getAllByText('60%')).toHaveLength(2)
+    expect(
+      screen.getByRole('progressbar', { name: 'Invite conversion progress' }),
+    ).toHaveAttribute('aria-valuenow', '60')
+    expect(
+      screen.getByRole('progressbar', { name: 'Referral milestone progress' }),
+    ).toHaveAttribute('aria-valuenow', '60')
   })
 
   it('shows a next-invite prompt when no referrals are pending', () => {
@@ -464,6 +470,12 @@ describe('ReferralInviteCard', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('1 of 3 published referrals')).toBeInTheDocument()
     expect(screen.getByText('33%')).toBeInTheDocument()
+    expect(
+      screen.getByRole('progressbar', { name: 'Referral milestone progress' }),
+    ).toHaveAttribute('aria-valuenow', '33')
+    expect(
+      screen.getByRole('progressbar', { name: 'Referral milestone progress' }),
+    ).toHaveAttribute('aria-valuetext', '1 of 3 published referrals')
   })
 
   it('shows a completed milestone state after the tracked milestones are cleared', () => {
@@ -488,5 +500,11 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('6 of 6 tracked invites published')).toBeInTheDocument()
     expect(screen.getByText('100%')).toBeInTheDocument()
     expect(screen.queryByText(/published referrals/i)).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('progressbar', { name: 'Invite conversion progress' }),
+    ).toHaveAttribute('aria-valuenow', '100')
+    expect(
+      screen.queryByRole('progressbar', { name: 'Referral milestone progress' }),
+    ).not.toBeInTheDocument()
   })
 })

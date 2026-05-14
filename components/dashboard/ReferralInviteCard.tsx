@@ -444,7 +444,12 @@ export function ReferralInviteCard({
                 <span>{conversionSnapshot.label}</span>
                 <span>{conversionSnapshot.value}%</span>
               </div>
-              <Progress value={conversionSnapshot.value} className="h-2" />
+              <Progress
+                value={conversionSnapshot.value}
+                className="h-2"
+                aria-label="Invite conversion progress"
+                aria-valuetext={conversionSnapshot.label}
+              />
             </div>
           </div>
         ) : null}
@@ -461,7 +466,12 @@ export function ReferralInviteCard({
                 <span>{milestoneProgress.label}</span>
                 <span>{milestoneProgress.value}%</span>
               </div>
-              <Progress value={milestoneProgress.value} className="h-2" />
+              <Progress
+                value={milestoneProgress.value}
+                className="h-2"
+                aria-label="Referral milestone progress"
+                aria-valuetext={milestoneProgress.label}
+              />
             </div>
           ) : null}
         </div>
