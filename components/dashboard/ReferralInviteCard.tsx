@@ -69,6 +69,38 @@ export function buildSmsReferralShareUrl(referralLink: string): string {
   return `sms:?${params.toString()}`
 }
 
+function getReferralMomentumCopy(convertedReferralCount: number, pendingReferralCount: number) {
+  if (pendingReferralCount > 0) {
+    const potentialCredits = pendingReferralCount * 10
+
+    return {
+      eyebrow: 'Next reward',
+      title:
+        pendingReferralCount === 1
+          ? '1 pending invite can unlock 10 credits'
+          : `${pendingReferralCount} pending invites can unlock ${potentialCredits} credits`,
+      body:
+        pendingReferralCount === 1
+          ? 'One invited member is still one publish away from converting. Send a quick follow-up and close the loop.'
+          : 'These invited members are still one publish away from converting. A quick follow-up can turn them into credits.',
+    }
+  }
+
+  if (convertedReferralCount > 0) {
+    return {
+      eyebrow: 'Next reward',
+      title: 'One more referral unlocks another 10 credits',
+      body: 'Copy your invite message and send it to one neighbor who would be a strong first trade match.',
+    }
+  }
+
+  return {
+    eyebrow: 'First reward',
+    title: 'Your first published referral unlocks 10 credits',
+    body: 'Start with one friend or neighbor who can finish their profile quickly and make the first trade feel easy.',
+  }
+}
+
 export function ReferralInviteCard({
   referralCode,
   referralLink,
@@ -86,6 +118,7 @@ export function ReferralInviteCard({
   const [messageCopied, setMessageCopied] = useState(false)
   const [sharePending, setSharePending] = useState(false)
   const inviteMessage = buildReferralInviteMessage(referralLink)
+  const momentumCopy = getReferralMomentumCopy(convertedReferralCount, pendingReferralCount)
 
   async function copyText(value: string, copyTarget: 'link' | 'message') {
     try {
@@ -229,6 +262,14 @@ export function ReferralInviteCard({
           </p>
         </div>
 
+        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+          <div className="text-xs font-medium uppercase tracking-[0.18em] text-primary/80">
+            {momentumCopy.eyebrow}
+          </div>
+          <p className="mt-2 text-base font-semibold text-foreground">{momentumCopy.title}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{momentumCopy.body}</p>
+        </div>
+
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           {hasNativeShare ? (
             <Button
@@ -241,6 +282,24 @@ export function ReferralInviteCard({
               {sharePending ? 'Sharing...' : 'Share invite link'}
             </Button>
           ) : null}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => handleChannelShare('whatsapp')}
+          >
+            <Share2 className="h-4 w-4" />
+            Share on WhatsApp
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => handleChannelShare('sms')}
+          >
+            <Share2 className="h-4 w-4" />
+            Share by SMS
+          </Button>
           <Button
             type="button"
             variant="outline"
@@ -263,15 +322,6 @@ export function ReferralInviteCard({
             type="button"
             variant="outline"
             className="w-full sm:w-auto"
-            onClick={() => handleChannelShare('whatsapp')}
-          >
-            <Share2 className="h-4 w-4" />
-            Share on WhatsApp
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full sm:w-auto"
             onClick={() => handleChannelShare('telegram')}
           >
             <Share2 className="h-4 w-4" />
@@ -285,15 +335,6 @@ export function ReferralInviteCard({
           >
             <Share2 className="h-4 w-4" />
             Share on LinkedIn
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full sm:w-auto"
-            onClick={() => handleChannelShare('sms')}
-          >
-            <Share2 className="h-4 w-4" />
-            Share by SMS
           </Button>
           <Button
             type="button"

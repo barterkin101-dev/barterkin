@@ -350,4 +350,36 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('Pending')).toBeInTheDocument()
     expect(screen.getByText(/earn 10 credits/i)).toBeInTheDocument()
   })
+
+  it('shows concrete payout math when referrals are pending', () => {
+    render(
+      <ReferralInviteCard
+        referralCode="ABCDEFGH"
+        referralLink="https://barterkin.com/r/ABCDEFGH"
+        credits={10}
+        convertedReferralCount={3}
+        pendingReferralCount={2}
+      />,
+    )
+
+    expect(screen.getByText('Next reward')).toBeInTheDocument()
+    expect(screen.getByText('2 pending invites can unlock 20 credits')).toBeInTheDocument()
+    expect(screen.getByText(/quick follow-up can turn them into credits/i)).toBeInTheDocument()
+  })
+
+  it('shows a next-invite prompt when no referrals are pending', () => {
+    render(
+      <ReferralInviteCard
+        referralCode="ABCDEFGH"
+        referralLink="https://barterkin.com/r/ABCDEFGH"
+        credits={10}
+        convertedReferralCount={1}
+        pendingReferralCount={0}
+      />,
+    )
+
+    expect(screen.getByText('Next reward')).toBeInTheDocument()
+    expect(screen.getByText('One more referral unlocks another 10 credits')).toBeInTheDocument()
+    expect(screen.getByText(/copy your invite message/i)).toBeInTheDocument()
+  })
 })

@@ -72,5 +72,35 @@
     "created_at": "2026-05-14T09-28-01Z",
     "source": "codex-review",
     "notes": "Restricted quest_first_listing awards to members with zero pre-existing listings before create; added regression coverage for create vs update and rollout cases. Commit: 5b86c81."
+  },
+  {
+    "id": "99",
+    "title": "Add referral momentum nudge to dashboard invite card — growth/acquisition",
+    "description": "Upgrade the dashboard referral card to show a clear 'next reward' nudge based on pending and converted referrals. Surface immediate payout math (for example, how many credits pending invites could unlock), prioritize the highest-converting share actions, and add tests for the new states. Acceptance: members with pending referrals see a concrete conversion nudge, members with no pending referrals see a next-invite prompt, analytics/tracking remain intact, tests pass.",
+    "priority": "high",
+    "status": "in_progress",
+    "created_at": "2026-05-14T12:00:00Z",
+    "source": "cron-self-generated",
+    "notes": "Queue generated from current dashboard referral and billing surfaces. Implementing the growth task this run."
+  },
+  {
+    "id": "100",
+    "title": "Add weekly digest win-back CTA for opted-out members — retention/engagement",
+    "description": "Turn the existing digest opt-out reminder into a stronger re-subscribe card with a preview of what members miss, a one-click enable action, and PostHog tracking. Acceptance: only opted-out members see it, action updates preferences, and tests cover visibility plus success state.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-14T12:00:00Z",
+    "source": "cron-self-generated",
+    "notes": "Grounded in the existing dashboard digest reminder and weekly digest cron."
+  },
+  {
+    "id": "101",
+    "title": "Add free-plan billing nudge when members approach listing cap — revenue/monetization",
+    "description": "Show a targeted premium upgrade nudge on the dashboard listings area when free members are one listing away from their cap. Use live plan values, explain the unlocked capacity, and link directly to billing. Acceptance: only free members near the cap see it, pricing math is live, click tracking is added, and tests cover visibility rules.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-14T12:00:00Z",
+    "source": "cron-self-generated",
+    "notes": "Grounded in existing billing page pricing and listing cap messaging."
   }
 ]
