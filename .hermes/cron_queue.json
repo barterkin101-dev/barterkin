@@ -138,10 +138,10 @@
     "title": "Add next referral milestone progress to dashboard invite card — growth/acquisition",
     "description": "Upgrade the dashboard referral card to show the next referral milestone based on converted invites, including how many more publishes are needed and the total credits unlocked at that milestone. Keep the existing share analytics intact and add unit tests for zero, mid, and completed milestone states. Acceptance: members see a concrete next milestone CTA, copy changes with converted count, milestone-complete state is handled cleanly, and tests pass.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-14T13:00:00Z",
     "source": "cron-self-generated",
-    "notes": "Task claimed in current run."
+    "notes": "Added referral milestone progress copy to the dashboard invite card and covered zero, mid, and cleared milestone states in unit tests. Commit: 6595d59."
   },
   {
     "id": "106",
