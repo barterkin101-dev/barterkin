@@ -148,9 +148,10 @@
     "title": "Add onboarding return reminder card for skipped members — retention/engagement",
     "description": "Show a dashboard reminder card to signed-in members whose `onboarding_completed_at` is still null and who skipped setup, with a one-click CTA back to `/onboarding`. Acceptance: only incomplete members see it, copy explains the remaining setup value, CTA deep-links back into onboarding, and tests cover visibility.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-14T13:00:00Z",
-    "source": "cron-self-generated"
+    "source": "cron-self-generated",
+    "notes": "Added a skip-aware onboarding cookie flow, dashboard return reminder card, and regression coverage for reminder visibility plus onboarding cookie cleanup. Commit: ec982c9."
   },
   {
     "id": "107",
