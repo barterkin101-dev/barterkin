@@ -12,8 +12,8 @@
     "title": "Add Twilio SMS phone verification — trust badge for local trades",
     "description": "Add phone number verification via Twilio Verify API. Members enter phone number in profile edit, receive SMS code, verify to get a 'Phone Verified' badge on their profile and listings. Store verified phone in profiles.phone_verified (boolean) and profiles.phone_number (encrypted). Gate: only show badge when verified. Use Twilio Verify (not direct SMS) for compliance. Add to profile edit form, show badge in ListingCard and member profile. Acceptance: full verify flow works in test mode, badge shows when verified, hidden when not, unit tests cover verify action edge cases.",
     "priority": "medium",
-    "status": "in_progress",
-    "notes": "Added encrypted phone-number storage primitives, profile form field, and phone_verified badge plumbing on profile/listing surfaces. Twilio Verify send/check actions still pending."
+    "status": "completed",
+    "notes": "Added Twilio Verify send/check actions, inline profile SMS verification UI, decrypted phone prefill, and unit coverage for verify edge cases. Commit: 5d9fe02."
   },
   {
     "id": "75",
