@@ -5,6 +5,7 @@ import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
 import { getConversations } from '@/lib/data/messaging'
 import { getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
+import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { buildReferralLink } from '@/lib/referrals'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -15,6 +16,7 @@ import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'
 import { DiscoverFeedTabs } from '@/components/dashboard/DiscoverFeedTabs'
 import { QuestCard } from '@/components/dashboard/QuestCard'
 import { UnreadMessageReminder } from '@/components/dashboard/UnreadMessageReminder'
+import { ContactLimitUpsell } from '@/components/dashboard/ContactLimitUpsell'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
@@ -113,6 +115,10 @@ export default async function DashboardPage() {
     : null
   const foundingSlotsRemaining = Math.max(0, STRIPE_FOUNDING_MEMBER_LIMIT - foundingCountResult)
   const showFoundingNudge = profile?.tier === 'free' && foundingSlotsRemaining > 0
+  const contactLimitStatus = profile && profile.tier === 'free'
+    ? await getContactLimitStatus(profile.id, profile.tier)
+    : null
+  const showContactLimitUpsell = contactLimitStatus?.isNearLimit || contactLimitStatus?.isAtLimit || false
   const completedQuests = new Set((questCompletions.data ?? []).map((row) => row.quest_key))
   const checkedInToday = Boolean(
     profile && (
@@ -293,6 +299,15 @@ export default async function DashboardPage() {
           </Link>
         </Card>
       </div>
+
+      {showContactLimitUpsell && contactLimitStatus && (
+        <ContactLimitUpsell
+          used={contactLimitStatus.used}
+          limit={contactLimitStatus.limit}
+          remaining={contactLimitStatus.remaining}
+          isAtLimit={contactLimitStatus.isAtLimit}
+        />
+      )}
 
       {/* Founding member nudge for free users */}
       {showFoundingNudge && (
