@@ -36,8 +36,8 @@
     "title": "Add weekly digest preference toggle to profile settings — retention control",
     "description": "Expose `profiles.email_digest_enabled` in profile settings so members can opt in or out of the weekly 'new listings in your county' email. Show a short explanation near the toggle, persist through the existing profile update flow, and cover the schema/action/UI path with unit tests. Acceptance: setting is visible on profile edit, saves correctly, existing digest cron respects it, tests cover save behavior.",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "Added the weekly digest profile toggle, persisted email_digest_enabled through saveProfile, and covered schema/helper/action behavior with unit tests. Commit: 52acaab."
   },
   {
     "id": "78",
