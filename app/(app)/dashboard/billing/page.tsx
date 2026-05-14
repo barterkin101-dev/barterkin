@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { CheckCircle2, CreditCard, ShieldCheck, Sparkles, Zap } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
@@ -8,6 +9,7 @@ import { BillingActions } from '@/components/dashboard/BillingActions'
 import {
   BILLING_PLAN_AMOUNTS,
   formatUsdFromCents,
+  getFoundingMemberSavings,
   getPremiumAnnualSavings,
   STRIPE_FOUNDING_MEMBER_LIMIT,
 } from '@/lib/stripe/config'
@@ -46,11 +48,15 @@ export default async function BillingPage() {
   const periodEnd = formatPeriodEnd(profile?.subscription_current_period_end ?? null)
   const canManageBilling = Boolean(profile?.stripe_customer_id)
   const annualSavings = getPremiumAnnualSavings()
+  const foundingSavings = getFoundingMemberSavings()
   const premiumMonthlyLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents)}/month`
   const premiumAnnualLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumAnnualCents)}/year`
   const foundingMonthlyLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.foundingMonthlyCents)}/month`
   const annualEquivalentLabel = `${formatUsdFromCents(annualSavings.monthlyEquivalentCents)}/month`
   const annualSavingsLabel = formatUsdFromCents(annualSavings.totalSavingsCents)
+  const foundingAnnualizedLabel = formatUsdFromCents(foundingSavings.annualizedCents)
+  const foundingAnnualSavingsLabel = formatUsdFromCents(foundingSavings.versusPremiumAnnualCents)
+  const foundingMonthlySavingsLabel = formatUsdFromCents(foundingSavings.versusPremiumMonthlyCents)
 
   // Count how many founding member slots are taken
   const { count: foundingCount } = await supabase
@@ -86,6 +92,29 @@ export default async function BillingPage() {
             : 'Free members can keep using Barterkin, but premium unlocks unlimited listings and paid-member perks.'}
         </AlertDescription>
       </Alert>
+
+      {!isPaid && foundingAvailable ? (
+        <Card className="border-amber-300 bg-amber-50/80">
+          <CardHeader className="space-y-2">
+            <Badge className="w-fit bg-amber-600">Founding window</Badge>
+            <CardTitle className="text-xl text-amber-950">Founding pricing closes when these slots are gone.</CardTitle>
+            <CardDescription className="max-w-3xl text-amber-900/80">
+              Lock in Founding Member at {foundingMonthlyLabel} for an annualized {foundingAnnualizedLabel}, saving {foundingAnnualSavingsLabel} versus Premium Annual and {foundingMonthlySavingsLabel} versus Premium Monthly.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3 border-t border-amber-200/80 pt-5 text-sm text-amber-950 sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              {foundingSlotsRemaining} of {STRIPE_FOUNDING_MEMBER_LIMIT} founding slots are still available for free members upgrading today.
+            </p>
+            <Link
+              href="#founding-checkout"
+              className="inline-flex items-center justify-center rounded-md bg-amber-600 px-4 py-2 font-medium text-white transition hover:bg-amber-700"
+            >
+              Claim founding pricing
+            </Link>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <section className="grid gap-4 lg:grid-cols-[1.25fr,0.75fr]">
         <Card>

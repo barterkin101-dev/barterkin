@@ -29,6 +29,16 @@ export function getPremiumAnnualSavings() {
   }
 }
 
+export function getFoundingMemberSavings() {
+  const foundingAnnualized = BILLING_PLAN_AMOUNTS.foundingMonthlyCents * 12
+
+  return {
+    annualizedCents: foundingAnnualized,
+    versusPremiumAnnualCents: BILLING_PLAN_AMOUNTS.premiumAnnualCents - foundingAnnualized,
+    versusPremiumMonthlyCents: (BILLING_PLAN_AMOUNTS.premiumMonthlyCents * 12) - foundingAnnualized,
+  }
+}
+
 export function getStripePublishableKey(): string {
   const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   if (!key) {

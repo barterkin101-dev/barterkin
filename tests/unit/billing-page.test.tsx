@@ -75,12 +75,32 @@ describe('/dashboard/billing', () => {
     expect(screen.getByRole('button', { name: /upgrade to premium annual .* \$90\/yr/i })).toBeInTheDocument()
   })
 
+  it('shows the founding deadline callout when free members can still claim a slot', async () => {
+    mockBillingData({ tier: 'free', foundingCount: 12 })
+
+    await renderPage()
+
+    expect(screen.getByText('Founding pricing closes when these slots are gone.')).toBeInTheDocument()
+    expect(screen.getByText('Lock in Founding Member at $5/month for an annualized $60, saving $30 versus Premium Annual and $48 versus Premium Monthly.')).toBeInTheDocument()
+    expect(screen.getByText('88 of 100 founding slots are still available for free members upgrading today.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /claim founding pricing/i })).toHaveAttribute('href', '#founding-checkout')
+  })
+
   it('hides the upgrade savings callout for paid members', async () => {
     mockBillingData({ tier: 'premium', stripeCustomerId: 'cus_123' })
 
     await renderPage()
 
     expect(screen.queryByText('Annual Premium saves $18 per year.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Founding pricing closes when these slots are gone.')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /manage billing/i })).toBeInTheDocument()
+  })
+
+  it('hides the founding deadline callout when slots are sold out', async () => {
+    mockBillingData({ tier: 'free', foundingCount: 100 })
+
+    await renderPage()
+
+    expect(screen.queryByText('Founding pricing closes when these slots are gone.')).not.toBeInTheDocument()
   })
 })

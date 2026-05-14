@@ -141,6 +141,7 @@ export function BillingActions({
 
       {foundingAvailable && (
         <Button
+          id="founding-checkout"
           type="button"
           size="lg"
           variant="outline"
