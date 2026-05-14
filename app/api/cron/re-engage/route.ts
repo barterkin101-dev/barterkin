@@ -31,9 +31,9 @@ export async function POST(request: Request) {
   }
 
   const resend = new Resend(apiKey)
-  const admin = getSupabaseAdmin()
 
   try {
+    const admin = getSupabaseAdmin()
     const { recipients, error } = await getDormantRecipients()
     if (error) {
       return NextResponse.json({ error: 'Database error' }, { status: 500 })

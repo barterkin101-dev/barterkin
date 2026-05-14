@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const {
   mockSendEmail,
   mockRpc,
+  mockGetSupabaseAdmin,
   mockGetDormantRecipients,
   mockGetReEngagementListingsForProfile,
   mockRecordReEngagementSent,
@@ -10,6 +11,9 @@ const {
 } = vi.hoisted(() => ({
   mockSendEmail: vi.fn(),
   mockRpc: vi.fn(),
+  mockGetSupabaseAdmin: vi.fn(() => ({
+    rpc: mockRpc,
+  })),
   mockGetDormantRecipients: vi.fn(),
   mockGetReEngagementListingsForProfile: vi.fn(),
   mockRecordReEngagementSent: vi.fn(),
@@ -23,9 +27,7 @@ vi.mock('resend', () => ({
 }))
 
 vi.mock('@/lib/supabase/admin', () => ({
-  getSupabaseAdmin: vi.fn(() => ({
-    rpc: mockRpc,
-  })),
+  getSupabaseAdmin: mockGetSupabaseAdmin,
 }))
 
 vi.mock('@/lib/data/re-engagement', () => ({
@@ -51,6 +53,9 @@ import { POST } from '@/app/api/cron/re-engage/route'
 describe('POST /api/cron/re-engage', () => {
   beforeEach(() => {
     vi.resetAllMocks()
+    mockGetSupabaseAdmin.mockImplementation(() => ({
+      rpc: mockRpc,
+    }))
     vi.stubEnv('CRON_SECRET', 'test-cron-secret')
     vi.stubEnv('RESEND_API_KEY', 'test-resend-key')
     vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://barterkin.com')
@@ -80,6 +85,17 @@ describe('POST /api/cron/re-engage', () => {
     const res = await POST(makeRequest('Bearer test-cron-secret'))
     expect(res.status).toBe(500)
     await expect(res.json()).resolves.toMatchObject({ error: 'RESEND_API_KEY not configured' })
+  })
+
+  it('returns 500 when the Supabase admin client is unavailable', async () => {
+    mockGetSupabaseAdmin.mockImplementation(() => {
+      throw new Error('missing service role key')
+    })
+
+    const res = await POST(makeRequest('Bearer test-cron-secret'))
+
+    expect(res.status).toBe(500)
+    await expect(res.json()).resolves.toMatchObject({ error: 'Internal error' })
   })
 
   it('returns no_recipients when there is nobody eligible', async () => {
