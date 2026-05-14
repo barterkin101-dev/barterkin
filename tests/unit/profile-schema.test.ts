@@ -19,11 +19,29 @@ describe('ProfileFormSchema', () => {
     acceptingContact: true,
     tiktokHandle: '@kerry.smith',
     phoneNumber: '(404) 555-0123',
+    emailDigestEnabled: true,
   }
 
   it('accepts a valid complete profile object', () => {
     const result = ProfileFormSchema.safeParse(valid)
     expect(result.success).toBe(true)
+  })
+
+  it('accepts emailDigestEnabled false', () => {
+    const result = ProfileFormSchema.safeParse({ ...valid, emailDigestEnabled: false })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.emailDigestEnabled).toBe(false)
+    }
+  })
+
+  it('defaults emailDigestEnabled to true when omitted', () => {
+    const { emailDigestEnabled: _, ...without } = valid
+    const result = ProfileFormSchema.safeParse(without)
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.emailDigestEnabled).toBe(true)
+    }
   })
 
   it('rejects empty displayName (PROF-01 min 1)', () => {

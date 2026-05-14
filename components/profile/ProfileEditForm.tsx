@@ -60,6 +60,7 @@ export function ProfileEditForm({
       acceptingContact: defaultValues?.accepting_contact ?? true,
       tiktokHandle: defaultValues?.tiktok_handle ?? '',
       phoneNumber: initialPhoneNumber ?? '',
+      emailDigestEnabled: defaultValues?.email_digest_enabled ?? true,
     },
   })
 
@@ -104,6 +105,7 @@ export function ProfileEditForm({
     fd.set('acceptingContact', values.acceptingContact ? 'true' : 'false')
     fd.set('tiktokHandle', values.tiktokHandle ?? '')
     fd.set('phoneNumber', values.phoneNumber ?? '')
+    fd.set('emailDigestEnabled', values.emailDigestEnabled ? 'true' : 'false')
     formAction(fd)
   }
 
@@ -298,6 +300,26 @@ export function ProfileEditForm({
                     <FormLabel>Accept new contact requests</FormLabel>
                     <FormDescription>
                       When off, members won&rsquo;t be able to message you through Barterkin. Your profile stays visible in the directory.
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            <Controller
+              name="emailDigestEnabled"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="flex items-center gap-3">
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    aria-label="Receive weekly digest emails"
+                  />
+                  <div className="space-y-1">
+                    <FormLabel>Weekly digest emails</FormLabel>
+                    <FormDescription>
+                      Get a weekly roundup of new listings in your county. You can turn this off anytime.
                     </FormDescription>
                   </div>
                 </FormItem>

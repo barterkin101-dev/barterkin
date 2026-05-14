@@ -66,6 +66,7 @@ export const ProfileFormSchema = z.object({
     )
     .optional()
     .or(z.literal('')),
+  emailDigestEnabled: z.boolean().default(true),
 })
 
 export type ProfileFormValues = z.infer<typeof ProfileFormSchema>

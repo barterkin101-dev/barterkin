@@ -34,6 +34,7 @@ export function coerceFormDataToProfileInput(formData: FormData): {
   acceptingContact: boolean
   tiktokHandle: string
   phoneNumber: string
+  emailDigestEnabled: boolean
 } {
   const intOrNull = (v: FormDataEntryValue | null) => {
     const s = typeof v === 'string' ? v.trim() : ''
@@ -53,5 +54,6 @@ export function coerceFormDataToProfileInput(formData: FormData): {
     acceptingContact: formData.get('acceptingContact') === 'true',
     tiktokHandle: String(formData.get('tiktokHandle') ?? ''),
     phoneNumber: String(formData.get('phoneNumber') ?? ''),
+    emailDigestEnabled: formData.get('emailDigestEnabled') !== 'false',
   }
 }

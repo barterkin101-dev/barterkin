@@ -42,6 +42,7 @@ export async function coerceFormDataToProfileInput(formData: FormData): Promise<
   acceptingContact: boolean
   tiktokHandle: string
   phoneNumber: string
+  emailDigestEnabled: boolean
 }> {
   return _coerceFormDataToProfileInput(formData)
 }
@@ -150,6 +151,7 @@ export async function saveProfile(
     tiktok_handle: values.tiktokHandle || null,
     phone_number: normalizedPhoneNumber ? encryptPhoneNumber(normalizedPhoneNumber) : null,
     phone_verified: phoneNumberChanged ? false : (existing?.phone_verified ?? false),
+    email_digest_enabled: values.emailDigestEnabled,
   }
   const { data: upserted, error: upsertError } = await supabase
     .from('profiles')
