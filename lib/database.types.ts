@@ -828,6 +828,42 @@ export type Database = {
           },
         ]
       }
+      profile_views: {
+        Row: {
+          created_at: string
+          id: string
+          viewed_profile_id: string
+          viewer_profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          viewed_profile_id: string
+          viewer_profile_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          viewed_profile_id?: string
+          viewer_profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_views_viewed_profile_id_fkey"
+            columns: ["viewed_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_views_viewer_profile_id_fkey"
+            columns: ["viewer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ratings: {
         Row: {
           conversation_id: string | null

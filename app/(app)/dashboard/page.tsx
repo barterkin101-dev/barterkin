@@ -20,10 +20,12 @@ import { ContactLimitUpsell } from '@/components/dashboard/ContactLimitUpsell'
 import { StaleListingReminder } from '@/components/dashboard/StaleListingReminder'
 import { DigestOptOutReminder } from '@/components/dashboard/DigestOptOutReminder'
 import { ContactLimitComparisonCard } from '@/components/dashboard/ContactLimitComparisonCard'
+import { ProfileViewsSnapshotCard } from '@/components/dashboard/ProfileViewsSnapshotCard'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
 import { updateLoginStreak } from '@/lib/actions/quests'
+import { getProfileViewsSnapshot } from '@/lib/data/profile-views'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -169,6 +171,9 @@ export default async function DashboardPage() {
     profile?.email_digest_enabled,
     profile?.is_published,
   )
+  const profileViewsSnapshot = profile?.is_published
+    ? await getProfileViewsSnapshot(profile.id)
+    : null
 
   return (
     <div className="space-y-8">
@@ -359,6 +364,13 @@ export default async function DashboardPage() {
 
       {digestOptOutReminder && (
         <DigestOptOutReminder href={digestOptOutReminder.href} />
+      )}
+
+      {profile && profileViewsSnapshot && (
+        <ProfileViewsSnapshotCard
+          isPublished={profile.is_published}
+          snapshot={profileViewsSnapshot}
+        />
       )}
 
       {/* Profile completion nudge */}

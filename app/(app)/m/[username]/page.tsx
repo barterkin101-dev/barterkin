@@ -7,6 +7,7 @@ import { ProfileCard } from '@/components/profile/ProfileCard'
 import { RatingCard } from '@/components/ratings/RatingCard'
 import { getRatingsForProfile } from '@/lib/data/ratings'
 import type { ProfileWithRelations } from '@/lib/actions/profile.types'
+import { createLogger } from '@/lib/utils/logger'
 
 // Middleware's VERIFIED_REQUIRED_PREFIXES already covers '/m/' — auth+verify gate runs before this page.
 
@@ -94,6 +95,27 @@ export default async function MemberProfilePage({
   // Pitfall §1: getUser() revalidates against auth server — use for identity, not getSession()
   const { data: { user } } = await supabase.auth.getUser()
   const viewerOwnerId = user?.id ?? null
+
+  if (user && user.id !== profileRow.owner_id && profileRow.is_published) {
+    const { data: viewerProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('owner_id', user.id)
+      .maybeSingle()
+
+    if (viewerProfile?.id) {
+      const { error } = await supabase.from('profile_views').insert({
+        viewer_profile_id: viewerProfile.id,
+        viewed_profile_id: profileRow.id,
+      })
+
+      if (error) {
+        createLogger('member-profile').error('profile view insert error', {
+          context: { code: error.code, viewedProfileId: profileRow.id },
+        })
+      }
+    }
+  }
 
   const { ratings, avg, count } = await getRatingsForProfile(profileRow.id)
 
