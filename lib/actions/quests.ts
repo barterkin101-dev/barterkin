@@ -234,6 +234,25 @@ async function isQuestEligible(
         .eq('sender_profile_id', profileId)
       return !error && (count ?? 0) > 0
     }
+    case 'quest_first_trade': {
+      const completedByInitiator = await supabase
+        .from('trade_completions')
+        .select('conversation_id', { count: 'exact', head: true })
+        .eq('initiator_profile_id', profileId)
+        .eq('status', 'completed')
+
+      const completedByRecipient = await supabase
+        .from('trade_completions')
+        .select('conversation_id', { count: 'exact', head: true })
+        .eq('recipient_profile_id', profileId)
+        .eq('status', 'completed')
+
+      if (completedByInitiator.error || completedByRecipient.error) {
+        return false
+      }
+
+      return ((completedByInitiator.count ?? 0) + (completedByRecipient.count ?? 0)) > 0
+    }
     case 'quest_referral_converted': {
       const { count, error } = await supabase
         .from('referrals')

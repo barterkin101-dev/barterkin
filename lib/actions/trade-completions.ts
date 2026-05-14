@@ -4,6 +4,7 @@ import { Resend } from 'resend'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { awardQuest } from '@/lib/actions/quests'
 import { captureEvent } from '@/lib/analytics'
 import { createLogger } from '@/lib/utils/logger'
 import { RatingSchema } from '@/lib/schemas/ratings'
@@ -168,6 +169,15 @@ export async function markTradeComplete(
       listing_id: null,
       completed: true,
     })
+
+    const questResult = await awardQuest('quest_first_trade')
+    if (!questResult.ok && questResult.error !== 'Quest requirements not met yet.') {
+      const log = createLogger('trade-completions')
+      log.warn('quest_first_trade award failed', {
+        context: { conversationId, error: questResult.error },
+      })
+    }
+
     await sendTradeReviewPrompts(conversationId)
   }
 

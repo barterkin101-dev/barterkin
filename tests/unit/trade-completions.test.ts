@@ -18,6 +18,10 @@ vi.mock('@/lib/analytics', () => ({
   captureEvent: vi.fn(),
 }))
 
+vi.mock('@/lib/actions/quests', () => ({
+  awardQuest: vi.fn().mockResolvedValue({ ok: true, awarded: true, credits: 15 }),
+}))
+
 vi.mock('resend', () => ({
   Resend: class MockResend {
     emails = {
@@ -34,6 +38,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { captureEvent } from '@/lib/analytics'
+import { awardQuest } from '@/lib/actions/quests'
 
 import {
   markTradeComplete,
@@ -213,6 +218,7 @@ describe('markTradeComplete', () => {
       conversation_id: CONV_UUID,
       status: 'initiator_marked',
     })
+    expect(vi.mocked(awardQuest)).not.toHaveBeenCalled()
     expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith(`/dashboard/messages/${CONV_UUID}`)
   })
 
@@ -252,6 +258,7 @@ describe('markTradeComplete', () => {
       listing_id: null,
       completed: true,
     })
+    expect(vi.mocked(awardQuest)).toHaveBeenCalledWith('quest_first_trade')
     expect(mockResendSend).toHaveBeenCalledTimes(2)
   })
 

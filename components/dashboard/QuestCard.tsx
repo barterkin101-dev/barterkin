@@ -77,4 +77,5 @@ const QUEST_LABELS: Record<QuestKey, string> = {
   quest_complete_profile: 'Complete Profile',
   quest_referral_converted: 'Referral Converted',
   quest_first_message: 'First Message',
+  quest_first_trade: 'First Trade',
 }

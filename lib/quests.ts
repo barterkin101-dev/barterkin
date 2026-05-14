@@ -4,6 +4,7 @@ export type QuestKey =
   | 'quest_complete_profile'
   | 'quest_referral_converted'
   | 'quest_first_message'
+  | 'quest_first_trade'
 
 export interface QuestDef {
   key: QuestKey
@@ -53,6 +54,13 @@ export const QUESTS: QuestDef[] = [
     label: 'First Message',
     description: 'Send a message to another member',
     credits: 2,
+    autoAwarded: true,
+  },
+  {
+    key: 'quest_first_trade',
+    label: 'First Trade',
+    description: 'Complete your first trade with another member',
+    credits: 15,
     autoAwarded: true,
   },
 ]

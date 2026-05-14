@@ -5,7 +5,7 @@ vi.mock('@/lib/supabase/server', () => ({
 }))
 
 vi.mock('@/lib/analytics', () => ({
-  captureEvent: vi.fn(),
+  captureEvent: vi.fn().mockResolvedValue(undefined),
 }))
 
 import { createClient } from '@/lib/supabase/server'
@@ -112,6 +112,45 @@ describe('awardQuest', () => {
     expect(result).toEqual({
       ok: false,
       error: 'Quest requirements not met yet.',
+    })
+  })
+
+  it('awards first trade when the member has a completed trade as the initiator', async () => {
+    const profileSingle = vi.fn().mockResolvedValue({
+      data: { id: 'profile-1', credits: 4 },
+    })
+    const profileEq = vi.fn().mockReturnValue({ single: profileSingle })
+    const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
+
+    const initiatorStatusEq = vi.fn().mockResolvedValue({ count: 1, error: null })
+    const initiatorProfileEq = vi.fn().mockReturnValue({ eq: initiatorStatusEq })
+    const initiatorSelect = vi.fn().mockReturnValue({ eq: initiatorProfileEq })
+
+    const recipientStatusEq = vi.fn().mockResolvedValue({ count: 0, error: null })
+    const recipientProfileEq = vi.fn().mockReturnValue({ eq: recipientStatusEq })
+    const recipientSelect = vi.fn().mockReturnValue({ eq: recipientProfileEq })
+
+    const rpcMock = vi.fn().mockResolvedValue({ data: true, error: null })
+
+    const fromMock = vi
+      .fn()
+      .mockReturnValueOnce({ select: profileSelect })
+      .mockReturnValueOnce({ select: initiatorSelect })
+      .mockReturnValueOnce({ select: recipientSelect })
+
+    makeClient({ from: fromMock, rpc: rpcMock })
+
+    const result = await awardQuest('quest_first_trade')
+
+    expect(result).toEqual({
+      ok: true,
+      awarded: true,
+      credits: 19,
+    })
+    expect(rpcMock).toHaveBeenCalledWith('award_quest_credit', {
+      p_profile_id: 'profile-1',
+      p_quest_key: 'quest_first_trade',
+      p_credits: 15,
     })
   })
 })
