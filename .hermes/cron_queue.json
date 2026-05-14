@@ -178,10 +178,10 @@
     "title": "Add zero-listing dashboard launch CTA for onboarded members — retention/engagement",
     "description": "Show a dashboard reminder card for members who completed onboarding but still have zero active listings, pushing them into `/listings/new` with concrete copy about publishing their first offer and earning quest credits. Acceptance: only eligible members see it, CTA deep-links to listing creation, quest-credit copy is accurate, and tests cover visibility rules.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-14T14:00:00Z",
     "source": "cron-self-generated",
-    "notes": "Implementing an onboarded zero-active-listing dashboard reminder with a listing-create CTA and quest-aware reward copy."
+    "notes": "Added an onboarded zero-active-listing dashboard launch reminder with quest-aware first-listing credit copy and dashboard CTA coverage. Commit: 67fb20a."
   },
   {
     "id": "110",
