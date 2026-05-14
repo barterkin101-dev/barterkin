@@ -46,11 +46,14 @@ export function ListingCard({ listing, saved = false }: { listing: ListingRow; s
                 {conditionLabels[listing.condition] ?? listing.condition}
               </Badge>
             )}
-            {listing.boosted_until && new Date(listing.boosted_until) > new Date() && (
-              <Badge
-                className="absolute right-3 bottom-3 bg-purple-600 text-white border-purple-600"
-              >
+            {listing.featured_until && new Date(listing.featured_until) > new Date() && (
+              <Badge className="absolute right-3 bottom-3 border-amber-500 bg-amber-500 text-amber-950">
                 Featured
+              </Badge>
+            )}
+            {listing.boosted_until && new Date(listing.boosted_until) > new Date() && (
+              <Badge className="absolute bottom-3 right-3 translate-y-[-2rem] border-sky-600 bg-sky-600 text-white">
+                Boosted
               </Badge>
             )}
           </div>

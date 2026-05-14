@@ -20,8 +20,8 @@
     "title": "Add listing feature/boost credit sink for premium members — monetization/engagement",
     "description": "Let premium members spend 5 credits to 'feature' a listing for 7 days. Featured listings get a visual badge and a small ranking boost in discover/directory. Add `featured_until` timestamp to listings table, a 'Feature this listing' action in the listing edit flow, and deduct credits via the existing credit ledger. Gate to premium members only. Acceptance: feature action visible only to premium, credits deducted, badge renders on featured listings, ranking boost applied, unit tests cover gating and credit deduction.",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "in_progress",
+    "notes": "Implementing featured_until listing promotion with premium gating, credit deduction, browse/discover ranking updates, and regression tests."
   },
   {
     "id": "94",

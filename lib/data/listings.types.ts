@@ -23,6 +23,7 @@ export interface ListingRow {
   status: string
   created_at: string
   updated_at: string
+  featured_until: string | null
   boosted_until: string | null
   images: ListingImage[]
   profiles: {

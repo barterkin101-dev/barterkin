@@ -500,6 +500,7 @@ export type Database = {
           county_id: number | null
           created_at: string
           description: string
+          featured_until: string | null
           id: string
           price_estimate: string | null
           profile_id: string
@@ -516,6 +517,7 @@ export type Database = {
           county_id?: number | null
           created_at?: string
           description: string
+          featured_until?: string | null
           id?: string
           price_estimate?: string | null
           profile_id: string
@@ -532,6 +534,7 @@ export type Database = {
           county_id?: number | null
           created_at?: string
           description?: string
+          featured_until?: string | null
           id?: string
           price_estimate?: string | null
           profile_id?: string

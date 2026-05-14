@@ -20,3 +20,9 @@ export interface BoostListingResult {
   error?: string
   boostedUntil?: string
 }
+
+export interface FeatureListingResult {
+  ok: boolean
+  error?: string
+  featuredUntil?: string
+}

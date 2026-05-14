@@ -80,7 +80,7 @@ export async function getListings(
       let q = supabase
         .from('listings')
         .select(
-          `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, updated_at, boosted_until,
+          `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, updated_at, featured_until, boosted_until,
            profiles!inner(id, display_name, username, avatar_url, phone_verified),
            counties!left(name),
            categories!left(name)`,
@@ -90,6 +90,7 @@ export async function getListings(
       if (filters.countyId != null) q = q.eq('county_id', filters.countyId!)
       if (filters.condition != null) q = q.eq('condition', filters.condition!)
       return q
+        .order('featured_until', { ascending: false, nullsFirst: false })
         .order('boosted_until', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: false })
         .range(
@@ -139,7 +140,7 @@ export async function getListingById(id: string): Promise<ListingRow | null> {
     const { data, error } = await supabase
     .from('listings')
     .select(
-      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, updated_at, boosted_until,
+      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, updated_at, featured_until, boosted_until,
        profiles!inner(id, display_name, username, avatar_url, accepting_contact, phone_verified),
        counties!left(name),
        categories!left(name)`,
@@ -164,11 +165,12 @@ export async function getMyListings(profileId: string): Promise<ListingRow[]> {
   const { data, error } = await supabase
     .from('listings')
     .select(
-      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, updated_at, boosted_until,
+      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, updated_at, featured_until, boosted_until,
        counties!left(name),
        categories!left(name)`,
     )
     .eq('profile_id', profileId)
+    .order('featured_until', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
 
   if (error) {

@@ -23,7 +23,7 @@ export default async function DashboardListingsPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, credits')
+    .select('id, credits, tier')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -102,8 +102,13 @@ export default async function DashboardListingsPage() {
                       {listing.status}
                     </Badge>
                     {listing.boosted_until && new Date(listing.boosted_until) > new Date() && (
-                      <Badge className="bg-purple-100 text-purple-800">
+                      <Badge className="bg-sky-100 text-sky-800">
                         Boosted
+                      </Badge>
+                    )}
+                    {listing.featured_until && new Date(listing.featured_until) > new Date() && (
+                      <Badge className="bg-amber-100 text-amber-900">
+                        Featured
                       </Badge>
                     )}
                   </div>

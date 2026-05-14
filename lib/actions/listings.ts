@@ -12,6 +12,7 @@ import type {
   DeleteListingResult,
   ToggleListingStatusResult,
   BoostListingResult,
+  FeatureListingResult,
 } from '@/lib/actions/listings.types'
 
 // ============================================================================
@@ -344,6 +345,8 @@ export async function toggleListingStatus(
 // ============================================================================
 const BOOST_COST = 1
 const BOOST_DURATION_DAYS = 7
+const FEATURE_COST = 5
+const FEATURE_DURATION_DAYS = 7
 
 export async function boostListing(
   _prev: BoostListingResult | null,
@@ -431,4 +434,93 @@ export async function boostListing(
   })
 
   return { ok: true, boostedUntil: boostedUntil.toISOString() }
+}
+
+export async function featureListing(
+  _prev: FeatureListingResult | null,
+  formData: FormData,
+): Promise<FeatureListingResult> {
+  const supabase = await createClient()
+  const { data: { user }, error: authErr } = await supabase.auth.getUser()
+  if (authErr || !user) return { ok: false, error: 'Not authenticated.' }
+
+  const listingId = String(formData.get('listingId') ?? '')
+  if (!listingId) return { ok: false, error: 'Listing ID is required.' }
+
+  const { data: profile, error: profileErr } = await supabase
+    .from('profiles')
+    .select('id, tier, credits')
+    .eq('owner_id', user.id)
+    .maybeSingle()
+  if (profileErr || !profile) {
+    return { ok: false, error: 'Profile not found.' }
+  }
+
+  if (profile.tier !== 'premium') {
+    return { ok: false, error: 'Only Premium members can feature listings.' }
+  }
+
+  if ((profile.credits ?? 0) < FEATURE_COST) {
+    return {
+      ok: false,
+      error: `You need ${FEATURE_COST} credits to feature a listing for ${FEATURE_DURATION_DAYS} days.`,
+    }
+  }
+
+  const { data: existing, error: existingErr } = await supabase
+    .from('listings')
+    .select('id, profile_id, status, featured_until')
+    .eq('id', listingId)
+    .maybeSingle()
+  if (existingErr || !existing) {
+    return { ok: false, error: 'Listing not found.' }
+  }
+  if (existing.profile_id !== profile.id) {
+    return { ok: false, error: 'You can only feature your own listings.' }
+  }
+  if (existing.status !== 'active') {
+    return { ok: false, error: 'Only active listings can be featured.' }
+  }
+
+  const now = new Date()
+  if (existing.featured_until && new Date(existing.featured_until) > now) {
+    return { ok: false, error: 'This listing is already featured.' }
+  }
+
+  const featuredUntil = new Date(now.getTime() + FEATURE_DURATION_DAYS * 24 * 60 * 60 * 1000)
+
+  const { error: ledgerErr } = await supabase
+    .from('credit_ledger')
+    .insert({
+      profile_id: profile.id,
+      amount: -FEATURE_COST,
+      reason: 'listing_feature',
+    })
+  if (ledgerErr) {
+    const log = createLogger('listings')
+    log.error('feature credit deduction failed', { error: ledgerErr, context: { code: ledgerErr.code } })
+    return { ok: false, error: 'Could not deduct credits. Please try again.' }
+  }
+
+  const { error: updateErr } = await supabase
+    .from('listings')
+    .update({ featured_until: featuredUntil.toISOString() })
+    .eq('id', listingId)
+  if (updateErr) {
+    const log = createLogger('listings')
+    log.error('feature update failed', { error: updateErr, context: { code: updateErr.code } })
+    return { ok: false, error: 'Something went wrong featuring your listing.' }
+  }
+
+  revalidatePath('/dashboard/listings')
+  revalidatePath('/listings')
+  revalidatePath(`/listings/${listingId}`)
+
+  void captureEvent(user.id, 'listing_featured', {
+    listing_id: listingId,
+    cost: FEATURE_COST,
+    duration_days: FEATURE_DURATION_DAYS,
+  })
+
+  return { ok: true, featuredUntil: featuredUntil.toISOString() }
 }

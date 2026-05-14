@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getListingById } from '@/lib/data/listings'
 import { ListingForm } from '@/components/listings/ListingForm'
+import { ListingFeaturePanel } from '@/components/listings/ListingFeaturePanel'
 import { redirect, notFound } from 'next/navigation'
 
 interface EditListingPageProps {
@@ -19,7 +20,7 @@ export default async function EditListingPage({ params }: EditListingPageProps) 
   // Verify ownership
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id')
+    .select('id, tier, credits')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -33,12 +34,20 @@ export default async function EditListingPage({ params }: EditListingPageProps) 
   ])
 
   return (
-    <ListingForm
-      userId={user.id}
-      categories={categories ?? []}
-      counties={counties ?? []}
-      defaultValues={listing}
-      returnTo="/dashboard/listings"
-    />
+    <div className="space-y-6">
+      <ListingFeaturePanel
+        listingId={listing.id}
+        tier={profile.tier}
+        credits={profile.credits ?? 0}
+        featuredUntil={listing.featured_until}
+      />
+      <ListingForm
+        userId={user.id}
+        categories={categories ?? []}
+        counties={counties ?? []}
+        defaultValues={listing}
+        returnTo="/dashboard/listings"
+      />
+    </div>
   )
 }
