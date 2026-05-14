@@ -44,7 +44,7 @@
     "title": "Add premium annual savings callout on billing page — monetization",
     "description": "Surface a clear annual-plan savings comparison on /dashboard/billing so free members see the monthly equivalent and total saved versus month-to-month. Acceptance: savings callout renders for upgrade flows, copy uses live plan amounts from config, and unit tests cover the math and rendering states.",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "Added shared billing price config plus annual savings callouts and coverage for math/rendering states. Commit: 0fce923."
   }
 ]
