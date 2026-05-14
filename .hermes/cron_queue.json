@@ -208,10 +208,10 @@
     "title": "Add second-listing expansion reminder for single-listing members — retention/engagement",
     "description": "Show a dashboard reminder for members who have exactly one active listing and completed onboarding, nudging them to publish a second listing so they appear in more search contexts. Acceptance: only eligible members see it, CTA deep-links to `/listings/new`, copy references broader trade coverage, and tests cover visibility rules.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-14T14:30:00Z",
     "source": "cron-self-generated",
-    "notes": "Implementing a single-active-listing dashboard reminder with regression coverage."
+    "notes": "Added a single-active-listing dashboard expansion reminder with regression coverage for eligibility states. Commit: 63a5d81."
   },
   {
     "id": "113",
