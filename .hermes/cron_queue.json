@@ -84,8 +84,8 @@
     "title": "Add profile views snapshot card to dashboard — retention",
     "description": "Surface a compact dashboard card showing a member's last-7-days profile views versus the prior 7 days, with an encouragement CTA when views dip. Acceptance: card appears only for published profiles, uses live profile view data, includes positive/negative trend copy, and unit tests cover empty, rising, and declining states.",
     "priority": "medium",
-    "status": "pending",
-    "notes": "Grounded in the published-profile dashboard flow and existing engagement reminder patterns."
+    "status": "completed",
+    "notes": "Added first-party profile view tracking plus a published-profile dashboard snapshot card with trend coverage. Commit: 8b352b8."
   },
   {
     "id": "90",
