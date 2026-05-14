@@ -70,6 +70,9 @@ describe('quest award hooks', () => {
     const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
     const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
 
+    const priorListingCountEq = vi.fn().mockResolvedValue({ count: 0, error: null })
+    const priorListingCountSelect = vi.fn().mockReturnValue({ eq: priorListingCountEq })
+
     const listingSingle = vi
       .fn()
       .mockResolvedValue({ data: { id: LISTING_ID }, error: null })
@@ -83,6 +86,7 @@ describe('quest award hooks', () => {
     const fromMock = vi
       .fn()
       .mockReturnValueOnce({ select: profileSelect })
+      .mockReturnValueOnce({ select: priorListingCountSelect })
       .mockReturnValueOnce({ upsert: listingUpsert })
       .mockReturnValueOnce({ delete: deleteImages })
       .mockReturnValueOnce({ insert: insertImages })
@@ -132,6 +136,42 @@ describe('quest award hooks', () => {
     fd.set('listingId', LISTING_ID)
 
     const result = await saveListing(null, fd)
+
+    expect(result).toEqual({ ok: true, listingId: LISTING_ID })
+    expect(vi.mocked(awardQuest)).not.toHaveBeenCalled()
+  })
+
+  it('does not award first listing quest when the member already had listings before this create', async () => {
+    const profileMaybeSingle = vi
+      .fn()
+      .mockResolvedValue({ data: { id: PROFILE_ID, tier: 'premium' }, error: null })
+    const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
+    const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
+
+    const priorListingCountEq = vi.fn().mockResolvedValue({ count: 2, error: null })
+    const priorListingCountSelect = vi.fn().mockReturnValue({ eq: priorListingCountEq })
+
+    const listingSingle = vi
+      .fn()
+      .mockResolvedValue({ data: { id: LISTING_ID }, error: null })
+    const listingSelect = vi.fn().mockReturnValue({ single: listingSingle })
+    const listingUpsert = vi.fn().mockReturnValue({ select: listingSelect })
+
+    const deleteImagesEq = vi.fn().mockResolvedValue({ error: null })
+    const deleteImages = vi.fn().mockReturnValue({ eq: deleteImagesEq })
+    const insertImages = vi.fn().mockResolvedValue({ error: null })
+
+    const fromMock = vi
+      .fn()
+      .mockReturnValueOnce({ select: profileSelect })
+      .mockReturnValueOnce({ select: priorListingCountSelect })
+      .mockReturnValueOnce({ upsert: listingUpsert })
+      .mockReturnValueOnce({ delete: deleteImages })
+      .mockReturnValueOnce({ insert: insertImages })
+
+    makeClient(fromMock)
+
+    const result = await saveListing(null, makeListingFormData())
 
     expect(result).toEqual({ ok: true, listingId: LISTING_ID })
     expect(vi.mocked(awardQuest)).not.toHaveBeenCalled()

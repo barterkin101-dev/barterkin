@@ -93,8 +93,27 @@ export async function saveListing(
 
   const listingId = formData.get('listingId')
   const isUpdate = listingId && String(listingId) !== ''
+  let shouldAwardFirstListingQuest = false
 
   // Tier-based listing limits: free = 3 max, premium/founding = unlimited
+  if (!isUpdate) {
+    const { count: priorListingCount, error: priorListingCountErr } = await supabase
+      .from('listings')
+      .select('id', { count: 'exact', head: true })
+      .eq('profile_id', profile.id)
+
+    if (priorListingCountErr) {
+      const log = createLogger('listings')
+      log.error('prior listing count failed', {
+        error: priorListingCountErr,
+        context: { code: priorListingCountErr.code },
+      })
+      return { ok: false, error: 'Something went wrong saving your listing.' }
+    }
+
+    shouldAwardFirstListingQuest = (priorListingCount ?? 0) === 0
+  }
+
   if (!isUpdate && profile.tier === 'free') {
     const { count, error: countErr } = await supabase
       .from('listings')
@@ -192,7 +211,7 @@ export async function saveListing(
     has_images: values.images.length,
   })
 
-  if (!isUpdate) {
+  if (!isUpdate && shouldAwardFirstListingQuest) {
     const questResult = await awardQuest('quest_first_listing')
     if (!questResult.ok) {
       const log = createLogger('listings')
