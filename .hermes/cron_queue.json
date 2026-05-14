@@ -76,8 +76,8 @@
     "title": "Add LinkedIn referral share action to dashboard invite card — acquisition",
     "description": "Expand `ReferralInviteCard` with a one-tap LinkedIn share action using the member's referral link. Track the channel in PostHog via `referral_invite_shared`. Acceptance: LinkedIn button renders on the dashboard card, generated share URL is stable and encoded, analytics fires with method=linkedin, and unit tests cover URL generation and click behavior.",
     "priority": "high",
-    "status": "in_progress",
-    "notes": "Picked as the top new acquisition task because the referral card already supports multiple channels and this adds another high-intent sharing path with minimal UX friction."
+    "status": "completed",
+    "notes": "Added LinkedIn referral sharing to the dashboard invite card with analytics + unit coverage. Commit: 9ca5d2f."
   },
   {
     "id": "89",
