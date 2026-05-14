@@ -23,11 +23,22 @@ vi.mock('@/lib/actions/quests', () => ({
   awardQuest: vi.fn().mockResolvedValue({ ok: true, awarded: true, credits: 2 }),
 }))
 
+vi.mock('@/lib/data/contact-limit', () => ({
+  getContactLimitStatus: vi.fn().mockResolvedValue({
+    used: 8,
+    limit: 10,
+    remaining: 2,
+    isNearLimit: true,
+    isAtLimit: false,
+  }),
+}))
+
 // Import mocked modules AFTER vi.mock declarations
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { limitSendMessage } from '@/lib/rate-limit'
 import { awardQuest } from '@/lib/actions/quests'
+import { getContactLimitStatus } from '@/lib/data/contact-limit'
 
 import {
   sendMessage,
@@ -68,6 +79,13 @@ beforeEach(() => {
     remaining: 59,
     reset: 0,
   })
+  vi.mocked(getContactLimitStatus).mockResolvedValue({
+    used: 8,
+    limit: 10,
+    remaining: 2,
+    isNearLimit: true,
+    isAtLimit: false,
+  })
 })
 
 // ============================================================================
@@ -89,7 +107,7 @@ describe('sendMessage', () => {
     const { getUserMock, fromMock } = makeSupabaseMock()
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
-    const maybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const maybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID, tier: 'free' }, error: null })
     const eq = vi.fn().mockReturnValue({ maybeSingle })
     const select = vi.fn().mockReturnValue({ eq })
     fromMock.mockReturnValue({ select })
@@ -158,7 +176,7 @@ describe('sendMessage', () => {
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
     // 1st from('profiles'): sender profile lookup
-    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID, tier: 'free' }, error: null })
     const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
     const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
 
@@ -184,7 +202,7 @@ describe('sendMessage', () => {
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
     // 1st from('profiles'): sender profile lookup
-    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID, tier: 'free' }, error: null })
     const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
     const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
 
@@ -321,7 +339,7 @@ describe('createConversation', () => {
     const { getUserMock, fromMock } = makeSupabaseMock()
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
-    const maybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const maybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID, tier: 'free' }, error: null })
     const eq = vi.fn().mockReturnValue({ maybeSingle })
     const select = vi.fn().mockReturnValue({ eq })
     fromMock.mockReturnValue({ select })
@@ -338,7 +356,7 @@ describe('createConversation', () => {
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
     // 1st from('profiles'): sender profile lookup
-    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID, tier: 'free' }, error: null })
     const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
     const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
 
@@ -378,7 +396,7 @@ describe('createConversation', () => {
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
     // 1st from('profiles'): sender profile lookup
-    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID, tier: 'free' }, error: null })
     const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
     const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
 
@@ -420,12 +438,58 @@ describe('createConversation', () => {
     expect(vi.mocked(awardQuest)).toHaveBeenCalledWith('quest_first_message')
   })
 
+  it('returns a post-send billing nudge when a free member is down to one contact start', async () => {
+    const { getUserMock, fromMock, rpcMock } = makeSupabaseMock()
+    getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
+
+    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID, tier: 'free' }, error: null })
+    const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
+    const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
+
+    rpcMock.mockResolvedValue({ data: [{ id: CONV_UUID }], error: null })
+
+    const msgSingle = vi.fn().mockResolvedValue({ data: { id: MSG_UUID }, error: null })
+    const msgSelect = vi.fn().mockReturnValue({ single: msgSingle })
+    const msgInsert = vi.fn().mockReturnValue({ select: msgSelect })
+
+    fromMock
+      .mockReturnValueOnce({ select: profileSelect })
+      .mockReturnValueOnce({ insert: msgInsert })
+
+    vi.mocked(getContactLimitStatus).mockResolvedValue({
+      used: 9,
+      limit: 10,
+      remaining: 1,
+      isNearLimit: true,
+      isAtLimit: false,
+    })
+
+    const fd = new FormData()
+    fd.set('recipientProfileId', OTHER_UUID)
+    fd.set('initialMessage', 'Hello there')
+    const result = await createConversation(null, fd)
+
+    expect(result).toEqual({
+      ok: true,
+      conversationId: CONV_UUID,
+      postContactUpgradeNudge: {
+        used: 9,
+        limit: 10,
+        remaining: 1,
+        premiumMonthlyPrice: '$9',
+        premiumAnnualSavings: '$18',
+        premiumContactLimit: 100,
+      },
+    })
+    expect(vi.mocked(getContactLimitStatus)).toHaveBeenCalledWith(VALID_UUID, 'free')
+  })
+
   it('returns error when conversation insert fails', async () => {
     const { getUserMock, fromMock, rpcMock } = makeSupabaseMock()
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
     // 1st from('profiles'): sender profile lookup
-    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID, tier: 'free' }, error: null })
     const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
     const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
 
@@ -454,7 +518,7 @@ describe('createConversation', () => {
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
     // 1st from('profiles'): sender profile lookup
-    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID, tier: 'free' }, error: null })
     const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
     const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
 
@@ -487,7 +551,7 @@ describe('createConversation', () => {
     getUserMock.mockResolvedValue({ data: { user: { id: 'u1' } }, error: null })
 
     // 1st from('profiles'): sender profile lookup
-    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID }, error: null })
+    const profileMaybeSingle = vi.fn().mockResolvedValue({ data: { id: VALID_UUID, tier: 'free' }, error: null })
     const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
     const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
 

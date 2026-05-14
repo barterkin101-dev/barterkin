@@ -52,7 +52,20 @@ export function MessageButton({
 
   // On success, navigate to the new conversation thread
   if (state?.ok && state.conversationId) {
-    router.push(`/dashboard/messages/${state.conversationId}`)
+    const searchParams = new URLSearchParams()
+
+    if (state.postContactUpgradeNudge) {
+      searchParams.set('contactUpgrade', '1')
+      searchParams.set('contactUsed', String(state.postContactUpgradeNudge.used))
+      searchParams.set('contactLimit', String(state.postContactUpgradeNudge.limit))
+      searchParams.set('contactRemaining', String(state.postContactUpgradeNudge.remaining))
+      searchParams.set('premiumMonthlyPrice', state.postContactUpgradeNudge.premiumMonthlyPrice)
+      searchParams.set('premiumAnnualSavings', state.postContactUpgradeNudge.premiumAnnualSavings)
+      searchParams.set('premiumContactLimit', String(state.postContactUpgradeNudge.premiumContactLimit))
+    }
+
+    const query = searchParams.toString()
+    router.push(`/dashboard/messages/${state.conversationId}${query ? `?${query}` : ''}`)
     return null
   }
 

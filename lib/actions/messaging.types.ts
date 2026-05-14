@@ -1,3 +1,5 @@
+import type { PostContactUpgradeNudgeProps } from '@/lib/post-contact-upgrade-nudge'
+
 export interface SendMessageResult {
   ok: boolean
   messageId?: string
@@ -8,6 +10,7 @@ export interface SendMessageResult {
 export interface CreateConversationResult {
   ok: boolean
   conversationId?: string
+  postContactUpgradeNudge?: PostContactUpgradeNudgeProps
   error?: string
   fieldErrors?: Record<string, string[]>
 }

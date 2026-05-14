@@ -1,13 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { ConversationThread } from '@/components/messaging/ConversationThread'
 import { MessageComposer } from '@/components/messaging/MessageComposer'
+import { PostContactUpgradeNudge } from '@/components/messaging/PostContactUpgradeNudge'
 import { TradeCompletionPanel } from '@/components/messaging/TradeCompletionPanel'
 import type { MessageRow } from '@/lib/data/messaging'
 import type { Database } from '@/lib/database.types'
+import type { PostContactUpgradeNudgeProps } from '@/lib/post-contact-upgrade-nudge'
 
 type TradeCompletionRow = Database['public']['Tables']['trade_completions']['Row']
 
@@ -34,6 +36,7 @@ function getActorStatus(
 
 export default function MessageThreadPage() {
   const params = useParams()
+  const searchParams = useSearchParams()
   const conversationId = String(params.id)
   const [messages, setMessages] = useState<MessageRow[]>([])
   const [currentProfileId, setCurrentProfileId] = useState<string>('')
@@ -43,6 +46,28 @@ export default function MessageThreadPage() {
   const [actorStatus, setActorStatus] = useState<'idle' | 'marked' | 'waiting' | 'completed'>('idle')
   const [hasReviewed, setHasReviewed] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  function readIntParam(key: string): number | null {
+    const value = Number(searchParams.get(key))
+    return Number.isFinite(value) ? value : null
+  }
+
+  const upgradeNudgeProps: PostContactUpgradeNudgeProps | null = searchParams.get('contactUpgrade') === '1'
+    && readIntParam('contactUsed') != null
+    && readIntParam('contactLimit') != null
+    && readIntParam('contactRemaining') != null
+    && searchParams.get('premiumMonthlyPrice')
+    && searchParams.get('premiumAnnualSavings')
+    && readIntParam('premiumContactLimit') != null
+    ? {
+        used: readIntParam('contactUsed')!,
+        limit: readIntParam('contactLimit')!,
+        remaining: readIntParam('contactRemaining')!,
+        premiumMonthlyPrice: searchParams.get('premiumMonthlyPrice')!,
+        premiumAnnualSavings: searchParams.get('premiumAnnualSavings')!,
+        premiumContactLimit: readIntParam('premiumContactLimit')!,
+      }
+    : null
 
   useEffect(() => {
     const supabase = createClient()
@@ -169,6 +194,11 @@ export default function MessageThreadPage() {
 
   return (
     <div className="flex h-[calc(100vh-200px)] flex-col">
+      {upgradeNudgeProps && (
+        <div className="px-4 pb-4">
+          <PostContactUpgradeNudge {...upgradeNudgeProps} />
+        </div>
+      )}
       <div className="flex-1 overflow-y-auto px-4">
         <ConversationThread messages={messages} currentProfileId={currentProfileId} />
       </div>

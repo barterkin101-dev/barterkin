@@ -8,6 +8,8 @@ import { limitSendMessage } from '@/lib/rate-limit'
 import { validateAndSanitize } from '@/lib/utils/validation'
 import { createLogger } from '@/lib/utils/logger'
 import { awardQuest } from '@/lib/actions/quests'
+import { getContactLimitStatus } from '@/lib/data/contact-limit'
+import { getPostContactUpgradeNudgeProps } from '@/lib/post-contact-upgrade-nudge'
 import type {
   SendMessageResult,
   CreateConversationResult,
@@ -123,7 +125,7 @@ export async function createConversation(
   // Get sender profile
   const { data: senderProfile, error: senderErr } = await supabase
     .from('profiles')
-    .select('id')
+    .select('id, tier')
     .eq('owner_id', user.id)
     .maybeSingle()
   if (senderErr || !senderProfile) {
@@ -215,7 +217,16 @@ export async function createConversation(
     })
   }
 
-  return { ok: true, conversationId }
+  const postContactUpgradeNudge = senderProfile.tier === 'free'
+    ? getPostContactUpgradeNudgeProps(
+        senderProfile.tier,
+        await getContactLimitStatus(senderProfile.id, senderProfile.tier),
+      )
+    : null
+
+  return postContactUpgradeNudge
+    ? { ok: true, conversationId, postContactUpgradeNudge }
+    : { ok: true, conversationId }
 }
 
 export async function markConversationRead(
