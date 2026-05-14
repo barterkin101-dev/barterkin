@@ -126,7 +126,7 @@ Google OAuth also fires this event client-side when the user launches Google sig
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `method` | string | Share mechanism, currently `native-share`, `x`, `facebook`, `whatsapp`, `sms`, or `email` |
+| `method` | string | Share mechanism, currently `native-share`, `x`, `facebook`, `whatsapp`, `telegram`, `linkedin`, `sms`, or `email` |
 | `referral_code` | string | The 8-char referral code being shared |
 | `referral_count` | number | How many successful referrals the member has at share time |
 | `credits` | number | Current referral credit balance shown in the card |

@@ -70,5 +70,29 @@
     "priority": "medium",
     "status": "completed",
     "notes": "Added a free-tier dashboard contact-limit comparison card using live plan values, wired it to billing, and covered the copy in unit tests. Commit: ebe4a0c."
+  },
+  {
+    "id": "88",
+    "title": "Add LinkedIn referral share action to dashboard invite card — acquisition",
+    "description": "Expand `ReferralInviteCard` with a one-tap LinkedIn share action using the member's referral link. Track the channel in PostHog via `referral_invite_shared`. Acceptance: LinkedIn button renders on the dashboard card, generated share URL is stable and encoded, analytics fires with method=linkedin, and unit tests cover URL generation and click behavior.",
+    "priority": "high",
+    "status": "in_progress",
+    "notes": "Picked as the top new acquisition task because the referral card already supports multiple channels and this adds another high-intent sharing path with minimal UX friction."
+  },
+  {
+    "id": "89",
+    "title": "Add profile views snapshot card to dashboard — retention",
+    "description": "Surface a compact dashboard card showing a member's last-7-days profile views versus the prior 7 days, with an encouragement CTA when views dip. Acceptance: card appears only for published profiles, uses live profile view data, includes positive/negative trend copy, and unit tests cover empty, rising, and declining states.",
+    "priority": "medium",
+    "status": "pending",
+    "notes": "Grounded in the published-profile dashboard flow and existing engagement reminder patterns."
+  },
+  {
+    "id": "90",
+    "title": "Add billing page founding-member deadline callout — monetization",
+    "description": "Add a concise urgency panel on `/dashboard/billing` highlighting the founding-member annual savings window before it ends. Acceptance: panel only renders for free members in upgrade flow, uses live billing config values, links to checkout CTA, and unit tests cover copy and visibility states.",
+    "priority": "medium",
+    "status": "pending",
+    "notes": "Grounded in the existing billing upgrade surface and recent annual savings callout work."
   }
 ]

@@ -44,6 +44,14 @@ export function buildTelegramReferralShareUrl(referralLink: string): string {
   return `https://t.me/share/url?${params.toString()}`
 }
 
+export function buildLinkedInReferralShareUrl(referralLink: string): string {
+  const params = new URLSearchParams({
+    url: referralLink,
+  })
+
+  return `https://www.linkedin.com/sharing/share-offsite/?${params.toString()}`
+}
+
 export function buildEmailReferralShareUrl(referralLink: string): string {
   const params = new URLSearchParams({
     subject: 'Join me on Barterkin',
@@ -140,16 +148,20 @@ export function ReferralInviteCard({
     }
   }
 
-  function handleChannelShare(channel: 'x' | 'facebook' | 'whatsapp' | 'telegram' | 'email' | 'sms') {
+  function handleChannelShare(
+    channel: 'x' | 'facebook' | 'whatsapp' | 'telegram' | 'linkedin' | 'email' | 'sms',
+  ) {
     const shareUrl =
       channel === 'x'
         ? buildXReferralShareUrl(referralLink)
         : channel === 'facebook'
           ? buildFacebookReferralShareUrl(referralLink)
-          : channel === 'whatsapp'
+        : channel === 'whatsapp'
             ? buildWhatsAppReferralShareUrl(referralLink)
             : channel === 'telegram'
               ? buildTelegramReferralShareUrl(referralLink)
+            : channel === 'linkedin'
+              ? buildLinkedInReferralShareUrl(referralLink)
             : channel === 'email'
               ? buildEmailReferralShareUrl(referralLink)
               : buildSmsReferralShareUrl(referralLink)
@@ -264,6 +276,15 @@ export function ReferralInviteCard({
           >
             <Share2 className="h-4 w-4" />
             Share on Telegram
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => handleChannelShare('linkedin')}
+          >
+            <Share2 className="h-4 w-4" />
+            Share on LinkedIn
           </Button>
           <Button
             type="button"

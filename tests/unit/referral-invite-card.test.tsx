@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   buildEmailReferralShareUrl,
   buildFacebookReferralShareUrl,
+  buildLinkedInReferralShareUrl,
   buildReferralInviteMessage,
   buildSmsReferralShareUrl,
   buildTelegramReferralShareUrl,
@@ -55,6 +56,9 @@ describe('ReferralInviteCard', () => {
     )
     expect(buildTelegramReferralShareUrl('https://barterkin.com/r/ABCDEFGH')).toBe(
       'https://t.me/share/url?url=https%3A%2F%2Fbarterkin.com%2Fr%2FABCDEFGH&text=I%27m+on+Barterkin%2C+a+local+skill-trading+network+for+neighbors.+Join+with+my+invite+link%3A+https%3A%2F%2Fbarterkin.com%2Fr%2FABCDEFGH',
+    )
+    expect(buildLinkedInReferralShareUrl('https://barterkin.com/r/ABCDEFGH')).toBe(
+      'https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fbarterkin.com%2Fr%2FABCDEFGH',
     )
     expect(buildEmailReferralShareUrl('https://barterkin.com/r/ABCDEFGH')).toBe(
       'mailto:?subject=Join+me+on+Barterkin&body=I%27m+on+Barterkin%2C+a+local+skill-trading+network+for+neighbors.+Join+with+my+invite+link%3A+https%3A%2F%2Fbarterkin.com%2Fr%2FABCDEFGH',
@@ -199,7 +203,7 @@ describe('ReferralInviteCard', () => {
     })
   })
 
-  it('opens Facebook, WhatsApp, and Telegram share windows and tracks their channels', async () => {
+  it('opens Facebook, WhatsApp, Telegram, and LinkedIn share windows and tracks their channels', async () => {
     render(
       <ReferralInviteCard
         referralCode="ABCDEFGH"
@@ -213,6 +217,7 @@ describe('ReferralInviteCard', () => {
     await userEvent.click(screen.getByRole('button', { name: /share on facebook/i }))
     await userEvent.click(screen.getByRole('button', { name: /share on whatsapp/i }))
     await userEvent.click(screen.getByRole('button', { name: /share on telegram/i }))
+    await userEvent.click(screen.getByRole('button', { name: /share on linkedin/i }))
 
     expect(mockOpen).toHaveBeenNthCalledWith(
       1,
@@ -232,6 +237,12 @@ describe('ReferralInviteCard', () => {
       '_blank',
       'noopener,noreferrer',
     )
+    expect(mockOpen).toHaveBeenNthCalledWith(
+      4,
+      buildLinkedInReferralShareUrl('https://barterkin.com/r/ABCDEFGH'),
+      '_blank',
+      'noopener,noreferrer',
+    )
     expect(mockCapture).toHaveBeenNthCalledWith(1, 'referral_invite_shared', {
       method: 'facebook',
       referral_code: 'ABCDEFGH',
@@ -246,6 +257,12 @@ describe('ReferralInviteCard', () => {
     })
     expect(mockCapture).toHaveBeenNthCalledWith(3, 'referral_invite_shared', {
       method: 'telegram',
+      referral_code: 'ABCDEFGH',
+      referral_count: 8,
+      credits: 6,
+    })
+    expect(mockCapture).toHaveBeenNthCalledWith(4, 'referral_invite_shared', {
+      method: 'linkedin',
       referral_code: 'ABCDEFGH',
       referral_count: 8,
       credits: 6,
