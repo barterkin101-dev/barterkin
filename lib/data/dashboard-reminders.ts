@@ -53,6 +53,12 @@ export function getUnreadMessageReminder(
   const counterpart = topConversation.participants.find(
     (participant) => participant.profile_id !== currentProfileId,
   )
+  const counterpartName =
+    topConversation.last_message.sender?.display_name
+    ?? topConversation.last_message.sender?.username
+    ?? counterpart?.profile?.display_name
+    ?? counterpart?.profile?.username
+    ?? 'a member'
 
   return {
     unreadConversationCount: staleUnreadConversations.length,
@@ -61,10 +67,7 @@ export function getUnreadMessageReminder(
       0,
     ),
     href: `/dashboard/messages/${topConversation.id}`,
-    counterpartName:
-      counterpart?.profile?.display_name
-      ?? counterpart?.profile?.username
-      ?? 'a member',
+    counterpartName,
     lastMessageAt: topConversation.last_message.created_at,
   }
 }

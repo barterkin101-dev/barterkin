@@ -21,6 +21,10 @@ export interface ConversationRow {
     content: string
     created_at: string
     sender_profile_id: string
+    sender: {
+      display_name: string | null
+      username: string | null
+    } | null
   } | null
   unread_count: number
 }
@@ -38,6 +42,8 @@ export interface MessageRow {
     avatar_url: string | null
   } | null
 }
+
+type LastMessageRow = NonNullable<ConversationRow['last_message']>
 
 export async function getConversations(profileId: string): Promise<ConversationRow[]> {
   const supabase = await createClient()
@@ -79,7 +85,10 @@ export async function getConversations(profileId: string): Promise<ConversationR
   // Fetch last messages
   const { data: lastMessages, error: msgErr } = await supabase
     .from('messages')
-    .select('id, conversation_id, sender_profile_id, content, created_at')
+    .select(
+      `id, conversation_id, sender_profile_id, content, created_at,
+       profiles(display_name, username)`,
+    )
     .in('conversation_id', conversationIds)
     .order('created_at', { ascending: false })
 
@@ -116,6 +125,7 @@ export async function getConversations(profileId: string): Promise<ConversationR
         content: m.content,
         created_at: m.created_at,
         sender_profile_id: m.sender_profile_id,
+        sender: m.profiles as LastMessageRow['sender'],
       }
     }
   }

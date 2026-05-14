@@ -37,6 +37,10 @@ function makeConversation(overrides: Partial<ConversationRow>): ConversationRow 
       content: 'Checking in on the trade',
       created_at: '2026-05-11T09:00:00.000Z',
       sender_profile_id: 'profile-2',
+      sender: {
+        display_name: 'Alex',
+        username: 'alex',
+      },
     },
     unread_count: 2,
     ...overrides,
@@ -196,6 +200,36 @@ describe('getUnreadMessageReminder', () => {
       href: '/dashboard/messages/conv-valid',
       unreadConversationCount: 1,
       unreadMessageCount: 1,
+    })
+  })
+
+  it('falls back to the last message sender when RLS hides the counterpart participant row', () => {
+    const result = getUnreadMessageReminder(
+      [
+        makeConversation({
+          participants: [
+            {
+              profile_id: PROFILE_ID,
+              last_read_at: null,
+              profile: {
+                id: PROFILE_ID,
+                display_name: 'Naeem',
+                username: 'naeem',
+                avatar_url: null,
+              },
+            },
+          ],
+        }),
+      ],
+      PROFILE_ID,
+      new Date('2026-05-13T09:00:00.000Z'),
+    )
+
+    expect(result).toMatchObject({
+      href: '/dashboard/messages/conv-1',
+      counterpartName: 'Alex',
+      unreadConversationCount: 1,
+      unreadMessageCount: 2,
     })
   })
 })
