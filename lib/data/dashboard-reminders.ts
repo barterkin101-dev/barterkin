@@ -41,6 +41,11 @@ export interface ZeroListingLaunchReminder {
   rewardCredits: number | null
 }
 
+export interface SecondListingExpansionReminder {
+  href: string
+  listingTitle: string
+}
+
 export function getUnreadMessageReminder(
   conversations: ConversationRow[],
   currentProfileId: string,
@@ -200,5 +205,24 @@ export function getZeroListingLaunchReminder(
   return {
     href: '/dashboard/listings/new',
     rewardCredits,
+  }
+}
+
+export function getSecondListingExpansionReminder(
+  onboardingCompletedAt: string | null | undefined,
+  listings: ListingRow[],
+): SecondListingExpansionReminder | null {
+  if (!onboardingCompletedAt) {
+    return null
+  }
+
+  const activeListings = listings.filter((listing) => listing.status === 'active')
+  if (activeListings.length !== 1) {
+    return null
+  }
+
+  return {
+    href: '/dashboard/listings/new',
+    listingTitle: activeListings[0].title,
   }
 }

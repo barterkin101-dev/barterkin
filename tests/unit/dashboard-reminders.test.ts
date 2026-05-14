@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getStaleListingReminder, getUnreadMessageReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
+import { getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getSecondListingExpansionReminder, getStaleListingReminder, getUnreadMessageReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
 
@@ -476,6 +476,48 @@ describe('getFirstTradeProgressReminder', () => {
       href: '/dashboard/messages/conv-latest',
       counterpartName: 'Alex',
       rewardCredits: 15,
+    })
+  })
+})
+
+describe('getSecondListingExpansionReminder', () => {
+  it('returns null when onboarding is incomplete', () => {
+    expect(getSecondListingExpansionReminder(null, [makeListing()])).toBeNull()
+  })
+
+  it('returns null when the member has zero active listings', () => {
+    expect(
+      getSecondListingExpansionReminder(
+        '2026-05-14T12:00:00.000Z',
+        [makeListing({ status: 'paused' })],
+      ),
+    ).toBeNull()
+  })
+
+  it('returns null when the member already has multiple active listings', () => {
+    expect(
+      getSecondListingExpansionReminder(
+        '2026-05-14T12:00:00.000Z',
+        [
+          makeListing({ id: 'listing-1', title: 'Camera kit' }),
+          makeListing({ id: 'listing-2', title: 'Ceramic wheel' }),
+        ],
+      ),
+    ).toBeNull()
+  })
+
+  it('returns a second-listing CTA when exactly one listing is active', () => {
+    expect(
+      getSecondListingExpansionReminder(
+        '2026-05-14T12:00:00.000Z',
+        [
+          makeListing({ title: 'Vintage camera bundle' }),
+          makeListing({ id: 'listing-paused', status: 'paused', title: 'Old guitar amp' }),
+        ],
+      ),
+    ).toEqual({
+      href: '/dashboard/listings/new',
+      listingTitle: 'Vintage camera bundle',
     })
   })
 })
