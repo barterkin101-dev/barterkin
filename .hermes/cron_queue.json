@@ -261,7 +261,7 @@
     "status": "completed",
     "created_at": "2026-05-14T21-04-44Z",
     "source": "codex-review",
-    "notes": "Switched the first-contact dashboard reminder to outbound started-conversation count instead of total thread count, and added messaging data regression coverage. Commit: PENDING."
+    "notes": "Switched the first-contact dashboard reminder to outbound started-conversation count instead of total thread count, and added messaging data regression coverage. Commit: 5b1c210."
   },
   {
     "id": "118",
