@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getDigestOptOutReminder, getStaleListingReminder, getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
+import { getDigestOptOutReminder, getFirstTradeProgressReminder, getStaleListingReminder, getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
 
@@ -297,6 +297,128 @@ describe('getDigestOptOutReminder', () => {
   it('returns a reminder when published and emailDigestEnabled is false', () => {
     const result = getDigestOptOutReminder(false, true)
     expect(result).toEqual({ href: '/profile/edit' })
+  })
+})
+
+describe('getFirstTradeProgressReminder', () => {
+  it('returns null when the member already completed the first-trade quest', () => {
+    const result = getFirstTradeProgressReminder(
+      [makeConversation({ id: 'conv-1' })],
+      PROFILE_ID,
+      true,
+    )
+
+    expect(result).toBeNull()
+  })
+
+  it('returns null when there are no active conversations', () => {
+    const result = getFirstTradeProgressReminder(
+      [makeConversation({ id: 'conv-1', last_message: null })],
+      PROFILE_ID,
+      false,
+    )
+
+    expect(result).toBeNull()
+  })
+
+  it('prefers the warmest unread conversation for the CTA', () => {
+    const result = getFirstTradeProgressReminder(
+      [
+        makeConversation({
+          id: 'conv-read',
+          unread_count: 0,
+        }),
+        makeConversation({
+          id: 'conv-unread',
+          unread_count: 2,
+          participants: [
+            {
+              profile_id: PROFILE_ID,
+              last_read_at: null,
+              profile: {
+                id: PROFILE_ID,
+                display_name: 'Naeem',
+                username: 'naeem',
+                avatar_url: null,
+              },
+            },
+            {
+              profile_id: 'profile-3',
+              last_read_at: null,
+              profile: {
+                id: 'profile-3',
+                display_name: 'Sam',
+                username: 'sam',
+                avatar_url: null,
+              },
+            },
+          ],
+          last_message: {
+            content: 'Ready when you are',
+            created_at: '2026-05-12T09:00:00.000Z',
+            sender_profile_id: 'profile-3',
+            sender: {
+              display_name: 'Sam',
+              username: 'sam',
+            },
+          },
+        }),
+      ],
+      PROFILE_ID,
+      false,
+    )
+
+    expect(result).toEqual({
+      conversationCount: 2,
+      href: '/dashboard/messages/conv-unread',
+      counterpartName: 'Sam',
+      rewardCredits: 15,
+    })
+  })
+
+  it('falls back to the most recent active conversation when none are unread', () => {
+    const result = getFirstTradeProgressReminder(
+      [
+        makeConversation({
+          id: 'conv-latest',
+          unread_count: 0,
+        }),
+        makeConversation({
+          id: 'conv-older',
+          unread_count: 0,
+          participants: [
+            {
+              profile_id: PROFILE_ID,
+              last_read_at: null,
+              profile: {
+                id: PROFILE_ID,
+                display_name: 'Naeem',
+                username: 'naeem',
+                avatar_url: null,
+              },
+            },
+          ],
+          last_message: {
+            content: 'Trade soon?',
+            created_at: '2026-05-10T09:00:00.000Z',
+            sender_profile_id: 'profile-4',
+            sender: {
+              display_name: null,
+              username: 'jules',
+            },
+          },
+        }),
+      ],
+      PROFILE_ID,
+      false,
+    )
+
+    expect(result).toEqual({
+      conversationCount: 2,
+      href: '/dashboard/messages/conv-latest',
+      counterpartName: 'Alex',
+      rewardCredits: 15,
+    })
   })
 })
 

@@ -1,5 +1,6 @@
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
+import { QUESTS } from '@/lib/quests'
 
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000
 const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000
@@ -22,6 +23,13 @@ export interface StaleListingReminder {
 
 export interface DigestOptOutReminder {
   href: string
+}
+
+export interface FirstTradeProgressReminder {
+  conversationCount: number
+  href: string
+  counterpartName: string
+  rewardCredits: number
 }
 
 export function getUnreadMessageReminder(
@@ -114,4 +122,39 @@ export function getDigestOptOutReminder(
     return { href: '/profile/edit' }
   }
   return null
+}
+
+export function getFirstTradeProgressReminder(
+  conversations: ConversationRow[],
+  currentProfileId: string,
+  hasCompletedFirstTradeQuest: boolean,
+): FirstTradeProgressReminder | null {
+  if (hasCompletedFirstTradeQuest) {
+    return null
+  }
+
+  const activeConversations = conversations.filter((conversation) => conversation.last_message)
+  if (activeConversations.length === 0) {
+    return null
+  }
+
+  const topConversation = activeConversations.find((conversation) => conversation.unread_count > 0)
+    ?? activeConversations[0]
+  const counterpart = topConversation.participants.find(
+    (participant) => participant.profile_id !== currentProfileId,
+  )
+  const counterpartName =
+    counterpart?.profile?.display_name
+    ?? counterpart?.profile?.username
+    ?? topConversation.last_message?.sender?.display_name
+    ?? topConversation.last_message?.sender?.username
+    ?? 'a member'
+  const rewardCredits = QUESTS.find((quest) => quest.key === 'quest_first_trade')?.credits ?? 15
+
+  return {
+    conversationCount: activeConversations.length,
+    href: `/dashboard/messages/${topConversation.id}`,
+    counterpartName,
+    rewardCredits,
+  }
 }

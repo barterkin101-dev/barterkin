@@ -4,7 +4,7 @@ import { createLogger } from '@/lib/utils/logger'
 import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
 import { getConversations } from '@/lib/data/messaging'
-import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder } from '@/lib/data/dashboard-reminders'
+import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { buildReferralLink } from '@/lib/referrals'
 
@@ -20,6 +20,7 @@ import { ContactLimitUpsell } from '@/components/dashboard/ContactLimitUpsell'
 import { ListingCapUpsell } from '@/components/dashboard/ListingCapUpsell'
 import { StaleListingReminder } from '@/components/dashboard/StaleListingReminder'
 import { DigestOptOutReminder } from '@/components/dashboard/DigestOptOutReminder'
+import { FirstTradeProgressReminder } from '@/components/dashboard/FirstTradeProgressReminder'
 import { ContactLimitComparisonCard } from '@/components/dashboard/ContactLimitComparisonCard'
 import { ProfileViewsSnapshotCard } from '@/components/dashboard/ProfileViewsSnapshotCard'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
@@ -150,6 +151,13 @@ export default async function DashboardPage() {
   const questStreak = streakResult?.ok ? (streakResult.streak ?? profile?.login_streak ?? 0) : (profile?.login_streak ?? 0)
   const unreadMessageReminder = profile
     ? getUnreadMessageReminder(conversations, profile.id)
+    : null
+  const firstTradeProgressReminder = profile
+    ? getFirstTradeProgressReminder(
+      conversations,
+      profile.id,
+      completedQuests.has('quest_first_trade'),
+    )
     : null
   const listingSaveCounts = profile && listings.length > 0
     ? await supabase
@@ -363,6 +371,10 @@ export default async function DashboardPage() {
 
       {unreadMessageReminder && (
         <UnreadMessageReminder reminder={unreadMessageReminder} />
+      )}
+
+      {firstTradeProgressReminder && (
+        <FirstTradeProgressReminder reminder={firstTradeProgressReminder} />
       )}
 
       {staleListingReminder && (
