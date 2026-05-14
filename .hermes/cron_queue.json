@@ -1,50 +1,26 @@
 [
   {
-    "id": "73",
-    "title": "Add social share buttons to listing detail pages — viral growth loop",
-    "description": "Add share buttons to /listings/[id] that let members share their listings to Twitter/X, Facebook, and copy link. Pre-fill share copy with listing title + Barterkin URL. Use existing OG images (task 15) so shared links render rich previews. Track share events in PostHog (listing_shared). Add to listing detail page below the contact button. Acceptance: share buttons visible on public listing pages, copy-to-clipboard works, Twitter/Facebook share opens with pre-filled text, analytics fire, unit tests cover click handlers.",
+    "id": "79",
+    "title": "Add dynamic sitemap.xml for SEO — index all public listings + profiles",
+    "description": "The sitemap.ts exists but doesn't include category pages, county pages, or paginated listing URLs. Expand it to include /listings?category=, /listings?county=, and /directory?category= routes. Add lastModified from the most recently updated item in each group. This drives organic discovery (growth). Acceptance: sitemap includes all dynamic route variants, passes Google Search Console validation, unit test covers URL count and structure.",
     "priority": "high",
     "status": "completed",
-    "notes": "Added X/Facebook/copy share actions with listing_shared analytics on public listing pages and unit coverage. Commit: 0d3555b."
+    "notes": "Expanded sitemap with grouped category/county/directory URLs plus paginated listing pages and unit coverage. Commit: 2ca5899."
   },
   {
-    "id": "74",
-    "title": "Add Twilio SMS phone verification — trust badge for local trades",
-    "description": "Add phone number verification via Twilio Verify API. Members enter phone number in profile edit, receive SMS code, verify to get a 'Phone Verified' badge on their profile and listings. Store verified phone in profiles.phone_verified (boolean) and profiles.phone_number (encrypted). Gate: only show badge when verified. Use Twilio Verify (not direct SMS) for compliance. Add to profile edit form, show badge in ListingCard and member profile. Acceptance: full verify flow works in test mode, badge shows when verified, hidden when not, unit tests cover verify action edge cases.",
+    "id": "80",
+    "title": "Add browser push notification opt-in for new messages — retention loop",
+    "description": "Add a OneSignal or web-push notification system that prompts members to enable browser notifications after their 2nd login. Send push when a new message arrives in a conversation. Store subscription in profiles.push_subscription (JSONB). Gate: only show opt-in to published profiles, respect browser permission state. Track opt-in rate in PostHog. Acceptance: push prompt shows after 2nd login, new message triggers push, subscription persists, unit tests cover opt-in logic and push send.",
     "priority": "medium",
-    "status": "completed",
-    "notes": "Added Twilio Verify send/check actions, inline profile SMS verification UI, decrypted phone prefill, and unit coverage for verify edge cases. Commit: 5d9fe02."
+    "status": "pending",
+    "notes": ""
   },
   {
-    "id": "75",
-    "title": "Add annual billing option — $90/yr (2 months free) to increase LTV",
-    "description": "Add annual Premium plan alongside monthly. Stripe: create annual price ($90/yr) in config, update checkout session to accept 'annual' plan param. UI: billing page shows monthly ($9/mo) vs annual ($90/yr, 'Save $18') toggle. Default to annual as 'Best value'. Update webhook to handle annual billing cycle. Acceptance: checkout works for annual plan, webhook updates tier correctly, billing page shows both options with savings callout, unit tests cover annual checkout.",
-    "priority": "medium",
-    "status": "completed",
-    "notes": "Added Premium annual billing checkout, default annual UI toggle, deploy env docs, and unit coverage. Commit: d054041."
-  },
-  {
-    "id": "76",
-    "title": "Add channel-specific referral sharing on dashboard — higher invite conversion",
-    "description": "Extend the dashboard referral card with one-tap share buttons for X, Facebook, and WhatsApp while keeping native share on supported devices. Pre-fill each share with the member's referral link and Barterkin invite copy, and track per-channel analytics in PostHog. Acceptance: dashboard shows channel-specific share buttons, native share still works when available, fallback copy still works, and unit tests cover share URL generation plus analytics for each path.",
+    "id": "81",
+    "title": "Add referral reward credits on successful invite conversion — viral monetization",
+    "description": "When a referred user signs up AND publishes their profile, auto-award the inviter 10 credits. Add a 'Referral converted' quest (quest_referral_converted) worth 10 credits. Track conversion in PostHog (referral_converted). Show pending vs converted referrals in the dashboard ReferralInviteCard. Acceptance: credits awarded on profile publish (not just signup), quest completion tracked, dashboard shows conversion count, unit tests cover award logic and edge cases (duplicate, self-referral).",
     "priority": "high",
-    "status": "completed",
-    "notes": "Added dashboard referral share buttons for X, Facebook, WhatsApp, and native share with unit coverage. Commit: 30e7a55."
-  },
-  {
-    "id": "77",
-    "title": "Add weekly digest preference toggle to profile settings — retention control",
-    "description": "Expose `profiles.email_digest_enabled` in profile settings so members can opt in or out of the weekly 'new listings in your county' email. Show a short explanation near the toggle, persist through the existing profile update flow, and cover the schema/action/UI path with unit tests. Acceptance: setting is visible on profile edit, saves correctly, existing digest cron respects it, tests cover save behavior.",
-    "priority": "medium",
-    "status": "completed",
-    "notes": "Added the weekly digest profile toggle, persisted email_digest_enabled through saveProfile, and covered schema/helper/action behavior with unit tests. Commit: 52acaab."
-  },
-  {
-    "id": "78",
-    "title": "Add free-tier contact-limit upsell on messaging entry points — monetize active members",
-    "description": "When a free member is near or at the monthly contact limit, show an upsell panel on the dashboard/messages flow that explains Premium's higher contact cap and deep-links to billing. Acceptance: free members near the cap see the upgrade prompt, paid members do not, and unit tests cover threshold logic and rendering.",
-    "priority": "medium",
-    "status": "completed",
-    "notes": "Added free-tier dashboard contact-limit upsell with distinct-conversation threshold coverage and rendering tests. Commit: 11a24d2."
+    "status": "pending",
+    "notes": ""
   }
 ]
