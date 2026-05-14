@@ -50,6 +50,7 @@ vi.mock('@/lib/utils/logger', () => ({
 }))
 
 import { POST } from '@/app/api/stripe/checkout-session/route'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 describe('POST /api/stripe/checkout-session', () => {
   beforeEach(() => {
@@ -108,6 +109,31 @@ describe('POST /api/stripe/checkout-session', () => {
     expect(body.error).toContain('sold out')
     expect(mockAdminFrom).toHaveBeenCalledWith('profiles')
     expect(mockFrom).toHaveBeenCalledTimes(1)
+    expect(mockStripeCustomersCreate).not.toHaveBeenCalled()
+    expect(mockStripeCheckoutSessionsCreate).not.toHaveBeenCalled()
+  })
+
+  it('returns JSON 500 when founding checkout cannot initialize the admin client', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({
+      data: { id: 'prof-1', display_name: 'Test', stripe_customer_id: null, tier: 'free' },
+      error: null,
+    })
+
+    vi.mocked(getSupabaseAdmin).mockImplementationOnce(() => {
+      throw new Error('SUPABASE_SERVICE_ROLE_KEY missing')
+    })
+
+    const req = new Request('https://barterkin.com/api/stripe/checkout-session', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ priceId: 'founding' }),
+    })
+
+    const res = await POST(req as never)
+    const body = await res.json()
+
+    expect(res.status).toBe(500)
+    expect(body).toEqual({ ok: false, error: 'SUPABASE_SERVICE_ROLE_KEY missing' })
     expect(mockStripeCustomersCreate).not.toHaveBeenCalled()
     expect(mockStripeCheckoutSessionsCreate).not.toHaveBeenCalled()
   })

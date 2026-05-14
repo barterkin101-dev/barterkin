@@ -49,28 +49,27 @@ export async function POST(request: NextRequest) {
         ? 'annual'
         : 'premium'
 
-  // Check founding member limit
-  if (requestedPlan === 'founding') {
-    const { count: foundingCount, error: countErr } = await getSupabaseAdmin()
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .eq('tier', 'founding')
-
-    if (countErr) {
-      log.error('founding member count failed', { context: { error: countErr.message } })
-    }
-
-    if ((foundingCount ?? 0) >= STRIPE_FOUNDING_MEMBER_LIMIT) {
-      return NextResponse.json(
-        { ok: false, error: 'Founding member slots are sold out. Choose Premium instead.' },
-        { status: 409 },
-      )
-    }
-  }
-
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com'
 
   try {
+    if (requestedPlan === 'founding') {
+      const { count: foundingCount, error: countErr } = await getSupabaseAdmin()
+        .from('profiles')
+        .select('id', { count: 'exact', head: true })
+        .eq('tier', 'founding')
+
+      if (countErr) {
+        log.error('founding member count failed', { context: { error: countErr.message } })
+      }
+
+      if ((foundingCount ?? 0) >= STRIPE_FOUNDING_MEMBER_LIMIT) {
+        return NextResponse.json(
+          { ok: false, error: 'Founding member slots are sold out. Choose Premium instead.' },
+          { status: 409 },
+        )
+      }
+    }
+
     const stripe = getStripe()
     const priceIds = getPriceIds()
 
