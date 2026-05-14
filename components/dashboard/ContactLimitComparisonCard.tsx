@@ -3,9 +3,13 @@ import { ArrowRight, MessageSquareMore } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { FREE_CONTACT_LIMIT, PREMIUM_CONTACT_LIMIT } from '@/lib/contact-limits'
-import { BILLING_PLAN_AMOUNTS, formatUsdFromCents } from '@/lib/stripe/config'
+import { BILLING_PLAN_AMOUNTS, formatUsdFromCents, getPremiumAnnualSavings } from '@/lib/stripe/config'
 
 export function ContactLimitComparisonCard() {
+  const annualSavings = getPremiumAnnualSavings()
+  const monthlyPrice = formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents)
+  const annualSavingsFormatted = formatUsdFromCents(annualSavings.totalSavingsCents)
+
   return (
     <Card className="border-primary/20 bg-primary/5">
       <CardContent className="flex flex-col gap-5 p-6 md:flex-row md:items-center md:justify-between">
@@ -29,7 +33,10 @@ export function ContactLimitComparisonCard() {
               Premium: {PREMIUM_CONTACT_LIMIT}/mo
             </div>
             <div className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-emerald-900">
-              Premium from {formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents)}/mo
+              Premium from {monthlyPrice}/mo
+            </div>
+            <div className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-emerald-900">
+              Save {annualSavingsFormatted}/year with annual billing
             </div>
           </div>
         </div>

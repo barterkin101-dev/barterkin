@@ -32,6 +32,7 @@ import { QUESTS, isUtcDateToday } from '@/lib/quests'
 import { updateLoginStreak } from '@/lib/actions/quests'
 import { getProfileViewsSnapshot } from '@/lib/data/profile-views'
 import { getDashboardListingCapUpsellProps } from '@/lib/dashboard-listing-cap-upsell'
+import { getPremiumAnnualSavings, formatUsdFromCents, BILLING_PLAN_AMOUNTS } from '@/lib/stripe/config'
 
 export default async function DashboardPage() {
   const cookieStore = await cookies()
@@ -361,6 +362,8 @@ export default async function DashboardPage() {
           limit={contactLimitStatus.limit}
           remaining={contactLimitStatus.remaining}
           isAtLimit={contactLimitStatus.isAtLimit}
+          premiumMonthlyPrice={formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents)}
+          premiumAnnualSavings={formatUsdFromCents(getPremiumAnnualSavings().totalSavingsCents)}
         />
       )}
 

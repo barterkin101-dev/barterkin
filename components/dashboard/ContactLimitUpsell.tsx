@@ -8,11 +8,15 @@ export function ContactLimitUpsell({
   limit,
   remaining,
   isAtLimit,
+  premiumMonthlyPrice,
+  premiumAnnualSavings,
 }: {
   used: number
   limit: number
   remaining: number
   isAtLimit: boolean
+  premiumMonthlyPrice: string
+  premiumAnnualSavings: string
 }) {
   return (
     <Card className="border-amber-200 bg-amber-50">
@@ -33,8 +37,8 @@ export function ContactLimitUpsell({
             </h3>
             <p className="text-sm text-amber-800">
               {isAtLimit
-                ? `Free members can start ${limit} conversations per month. Upgrade to Premium to unlock ${limit * 10} contacts/mo and reach more traders.`
-                : `You have ${remaining} conversation${remaining === 1 ? '' : 's'} left this month. Upgrade to Premium for ${limit * 10} contacts/mo.`}
+                ? `Free members can start ${limit} conversations per month. Upgrade to Premium for ${premiumMonthlyPrice}/mo to unlock ${limit * 10} contacts/mo and reach more traders. Annual billing saves ${premiumAnnualSavings}.`
+                : `You have ${remaining} conversation${remaining === 1 ? '' : 's'} left this month. Upgrade to Premium for ${premiumMonthlyPrice}/mo. Annual billing saves ${premiumAnnualSavings}.`}
             </p>
           </div>
         </div>
