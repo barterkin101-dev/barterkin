@@ -20,6 +20,10 @@ export interface StaleListingReminder {
   staleSince: string
 }
 
+export interface DigestOptOutReminder {
+  href: string
+}
+
 export function getUnreadMessageReminder(
   conversations: ConversationRow[],
   currentProfileId: string,
@@ -102,4 +106,14 @@ export function getStaleListingReminder(
     listingId: oldestStaleListing.id,
     staleSince: oldestStaleListing.updated_at ?? oldestStaleListing.created_at,
   }
+}
+
+export function getDigestOptOutReminder(
+  emailDigestEnabled: boolean | null | undefined,
+  isPublished: boolean | null | undefined,
+): DigestOptOutReminder | null {
+  if (isPublished && emailDigestEnabled === false) {
+    return { href: '/profile/edit' }
+  }
+  return null
 }

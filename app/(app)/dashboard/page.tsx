@@ -4,7 +4,7 @@ import { createLogger } from '@/lib/utils/logger'
 import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
 import { getConversations } from '@/lib/data/messaging'
-import { getStaleListingReminder, getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
+import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { buildReferralLink } from '@/lib/referrals'
 
@@ -18,6 +18,7 @@ import { QuestCard } from '@/components/dashboard/QuestCard'
 import { UnreadMessageReminder } from '@/components/dashboard/UnreadMessageReminder'
 import { ContactLimitUpsell } from '@/components/dashboard/ContactLimitUpsell'
 import { StaleListingReminder } from '@/components/dashboard/StaleListingReminder'
+import { DigestOptOutReminder } from '@/components/dashboard/DigestOptOutReminder'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
@@ -37,7 +38,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, county_id, category_id, referral_code, tier, last_login_at, login_streak, skills_offered(id)')
+    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, email_digest_enabled, county_id, category_id, referral_code, tier, last_login_at, login_streak, skills_offered(id)')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -163,6 +164,10 @@ export default async function DashboardPage() {
       })
     : {}
   const staleListingReminder = getStaleListingReminder(listings, listingSaveCounts)
+  const digestOptOutReminder = getDigestOptOutReminder(
+    profile?.email_digest_enabled,
+    profile?.is_published,
+  )
 
   return (
     <div className="space-y-8">
@@ -345,6 +350,10 @@ export default async function DashboardPage() {
 
       {staleListingReminder && (
         <StaleListingReminder reminder={staleListingReminder} />
+      )}
+
+      {digestOptOutReminder && (
+        <DigestOptOutReminder href={digestOptOutReminder.href} />
       )}
 
       {/* Profile completion nudge */}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getStaleListingReminder, getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
+import { getDigestOptOutReminder, getStaleListingReminder, getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
 
@@ -284,5 +284,21 @@ describe('getStaleListingReminder', () => {
     )
 
     expect(result).toBeNull()
+  })
+})
+
+describe('getDigestOptOutReminder', () => {
+  it('returns a reminder when a published member has digests disabled', () => {
+    expect(getDigestOptOutReminder(false, true)).toEqual({
+      href: '/profile/edit',
+    })
+  })
+
+  it('returns null when digests are enabled', () => {
+    expect(getDigestOptOutReminder(true, true)).toBeNull()
+  })
+
+  it('returns null when the member is not published', () => {
+    expect(getDigestOptOutReminder(false, false)).toBeNull()
   })
 })
