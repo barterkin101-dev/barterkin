@@ -7,7 +7,32 @@ import { Button } from '@/components/ui/button'
 import { captureClientEvent } from '@/lib/analytics-client'
 
 export function buildReferralInviteMessage(referralLink: string): string {
-  return `I’m on Barterkin, a local skill-trading network for neighbors. Join with my invite link: ${referralLink}`
+  return `I'm on Barterkin, a local skill-trading network for neighbors. Join with my invite link: ${referralLink}`
+}
+
+export function buildXReferralShareUrl(referralLink: string): string {
+  const params = new URLSearchParams({
+    text: buildReferralInviteMessage(referralLink),
+    url: referralLink,
+  })
+
+  return `https://twitter.com/intent/tweet?${params.toString()}`
+}
+
+export function buildFacebookReferralShareUrl(referralLink: string): string {
+  const params = new URLSearchParams({
+    u: referralLink,
+  })
+
+  return `https://www.facebook.com/sharer/sharer.php?${params.toString()}`
+}
+
+export function buildWhatsAppReferralShareUrl(referralLink: string): string {
+  const params = new URLSearchParams({
+    text: buildReferralInviteMessage(referralLink),
+  })
+
+  return `https://wa.me/?${params.toString()}`
 }
 
 export function ReferralInviteCard({
@@ -87,6 +112,23 @@ export function ReferralInviteCard({
     }
   }
 
+  function handleChannelShare(channel: 'x' | 'facebook' | 'whatsapp') {
+    const shareUrl =
+      channel === 'x'
+        ? buildXReferralShareUrl(referralLink)
+        : channel === 'facebook'
+          ? buildFacebookReferralShareUrl(referralLink)
+          : buildWhatsAppReferralShareUrl(referralLink)
+
+    window.open(shareUrl, '_blank', 'noopener,noreferrer')
+    captureClientEvent('referral_invite_shared', {
+      method: channel,
+      referral_code: referralCode,
+      referral_count: referralCount,
+      credits,
+    })
+  }
+
   const hasNativeShare = typeof navigator.share === 'function'
 
   return (
@@ -135,15 +177,44 @@ export function ReferralInviteCard({
           </p>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          {hasNativeShare ? (
+            <Button
+              type="button"
+              className="w-full sm:w-auto"
+              onClick={handleShare}
+              disabled={sharePending}
+            >
+              <Share2 className="h-4 w-4" />
+              {sharePending ? 'Sharing...' : 'Share invite link'}
+            </Button>
+          ) : null}
           <Button
             type="button"
+            variant="outline"
             className="w-full sm:w-auto"
-            onClick={handleShare}
-            disabled={sharePending}
+            onClick={() => handleChannelShare('x')}
           >
             <Share2 className="h-4 w-4" />
-            {hasNativeShare ? (sharePending ? 'Sharing...' : 'Share invite link') : 'Share or copy link'}
+            Share on X
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => handleChannelShare('facebook')}
+          >
+            <Share2 className="h-4 w-4" />
+            Share on Facebook
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => handleChannelShare('whatsapp')}
+          >
+            <Share2 className="h-4 w-4" />
+            Share on WhatsApp
           </Button>
           <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={handleCopy}>
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}

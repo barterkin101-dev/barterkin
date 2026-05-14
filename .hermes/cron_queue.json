@@ -22,5 +22,29 @@
     "priority": "medium",
     "status": "completed",
     "notes": "Added Premium annual billing checkout, default annual UI toggle, deploy env docs, and unit coverage. Commit: d054041."
+  },
+  {
+    "id": "76",
+    "title": "Add channel-specific referral sharing on dashboard — higher invite conversion",
+    "description": "Extend the dashboard referral card with one-tap share buttons for X, Facebook, and WhatsApp while keeping native share on supported devices. Pre-fill each share with the member's referral link and Barterkin invite copy, and track per-channel analytics in PostHog. Acceptance: dashboard shows channel-specific share buttons, native share still works when available, fallback copy still works, and unit tests cover share URL generation plus analytics for each path.",
+    "priority": "high",
+    "status": "in_progress",
+    "notes": "Picked from regenerated queue. Implementing dashboard referral channel sharing and analytics coverage."
+  },
+  {
+    "id": "77",
+    "title": "Add weekly digest preference toggle to profile settings — retention control",
+    "description": "Expose `profiles.email_digest_enabled` in profile settings so members can opt in or out of the weekly 'new listings in your county' email. Show a short explanation near the toggle, persist through the existing profile update flow, and cover the schema/action/UI path with unit tests. Acceptance: setting is visible on profile edit, saves correctly, existing digest cron respects it, tests cover save behavior.",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "78",
+    "title": "Add free-tier contact-limit upsell on messaging entry points — monetize active members",
+    "description": "When a free member is near or at the monthly contact limit, show an upsell panel on the dashboard/messages flow that explains Premium's higher contact cap and deep-links to billing. Acceptance: free members near the cap see the upgrade prompt, paid members do not, and unit tests cover threshold logic and rendering.",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
   }
 ]
