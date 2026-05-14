@@ -44,7 +44,7 @@
     "title": "Add free-tier contact-limit upsell on messaging entry points — monetize active members",
     "description": "When a free member is near or at the monthly contact limit, show an upsell panel on the dashboard/messages flow that explains Premium's higher contact cap and deep-links to billing. Acceptance: free members near the cap see the upgrade prompt, paid members do not, and unit tests cover threshold logic and rendering.",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "Added free-tier dashboard contact-limit upsell with distinct-conversation threshold coverage and rendering tests. Commit: 11a24d2."
   }
 ]
