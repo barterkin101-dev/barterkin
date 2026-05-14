@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { ContactLimitUpsell } from '@/components/dashboard/ContactLimitUpsell'
+import { ContactLimitComparisonCard } from '@/components/dashboard/ContactLimitComparisonCard'
 
 describe('ContactLimitUpsell', () => {
   it('renders the warning state for free members near the cap', () => {
@@ -30,5 +31,18 @@ describe('ContactLimitUpsell', () => {
 
     expect(screen.getByText("You've reached your monthly contact limit")).toBeInTheDocument()
     expect(screen.getByText('Free members can start 10 conversations per month. Upgrade to Premium to unlock 100 contacts/mo and reach more traders.')).toBeInTheDocument()
+  })
+})
+
+describe('ContactLimitComparisonCard', () => {
+  it('renders the free vs premium contact limits with a billing CTA', () => {
+    render(<ContactLimitComparisonCard />)
+
+    expect(screen.getByText('Unlock more trade conversations')).toBeInTheDocument()
+    expect(screen.getByText('Free members can start 10 conversations per month. Premium raises that to 100 contacts/mo.')).toBeInTheDocument()
+    expect(screen.getByText('Free: 10/mo')).toBeInTheDocument()
+    expect(screen.getByText('Premium: 100/mo')).toBeInTheDocument()
+    expect(screen.getByText('Premium from $9/mo')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /compare plans/i })).toHaveAttribute('href', '/dashboard/billing')
   })
 })

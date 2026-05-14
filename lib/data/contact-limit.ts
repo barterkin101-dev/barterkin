@@ -8,10 +8,7 @@
 import 'server-only'
 import { createLogger } from '@/lib/utils/logger'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
-
-const FREE_CONTACT_LIMIT = 10
-const PREMIUM_CONTACT_LIMIT = 100
-const WARNING_THRESHOLD = 7 // show upsell when 7+ used
+import { FREE_CONTACT_LIMIT, PREMIUM_CONTACT_LIMIT, WARNING_THRESHOLD } from '@/lib/contact-limits'
 
 export interface ContactLimitStatus {
   used: number

@@ -200,6 +200,28 @@ describe('getUnreadMessageReminder', () => {
   })
 })
 
+describe('getDigestOptOutReminder', () => {
+  it('returns null when emailDigestEnabled is true', () => {
+    const result = getDigestOptOutReminder(true, true)
+    expect(result).toBeNull()
+  })
+
+  it('returns null when emailDigestEnabled is null', () => {
+    const result = getDigestOptOutReminder(null, true)
+    expect(result).toBeNull()
+  })
+
+  it('returns null when profile is not published', () => {
+    const result = getDigestOptOutReminder(false, false)
+    expect(result).toBeNull()
+  })
+
+  it('returns a reminder when published and emailDigestEnabled is false', () => {
+    const result = getDigestOptOutReminder(false, true)
+    expect(result).toEqual({ href: '/profile/edit' })
+  })
+})
+
 describe('getStaleListingReminder', () => {
   it('returns null when the listing is newer than 14 days', () => {
     const result = getStaleListingReminder(
@@ -284,21 +306,5 @@ describe('getStaleListingReminder', () => {
     )
 
     expect(result).toBeNull()
-  })
-})
-
-describe('getDigestOptOutReminder', () => {
-  it('returns a reminder when a published member has digests disabled', () => {
-    expect(getDigestOptOutReminder(false, true)).toEqual({
-      href: '/profile/edit',
-    })
-  })
-
-  it('returns null when digests are enabled', () => {
-    expect(getDigestOptOutReminder(true, true)).toBeNull()
-  })
-
-  it('returns null when the member is not published', () => {
-    expect(getDigestOptOutReminder(false, false)).toBeNull()
   })
 })

@@ -19,6 +19,7 @@ import { UnreadMessageReminder } from '@/components/dashboard/UnreadMessageRemin
 import { ContactLimitUpsell } from '@/components/dashboard/ContactLimitUpsell'
 import { StaleListingReminder } from '@/components/dashboard/StaleListingReminder'
 import { DigestOptOutReminder } from '@/components/dashboard/DigestOptOutReminder'
+import { ContactLimitComparisonCard } from '@/components/dashboard/ContactLimitComparisonCard'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
@@ -337,6 +338,10 @@ export default async function DashboardPage() {
           remaining={contactLimitStatus.remaining}
           isAtLimit={contactLimitStatus.isAtLimit}
         />
+      )}
+
+      {profile?.tier === 'free' && (
+        <ContactLimitComparisonCard />
       )}
 
       {/* Founding member nudge for free users */}
