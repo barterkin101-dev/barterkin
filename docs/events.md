@@ -133,6 +133,20 @@ Google OAuth also fires this event client-side when the user launches Google sig
 
 ---
 
+### `referral_converted`
+
+**When fired:** After an invited member publishes their profile and the inviter earns the conversion reward.
+**Fires from:** `lib/actions/profile.ts` → `setPublished()`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `referral_id` | string | Referral row that converted |
+| `invitee_profile_id` | string | Profile that published and triggered the reward |
+| `credits` | number | Credits awarded to the inviter, currently `10` |
+
+---
+
 ### `subscription_activated`
 
 **When fired:** After Stripe webhook confirms a successful subscription payment (checkout.session.completed).

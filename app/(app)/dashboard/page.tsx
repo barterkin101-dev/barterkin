@@ -43,7 +43,7 @@ export default async function DashboardPage() {
   const needsDailyLoginSync = profile ? !isUtcDateToday(profile.last_login_at) : false
   const streakResult = needsDailyLoginSync ? await updateLoginStreak() : null
 
-  const [listings, messageCount, , referralCount, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations] = profile ? await Promise.all([
+  const [listings, messageCount, , referralRows, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations] = profile ? await Promise.all([
     getMyListings(profile.id),
     supabase
       .from('conversation_participants')
@@ -69,14 +69,14 @@ export default async function DashboardPage() {
       }),
     supabase
       .from('referrals')
-      .select('id', { count: 'exact', head: true })
+      .select('id, credited_at')
       .eq('inviter_id', profile.id)
-      .then(({ count, error }) => {
+      .then(({ data, error }) => {
         if (error) {
           const log = createLogger('dashboard')
-          log.error('referral count error', { context: { code: error.code } })
+          log.error('referral rows error', { context: { code: error.code } })
         }
-        return count ?? 0
+        return data ?? []
       }),
     supabase
       .from('credit_ledger')
@@ -108,7 +108,7 @@ export default async function DashboardPage() {
       .select('quest_key')
       .eq('profile_id', profile.id),
     getConversations(profile.id),
-  ]) : [[], 0, 0, 0, 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }, { data: [], error: null }, []]
+  ]) : [[], 0, 0, [], 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }, { data: [], error: null }, []]
   const activeListings = listings.filter((l) => l.status === 'active')
   const referralLink = profile?.referral_code
     ? buildReferralLink(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com', profile.referral_code)
@@ -120,6 +120,8 @@ export default async function DashboardPage() {
     : null
   const showContactLimitUpsell = contactLimitStatus?.isNearLimit || contactLimitStatus?.isAtLimit || false
   const completedQuests = new Set((questCompletions.data ?? []).map((row) => row.quest_key))
+  const convertedReferralCount = referralRows.filter((row) => Boolean(row.credited_at)).length
+  const pendingReferralCount = referralRows.length - convertedReferralCount
   const checkedInToday = Boolean(
     profile && (
       isUtcDateToday(profile.last_login_at)
@@ -128,6 +130,9 @@ export default async function DashboardPage() {
   )
   if (checkedInToday) {
     completedQuests.add('quest_daily_login')
+  }
+  if (convertedReferralCount > 0) {
+    completedQuests.add('quest_referral_converted')
   }
   const questStatuses = QUESTS.map((quest) => ({
     key: quest.key,
@@ -338,7 +343,8 @@ export default async function DashboardPage() {
           referralCode={profile.referral_code}
           referralLink={referralLink ?? ''}
           credits={creditBalance}
-          referralCount={referralCount}
+          convertedReferralCount={convertedReferralCount}
+          pendingReferralCount={pendingReferralCount}
         />
       )}
 

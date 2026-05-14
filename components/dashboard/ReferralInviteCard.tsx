@@ -39,12 +39,14 @@ export function ReferralInviteCard({
   referralCode,
   referralLink,
   credits,
-  referralCount,
+  convertedReferralCount,
+  pendingReferralCount,
 }: {
   referralCode: string
   referralLink: string
   credits: number
-  referralCount: number
+  convertedReferralCount: number
+  pendingReferralCount: number
 }) {
   const [copied, setCopied] = useState(false)
   const [messageCopied, setMessageCopied] = useState(false)
@@ -63,7 +65,7 @@ export function ReferralInviteCard({
       }
       captureClientEvent('referral_invite_copied', {
         referral_code: referralCode,
-        referral_count: referralCount,
+        referral_count: convertedReferralCount,
         credits,
         copy_target: copyTarget,
       })
@@ -102,7 +104,7 @@ export function ReferralInviteCard({
       captureClientEvent('referral_invite_shared', {
         method: 'native-share',
         referral_code: referralCode,
-        referral_count: referralCount,
+        referral_count: convertedReferralCount,
         credits,
       })
     } catch {
@@ -124,7 +126,7 @@ export function ReferralInviteCard({
     captureClientEvent('referral_invite_shared', {
       method: channel,
       referral_code: referralCode,
-      referral_count: referralCount,
+      referral_count: convertedReferralCount,
       credits,
     })
   }
@@ -139,11 +141,11 @@ export function ReferralInviteCard({
         </div>
         <CardTitle className="font-serif text-2xl">Invite friends</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Share your invite link to bring more skilled neighbors into the directory.
+          Share your invite link. You earn 10 credits when an invited member goes on to publish.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-lg border bg-background/80 p-3 text-center">
             <div className="text-2xl font-bold text-primary">{credits}</div>
             <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
@@ -151,9 +153,15 @@ export function ReferralInviteCard({
             </div>
           </div>
           <div className="rounded-lg border bg-background/80 p-3 text-center">
-            <div className="text-2xl font-bold text-primary">{referralCount}</div>
+            <div className="text-2xl font-bold text-primary">{convertedReferralCount}</div>
             <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              Friends joined
+              Converted
+            </div>
+          </div>
+          <div className="rounded-lg border bg-background/80 p-3 text-center">
+            <div className="text-2xl font-bold text-primary">{pendingReferralCount}</div>
+            <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Pending
             </div>
           </div>
         </div>

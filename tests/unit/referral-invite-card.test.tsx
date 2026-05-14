@@ -60,7 +60,8 @@ describe('ReferralInviteCard', () => {
         referralCode="ABCDEFGH"
         referralLink="https://barterkin.com/r/ABCDEFGH"
         credits={3}
-        referralCount={2}
+        convertedReferralCount={2}
+        pendingReferralCount={1}
       />,
     )
 
@@ -84,7 +85,8 @@ describe('ReferralInviteCard', () => {
         referralCode="ABCDEFGH"
         referralLink="https://barterkin.com/r/ABCDEFGH"
         credits={7}
-        referralCount={5}
+        convertedReferralCount={5}
+        pendingReferralCount={0}
       />,
     )
 
@@ -115,7 +117,8 @@ describe('ReferralInviteCard', () => {
         referralCode="ABCDEFGH"
         referralLink="https://barterkin.com/r/ABCDEFGH"
         credits={5}
-        referralCount={4}
+        convertedReferralCount={4}
+        pendingReferralCount={2}
       />,
     )
 
@@ -142,7 +145,8 @@ describe('ReferralInviteCard', () => {
         referralCode="ABCDEFGH"
         referralLink="https://barterkin.com/r/ABCDEFGH"
         credits={1}
-        referralCount={0}
+        convertedReferralCount={0}
+        pendingReferralCount={3}
       />,
     )
 
@@ -163,7 +167,8 @@ describe('ReferralInviteCard', () => {
         referralCode="ABCDEFGH"
         referralLink="https://barterkin.com/r/ABCDEFGH"
         credits={4}
-        referralCount={3}
+        convertedReferralCount={3}
+        pendingReferralCount={1}
       />,
     )
 
@@ -188,7 +193,8 @@ describe('ReferralInviteCard', () => {
         referralCode="ABCDEFGH"
         referralLink="https://barterkin.com/r/ABCDEFGH"
         credits={6}
-        referralCount={8}
+        convertedReferralCount={8}
+        pendingReferralCount={0}
       />,
     )
 
@@ -234,7 +240,8 @@ describe('ReferralInviteCard', () => {
         referralCode="ABCDEFGH"
         referralLink="https://barterkin.com/r/ABCDEFGH"
         credits={2}
-        referralCount={1}
+        convertedReferralCount={1}
+        pendingReferralCount={4}
       />,
     )
 
@@ -244,5 +251,21 @@ describe('ReferralInviteCard', () => {
       expect(screen.getByRole('button', { name: /share invite link/i })).toBeEnabled()
     })
     expect(mockCapture).not.toHaveBeenCalled()
+  })
+
+  it('shows converted and pending referral counts separately', () => {
+    render(
+      <ReferralInviteCard
+        referralCode="ABCDEFGH"
+        referralLink="https://barterkin.com/r/ABCDEFGH"
+        credits={10}
+        convertedReferralCount={3}
+        pendingReferralCount={2}
+      />,
+    )
+
+    expect(screen.getByText('Converted')).toBeInTheDocument()
+    expect(screen.getByText('Pending')).toBeInTheDocument()
+    expect(screen.getByText(/earn 10 credits/i)).toBeInTheDocument()
   })
 })

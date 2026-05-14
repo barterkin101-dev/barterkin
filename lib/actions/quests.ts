@@ -37,9 +37,18 @@ export async function getQuestStatus(): Promise<GetQuestsResult> {
     .select('quest_key')
     .eq('profile_id', profile.id)
 
+  const { count: convertedReferralCount } = await supabase
+    .from('referrals')
+    .select('id', { count: 'exact', head: true })
+    .eq('inviter_id', profile.id)
+    .not('credited_at', 'is', null)
+
   const completedSet = new Set((completions ?? []).map((c) => c.quest_key))
   if (isUtcDateToday(profile.last_login_at)) {
     completedSet.add('quest_daily_login')
+  }
+  if ((convertedReferralCount ?? 0) > 0) {
+    completedSet.add('quest_referral_converted')
   }
 
   const quests: QuestStatus[] = QUESTS.map((q) => ({
@@ -223,6 +232,14 @@ async function isQuestEligible(
         .from('messages')
         .select('id', { count: 'exact', head: true })
         .eq('sender_profile_id', profileId)
+      return !error && (count ?? 0) > 0
+    }
+    case 'quest_referral_converted': {
+      const { count, error } = await supabase
+        .from('referrals')
+        .select('id', { count: 'exact', head: true })
+        .eq('inviter_id', profileId)
+        .not('credited_at', 'is', null)
       return !error && (count ?? 0) > 0
     }
     default:

@@ -47,10 +47,15 @@ describe('getQuestStatus', () => {
     })
     const completionSelect = vi.fn().mockReturnValue({ eq: completionEq })
 
+    const referralsNot = vi.fn().mockResolvedValue({ count: 1, error: null })
+    const referralsEq = vi.fn().mockReturnValue({ not: referralsNot })
+    const referralsSelect = vi.fn().mockReturnValue({ eq: referralsEq })
+
     const fromMock = vi
       .fn()
       .mockReturnValueOnce({ select: profileSelect })
       .mockReturnValueOnce({ select: completionSelect })
+      .mockReturnValueOnce({ select: referralsSelect })
 
     makeClient({ from: fromMock })
 
@@ -61,6 +66,7 @@ describe('getQuestStatus', () => {
     expect(result.credits).toBe(11)
     expect(result.quests?.find((quest) => quest.key === 'quest_daily_login')?.completed).toBe(true)
     expect(result.quests?.find((quest) => quest.key === 'quest_first_listing')?.completed).toBe(true)
+    expect(result.quests?.find((quest) => quest.key === 'quest_referral_converted')?.completed).toBe(true)
   })
 })
 

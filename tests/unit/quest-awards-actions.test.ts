@@ -22,13 +22,17 @@ vi.mock('@/lib/actions/quests', () => ({
 
 import { createClient } from '@/lib/supabase/server'
 import { awardQuest } from '@/lib/actions/quests'
+import { captureEvent } from '@/lib/analytics'
 import { saveListing } from '@/lib/actions/listings'
 import { setPublished } from '@/lib/actions/profile'
 
 const PROFILE_ID = '550e8400-e29b-41d4-a716-446655440000'
 const LISTING_ID = '660e8400-e29b-41d4-a716-446655440000'
 
-function makeClient(fromMock: ReturnType<typeof vi.fn>) {
+function makeClient(
+  fromMock: ReturnType<typeof vi.fn>,
+  rpcMock: ReturnType<typeof vi.fn> = vi.fn(),
+) {
   vi.mocked(createClient).mockResolvedValue({
     auth: {
       getUser: vi.fn().mockResolvedValue({
@@ -37,6 +41,7 @@ function makeClient(fromMock: ReturnType<typeof vi.fn>) {
       }),
     },
     from: fromMock,
+    rpc: rpcMock,
   } as unknown as Awaited<ReturnType<typeof createClient>>)
 }
 
@@ -152,12 +157,22 @@ describe('quest award hooks', () => {
     const publishEqId = vi.fn().mockReturnValue({ eq: publishEqOwner })
     const publishUpdate = vi.fn().mockReturnValue({ eq: publishEqId })
 
+    const referralMaybeSingle = vi.fn().mockResolvedValue({
+      data: { id: 'ref-1', inviter_id: 'inviter-1' },
+      error: null,
+    })
+    const referralEq = vi.fn().mockReturnValue({ maybeSingle: referralMaybeSingle })
+    const referralSelect = vi.fn().mockReturnValue({ eq: referralEq })
+
     const fromMock = vi
       .fn()
       .mockReturnValueOnce({ select: profileSelect })
       .mockReturnValueOnce({ update: publishUpdate })
+      .mockReturnValueOnce({ select: referralSelect })
 
-    makeClient(fromMock)
+    const rpcMock = vi.fn().mockResolvedValue({ data: true, error: null })
+
+    makeClient(fromMock, rpcMock)
 
     const fd = new FormData()
     fd.set('profileId', PROFILE_ID)
@@ -166,6 +181,14 @@ describe('quest award hooks', () => {
     const result = await setPublished(null, fd)
 
     expect(result).toEqual({ ok: true })
+    expect(rpcMock).toHaveBeenCalledWith('award_referral_credits', {
+      p_invitee_id: PROFILE_ID,
+    })
+    expect(vi.mocked(captureEvent)).toHaveBeenCalledWith('inviter-1', 'referral_converted', {
+      referral_id: 'ref-1',
+      invitee_profile_id: PROFILE_ID,
+      credits: 10,
+    })
     expect(vi.mocked(awardQuest)).toHaveBeenCalledWith('quest_complete_profile')
   })
 
@@ -176,7 +199,9 @@ describe('quest award hooks', () => {
 
     const fromMock = vi.fn().mockReturnValueOnce({ update: unpublishUpdate })
 
-    makeClient(fromMock)
+    const rpcMock = vi.fn()
+
+    makeClient(fromMock, rpcMock)
 
     const fd = new FormData()
     fd.set('profileId', PROFILE_ID)
@@ -185,6 +210,7 @@ describe('quest award hooks', () => {
     const result = await setPublished(null, fd)
 
     expect(result).toEqual({ ok: true })
+    expect(rpcMock).not.toHaveBeenCalled()
     expect(vi.mocked(awardQuest)).not.toHaveBeenCalled()
   })
 })

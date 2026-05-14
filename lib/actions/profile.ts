@@ -304,6 +304,37 @@ export async function setPublished(
     profile_id: profileId,
   })
 
+  try {
+    const { data: awardedReferral, error: referralError } = await supabase.rpc('award_referral_credits', {
+      p_invitee_id: profileId,
+    })
+
+    if (referralError) {
+      throw referralError
+    }
+
+    if (awardedReferral) {
+      const { data: referral } = await supabase
+        .from('referrals')
+        .select('id, inviter_id')
+        .eq('invitee_id', profileId)
+        .maybeSingle()
+
+      if (referral?.inviter_id) {
+        void captureEvent(referral.inviter_id, 'referral_converted', {
+          referral_id: referral.id,
+          invitee_profile_id: profileId,
+          credits: 10,
+        })
+      }
+    }
+  } catch (err) {
+    const log = createLogger('profile')
+    log.warn('referral conversion award failed', {
+      context: { profileId, error: err instanceof Error ? err.message : String(err) },
+    })
+  }
+
   const questResult = await awardQuest('quest_complete_profile')
   if (!questResult.ok) {
     const log = createLogger('profile')

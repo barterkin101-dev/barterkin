@@ -2,6 +2,7 @@ export type QuestKey =
   | 'quest_daily_login'
   | 'quest_first_listing'
   | 'quest_complete_profile'
+  | 'quest_referral_converted'
   | 'quest_first_message'
 
 export interface QuestDef {
@@ -38,6 +39,13 @@ export const QUESTS: QuestDef[] = [
     label: 'Complete Profile',
     description: 'Fill out your profile and publish it',
     credits: 3,
+    autoAwarded: true,
+  },
+  {
+    key: 'quest_referral_converted',
+    label: 'Referral Converted',
+    description: 'Invite a member who goes on to publish their profile',
+    credits: 10,
     autoAwarded: true,
   },
   {
