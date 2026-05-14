@@ -188,8 +188,9 @@
     "title": "Add annual-upgrade savings card for monthly premium members on dashboard billing surfaces — revenue/monetization",
     "description": "Show monthly Premium members a compact dashboard card that quantifies annual-plan savings and links directly to `/dashboard/billing` to switch plans. Acceptance: only monthly premium members see it, savings math uses live Stripe config values, click tracking is added, and tests cover visibility plus copy.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-14T14:00:00Z",
-    "source": "cron-self-generated"
+    "source": "cron-self-generated",
+    "notes": "Added a monthly-Premium-only annual savings card on the dashboard with Stripe-backed interval gating, PostHog impression/click tracking, and regression coverage. Commit: aeaaf7a."
   }
 ]
