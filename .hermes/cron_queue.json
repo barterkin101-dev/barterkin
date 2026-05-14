@@ -4,8 +4,8 @@
     "title": "Add social share buttons to listing detail pages — viral growth loop",
     "description": "Add share buttons to /listings/[id] that let members share their listings to Twitter/X, Facebook, and copy link. Pre-fill share copy with listing title + Barterkin URL. Use existing OG images (task 15) so shared links render rich previews. Track share events in PostHog (listing_shared). Add to listing detail page below the contact button. Acceptance: share buttons visible on public listing pages, copy-to-clipboard works, Twitter/Facebook share opens with pre-filled text, analytics fire, unit tests cover click handlers.",
     "priority": "high",
-    "status": "in_progress",
-    "notes": "Implementing public listing share buttons and analytics."
+    "status": "completed",
+    "notes": "Added X/Facebook/copy share actions with listing_shared analytics on public listing pages and unit coverage. Commit: 0d3555b."
   },
   {
     "id": "74",
