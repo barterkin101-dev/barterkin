@@ -128,8 +128,9 @@
     "title": "Add low-contact-count upgrade nudge after free-member outreach — revenue/monetization",
     "description": "After a free member sends a contact request and has 1 or fewer monthly contacts left, show a post-send upgrade nudge with the exact remaining count and a direct CTA to billing. Acceptance: only free members near exhaustion see it, remaining-contact math uses live data, analytics are tracked, and tests cover the visibility thresholds.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-14T12:30:00Z",
-    "source": "cron-self-generated"
+    "source": "cron-self-generated",
+    "notes": "Added a post-send Premium upgrade nudge in messaging for free members with 1 or fewer contact starts left, with analytics and regression coverage. Commit: 6b20ad8."
   }
 ]
