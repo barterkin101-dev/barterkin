@@ -46,5 +46,29 @@
     "priority": "medium",
     "status": "completed",
     "notes": "Added shared billing price config plus annual savings callouts and coverage for math/rendering states. Commit: 0fce923."
+  },
+  {
+    "id": "85",
+    "title": "Add Telegram referral share action to dashboard invite card — acquisition",
+    "description": "Expand ReferralInviteCard with a one-tap Telegram share action using the existing referral invite copy. Track the channel in PostHog via referral_invite_shared. Acceptance: Telegram button renders on the dashboard card, generated share URL is stable and encoded, analytics fires with method=telegram, and unit tests cover URL generation and click behavior.",
+    "priority": "high",
+    "status": "completed",
+    "notes": "Added Telegram referral sharing to the dashboard invite card with analytics + unit coverage. Commit: 01c13d7."
+  },
+  {
+    "id": "86",
+    "title": "Add dashboard digest re-enable reminder for members who opted out — retention",
+    "description": "Show a dashboard reminder to published members who have email_digest_enabled=false so they can re-enable weekly digest emails from profile settings. Acceptance: reminder only appears when digests are off, explains the value clearly, links to profile settings, and unit tests cover visibility logic.",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
+  },
+  {
+    "id": "87",
+    "title": "Add premium contact-limit comparison card on dashboard — monetization",
+    "description": "Surface a compact dashboard card for free members showing their monthly contact limit versus Premium, with a direct billing CTA. Acceptance: card appears only for free members, uses live plan/contact-limit values, links to /dashboard/billing, and unit tests cover rendering states and copy.",
+    "priority": "medium",
+    "status": "pending",
+    "notes": ""
   }
 ]
