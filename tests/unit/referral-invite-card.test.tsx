@@ -414,4 +414,56 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('One more referral unlocks another 10 credits')).toBeInTheDocument()
     expect(screen.getByText(/copy your invite message/i)).toBeInTheDocument()
   })
+
+  it('shows the first referral milestone when no referrals have converted yet', () => {
+    render(
+      <ReferralInviteCard
+        referralCode="ABCDEFGH"
+        referralLink="https://barterkin.com/r/ABCDEFGH"
+        credits={0}
+        convertedReferralCount={0}
+        pendingReferralCount={0}
+      />,
+    )
+
+    expect(screen.getByText('Next milestone')).toBeInTheDocument()
+    expect(screen.getByText('1 more published referral reaches 1 total')).toBeInTheDocument()
+    expect(screen.getByText('That milestone unlocks 10 referral credits in total.')).toBeInTheDocument()
+  })
+
+  it('shows the next referral milestone after early conversions', () => {
+    render(
+      <ReferralInviteCard
+        referralCode="ABCDEFGH"
+        referralLink="https://barterkin.com/r/ABCDEFGH"
+        credits={20}
+        convertedReferralCount={1}
+        pendingReferralCount={1}
+      />,
+    )
+
+    expect(screen.getByText('Next milestone')).toBeInTheDocument()
+    expect(screen.getByText('2 more published referrals reach 3 total')).toBeInTheDocument()
+    expect(
+      screen.getByText('That milestone unlocks 30 referral credits in total once those invites publish.'),
+    ).toBeInTheDocument()
+  })
+
+  it('shows a completed milestone state after the tracked milestones are cleared', () => {
+    render(
+      <ReferralInviteCard
+        referralCode="ABCDEFGH"
+        referralLink="https://barterkin.com/r/ABCDEFGH"
+        credits={60}
+        convertedReferralCount={6}
+        pendingReferralCount={0}
+      />,
+    )
+
+    expect(screen.getByText('Referral milestone')).toBeInTheDocument()
+    expect(screen.getByText("You've already unlocked 60 credits from referrals")).toBeInTheDocument()
+    expect(
+      screen.getByText(/keep sharing your link to stack more referral credits/i),
+    ).toBeInTheDocument()
+  })
 })

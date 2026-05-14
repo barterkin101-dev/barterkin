@@ -114,6 +114,36 @@ function getReferralMomentumCopy(convertedReferralCount: number, pendingReferral
   }
 }
 
+function getReferralMilestoneCopy(convertedReferralCount: number) {
+  const milestones = [1, 3, 5]
+  const nextMilestone = milestones.find((milestone) => convertedReferralCount < milestone)
+
+  if (!nextMilestone) {
+    const unlockedCredits = convertedReferralCount * 10
+
+    return {
+      eyebrow: 'Referral milestone',
+      title: `You've already unlocked ${unlockedCredits} credits from referrals`,
+      body: 'Keep sharing your link to stack more referral credits as new members publish.',
+    }
+  }
+
+  const referralsRemaining = nextMilestone - convertedReferralCount
+  const unlockedCredits = nextMilestone * 10
+
+  return {
+    eyebrow: 'Next milestone',
+    title:
+      referralsRemaining === 1
+        ? `1 more published referral reaches ${nextMilestone} total`
+        : `${referralsRemaining} more published referrals reach ${nextMilestone} total`,
+    body:
+      referralsRemaining === 1
+        ? `That milestone unlocks ${unlockedCredits} referral credits in total.`
+        : `That milestone unlocks ${unlockedCredits} referral credits in total once those invites publish.`,
+  }
+}
+
 function getReferralMessageVariant(pendingReferralCount: number) {
   if (pendingReferralCount > 0) {
     return {
@@ -157,6 +187,7 @@ export function ReferralInviteCard({
   const messageVariant = getReferralMessageVariant(pendingReferralCount)
   const inviteMessage = messageVariant.message(referralLink)
   const momentumCopy = getReferralMomentumCopy(convertedReferralCount, pendingReferralCount)
+  const milestoneCopy = getReferralMilestoneCopy(convertedReferralCount)
 
   async function copyText(value: string, copyTarget: 'link' | 'message') {
     try {
@@ -306,6 +337,14 @@ export function ReferralInviteCard({
           </div>
           <p className="mt-2 text-base font-semibold text-foreground">{momentumCopy.title}</p>
           <p className="mt-2 text-sm text-muted-foreground">{momentumCopy.body}</p>
+        </div>
+
+        <div className="rounded-lg border border-sage/20 bg-background/90 p-4">
+          <div className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            {milestoneCopy.eyebrow}
+          </div>
+          <p className="mt-2 text-base font-semibold text-foreground">{milestoneCopy.title}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{milestoneCopy.body}</p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
