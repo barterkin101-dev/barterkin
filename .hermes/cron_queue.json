@@ -20,7 +20,7 @@
     "title": "Add annual billing option — $90/yr (2 months free) to increase LTV",
     "description": "Add annual Premium plan alongside monthly. Stripe: create annual price ($90/yr) in config, update checkout session to accept 'annual' plan param. UI: billing page shows monthly ($9/mo) vs annual ($90/yr, 'Save $18') toggle. Default to annual as 'Best value'. Update webhook to handle annual billing cycle. Acceptance: checkout works for annual plan, webhook updates tier correctly, billing page shows both options with savings callout, unit tests cover annual checkout.",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "Added Premium annual billing checkout, default annual UI toggle, deploy env docs, and unit coverage. Commit: d054041."
   }
 ]
