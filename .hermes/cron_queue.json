@@ -92,7 +92,7 @@
     "title": "Add billing page founding-member deadline callout — monetization",
     "description": "Add a concise urgency panel on `/dashboard/billing` highlighting the founding-member annual savings window before it ends. Acceptance: panel only renders for free members in upgrade flow, uses live billing config values, links to checkout CTA, and unit tests cover copy and visibility states.",
     "priority": "medium",
-    "status": "pending",
-    "notes": "Grounded in the existing billing upgrade surface and recent annual savings callout work."
+    "status": "completed",
+    "notes": "Added a founding-pricing urgency callout on the billing page with live savings math, CTA anchor wiring, and free-member visibility coverage. Commit: 2b03e56."
   }
 ]
