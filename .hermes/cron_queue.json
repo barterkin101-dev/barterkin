@@ -60,8 +60,8 @@
     "title": "Add dashboard digest re-enable reminder for members who opted out — retention",
     "description": "Show a dashboard reminder to published members who have email_digest_enabled=false so they can re-enable weekly digest emails from profile settings. Acceptance: reminder only appears when digests are off, explains the value clearly, links to profile settings, and unit tests cover visibility logic.",
     "priority": "medium",
-    "status": "pending",
-    "notes": ""
+    "status": "completed",
+    "notes": "Added a dashboard digest opt-in reminder for published members with digests disabled, wired to profile settings with unit coverage. Commit: 7be4493."
   },
   {
     "id": "87",
