@@ -407,7 +407,12 @@ export default async function DashboardPage() {
 
       {/* Founding member nudge for free users */}
       {showFoundingNudge && (
-        <FoundingMemberNudge slotsRemaining={foundingSlotsRemaining} />
+        <FoundingMemberNudge
+          slotsRemaining={foundingSlotsRemaining}
+          foundingMonthlyCents={BILLING_PLAN_AMOUNTS.foundingMonthlyCents}
+          premiumMonthlyCents={BILLING_PLAN_AMOUNTS.premiumMonthlyCents}
+          premiumAnnualCents={BILLING_PLAN_AMOUNTS.premiumAnnualCents}
+        />
       )}
 
       {unreadMessageReminder && (

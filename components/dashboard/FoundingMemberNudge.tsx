@@ -8,12 +8,33 @@ import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 
 interface FoundingMemberNudgeProps {
   slotsRemaining: number
+  foundingMonthlyCents: number
+  premiumMonthlyCents: number
+  premiumAnnualCents: number
 }
 
-export function FoundingMemberNudge({ slotsRemaining }: FoundingMemberNudgeProps) {
+export function FoundingMemberNudge({
+  slotsRemaining,
+  foundingMonthlyCents,
+  premiumMonthlyCents,
+  premiumAnnualCents,
+}: FoundingMemberNudgeProps) {
   const slotsTaken = STRIPE_FOUNDING_MEMBER_LIMIT - slotsRemaining
   const percentFilled = Math.round((slotsTaken / STRIPE_FOUNDING_MEMBER_LIMIT) * 100)
   const isUrgent = slotsRemaining <= 10
+
+  const foundingAnnualized = foundingMonthlyCents * 12
+  const versusPremiumMonthly = (premiumMonthlyCents * 12) - foundingAnnualized
+  const versusPremiumAnnual = premiumAnnualCents - foundingAnnualized
+  const bestSavingsCents = Math.max(versusPremiumMonthly, versusPremiumAnnual)
+
+  const fmt = (cents: number) =>
+    new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
+      maximumFractionDigits: cents % 100 === 0 ? 0 : 2,
+    }).format(cents / 100)
 
   return (
     <Card className={cn(
@@ -31,7 +52,11 @@ export function FoundingMemberNudge({ slotsRemaining }: FoundingMemberNudgeProps
               </h3>
             </div>
             <p className="text-sm text-amber-800/70 max-w-md">
-              Lock in Premium forever at $5/month (vs $9). Exclusive founding member badge on your profile.
+              Lock in Premium forever at {fmt(foundingMonthlyCents)}/month
+              {bestSavingsCents > 0
+                ? ` — save ${fmt(bestSavingsCents)} every year vs Premium.`
+                : '.'}
+              {' '}Exclusive founding member badge on your profile.
             </p>
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-amber-800/60">
