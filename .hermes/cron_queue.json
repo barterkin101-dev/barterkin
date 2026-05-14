@@ -28,8 +28,8 @@
     "title": "Add SMS + email referral share actions to dashboard invite card — acquisition",
     "description": "Expand the existing ReferralInviteCard so members can share their invite link through prefilled SMS and email actions in one tap. Track each share method in PostHog via referral_invite_shared. Acceptance: SMS and email buttons render on the dashboard card, generated URLs are stable and encoded, analytics fires with method=sms/email, and unit tests cover URL generation and click behavior.",
     "priority": "high",
-    "status": "in_progress",
-    "notes": "Implementing dashboard referral share shortcuts on top of the existing invite card."
+    "status": "completed",
+    "notes": "Added one-tap SMS and email referral sharing with analytics + unit coverage. Commit: ed69b6e."
   },
   {
     "id": "83",
