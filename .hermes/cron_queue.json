@@ -118,9 +118,10 @@
     "title": "Add first-trade progress reminder to active conversations — retention/engagement",
     "description": "Surface a lightweight dashboard or inbox reminder for members who have active conversations but have not yet completed the `quest_first_trade` quest. Point them back into their warmest conversation and explain the 15-credit reward. Acceptance: only eligible members see it, links deep-link into messages, quest reward copy is accurate, and tests cover visibility logic.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-14T12:30:00Z",
-    "source": "cron-self-generated"
+    "source": "cron-self-generated",
+    "notes": "Added a dashboard first-trade progress reminder that deep-links into the warmest conversation and uses the live 15-credit quest reward copy. Commit: 70f6bd6."
   },
   {
     "id": "104",
