@@ -7,6 +7,8 @@ import type Stripe from 'stripe'
 
 const log = createLogger('stripe-webhook')
 
+type BillingInterval = 'monthly' | 'annual'
+
 /**
  * POST /api/stripe/webhook
  * Handles Stripe webhook events for subscription lifecycle.
@@ -78,11 +80,13 @@ async function handleCheckoutSessionCompleted(
   }
 
   const tier = (session.metadata?.tier as 'premium' | 'founding') ?? 'premium'
+  const billingInterval = normalizeBillingInterval(session.metadata?.billing_interval)
 
   const { error } = await supabase
     .from('profiles')
     .update({
       tier,
+      billing_interval: billingInterval,
       stripe_customer_id: session.customer as string,
       stripe_subscription_id: session.subscription as string,
     })
@@ -142,7 +146,7 @@ async function handleInvoicePaymentFailed(
   // Downgrade to free on payment failure (grace period handled by subscription_current_period_end)
   const { error } = await supabase
     .from('profiles')
-    .update({ tier: 'free' })
+    .update({ tier: 'free', billing_interval: null })
     .eq('stripe_subscription_id', subscriptionId)
 
   if (error) {
@@ -179,6 +183,7 @@ async function syncSubscription(
   const tier = isActive
     ? (subscription.metadata?.tier as 'premium' | 'founding' | undefined) ?? 'premium'
     : 'free'
+  const billingInterval = isActive ? getSubscriptionBillingInterval(subscription) : null
 
   const targetId = profileId ?? (
     await supabase
@@ -202,6 +207,7 @@ async function syncSubscription(
     .from('profiles')
     .update({
       tier,
+      billing_interval: billingInterval,
       stripe_subscription_id: subscription.id,
       subscription_current_period_end: periodEnd
         ? new Date(periodEnd * 1000).toISOString()
@@ -219,4 +225,30 @@ async function syncSubscription(
   log.info('Subscription synced', {
     context: { profile_id: targetId, tier, status: subscription.status },
   })
+}
+
+function normalizeBillingInterval(value: string | undefined): BillingInterval | null {
+  if (value === 'monthly' || value === 'annual') {
+    return value
+  }
+
+  return null
+}
+
+function getSubscriptionBillingInterval(subscription: Stripe.Subscription): BillingInterval | null {
+  const metadataInterval = normalizeBillingInterval(subscription.metadata?.billing_interval)
+  if (metadataInterval) {
+    return metadataInterval
+  }
+
+  const interval = subscription.items.data[0]?.price.recurring?.interval
+  if (interval === 'month') {
+    return 'monthly'
+  }
+
+  if (interval === 'year') {
+    return 'annual'
+  }
+
+  return null
 }

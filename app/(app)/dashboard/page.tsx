@@ -55,7 +55,7 @@ export default async function DashboardPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, email_digest_enabled, county_id, category_id, referral_code, tier, stripe_subscription_id, last_login_at, login_streak, onboarding_completed_at, skills_offered(id)')
+    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, email_digest_enabled, county_id, category_id, referral_code, tier, billing_interval, last_login_at, login_streak, onboarding_completed_at, skills_offered(id)')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -140,9 +140,9 @@ export default async function DashboardPage() {
     : null
   const showContactLimitUpsell = contactLimitStatus?.isNearLimit || contactLimitStatus?.isAtLimit || false
   const listingCapUpsell = getDashboardListingCapUpsellProps(profile?.tier, listings)
-  const premiumBillingInterval = await getPremiumBillingInterval(
+  const premiumBillingInterval = getPremiumBillingInterval(
     profile?.tier,
-    profile?.stripe_subscription_id,
+    profile?.billing_interval,
   )
   const annualUpgradeSavingsCard = getDashboardAnnualUpgradeSavingsProps(
     profile?.tier,

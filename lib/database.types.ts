@@ -718,6 +718,7 @@ export type Database = {
           avatar_url: string | null
           banned: boolean
           bio: string | null
+          billing_interval: string | null
           category_id: number | null
           county_id: number | null
           created_at: string
@@ -752,6 +753,7 @@ export type Database = {
           avatar_url?: string | null
           banned?: boolean
           bio?: string | null
+          billing_interval?: string | null
           category_id?: number | null
           county_id?: number | null
           created_at?: string
@@ -786,6 +788,7 @@ export type Database = {
           avatar_url?: string | null
           banned?: boolean
           bio?: string | null
+          billing_interval?: string | null
           category_id?: number | null
           county_id?: number | null
           created_at?: string
