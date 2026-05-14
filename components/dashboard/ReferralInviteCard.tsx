@@ -159,6 +159,36 @@ function getReferralMilestoneProgress(convertedReferralCount: number) {
   }
 }
 
+function getReferralNextStepCopy(convertedReferralCount: number, pendingReferralCount: number) {
+  if (pendingReferralCount > 0) {
+    return {
+      eyebrow: 'Best next move',
+      title:
+        pendingReferralCount === 1
+          ? 'Follow up with your 1 pending invite today'
+          : `Follow up with your ${pendingReferralCount} pending invites today`,
+      body:
+        'Use WhatsApp, SMS, or email below while your invite is still warm. One publish turns that follow-up into credits.',
+    }
+  }
+
+  if (convertedReferralCount > 0) {
+    return {
+      eyebrow: 'Best next move',
+      title: 'Send 1 fresh invite to keep your referral streak moving',
+      body:
+        'Start with one neighbor who is likely to publish quickly so you can stack the next 10-credit referral reward.',
+    }
+  }
+
+  return {
+    eyebrow: 'Best next move',
+    title: 'Start with your warmest first invite',
+    body:
+      'Pick one friend, neighbor, or past collaborator who can complete a profile fast and get your first referral conversion on the board.',
+  }
+}
+
 function getReferralMessageVariant(pendingReferralCount: number) {
   if (pendingReferralCount > 0) {
     return {
@@ -204,6 +234,7 @@ export function ReferralInviteCard({
   const momentumCopy = getReferralMomentumCopy(convertedReferralCount, pendingReferralCount)
   const milestoneCopy = getReferralMilestoneCopy(convertedReferralCount)
   const milestoneProgress = getReferralMilestoneProgress(convertedReferralCount)
+  const nextStepCopy = getReferralNextStepCopy(convertedReferralCount, pendingReferralCount)
 
   async function copyText(value: string, copyTarget: 'link' | 'message') {
     try {
@@ -353,6 +384,14 @@ export function ReferralInviteCard({
           </div>
           <p className="mt-2 text-base font-semibold text-foreground">{momentumCopy.title}</p>
           <p className="mt-2 text-sm text-muted-foreground">{momentumCopy.body}</p>
+        </div>
+
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50/80 p-4">
+          <div className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-800">
+            {nextStepCopy.eyebrow}
+          </div>
+          <p className="mt-2 text-base font-semibold text-foreground">{nextStepCopy.title}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{nextStepCopy.body}</p>
         </div>
 
         <div className="rounded-lg border border-sage/20 bg-background/90 p-4">

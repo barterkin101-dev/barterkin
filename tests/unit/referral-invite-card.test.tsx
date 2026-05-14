@@ -397,6 +397,9 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('Next reward')).toBeInTheDocument()
     expect(screen.getByText('2 pending invites can unlock 20 credits')).toBeInTheDocument()
     expect(screen.getByText(/quick follow-up can turn them into credits/i)).toBeInTheDocument()
+    expect(screen.getByText('Best next move')).toBeInTheDocument()
+    expect(screen.getByText('Follow up with your 2 pending invites today')).toBeInTheDocument()
+    expect(screen.getByText(/use whatsapp, sms, or email below while your invite is still warm/i)).toBeInTheDocument()
   })
 
   it('shows a next-invite prompt when no referrals are pending', () => {
@@ -413,6 +416,8 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('Next reward')).toBeInTheDocument()
     expect(screen.getByText('One more referral unlocks another 10 credits')).toBeInTheDocument()
     expect(screen.getByText(/copy your invite message/i)).toBeInTheDocument()
+    expect(screen.getByText('Send 1 fresh invite to keep your referral streak moving')).toBeInTheDocument()
+    expect(screen.getByText(/start with one neighbor who is likely to publish quickly/i)).toBeInTheDocument()
   })
 
   it('shows the first referral milestone when no referrals have converted yet', () => {
@@ -431,6 +436,8 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('That milestone unlocks 10 referral credits in total.')).toBeInTheDocument()
     expect(screen.getByText('0 of 1 published referrals')).toBeInTheDocument()
     expect(screen.getByText('0%')).toBeInTheDocument()
+    expect(screen.getByText('Start with your warmest first invite')).toBeInTheDocument()
+    expect(screen.getByText(/pick one friend, neighbor, or past collaborator/i)).toBeInTheDocument()
   })
 
   it('shows the next referral milestone after early conversions', () => {
