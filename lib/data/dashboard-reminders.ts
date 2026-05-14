@@ -46,6 +46,12 @@ export interface SecondListingExpansionReminder {
   listingTitle: string
 }
 
+export interface FirstContactLaunchReminder {
+  href: string
+  activeListingCount: number
+  listingTitle: string
+}
+
 export function getUnreadMessageReminder(
   conversations: ConversationRow[],
   currentProfileId: string,
@@ -223,6 +229,27 @@ export function getSecondListingExpansionReminder(
 
   return {
     href: '/dashboard/listings/new',
+    listingTitle: activeListings[0].title,
+  }
+}
+
+export function getFirstContactLaunchReminder(
+  onboardingCompletedAt: string | null | undefined,
+  listings: ListingRow[],
+  conversationCount: number,
+): FirstContactLaunchReminder | null {
+  if (!onboardingCompletedAt || conversationCount > 0) {
+    return null
+  }
+
+  const activeListings = listings.filter((listing) => listing.status === 'active')
+  if (activeListings.length === 0) {
+    return null
+  }
+
+  return {
+    href: '/directory',
+    activeListingCount: activeListings.length,
     listingTitle: activeListings[0].title,
   }
 }

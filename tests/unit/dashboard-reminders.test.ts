@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getSecondListingExpansionReminder, getStaleListingReminder, getUnreadMessageReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
+import { getDigestOptOutReminder, getFirstContactLaunchReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getSecondListingExpansionReminder, getStaleListingReminder, getUnreadMessageReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
 
@@ -517,6 +517,66 @@ describe('getSecondListingExpansionReminder', () => {
       ),
     ).toEqual({
       href: '/dashboard/listings/new',
+      listingTitle: 'Vintage camera bundle',
+    })
+  })
+})
+
+describe('getFirstContactLaunchReminder', () => {
+  it('returns null when onboarding is incomplete', () => {
+    expect(getFirstContactLaunchReminder(null, [makeListing()], 0)).toBeNull()
+  })
+
+  it('returns null when the member has no active listings', () => {
+    expect(
+      getFirstContactLaunchReminder(
+        '2026-05-14T12:00:00.000Z',
+        [makeListing({ status: 'paused' })],
+        0,
+      ),
+    ).toBeNull()
+  })
+
+  it('returns null once the member has already started a conversation', () => {
+    expect(
+      getFirstContactLaunchReminder(
+        '2026-05-14T12:00:00.000Z',
+        [makeListing()],
+        1,
+      ),
+    ).toBeNull()
+  })
+
+  it('returns a first-contact CTA for onboarded members with active listings and zero conversations', () => {
+    expect(
+      getFirstContactLaunchReminder(
+        '2026-05-14T12:00:00.000Z',
+        [
+          makeListing({ id: 'listing-1', title: 'Vintage camera bundle' }),
+          makeListing({ id: 'listing-2', title: 'Ceramic kiln', status: 'paused' }),
+        ],
+        0,
+      ),
+    ).toEqual({
+      href: '/directory',
+      activeListingCount: 1,
+      listingTitle: 'Vintage camera bundle',
+    })
+  })
+
+  it('uses the active listing count when multiple listings are live', () => {
+    expect(
+      getFirstContactLaunchReminder(
+        '2026-05-14T12:00:00.000Z',
+        [
+          makeListing({ id: 'listing-1', title: 'Vintage camera bundle' }),
+          makeListing({ id: 'listing-2', title: 'Ceramic wheel' }),
+        ],
+        0,
+      ),
+    ).toEqual({
+      href: '/directory',
+      activeListingCount: 2,
       listingTitle: 'Vintage camera bundle',
     })
   })

@@ -5,7 +5,7 @@ import { createLogger } from '@/lib/utils/logger'
 import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
 import { getConversations } from '@/lib/data/messaging'
-import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder, getSecondListingExpansionReminder } from '@/lib/data/dashboard-reminders'
+import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder, getSecondListingExpansionReminder, getFirstContactLaunchReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { buildReferralLink } from '@/lib/referrals'
 import { hasSkippedOnboarding, ONBOARDING_SKIP_COOKIE_NAME } from '@/lib/onboarding-skip'
@@ -28,6 +28,7 @@ import { ProfileViewsSnapshotCard } from '@/components/dashboard/ProfileViewsSna
 import { OnboardingReturnReminder } from '@/components/dashboard/OnboardingReturnReminder'
 import { ZeroListingLaunchReminder } from '@/components/dashboard/ZeroListingLaunchReminder'
 import { SecondListingExpansionReminder } from '@/components/dashboard/SecondListingExpansionReminder'
+import { FirstContactLaunchReminder } from '@/components/dashboard/FirstContactLaunchReminder'
 import { AnnualUpgradeSavingsCard } from '@/components/dashboard/AnnualUpgradeSavingsCard'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
@@ -215,6 +216,13 @@ export default async function DashboardPage() {
     ? getSecondListingExpansionReminder(
       profile.onboarding_completed_at,
       listings,
+    )
+    : null
+  const firstContactLaunchReminder = profile
+    ? getFirstContactLaunchReminder(
+      profile.onboarding_completed_at,
+      listings,
+      conversations.length,
     )
     : null
   const profileViewsSnapshot = profile?.is_published
@@ -441,6 +449,10 @@ export default async function DashboardPage() {
 
       {secondListingExpansionReminder && (
         <SecondListingExpansionReminder reminder={secondListingExpansionReminder} />
+      )}
+
+      {firstContactLaunchReminder && (
+        <FirstContactLaunchReminder reminder={firstContactLaunchReminder} />
       )}
 
       {profile && profileViewsSnapshot && (
