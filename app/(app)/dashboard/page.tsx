@@ -17,6 +17,7 @@ import { DiscoverFeedTabs } from '@/components/dashboard/DiscoverFeedTabs'
 import { QuestCard } from '@/components/dashboard/QuestCard'
 import { UnreadMessageReminder } from '@/components/dashboard/UnreadMessageReminder'
 import { ContactLimitUpsell } from '@/components/dashboard/ContactLimitUpsell'
+import { ListingCapUpsell } from '@/components/dashboard/ListingCapUpsell'
 import { StaleListingReminder } from '@/components/dashboard/StaleListingReminder'
 import { DigestOptOutReminder } from '@/components/dashboard/DigestOptOutReminder'
 import { ContactLimitComparisonCard } from '@/components/dashboard/ContactLimitComparisonCard'
@@ -26,6 +27,7 @@ import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
 import { updateLoginStreak } from '@/lib/actions/quests'
 import { getProfileViewsSnapshot } from '@/lib/data/profile-views'
+import { getDashboardListingCapUpsellProps } from '@/lib/dashboard-listing-cap-upsell'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -124,6 +126,7 @@ export default async function DashboardPage() {
     ? await getContactLimitStatus(profile.id, profile.tier)
     : null
   const showContactLimitUpsell = contactLimitStatus?.isNearLimit || contactLimitStatus?.isAtLimit || false
+  const listingCapUpsell = getDashboardListingCapUpsellProps(profile?.tier, listings)
   const completedQuests = new Set((questCompletions.data ?? []).map((row) => row.quest_key))
   const convertedReferralCount = referralRows.filter((row) => Boolean(row.credited_at)).length
   const pendingReferralCount = referralRows.length - convertedReferralCount
@@ -343,6 +346,10 @@ export default async function DashboardPage() {
           remaining={contactLimitStatus.remaining}
           isAtLimit={contactLimitStatus.isAtLimit}
         />
+      )}
+
+      {listingCapUpsell && (
+        <ListingCapUpsell {...listingCapUpsell} />
       )}
 
       {profile?.tier === 'free' && (

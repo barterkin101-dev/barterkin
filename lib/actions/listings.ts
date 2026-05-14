@@ -7,6 +7,7 @@ import { limitCreateListing } from '@/lib/rate-limit'
 import { validateAndSanitize } from '@/lib/utils/validation'
 import { createLogger } from '@/lib/utils/logger'
 import { awardQuest } from '@/lib/actions/quests'
+import { FREE_LISTING_LIMIT } from '@/lib/listing-limits'
 import type {
   SaveListingResult,
   DeleteListingResult,
@@ -125,10 +126,10 @@ export async function saveListing(
       const log = createLogger('listings')
       log.error('listing count failed', { error: countErr, context: { code: countErr.code } })
     }
-    if ((count ?? 0) >= 3) {
+    if ((count ?? 0) >= FREE_LISTING_LIMIT) {
       return {
         ok: false,
-        error: 'Free members can create up to 3 listings. Upgrade to Premium for unlimited listings.',
+        error: `Free members can create up to ${FREE_LISTING_LIMIT} listings. Upgrade to Premium for unlimited listings.`,
       }
     }
   }

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { BillingActions } from '@/components/dashboard/BillingActions'
+import { FREE_LISTING_LIMIT } from '@/lib/listing-limits'
 import {
   BILLING_PLAN_AMOUNTS,
   formatUsdFromCents,
@@ -137,7 +138,7 @@ export default async function BillingPage() {
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="mt-0.5 size-4 text-primary" />
-                  Up to 3 active listings
+                  Up to {FREE_LISTING_LIMIT} active listings
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="mt-0.5 size-4 text-primary" />
