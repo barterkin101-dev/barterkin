@@ -45,6 +45,23 @@ export interface MessageRow {
 
 type LastMessageRow = NonNullable<ConversationRow['last_message']>
 
+export async function getStartedConversationCount(profileId: string): Promise<number> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('messages')
+    .select('conversation_id')
+    .eq('sender_profile_id', profileId)
+
+  if (error) {
+    const log = createLogger('messaging')
+    log.warn('getStartedConversationCount error', { context: { code: error.code, profileId } })
+    return 0
+  }
+
+  return new Set((data ?? []).map((row) => row.conversation_id)).size
+}
+
 export async function getConversations(profileId: string): Promise<ConversationRow[]> {
   const supabase = await createClient()
 

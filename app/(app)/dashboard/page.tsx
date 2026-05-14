@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
 import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
-import { getConversations } from '@/lib/data/messaging'
+import { getConversations, getStartedConversationCount } from '@/lib/data/messaging'
 import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder, getSecondListingExpansionReminder, getFirstContactLaunchReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { buildReferralLink } from '@/lib/referrals'
@@ -62,7 +62,7 @@ export default async function DashboardPage() {
   const needsDailyLoginSync = profile ? !isUtcDateToday(profile.last_login_at) : false
   const streakResult = needsDailyLoginSync ? await updateLoginStreak() : null
 
-  const [listings, messageCount, , referralRows, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations] = profile ? await Promise.all([
+  const [listings, messageCount, , referralRows, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations, startedConversationCount] = profile ? await Promise.all([
     getMyListings(profile.id),
     supabase
       .from('conversation_participants')
@@ -127,7 +127,8 @@ export default async function DashboardPage() {
       .select('quest_key')
       .eq('profile_id', profile.id),
     getConversations(profile.id),
-  ]) : [[], 0, 0, [], 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }, { data: [], error: null }, []]
+    getStartedConversationCount(profile.id),
+  ]) : [[], 0, 0, [], 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }, { data: [], error: null }, [], 0]
   const activeListings = listings.filter((l) => l.status === 'active')
   const referralLink = profile?.referral_code
     ? buildReferralLink(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com', profile.referral_code)
@@ -222,7 +223,7 @@ export default async function DashboardPage() {
     ? getFirstContactLaunchReminder(
       profile.onboarding_completed_at,
       listings,
-      conversations.length,
+      startedConversationCount,
     )
     : null
   const profileViewsSnapshot = profile?.is_published
