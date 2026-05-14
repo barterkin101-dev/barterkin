@@ -3,6 +3,32 @@
  * Only exposes the publishable key — never the secret key.
  */
 
+export const BILLING_PLAN_AMOUNTS = {
+  premiumMonthlyCents: 900,
+  premiumAnnualCents: 9000,
+  foundingMonthlyCents: 500,
+} as const
+
+export function formatUsdFromCents(cents: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
+    maximumFractionDigits: cents % 100 === 0 ? 0 : 2,
+  }).format(cents / 100)
+}
+
+export function getPremiumAnnualSavings() {
+  const monthly = BILLING_PLAN_AMOUNTS.premiumMonthlyCents
+  const annual = BILLING_PLAN_AMOUNTS.premiumAnnualCents
+  const annualizedMonthly = monthly * 12
+
+  return {
+    monthlyEquivalentCents: annual / 12,
+    totalSavingsCents: annualizedMonthly - annual,
+  }
+}
+
 export function getStripePublishableKey(): string {
   const key = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   if (!key) {

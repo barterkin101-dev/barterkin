@@ -5,7 +5,12 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { BillingActions } from '@/components/dashboard/BillingActions'
-import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
+import {
+  BILLING_PLAN_AMOUNTS,
+  formatUsdFromCents,
+  getPremiumAnnualSavings,
+  STRIPE_FOUNDING_MEMBER_LIMIT,
+} from '@/lib/stripe/config'
 
 function formatPeriodEnd(value: string | null): string | null {
   if (!value) return null
@@ -40,6 +45,12 @@ export default async function BillingPage() {
   const isPaid = tier === 'premium' || tier === 'founding'
   const periodEnd = formatPeriodEnd(profile?.subscription_current_period_end ?? null)
   const canManageBilling = Boolean(profile?.stripe_customer_id)
+  const annualSavings = getPremiumAnnualSavings()
+  const premiumMonthlyLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents)}/month`
+  const premiumAnnualLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumAnnualCents)}/year`
+  const foundingMonthlyLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.foundingMonthlyCents)}/month`
+  const annualEquivalentLabel = `${formatUsdFromCents(annualSavings.monthlyEquivalentCents)}/month`
+  const annualSavingsLabel = formatUsdFromCents(annualSavings.totalSavingsCents)
 
   // Count how many founding member slots are taken
   const { count: foundingCount } = await supabase
@@ -90,7 +101,7 @@ export default async function BillingPage() {
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <h2 className="font-semibold">Free</h2>
-                  <p className="text-sm text-muted-foreground">$0/month</p>
+                  <p className="text-sm text-muted-foreground">{formatUsdFromCents(0)}/month</p>
                 </div>
                 {tier === 'free' ? <Badge variant="outline">Current</Badge> : null}
               </div>
@@ -115,7 +126,7 @@ export default async function BillingPage() {
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <h2 className="font-semibold">Premium Monthly</h2>
-                  <p className="text-sm text-muted-foreground">$9/month</p>
+                  <p className="text-sm text-muted-foreground">{premiumMonthlyLabel}</p>
                 </div>
                 {tier === 'premium' ? <Badge>Current</Badge> : <Badge variant="outline">Flexible</Badge>}
               </div>
@@ -140,7 +151,7 @@ export default async function BillingPage() {
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <h2 className="font-semibold">Premium Annual</h2>
-                  <p className="text-sm text-muted-foreground">$90/year</p>
+                  <p className="text-sm text-muted-foreground">{premiumAnnualLabel}</p>
                 </div>
                 <Badge className="bg-emerald-600">Best value</Badge>
               </div>
@@ -151,11 +162,11 @@ export default async function BillingPage() {
                 </li>
                 <li className="flex items-start gap-2">
                   <Sparkles className="mt-0.5 size-4 text-emerald-600" />
-                  Save $18 per year
+                  Save {annualSavingsLabel} per year
                 </li>
                 <li className="flex items-start gap-2">
                   <ShieldCheck className="mt-0.5 size-4 text-emerald-600" />
-                  One checkout for the full year
+                  Works out to {annualEquivalentLabel} billed yearly
                 </li>
               </ul>
             </div>
@@ -165,7 +176,7 @@ export default async function BillingPage() {
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
                   <h2 className="font-semibold">Founding Member</h2>
-                  <p className="text-sm text-muted-foreground">$5/month</p>
+                  <p className="text-sm text-muted-foreground">{foundingMonthlyLabel}</p>
                 </div>
                 {tier === 'founding' ? (
                   <Badge className="bg-amber-600">Current</Badge>
@@ -200,11 +211,21 @@ export default async function BillingPage() {
               {isPaid
                 ? 'Manage your subscription or change plans.'
                 : foundingAvailable
-                  ? 'Choose annual Premium by default, switch to monthly if you prefer, or claim a Founding Member slot.'
-                  : 'Choose annual Premium by default or switch to monthly — founding slots are sold out.'}
+                  ? `Choose annual Premium at ${annualEquivalentLabel} billed yearly, switch to monthly if you prefer, or claim a Founding Member slot.`
+                  : `Choose annual Premium at ${annualEquivalentLabel} billed yearly or switch to monthly — founding slots are sold out.`}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {!isPaid ? (
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-950">
+                <p className="text-sm font-semibold">
+                  Annual Premium saves {annualSavingsLabel} per year.
+                </p>
+                <p className="mt-1 text-sm text-emerald-900/80">
+                  That is {annualEquivalentLabel} instead of {premiumMonthlyLabel} when paid month-to-month.
+                </p>
+              </div>
+            ) : null}
             <BillingActions
               canManageBilling={canManageBilling}
               tier={tier}
@@ -212,7 +233,9 @@ export default async function BillingPage() {
             />
             {!canManageBilling ? (
               <p className="text-sm text-muted-foreground">
-                The billing portal unlocks after your first successful checkout.
+                {isPaid
+                  ? 'The billing portal unlocks after your first successful checkout.'
+                  : `The billing portal unlocks after your first successful checkout. Annual Premium bills ${premiumAnnualLabel} upfront and saves ${annualSavingsLabel} versus monthly.`}
               </p>
             ) : null}
           </CardContent>

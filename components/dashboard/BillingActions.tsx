@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { LoaderCircle, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { BILLING_PLAN_AMOUNTS, formatUsdFromCents, getPremiumAnnualSavings } from '@/lib/stripe/config'
 import { Button } from '@/components/ui/button'
 
 type BillingActionType = 'checkout-premium' | 'checkout-founding' | 'portal' | null
@@ -56,6 +57,11 @@ export function BillingActions({
   const foundingPending = pendingAction === 'checkout-founding'
   const portalPending = pendingAction === 'portal'
   const anyPending = pendingAction !== null
+  const annualSavings = getPremiumAnnualSavings()
+  const premiumMonthlyLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents)}/month`
+  const premiumAnnualLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumAnnualCents)}/year`
+  const foundingMonthlyLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.foundingMonthlyCents)}/month`
+  const annualSavingsLabel = formatUsdFromCents(annualSavings.totalSavingsCents)
 
   // Paid users only see portal
   if (isPaid) {
@@ -92,9 +98,9 @@ export function BillingActions({
             disabled={anyPending}
           >
             <span className="block text-sm font-semibold text-foreground">Annual</span>
-            <span className="block text-xs text-muted-foreground">$90/year</span>
+            <span className="block text-xs text-muted-foreground">{premiumAnnualLabel}</span>
             <span className="mt-1 inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
-              Save $18
+              Save {annualSavingsLabel}
             </span>
           </button>
           <button
@@ -109,7 +115,7 @@ export function BillingActions({
             disabled={anyPending}
           >
             <span className="block text-sm font-semibold text-foreground">Monthly</span>
-            <span className="block text-xs text-muted-foreground">$9/month</span>
+            <span className="block text-xs text-muted-foreground">{premiumMonthlyLabel}</span>
             <span className="mt-1 inline-flex px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
               Flexible billing
             </span>
@@ -128,7 +134,9 @@ export function BillingActions({
         }
       >
         {premiumPending ? <LoaderCircle className="size-4 animate-spin" /> : null}
-        {premiumInterval === 'annual' ? 'Upgrade to Premium Annual — $90/yr' : 'Upgrade to Premium — $9/mo'}
+        {premiumInterval === 'annual'
+          ? `Upgrade to Premium Annual — ${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumAnnualCents)}/yr`
+          : `Upgrade to Premium — ${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents)}/mo`}
       </Button>
 
       {foundingAvailable && (
@@ -146,7 +154,7 @@ export function BillingActions({
         >
           {foundingPending ? <LoaderCircle className="size-4 animate-spin" /> : null}
           <Zap className="mr-2 size-4" />
-          Claim Founding Member — $5/mo
+          Claim Founding Member — {formatUsdFromCents(BILLING_PLAN_AMOUNTS.foundingMonthlyCents)}/mo
         </Button>
       )}
     </div>
