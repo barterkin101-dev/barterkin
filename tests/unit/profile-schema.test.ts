@@ -18,6 +18,7 @@ describe('ProfileFormSchema', () => {
     availability: 'Evenings + weekends',
     acceptingContact: true,
     tiktokHandle: '@kerry.smith',
+    phoneNumber: '(404) 555-0123',
   }
 
   it('accepts a valid complete profile object', () => {
@@ -111,6 +112,16 @@ describe('ProfileFormSchema', () => {
   it('accepts empty tiktokHandle', () => {
     const result = ProfileFormSchema.safeParse({ ...valid, tiktokHandle: '' })
     expect(result.success).toBe(true)
+  })
+
+  it('accepts a valid US phone number', () => {
+    const result = ProfileFormSchema.safeParse({ ...valid, phoneNumber: '+1 404 555 0123' })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects an invalid phone number', () => {
+    const result = ProfileFormSchema.safeParse({ ...valid, phoneNumber: '123' })
+    expect(result.success).toBe(false)
   })
 
   it('rejects availability > 200 chars (PROF-07)', () => {

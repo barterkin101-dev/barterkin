@@ -30,6 +30,7 @@ export interface ListingRow {
     username: string | null
     avatar_url: string | null
     accepting_contact: boolean | null
+    phone_verified?: boolean | null
   } | null
   counties: { name: string } | null
   categories: { name: string } | null

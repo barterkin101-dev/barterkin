@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import type { ListingRow } from '@/lib/data/listings.types'
 import { SaveListingButton } from './SaveListingButton'
+import { PhoneVerifiedBadge } from '@/components/profile/PhoneVerifiedBadge'
 
 const conditionLabels: Record<string, string> = {
   new: 'New',
@@ -86,6 +87,7 @@ export function ListingCard({ listing, saved = false }: { listing: ListingRow; s
                 <span className="text-sm text-muted-foreground">
                   {profile.display_name ?? profile.username ?? 'Member'}
                 </span>
+                {profile.phone_verified ? <PhoneVerifiedBadge className="ml-auto text-xs" /> : null}
               </div>
             )}
           </CardContent>

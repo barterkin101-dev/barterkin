@@ -132,6 +132,7 @@ export async function getDiscoverFeed(profileId: string): Promise<DiscoverResult
             username: profileMap[row.profile_id].username,
             avatar_url: profileMap[row.profile_id].avatar_url,
             accepting_contact: null,
+            phone_verified: false,
           }
         : null,
       counties: row.county_id != null ? { name: countyMap[row.county_id] ?? 'Georgia' } : null,

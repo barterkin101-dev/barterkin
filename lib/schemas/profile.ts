@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { normalizePhoneNumber } from '@/lib/utils/phone'
 
 /**
  * ProfileFormSchema — single source of truth for profile edit payloads.
@@ -53,6 +54,15 @@ export const ProfileFormSchema = z.object({
     .regex(
       /^@[a-zA-Z0-9_.]{1,24}$/,
       'TikTok handles start with @ and can have letters, numbers, periods, and underscores.',
+    )
+    .optional()
+    .or(z.literal('')),
+  phoneNumber: z
+    .string()
+    .trim()
+    .refine(
+      (value) => value === '' || normalizePhoneNumber(value) != null,
+      'Enter a valid US phone number.',
     )
     .optional()
     .or(z.literal('')),

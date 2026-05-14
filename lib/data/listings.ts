@@ -81,7 +81,7 @@ export async function getListings(
         .from('listings')
         .select(
           `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, boosted_until,
-           profiles!inner(id, display_name, username, avatar_url),
+           profiles!inner(id, display_name, username, avatar_url, phone_verified),
            counties!left(name),
            categories!left(name)`,
         )
@@ -140,7 +140,7 @@ export async function getListingById(id: string): Promise<ListingRow | null> {
     .from('listings')
     .select(
       `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, boosted_until,
-       profiles!inner(id, display_name, username, avatar_url, accepting_contact),
+       profiles!inner(id, display_name, username, avatar_url, accepting_contact, phone_verified),
        counties!left(name),
        categories!left(name)`,
     )

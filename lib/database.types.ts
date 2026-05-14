@@ -728,6 +728,8 @@ export type Database = {
           login_streak: number
           onboarding_completed_at: string | null
           owner_id: string
+          phone_number: string | null
+          phone_verified: boolean
           referral_code: string
           rating_avg: number | null
           rating_count: number
@@ -760,6 +762,8 @@ export type Database = {
           login_streak?: number
           onboarding_completed_at?: string | null
           owner_id: string
+          phone_number?: string | null
+          phone_verified?: boolean
           referral_code?: string
           rating_avg?: number | null
           rating_count?: number
@@ -792,6 +796,8 @@ export type Database = {
           login_streak?: number
           onboarding_completed_at?: string | null
           owner_id?: string
+          phone_number?: string | null
+          phone_verified?: boolean
           referral_code?: string
           rating_avg?: number | null
           rating_count?: number

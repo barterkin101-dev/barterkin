@@ -8,6 +8,8 @@ import { validateAndSanitize } from '@/lib/utils/validation'
 import { createLogger } from '@/lib/utils/logger'
 import { captureEvent } from '@/lib/analytics'
 import { awardQuest } from '@/lib/actions/quests'
+import { normalizePhoneNumber } from '@/lib/utils/phone'
+import { decryptPhoneNumber, encryptPhoneNumber } from '@/lib/utils/phone-encryption'
 import type {
   SaveProfileResult,
   SetPublishedResult,
@@ -39,6 +41,7 @@ export async function coerceFormDataToProfileInput(formData: FormData): Promise<
   availability: string
   acceptingContact: boolean
   tiktokHandle: string
+  phoneNumber: string
 }> {
   return _coerceFormDataToProfileInput(formData)
 }
@@ -105,7 +108,7 @@ export async function saveProfile(
   // Fetch existing to determine slug lock (D-08) and profile id
   const { data: existing, error: fetchError } = await supabase
     .from('profiles')
-    .select('id, username')
+    .select('id, username, phone_number, phone_verified')
     .eq('owner_id', user.id)
     .maybeSingle()
   if (fetchError) {
@@ -113,6 +116,18 @@ export async function saveProfile(
     log.error('fetch existing failed', { error: fetchError, context: { code: fetchError.code } })
     return { ok: false, error: 'Something went wrong. Please try again.' }
   }
+
+  const normalizedPhoneNumber = values.phoneNumber ? normalizePhoneNumber(values.phoneNumber) : null
+  const existingPhoneNumber = existing?.phone_number
+    ? (() => {
+        try {
+          return normalizePhoneNumber(decryptPhoneNumber(existing.phone_number))
+        } catch {
+          return null
+        }
+      })()
+    : null
+  const phoneNumberChanged = normalizedPhoneNumber !== existingPhoneNumber
 
   // D-07 + D-08: generate slug only on first save (when existing.username is null/unset)
   let finalSlug = existing?.username ?? null
@@ -133,6 +148,8 @@ export async function saveProfile(
     availability: values.availability || null,
     accepting_contact: values.acceptingContact,
     tiktok_handle: values.tiktokHandle || null,
+    phone_number: normalizedPhoneNumber ? encryptPhoneNumber(normalizedPhoneNumber) : null,
+    phone_verified: phoneNumberChanged ? false : (existing?.phone_verified ?? false),
   }
   const { data: upserted, error: upsertError } = await supabase
     .from('profiles')

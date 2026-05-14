@@ -26,6 +26,7 @@ import { SkillRowList } from '@/components/profile/SkillRowList'
 import { CountyCombobox } from '@/components/profile/CountyCombobox'
 import { CategoryPicker } from '@/components/profile/CategoryPicker'
 import { AvatarUploader } from '@/components/profile/AvatarUploader'
+import { PhoneVerifiedBadge } from '@/components/profile/PhoneVerifiedBadge'
 
 export function ProfileEditForm({
   userId,
@@ -56,6 +57,7 @@ export function ProfileEditForm({
       availability: defaultValues?.availability ?? '',
       acceptingContact: defaultValues?.accepting_contact ?? true,
       tiktokHandle: defaultValues?.tiktok_handle ?? '',
+      phoneNumber: '',
     },
   })
 
@@ -99,6 +101,7 @@ export function ProfileEditForm({
     fd.set('availability', values.availability ?? '')
     fd.set('acceptingContact', values.acceptingContact ? 'true' : 'false')
     fd.set('tiktokHandle', values.tiktokHandle ?? '')
+    fd.set('phoneNumber', values.phoneNumber ?? '')
     formAction(fd)
   }
 
@@ -168,6 +171,31 @@ export function ProfileEditForm({
                     value={field.value || null}
                     onChange={(url) => field.onChange(url ?? '')}
                   />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center gap-2">
+                    <FormLabel>Phone number</FormLabel>
+                    {defaultValues?.phone_verified ? <PhoneVerifiedBadge className="text-xs" /> : null}
+                  </div>
+                  <FormControl>
+                    <Input
+                      inputMode="tel"
+                      autoComplete="tel"
+                      placeholder="(404) 555-0123"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Used only for SMS verification. Saving a new number clears any existing phone-verification badge until you verify it.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
