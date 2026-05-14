@@ -133,6 +133,10 @@ describe('getUnreadMessageReminder', () => {
             content: 'First thread',
             created_at: '2026-05-12T08:00:00.000Z',
             sender_profile_id: 'profile-2',
+            sender: {
+              display_name: 'Alex',
+              username: 'alex',
+            },
           },
         }),
         makeConversation({
@@ -164,6 +168,10 @@ describe('getUnreadMessageReminder', () => {
             content: 'Second thread',
             created_at: '2026-05-11T07:00:00.000Z',
             sender_profile_id: 'profile-3',
+            sender: {
+              display_name: null,
+              username: 'sam',
+            },
           },
         }),
       ],
@@ -228,6 +236,42 @@ describe('getUnreadMessageReminder', () => {
     expect(result).toMatchObject({
       href: '/dashboard/messages/conv-1',
       counterpartName: 'Alex',
+      unreadConversationCount: 1,
+      unreadMessageCount: 2,
+    })
+  })
+
+  it('falls back to a generic label when RLS hides the counterpart row and sender profile payload is absent', () => {
+    const result = getUnreadMessageReminder(
+      [
+        makeConversation({
+          participants: [
+            {
+              profile_id: PROFILE_ID,
+              last_read_at: null,
+              profile: {
+                id: PROFILE_ID,
+                display_name: 'Naeem',
+                username: 'naeem',
+                avatar_url: null,
+              },
+            },
+          ],
+          last_message: {
+            content: 'Ping',
+            created_at: '2026-05-11T09:00:00.000Z',
+            sender_profile_id: 'profile-2',
+            sender: null,
+          },
+        }),
+      ],
+      PROFILE_ID,
+      new Date('2026-05-13T09:00:00.000Z'),
+    )
+
+    expect(result).toMatchObject({
+      href: '/dashboard/messages/conv-1',
+      counterpartName: 'a member',
       unreadConversationCount: 1,
       unreadMessageCount: 2,
     })
