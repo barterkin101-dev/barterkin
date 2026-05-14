@@ -28,8 +28,8 @@
     "title": "Add channel-specific referral sharing on dashboard — higher invite conversion",
     "description": "Extend the dashboard referral card with one-tap share buttons for X, Facebook, and WhatsApp while keeping native share on supported devices. Pre-fill each share with the member's referral link and Barterkin invite copy, and track per-channel analytics in PostHog. Acceptance: dashboard shows channel-specific share buttons, native share still works when available, fallback copy still works, and unit tests cover share URL generation plus analytics for each path.",
     "priority": "high",
-    "status": "in_progress",
-    "notes": "Picked from regenerated queue. Implementing dashboard referral channel sharing and analytics coverage."
+    "status": "completed",
+    "notes": "Added dashboard referral share buttons for X, Facebook, WhatsApp, and native share with unit coverage. Commit: 30e7a55."
   },
   {
     "id": "77",
