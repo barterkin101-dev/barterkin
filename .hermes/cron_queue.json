@@ -281,16 +281,17 @@
     "status": "completed",
     "created_at": "2026-05-14T21-04-44Z",
     "source": "codex-review",
-    "notes": "Scoped the second-listing dashboard reminder to members who have already started at least one conversation, preventing overlap with the first-contact nudge. Commit: PENDING."
+    "notes": "Scoped the second-listing dashboard reminder to members who have already started at least one conversation, preventing overlap with the first-contact nudge. Commit: e9818ee."
   },
   {
     "id": "120",
     "title": "[codex-review FIX_FIRST] [task-110 codex-fallback] add annual premium savings nudge (aeaaf7ab)",
     "description": "codex flagged issues in aeaaf7ab. Address concerns, recommit with [task-120 fix-aeaaf7ab] prefix.\n\n-lc \"sed -n '1,260p' lib/stripe/server.ts\" in /root/barterkin succeeded in 0ms:\nimport Stripe from 'stripe'\nimport { createLogger } from '@/lib/utils/logger'\n\nconst log = createLogger('stripe')\n\nlet _stripe: Stripe | null = null\n\nfunction initStripe(): Stripe {\n  if (_stripe) return _stripe\n  const secretKey = process.env.STRIPE_SECRET_KEY\n  if (!secretKey) {\n    log.error('Stripe not initialized: STRIPE_SECRET_KEY missing')\n    throw new Error('Stripe is not configured.')\n  }\n  _stripe = new Stripe(secretKey, {\n    apiVersion: '2026-04-22.dahlia',\n    typescript: true,\n  })\n  return _stripe\n}\nexec\n/bin/bash -lc \"sed -n '1,220p' supabase/migrations/20260513050000_stripe_billing.sql\" in /root/barterkin succeeded in 0ms:\n-- Stripe subscription billing v1\n-- Adds tier tracking and Stripe customer/subscription IDs to profiles.\n--\n-- Free tier: 3 listings max, 10 contacts/mo\n-- Premium tier ($9/mo): unlimited listings, featured placement, 100 contacts/mo, verified badge\n\n-- Add tier column to profiles\nalter table public.profiles\n  add column if not exists tier text not null default 'free'\n  check (tier in ('free', 'premium', 'founding'));\n\n-- Add Stripe customer ID for Customer Portal lookups\nalter table public.profiles\n  add column if not exists stripe_customer_id text;\n\n-- Add Stripe subscription ID for webhook sync\nalter table public.profiles\n  add column if not exists stripe_subscription_id text;\n\n-- Add subscription period end for grace-period handling\nexec\n/bin/bash -lc \"sed -n '1,260p' app/api/stripe/checkout-session/route.ts\" in /root/barterkin succeeded in 0ms:\nimport { NextResponse, type NextRequest } from 'next/server'\nimport { createClient } from '@/lib/supabase/server'\nimport { getSupabaseAdmin } from '@/lib/supabase/admin'\nimport { getStripe, getPriceIds } from '@/lib/stripe/server'\nimport { createLogger } from '@/lib/utils/logger'\nimport { captureEvent } from '@/lib/analytics'\nimport { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'\n\nconst log = ",
     "priority": "critical",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-14T21-04-44Z",
-    "source": "codex-review"
+    "source": "codex-review",
+    "notes": "Persisted subscription billing_interval on profiles and switched the dashboard annual-upgrade upsell to local billing state instead of live Stripe reads. Commit: cd008de."
   },
   {
     "id": "121",
