@@ -84,4 +84,33 @@ describe('FoundingMemberNudge', () => {
     expect(screen.getByText(/25 claimed/)).toBeInTheDocument()
     expect(screen.getByText(/100 total/)).toBeInTheDocument()
   })
+
+  it('omits negative savings comparisons', () => {
+    render(
+      <FoundingMemberNudge
+        slotsRemaining={8}
+        foundingMonthlyCents={1000}
+        premiumMonthlyCents={900}
+        premiumAnnualCents={9000}
+      />,
+    )
+
+    expect(screen.getByText(/Lock in Premium forever at \$10\/month for \$120 a year\./)).toBeInTheDocument()
+    expect(screen.queryByText(/That saves/)).not.toBeInTheDocument()
+    expect(screen.getByText(/Exclusive founding member badge on your profile\./)).toBeInTheDocument()
+  })
+
+  it('shows only positive savings comparisons when annual pricing is lower', () => {
+    render(
+      <FoundingMemberNudge
+        slotsRemaining={12}
+        foundingMonthlyCents={700}
+        premiumMonthlyCents={900}
+        premiumAnnualCents={8000}
+      />,
+    )
+
+    expect(screen.getByText(/That saves \$24 versus Premium Monthly\./)).toBeInTheDocument()
+    expect(screen.queryByText(/Premium Annual/)).not.toBeInTheDocument()
+  })
 })

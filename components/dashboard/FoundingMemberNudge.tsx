@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
+import { formatUsdFromCents, STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 
 interface FoundingMemberNudgeProps {
   slotsRemaining: number
@@ -19,21 +19,31 @@ export function FoundingMemberNudge({
   premiumMonthlyCents,
   premiumAnnualCents,
 }: FoundingMemberNudgeProps) {
-  const slotsTaken = STRIPE_FOUNDING_MEMBER_LIMIT - slotsRemaining
+  const normalizedSlotsRemaining = Math.min(
+    STRIPE_FOUNDING_MEMBER_LIMIT,
+    Math.max(0, slotsRemaining),
+  )
+  const slotsTaken = STRIPE_FOUNDING_MEMBER_LIMIT - normalizedSlotsRemaining
   const percentFilled = Math.round((slotsTaken / STRIPE_FOUNDING_MEMBER_LIMIT) * 100)
-  const isUrgent = slotsRemaining <= 10
+  const isUrgent = normalizedSlotsRemaining <= 10
 
   const foundingAnnualized = foundingMonthlyCents * 12
   const versusPremiumMonthly = (premiumMonthlyCents * 12) - foundingAnnualized
   const versusPremiumAnnual = premiumAnnualCents - foundingAnnualized
+  const savingsComparisons = [
+    versusPremiumMonthly > 0
+      ? `${formatUsdFromCents(versusPremiumMonthly)} versus Premium Monthly`
+      : null,
+    versusPremiumAnnual > 0
+      ? `${formatUsdFromCents(versusPremiumAnnual)} versus Premium Annual`
+      : null,
+  ].filter((comparison): comparison is string => comparison !== null)
 
-  const fmt = (cents: number) =>
-    new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: cents % 100 === 0 ? 0 : 2,
-      maximumFractionDigits: cents % 100 === 0 ? 0 : 2,
-    }).format(cents / 100)
+  const pricingSummary = savingsComparisons.length === 0
+    ? null
+    : savingsComparisons.length === 1
+      ? `That saves ${savingsComparisons[0]}.`
+      : `That saves ${savingsComparisons[0]} and ${savingsComparisons[1]}.`
 
   return (
     <Card className={cn(
@@ -47,12 +57,12 @@ export function FoundingMemberNudge({
               <Zap className={cn('h-5 w-5', isUrgent ? 'text-amber-600' : 'text-amber-500')} />
               <h3 className="font-semibold text-amber-900">
                 {isUrgent ? 'Almost gone — ' : ''}
-                {slotsRemaining} founding {slotsRemaining === 1 ? 'slot' : 'slots'} left
+                {normalizedSlotsRemaining} founding {normalizedSlotsRemaining === 1 ? 'slot' : 'slots'} left
               </h3>
             </div>
             <p className="text-sm text-amber-800/70 max-w-md">
-              Lock in Premium forever at {fmt(foundingMonthlyCents)}/month for {fmt(foundingAnnualized)} a year.
-              {' '}That saves {fmt(versusPremiumMonthly)} versus Premium Monthly and {fmt(versusPremiumAnnual)} versus Premium Annual.
+              Lock in Premium forever at {formatUsdFromCents(foundingMonthlyCents)}/month for {formatUsdFromCents(foundingAnnualized)} a year.
+              {pricingSummary ? ` ${pricingSummary}` : ''}
               {' '}Exclusive founding member badge on your profile.
             </p>
             <div className="space-y-1">
