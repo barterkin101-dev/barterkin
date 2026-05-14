@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
+import { getStaleListingReminder, getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
+import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
 
 const PROFILE_ID = 'profile-1'
@@ -38,6 +39,29 @@ function makeConversation(overrides: Partial<ConversationRow>): ConversationRow 
       sender_profile_id: 'profile-2',
     },
     unread_count: 2,
+    ...overrides,
+  }
+}
+
+function makeListing(overrides: Partial<ListingRow>): ListingRow {
+  return {
+    id: 'listing-1',
+    profile_id: PROFILE_ID,
+    title: 'Vintage camera bundle',
+    description: 'Film camera bundle with lenses and carrying case for trade.',
+    condition: 'good',
+    trade_terms: 'Open to tools or furniture',
+    price_estimate: null,
+    status: 'active',
+    created_at: '2026-04-20T09:00:00.000Z',
+    updated_at: '2026-04-20T09:00:00.000Z',
+    boosted_until: null,
+    images: [],
+    profiles: null,
+    counties: null,
+    categories: null,
+    category_id: null,
+    county_id: null,
     ...overrides,
   }
 }
@@ -173,5 +197,92 @@ describe('getUnreadMessageReminder', () => {
       unreadConversationCount: 1,
       unreadMessageCount: 1,
     })
+  })
+})
+
+describe('getStaleListingReminder', () => {
+  it('returns null when the listing is newer than 14 days', () => {
+    const result = getStaleListingReminder(
+      [
+        makeListing({
+          created_at: '2026-05-05T09:00:00.000Z',
+          updated_at: '2026-05-05T09:00:00.000Z',
+        }),
+      ],
+      {},
+      new Date('2026-05-14T09:00:00.000Z'),
+    )
+
+    expect(result).toBeNull()
+  })
+
+  it('returns null when the active listing already has saves', () => {
+    const result = getStaleListingReminder(
+      [makeListing({ id: 'listing-saved' })],
+      { 'listing-saved': 2 },
+      new Date('2026-05-14T09:00:00.000Z'),
+    )
+
+    expect(result).toBeNull()
+  })
+
+  it('returns null when the listing is not active', () => {
+    const result = getStaleListingReminder(
+      [makeListing({ status: 'paused' })],
+      {},
+      new Date('2026-05-14T09:00:00.000Z'),
+    )
+
+    expect(result).toBeNull()
+  })
+
+  it('links to the oldest active zero-save listing that has gone stale', () => {
+    const result = getStaleListingReminder(
+      [
+        makeListing({
+          id: 'listing-oldest',
+          title: 'Old camera kit',
+          created_at: '2026-04-15T09:00:00.000Z',
+          updated_at: '2026-04-28T09:00:00.000Z',
+        }),
+        makeListing({
+          id: 'listing-newer',
+          title: 'Handmade desk',
+          created_at: '2026-04-22T09:00:00.000Z',
+          updated_at: '2026-04-29T09:00:00.000Z',
+        }),
+        makeListing({
+          id: 'listing-has-saves',
+          title: 'Saved listing',
+          created_at: '2026-04-10T09:00:00.000Z',
+          updated_at: '2026-04-18T09:00:00.000Z',
+        }),
+      ],
+      { 'listing-has-saves': 1 },
+      new Date('2026-05-14T09:00:00.000Z'),
+    )
+
+    expect(result).toEqual({
+      staleListingCount: 2,
+      href: '/dashboard/listings/listing-oldest/edit',
+      listingTitle: 'Old camera kit',
+      listingId: 'listing-oldest',
+      staleSince: '2026-04-28T09:00:00.000Z',
+    })
+  })
+
+  it('uses updated_at so recently refreshed listings do not trigger the reminder', () => {
+    const result = getStaleListingReminder(
+      [
+        makeListing({
+          created_at: '2026-04-01T09:00:00.000Z',
+          updated_at: '2026-05-10T09:00:00.000Z',
+        }),
+      ],
+      {},
+      new Date('2026-05-14T09:00:00.000Z'),
+    )
+
+    expect(result).toBeNull()
   })
 })

@@ -4,7 +4,7 @@ import { createLogger } from '@/lib/utils/logger'
 import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
 import { getConversations } from '@/lib/data/messaging'
-import { getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
+import { getStaleListingReminder, getUnreadMessageReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { buildReferralLink } from '@/lib/referrals'
 
@@ -17,6 +17,7 @@ import { DiscoverFeedTabs } from '@/components/dashboard/DiscoverFeedTabs'
 import { QuestCard } from '@/components/dashboard/QuestCard'
 import { UnreadMessageReminder } from '@/components/dashboard/UnreadMessageReminder'
 import { ContactLimitUpsell } from '@/components/dashboard/ContactLimitUpsell'
+import { StaleListingReminder } from '@/components/dashboard/StaleListingReminder'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
@@ -143,6 +144,25 @@ export default async function DashboardPage() {
   const unreadMessageReminder = profile
     ? getUnreadMessageReminder(conversations, profile.id)
     : null
+  const listingSaveCounts = profile && listings.length > 0
+    ? await supabase
+      .from('saved_listings')
+      .select('listing_id')
+      .in('listing_id', listings.map((listing) => listing.id))
+      .then(({ data, error }) => {
+        if (error) {
+          const log = createLogger('dashboard')
+          log.error('saved listing counts error', { context: { code: error.code } })
+          return {}
+        }
+
+        return (data ?? []).reduce<Record<string, number>>((counts, row) => {
+          counts[row.listing_id] = (counts[row.listing_id] ?? 0) + 1
+          return counts
+        }, {})
+      })
+    : {}
+  const staleListingReminder = getStaleListingReminder(listings, listingSaveCounts)
 
   return (
     <div className="space-y-8">
@@ -321,6 +341,10 @@ export default async function DashboardPage() {
 
       {unreadMessageReminder && (
         <UnreadMessageReminder reminder={unreadMessageReminder} />
+      )}
+
+      {staleListingReminder && (
+        <StaleListingReminder reminder={staleListingReminder} />
       )}
 
       {/* Profile completion nudge */}

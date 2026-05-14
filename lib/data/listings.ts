@@ -80,7 +80,7 @@ export async function getListings(
       let q = supabase
         .from('listings')
         .select(
-          `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, boosted_until,
+          `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, updated_at, boosted_until,
            profiles!inner(id, display_name, username, avatar_url, phone_verified),
            counties!left(name),
            categories!left(name)`,
@@ -139,7 +139,7 @@ export async function getListingById(id: string): Promise<ListingRow | null> {
     const { data, error } = await supabase
     .from('listings')
     .select(
-      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, boosted_until,
+      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, updated_at, boosted_until,
        profiles!inner(id, display_name, username, avatar_url, accepting_contact, phone_verified),
        counties!left(name),
        categories!left(name)`,
@@ -164,7 +164,7 @@ export async function getMyListings(profileId: string): Promise<ListingRow[]> {
   const { data, error } = await supabase
     .from('listings')
     .select(
-      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, boosted_until,
+      `id, profile_id, title, description, condition, trade_terms, price_estimate, status, created_at, updated_at, boosted_until,
        counties!left(name),
        categories!left(name)`,
     )
