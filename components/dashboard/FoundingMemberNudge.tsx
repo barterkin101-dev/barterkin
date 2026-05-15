@@ -28,6 +28,7 @@ export function FoundingMemberNudge({
   const isUrgent = normalizedSlotsRemaining <= 10
 
   const foundingAnnualized = foundingMonthlyCents * 12
+  const premiumAnnualEffectiveMonthlyCents = premiumAnnualCents / 12
   const versusPremiumMonthly = (premiumMonthlyCents * 12) - foundingAnnualized
   const versusPremiumAnnual = premiumAnnualCents - foundingAnnualized
   const savingsComparisons = [
@@ -44,6 +45,14 @@ export function FoundingMemberNudge({
     : savingsComparisons.length === 1
       ? `That saves ${savingsComparisons[0]}.`
       : `That saves ${savingsComparisons[0]} and ${savingsComparisons[1]}.`
+  const monthlySavingsComparisons = [
+    premiumMonthlyCents > foundingMonthlyCents
+      ? `Save ${formatUsdFromCents(premiumMonthlyCents - foundingMonthlyCents)}/mo vs Premium monthly`
+      : null,
+    premiumAnnualEffectiveMonthlyCents > foundingMonthlyCents
+      ? `Save ${formatUsdFromCents(premiumAnnualEffectiveMonthlyCents - foundingMonthlyCents)}/mo vs Premium annual`
+      : null,
+  ].filter((comparison): comparison is string => comparison !== null)
 
   return (
     <Card className={cn(
@@ -65,6 +74,22 @@ export function FoundingMemberNudge({
               {pricingSummary ? ` ${pricingSummary}` : ''}
               {' '}Exclusive founding member badge on your profile.
             </p>
+            <div className="flex flex-wrap gap-2 text-xs text-amber-900/80">
+              <span className="rounded-full bg-white/80 px-3 py-1">
+                Founding {formatUsdFromCents(foundingMonthlyCents)}/mo
+              </span>
+              <span className="rounded-full bg-white/70 px-3 py-1">
+                Premium annual {formatUsdFromCents(premiumAnnualEffectiveMonthlyCents)}/mo
+              </span>
+              <span className="rounded-full bg-white/70 px-3 py-1">
+                Premium monthly {formatUsdFromCents(premiumMonthlyCents)}/mo
+              </span>
+            </div>
+            {monthlySavingsComparisons.length > 0 && (
+              <p className="text-xs text-amber-900/75">
+                {monthlySavingsComparisons.join(' • ')}
+              </p>
+            )}
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-amber-800/60">
                 <span>{slotsTaken} claimed</span>

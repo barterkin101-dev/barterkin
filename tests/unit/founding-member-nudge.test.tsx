@@ -45,6 +45,11 @@ describe('FoundingMemberNudge', () => {
     expect(screen.getByText(/\$5\/month/)).toBeInTheDocument()
     expect(screen.getByText(/\$60 a year/)).toBeInTheDocument()
     expect(screen.getByText(/saves \$48 versus Premium Monthly and \$30 versus Premium Annual/)).toBeInTheDocument()
+    expect(screen.getByText(/Founding \$5\/mo/)).toBeInTheDocument()
+    expect(screen.getByText(/Premium annual \$7\.50\/mo/)).toBeInTheDocument()
+    expect(screen.getByText(/Premium monthly \$9\/mo/)).toBeInTheDocument()
+    expect(screen.getByText(/Save \$4\/mo vs Premium monthly/)).toBeInTheDocument()
+    expect(screen.getByText(/Save \$2\.50\/mo vs Premium annual/)).toBeInTheDocument()
   })
 
   it('shows singular slot when one remains', () => {
@@ -97,6 +102,10 @@ describe('FoundingMemberNudge', () => {
 
     expect(screen.getByText(/Lock in Premium forever at \$10\/month for \$120 a year\./)).toBeInTheDocument()
     expect(screen.queryByText(/That saves/)).not.toBeInTheDocument()
+    expect(screen.getByText(/Premium annual \$7\.50\/mo/)).toBeInTheDocument()
+    expect(screen.getByText(/Premium monthly \$9\/mo/)).toBeInTheDocument()
+    expect(screen.queryByText(/Save .* Premium monthly/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Save .* Premium annual/)).not.toBeInTheDocument()
     expect(screen.getByText(/Exclusive founding member badge on your profile\./)).toBeInTheDocument()
   })
 
@@ -112,5 +121,7 @@ describe('FoundingMemberNudge', () => {
 
     expect(screen.getByText(/That saves \$24 versus Premium Monthly\./)).toBeInTheDocument()
     expect(screen.queryByText(/Premium Annual/)).not.toBeInTheDocument()
+    expect(screen.getByText(/Save \$2\/mo vs Premium monthly/)).toBeInTheDocument()
+    expect(screen.queryByText(/Save .* Premium annual/)).not.toBeInTheDocument()
   })
 })

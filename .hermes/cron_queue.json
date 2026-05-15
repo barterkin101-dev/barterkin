@@ -372,5 +372,35 @@
     "created_at": "2026-05-15T00:30:00Z",
     "source": "cron-self-generated",
     "notes": "Added a shared annual-pricing proof row across free-tier dashboard billing nudges and covered the pricing math in unit tests. Commit: cb533f9."
+  },
+  {
+    "id": "129",
+    "title": "Add founding-plan effective monthly savings row to free-member nudge — revenue/monetization",
+    "description": "Strengthen the free-member founding upsell by adding a compact proof row inside `FoundingMemberNudge` that shows founding effective monthly price versus Premium monthly and Premium annual effective monthly pricing. Acceptance: copy uses live Stripe config, founding urgency remains intact, and unit tests cover the savings math plus cases where only one comparison is positive.",
+    "priority": "high",
+    "status": "in_progress",
+    "created_at": "2026-05-15T16:10:00Z",
+    "source": "cron-self-generated",
+    "notes": "Selected for current run."
+  },
+  {
+    "id": "130",
+    "title": "Add SMS referral CTA to dashboard best-next-move panel — growth/acquisition",
+    "description": "Extend the referral card's best-next-move panel with a compact SMS share CTA when a referral link is available, using the existing referral share helpers and analytics event naming. Acceptance: CTA only appears when a referral link exists, remains secondary to the main share action, and tests cover href generation plus click tracking.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-15T16:10:00Z",
+    "source": "cron-self-generated",
+    "notes": ""
+  },
+  {
+    "id": "131",
+    "title": "Add fresh-listing dashboard reminder for members idle 7 days after first publish — retention/engagement",
+    "description": "Show a dashboard reminder to members who published exactly one listing more than 7 days ago and have not added another since, nudging them to post a fresh offer to stay visible. Acceptance: only eligible members see it, CTA deep-links to `/listings/new`, and tests cover the 7-day threshold and ineligible states.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-15T16:10:00Z",
+    "source": "cron-self-generated",
+    "notes": ""
   }
 ]
