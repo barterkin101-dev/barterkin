@@ -264,6 +264,7 @@ export function ReferralInviteCard({
         referral_code: referralCode,
         referral_count: convertedReferralCount,
         credits,
+        share_surface: 'referral_invite_card',
       })
     } catch {
       // User cancellations and unsupported share targets should stay silent.
@@ -296,6 +297,7 @@ export function ReferralInviteCard({
       referral_code: referralCode,
       referral_count: convertedReferralCount,
       credits,
+      share_surface: 'referral_invite_card',
     })
   }
 

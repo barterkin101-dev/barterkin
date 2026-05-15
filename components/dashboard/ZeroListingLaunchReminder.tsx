@@ -62,6 +62,7 @@ export function ZeroListingLaunchReminder({
       referral_code: reminder.referralCode,
       referral_count: reminder.referralCount,
       credits: reminder.credits,
+      share_surface: 'zero_listing_launch',
     })
   }
 

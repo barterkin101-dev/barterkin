@@ -161,18 +161,21 @@ describe('ZeroListingLaunchReminder', () => {
       referral_code: 'ABC12345',
       referral_count: 2,
       credits: 7,
+      share_surface: 'zero_listing_launch',
     })
     expect(mockCapture).toHaveBeenNthCalledWith(2, 'referral_invite_shared', {
       method: 'sms',
       referral_code: 'ABC12345',
       referral_count: 2,
       credits: 7,
+      share_surface: 'zero_listing_launch',
     })
     expect(mockCapture).toHaveBeenNthCalledWith(3, 'referral_invite_shared', {
       method: 'email',
       referral_code: 'ABC12345',
       referral_count: 2,
       credits: 7,
+      share_surface: 'zero_listing_launch',
     })
   })
 })

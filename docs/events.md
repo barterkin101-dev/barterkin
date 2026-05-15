@@ -130,6 +130,7 @@ Google OAuth also fires this event client-side when the user launches Google sig
 | `referral_code` | string | The 8-char referral code being shared |
 | `referral_count` | number | How many successful referrals the member has at share time |
 | `credits` | number | Current referral credit balance shown in the card |
+| `share_surface` | string | Which UI initiated the share: `referral_invite_card` or `zero_listing_launch` |
 
 ---
 
@@ -400,7 +401,7 @@ Google OAuth also fires this event client-side when the user launches Google sig
 | `contact_blocked` | ✅ Implemented | `lib/actions/contact.ts` | 5 |
 | `referral_link_used` | ✅ Implemented | `app/auth/callback/route.ts`, `app/auth/confirm/route.ts` | 6 |
 | `referral_invite_copied` | ✅ Implemented | `components/dashboard/ReferralInviteCard.tsx` | 7 |
-| `referral_invite_shared` | ✅ Implemented | `components/dashboard/ReferralInviteCard.tsx`, `components/dashboard/ZeroListingLaunchReminder.tsx` | 7 |
+| `referral_invite_shared` | ✅ Implemented | `components/dashboard/ReferralInviteCard.tsx`, `components/dashboard/ZeroListingLaunchReminder.tsx` | 8 |
 | `subscription_activated` | ✅ Implemented | `app/api/stripe/webhook/route.ts` | 7 |
 | `founding_slot_claimed` | ✅ Implemented | `lib/actions/billing.ts` | 7 |
 | `waitlist_founding_notified` | ✅ Implemented | `app/api/cron/notify-waitlist/route.ts` | 7 |

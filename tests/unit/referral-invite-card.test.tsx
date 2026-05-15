@@ -184,6 +184,7 @@ describe('ReferralInviteCard', () => {
       referral_code: 'ABCDEFGH',
       referral_count: 4,
       credits: 5,
+      share_surface: 'referral_invite_card',
     })
   })
 
@@ -234,6 +235,7 @@ describe('ReferralInviteCard', () => {
       referral_code: 'ABCDEFGH',
       referral_count: 3,
       credits: 4,
+      share_surface: 'referral_invite_card',
     })
   })
 
@@ -282,24 +284,28 @@ describe('ReferralInviteCard', () => {
       referral_code: 'ABCDEFGH',
       referral_count: 8,
       credits: 6,
+      share_surface: 'referral_invite_card',
     })
     expect(mockCapture).toHaveBeenNthCalledWith(2, 'referral_invite_shared', {
       method: 'whatsapp',
       referral_code: 'ABCDEFGH',
       referral_count: 8,
       credits: 6,
+      share_surface: 'referral_invite_card',
     })
     expect(mockCapture).toHaveBeenNthCalledWith(3, 'referral_invite_shared', {
       method: 'telegram',
       referral_code: 'ABCDEFGH',
       referral_count: 8,
       credits: 6,
+      share_surface: 'referral_invite_card',
     })
     expect(mockCapture).toHaveBeenNthCalledWith(4, 'referral_invite_shared', {
       method: 'linkedin',
       referral_code: 'ABCDEFGH',
       referral_count: 8,
       credits: 6,
+      share_surface: 'referral_invite_card',
     })
   })
 
@@ -340,12 +346,14 @@ describe('ReferralInviteCard', () => {
       referral_code: 'ABCDEFGH',
       referral_count: 6,
       credits: 9,
+      share_surface: 'referral_invite_card',
     })
     expect(mockCapture).toHaveBeenNthCalledWith(2, 'referral_invite_shared', {
       method: 'email',
       referral_code: 'ABCDEFGH',
       referral_count: 6,
       credits: 9,
+      share_surface: 'referral_invite_card',
     })
   })
 
@@ -563,6 +571,7 @@ describe('ReferralInviteCard', () => {
       referral_code: 'ABCDEFGH',
       referral_count: 2,
       credits: 5,
+      share_surface: 'referral_invite_card',
     })
   })
 
