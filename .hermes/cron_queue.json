@@ -358,10 +358,10 @@
     "title": "Add one-click reply CTA to two-day unread reminder copy — retention/engagement",
     "description": "Increase reply recovery for stale conversations by adding a clearer dashboard CTA label and a short context line that names the sender and age tier directly in the reminder component. Acceptance: two-day unread reminders use stronger reply-now framing than one-day reminders, no extra query path is introduced, and unit tests cover both copy variants.",
     "priority": "medium",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-15T00:30:00Z",
     "source": "cron-self-generated",
-    "notes": "Backlog seed generated from the existing unread-message reminder flow."
+    "notes": "Added sender-named 24h/48h unread reminder CTA copy variants and regression coverage for both card states. Commit: 649c818."
   },
   {
     "id": "128",
