@@ -341,6 +341,8 @@ describe('getZeroListingLaunchReminder', () => {
     ).toEqual({
       href: '/dashboard/listings/new',
       rewardCredits: 5,
+      referralCode: null,
+      referralLink: null,
     })
   })
 
@@ -354,6 +356,42 @@ describe('getZeroListingLaunchReminder', () => {
     ).toEqual({
       href: '/dashboard/listings/new',
       rewardCredits: null,
+      referralCode: null,
+      referralLink: null,
+    })
+  })
+
+  it('includes referral code and link when provided', () => {
+    expect(
+      getZeroListingLaunchReminder(
+        '2026-05-14T12:00:00.000Z',
+        [],
+        false,
+        'ABC12345',
+        'https://barterkin.com/r/ABC12345',
+      ),
+    ).toEqual({
+      href: '/dashboard/listings/new',
+      rewardCredits: 5,
+      referralCode: 'ABC12345',
+      referralLink: 'https://barterkin.com/r/ABC12345',
+    })
+  })
+
+  it('omits referral fields when referral code is missing', () => {
+    expect(
+      getZeroListingLaunchReminder(
+        '2026-05-14T12:00:00.000Z',
+        [],
+        false,
+        null,
+        null,
+      ),
+    ).toEqual({
+      href: '/dashboard/listings/new',
+      rewardCredits: 5,
+      referralCode: null,
+      referralLink: null,
     })
   })
 })

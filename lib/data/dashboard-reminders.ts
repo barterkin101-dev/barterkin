@@ -39,6 +39,8 @@ export interface FirstTradeProgressReminder {
 export interface ZeroListingLaunchReminder {
   href: string
   rewardCredits: number | null
+  referralCode: string | null
+  referralLink: string | null
 }
 
 export interface SecondListingExpansionReminder {
@@ -194,6 +196,8 @@ export function getZeroListingLaunchReminder(
   onboardingCompletedAt: string | null | undefined,
   listings: ListingRow[],
   hasCompletedFirstListingQuest: boolean,
+  referralCode?: string | null,
+  referralLink?: string | null,
 ): ZeroListingLaunchReminder | null {
   if (!onboardingCompletedAt) {
     return null
@@ -211,6 +215,8 @@ export function getZeroListingLaunchReminder(
   return {
     href: '/dashboard/listings/new',
     rewardCredits,
+    referralCode: referralCode ?? null,
+    referralLink: referralLink ?? null,
   }
 }
 

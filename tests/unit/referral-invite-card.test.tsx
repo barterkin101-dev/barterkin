@@ -4,13 +4,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   buildEmailReferralShareUrl,
   buildFacebookReferralShareUrl,
-  buildReferralFollowUpMessage,
   buildLinkedInReferralShareUrl,
+  buildReferralFollowUpMessage,
   buildReferralInviteMessage,
   buildSmsReferralShareUrl,
   buildTelegramReferralShareUrl,
   buildWhatsAppReferralShareUrl,
   buildXReferralShareUrl,
+} from '@/lib/referral-share'
+import {
   ReferralInviteCard,
 } from '@/components/dashboard/ReferralInviteCard'
 

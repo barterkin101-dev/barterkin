@@ -1,8 +1,12 @@
+'use client'
+
 import Link from 'next/link'
-import { ArrowRight, Rocket, Sparkles } from 'lucide-react'
+import { ArrowRight, Rocket, Share2, Sparkles } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { captureClientEvent } from '@/lib/analytics-client'
+import { buildWhatsAppReferralShareUrl } from '@/lib/referral-share'
 import type { ZeroListingLaunchReminder as ZeroListingLaunchReminderData } from '@/lib/data/dashboard-reminders'
 
 export function ZeroListingLaunchReminder({
@@ -10,6 +14,21 @@ export function ZeroListingLaunchReminder({
 }: {
   reminder: ZeroListingLaunchReminderData
 }) {
+  const shareHref = reminder.referralLink
+    ? buildWhatsAppReferralShareUrl(reminder.referralLink)
+    : null
+  const hasReferral = Boolean(reminder.referralCode && shareHref)
+
+  function handleShareClick() {
+    if (!reminder.referralCode) return
+
+    captureClientEvent('referral_invite_shared', {
+      method: 'whatsapp',
+      referral_code: reminder.referralCode,
+      share_target: 'zero_listing_launch',
+    })
+  }
+
   return (
     <Card className="border-sky-200 bg-sky-50/80">
       <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
@@ -29,16 +48,34 @@ export function ZeroListingLaunchReminder({
           </div>
         </div>
 
-        <Link
-          href={reminder.href}
-          className={cn(
-            buttonVariants({ size: 'lg' }),
-            'shrink-0 bg-sky-700 text-white hover:bg-sky-800',
+        <div className="flex flex-col gap-2 sm:items-end">
+          <Link
+            href={reminder.href}
+            className={cn(
+              buttonVariants({ size: 'lg' }),
+              'shrink-0 bg-sky-700 text-white hover:bg-sky-800',
+            )}
+          >
+            Create listing
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+
+          {hasReferral && (
+            <a
+              href={shareHref ?? undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleShareClick}
+              className={cn(
+                buttonVariants({ variant: 'ghost', size: 'sm' }),
+                'text-sky-700 hover:text-sky-800 hover:bg-sky-100',
+              )}
+            >
+              <Share2 className="mr-1.5 h-3.5 w-3.5" />
+              Share invite
+            </a>
           )}
-        >
-          Create listing
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+        </div>
       </CardContent>
     </Card>
   )

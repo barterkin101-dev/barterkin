@@ -211,6 +211,8 @@ export default async function DashboardPage() {
       profile.onboarding_completed_at,
       listings,
       completedQuests.has('quest_first_listing'),
+      profile.referral_code,
+      referralLink,
     )
     : null
   const secondListingExpansionReminder = profile
