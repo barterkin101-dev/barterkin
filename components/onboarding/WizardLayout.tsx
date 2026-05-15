@@ -1,6 +1,7 @@
-import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { buttonVariants } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { ProgressIndicator } from './ProgressIndicator'
 
 export function WizardLayout({
@@ -23,12 +24,17 @@ export function WizardLayout({
       </CardContent>
       <Separator className="bg-sage-light" />
       <CardFooter className="justify-center py-4">
-        <Link
-          href="/onboarding/skip"
-          className="text-sm text-forest-mid underline-offset-4 hover:underline"
-        >
-          Skip for now
-        </Link>
+        <form action="/onboarding/skip" method="post">
+          <button
+            type="submit"
+            className={cn(
+              buttonVariants({ variant: 'link' }),
+              'h-auto px-0 py-0 text-sm text-forest-mid',
+            )}
+          >
+            Skip for now
+          </button>
+        </form>
       </CardFooter>
     </Card>
   )

@@ -159,7 +159,7 @@ test.describe('Onboarding redirect + wizard route (D-02, D-03, D-10, D-16)', () 
       // Step 2 always shows the Skip link in WizardLayout footer
       await page.goto('/onboarding?step=2')
       await page.waitForLoadState('networkidle')
-      await page.getByRole('link', { name: /Skip for now/i }).click()
+      await page.getByRole('button', { name: /Skip for now/i }).click()
       await page.waitForURL(/\/directory/, { timeout: 10_000 })
       expect(page.url()).toMatch(/\/directory/)
     } finally {
@@ -175,7 +175,7 @@ test.describe('Onboarding redirect + wizard route (D-02, D-03, D-10, D-16)', () 
       await loginAs(page, email, password)
       await page.goto('/onboarding?step=2')
       await page.waitForLoadState('networkidle')
-      await page.getByRole('link', { name: /Skip for now/i }).click()
+      await page.getByRole('button', { name: /Skip for now/i }).click()
       await page.waitForURL(/\/directory/, { timeout: 10_000 })
 
       // Verify onboarding_completed_at is still NULL after skip

@@ -7,7 +7,7 @@ import {
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const response = NextResponse.redirect(new URL('/directory', request.url))
   response.cookies.set(ONBOARDING_SKIP_COOKIE_NAME, ONBOARDING_SKIP_COOKIE_VALUE, {
     httpOnly: true,
@@ -17,4 +17,8 @@ export async function GET(request: NextRequest) {
     maxAge: ONBOARDING_SKIP_COOKIE_MAX_AGE_SECONDS,
   })
   return response
+}
+
+export async function GET(request: NextRequest) {
+  return NextResponse.redirect(new URL('/onboarding', request.url))
 }
