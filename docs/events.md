@@ -133,6 +133,34 @@ Google OAuth also fires this event client-side when the user launches Google sig
 
 ---
 
+### `unread_message_reminder_impression`
+
+**When fired:** When the dashboard unread-message reminder renders for a member.
+**Fires from:** `components/dashboard/UnreadMessageReminder.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `stale_tier` | string | Reminder urgency tier, currently `day` or `two-day` |
+| `unread_conversation_count` | number | Count of stale unread conversations shown in the reminder |
+| `unread_message_count` | number | Total unread messages summed across those stale conversations |
+
+---
+
+### `unread_message_reminder_clicked`
+
+**When fired:** When a member clicks the unread-message reminder reply CTA.
+**Fires from:** `components/dashboard/UnreadMessageReminder.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `stale_tier` | string | Reminder urgency tier, currently `day` or `two-day` |
+| `unread_conversation_count` | number | Count of stale unread conversations shown in the reminder |
+| `unread_message_count` | number | Total unread messages summed across those stale conversations |
+
+---
+
 ### `referral_converted`
 
 **When fired:** After an invited member publishes their profile and the inviter earns the conversion reward.
@@ -381,6 +409,8 @@ Google OAuth also fires this event client-side when the user launches Google sig
 | `weekly_digest_sent` | ✅ Implemented | `app/api/cron/weekly-digest/route.ts` | 7 |
 | `re_engagement_sent` | ✅ Implemented | `app/api/cron/re-engage/route.ts` | 7 |
 | `landing_social_proof_viewed` | ✅ Implemented | `components/landing/RecentActivity.tsx` | 7 |
+| `unread_message_reminder_impression` | ✅ Implemented | `components/dashboard/UnreadMessageReminder.tsx` | 7 |
+| `unread_message_reminder_clicked` | ✅ Implemented | `components/dashboard/UnreadMessageReminder.tsx` | 7 |
 | `trade_marked_complete` | ✅ Implemented | `lib/actions/trade-completions.ts` | 8 |
 | `trade_mutually_completed` | ✅ Implemented | `lib/actions/trade-completions.ts` | 8 |
 | `trade_review_submitted` | ✅ Implemented | `lib/actions/trade-completions.ts` | 8 |
