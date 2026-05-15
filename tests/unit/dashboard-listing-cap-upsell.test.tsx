@@ -108,6 +108,9 @@ describe('ListingCapUpsell', () => {
 
     expect(screen.getByText('Your next listing fills your free cap (2/3 used).')).toBeInTheDocument()
     expect(screen.getByText('You have 1 listing slot left. Upgrade to Premium from $9/mo to remove the cap before your next post. Annual billing saves $18.')).toBeInTheDocument()
+    expect(screen.getByText('Monthly: $9/mo')).toBeInTheDocument()
+    expect(screen.getByText('Annual: $90/yr')).toBeInTheDocument()
+    expect(screen.getByText('Effective: $7.50/mo billed yearly')).toBeInTheDocument()
 
     const cta = screen.getByRole('link', { name: /unlock unlimited listings/i })
     expect(cta).toHaveAttribute('href', '/dashboard/billing')
@@ -145,6 +148,9 @@ describe('ListingCapUpsell', () => {
 
     expect(screen.getByText("You've hit your free listing cap (3/3 used).")).toBeInTheDocument()
     expect(screen.getByText('Free members can keep up to 3 listings. Upgrade to Premium from $9/mo to publish another listing now and remove the cap. Annual billing saves $18.')).toBeInTheDocument()
+    expect(screen.getByText('Monthly: $9/mo')).toBeInTheDocument()
+    expect(screen.getByText('Annual: $90/yr')).toBeInTheDocument()
+    expect(screen.getByText('Effective: $7.50/mo billed yearly')).toBeInTheDocument()
 
     const cta = screen.getByRole('link', { name: /upgrade for more listings/i })
     expect(cta).toHaveAttribute('href', '/dashboard/billing')

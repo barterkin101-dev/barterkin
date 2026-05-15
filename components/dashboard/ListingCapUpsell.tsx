@@ -6,6 +6,7 @@ import { ArrowRight, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { captureClientEvent } from '@/lib/analytics-client'
+import { BillingSavingsProofRow } from '@/components/dashboard/BillingSavingsProofRow'
 import type { DashboardListingCapUpsellProps } from '@/lib/dashboard-listing-cap-upsell'
 
 export function ListingCapUpsell({
@@ -44,22 +45,25 @@ export function ListingCapUpsell({
   return (
     <Card className="border-sky-200 bg-[linear-gradient(135deg,rgba(240,249,255,1),rgba(255,255,255,1))]">
       <CardContent className="flex flex-col gap-4 p-6 lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex items-start gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-700">
-            <Sparkles className="h-5 w-5" />
+        <div className="space-y-3">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-sky-100 text-sky-700">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div className="space-y-1.5">
+              <p className="font-semibold text-sky-950">
+                {isAtLimit
+                  ? `You've hit your free listing cap (${used}/${limit} used).`
+                  : `Your next listing fills your free cap (${used}/${limit} used).`}
+              </p>
+              <p className="max-w-3xl text-sm text-sky-900/90">
+                {isAtLimit
+                  ? `Free members can keep up to ${limit} listings. Upgrade to Premium from ${premiumMonthlyPrice}/mo to publish another listing now and remove the cap. Annual billing saves ${premiumAnnualSavings}.`
+                  : `You have ${remaining} listing slot left. Upgrade to Premium from ${premiumMonthlyPrice}/mo to remove the cap before your next post. Annual billing saves ${premiumAnnualSavings}.`}
+              </p>
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <p className="font-semibold text-sky-950">
-              {isAtLimit
-                ? `You've hit your free listing cap (${used}/${limit} used).`
-                : `Your next listing fills your free cap (${used}/${limit} used).`}
-            </p>
-            <p className="max-w-3xl text-sm text-sky-900/90">
-              {isAtLimit
-                ? `Free members can keep up to ${limit} listings. Upgrade to Premium from ${premiumMonthlyPrice}/mo to publish another listing now and remove the cap. Annual billing saves ${premiumAnnualSavings}.`
-                : `You have ${remaining} listing slot left. Upgrade to Premium from ${premiumMonthlyPrice}/mo to remove the cap before your next post. Annual billing saves ${premiumAnnualSavings}.`}
-            </p>
-          </div>
+          <BillingSavingsProofRow />
         </div>
 
         <Button asChild className="shrink-0" onClick={handleClick}>
