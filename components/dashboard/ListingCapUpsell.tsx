@@ -12,6 +12,7 @@ export function ListingCapUpsell({
   used,
   limit,
   remaining,
+  isAtLimit,
   premiumMonthlyPrice,
   premiumAnnualSavings,
 }: DashboardListingCapUpsellProps) {
@@ -25,15 +26,17 @@ export function ListingCapUpsell({
       used,
       limit,
       remaining,
+      state: isAtLimit ? 'at_limit' : 'near_limit',
       premium_monthly_price: premiumMonthlyPrice,
     })
-  }, [limit, premiumMonthlyPrice, remaining, used])
+  }, [isAtLimit, limit, premiumMonthlyPrice, remaining, used])
 
   function handleClick() {
     captureClientEvent('listing_cap_upgrade_nudge_clicked', {
       used,
       limit,
       remaining,
+      state: isAtLimit ? 'at_limit' : 'near_limit',
       premium_monthly_price: premiumMonthlyPrice,
     })
   }
@@ -47,17 +50,21 @@ export function ListingCapUpsell({
           </div>
           <div className="space-y-1.5">
             <p className="font-semibold text-sky-950">
-              Your next listing fills your free cap ({used}/{limit} used).
+              {isAtLimit
+                ? `You've hit your free listing cap (${used}/${limit} used).`
+                : `Your next listing fills your free cap (${used}/${limit} used).`}
             </p>
             <p className="max-w-3xl text-sm text-sky-900/90">
-              You have {remaining} listing slot left. Upgrade to Premium from {premiumMonthlyPrice}/mo to remove the cap before your next post. Annual billing saves {premiumAnnualSavings}.
+              {isAtLimit
+                ? `Free members can keep up to ${limit} listings. Upgrade to Premium from ${premiumMonthlyPrice}/mo to publish another listing now and remove the cap. Annual billing saves ${premiumAnnualSavings}.`
+                : `You have ${remaining} listing slot left. Upgrade to Premium from ${premiumMonthlyPrice}/mo to remove the cap before your next post. Annual billing saves ${premiumAnnualSavings}.`}
             </p>
           </div>
         </div>
 
         <Button asChild className="shrink-0" onClick={handleClick}>
           <Link href="/dashboard/billing">
-            Unlock unlimited listings
+            {isAtLimit ? 'Upgrade for more listings' : 'Unlock unlimited listings'}
             <ArrowRight className="h-4 w-4" />
           </Link>
         </Button>

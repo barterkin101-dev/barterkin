@@ -312,5 +312,35 @@
     "created_at": "2026-05-14T21-04-44Z",
     "source": "codex-review",
     "notes": "Moved onboarding skip behind an explicit POST form so the proxy-bypass cookie is only set on submit, with route and E2E coverage. Commit: 7e31bdf."
+  },
+  {
+    "id": "123",
+    "title": "Extend dashboard listing-cap upsell to free members already at cap — revenue/monetization",
+    "description": "Close the monetization gap where the dashboard only nudges free members when they have exactly one listing slot left. Update the listing-cap upsell helper/component so members already at the free cap still see a clear Premium CTA, with distinct copy and analytics state for near-cap vs at-cap. Acceptance: free members at 2/3 and 3+/3 both see the nudge, paid members do not, CTA still links to /dashboard/billing, and unit tests cover both states.",
+    "priority": "high",
+    "status": "in_progress",
+    "created_at": "2026-05-15T00:00:00Z",
+    "source": "cron-self-generated",
+    "notes": "Starting: expand the existing dashboard listing-cap upsell to cover at-cap free members and add regression coverage."
+  },
+  {
+    "id": "124",
+    "title": "Add referral share CTA to post-onboarding zero-listing reminder — growth/acquisition",
+    "description": "When an onboarded member still has zero listings, add a secondary referral-share CTA beside the first-listing launch reminder so early members can invite neighbors even before posting. Reuse the member referral code and existing analytics naming where possible. Acceptance: CTA only appears when the member has a referral code, copy stays subordinate to the main listing CTA, and tests cover visibility + href generation.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-15T00:00:00Z",
+    "source": "cron-self-generated",
+    "notes": ""
+  },
+  {
+    "id": "125",
+    "title": "Add unread-message streak reminder for two-day-old conversations — retention/engagement",
+    "description": "Strengthen reply rates by adding a second-tier dashboard reminder for members with unread messages older than 48 hours, with copy that emphasizes keeping barter momentum alive. Build on the existing unread reminder helper rather than a separate query path. Acceptance: only unread threads older than 48 hours trigger the stronger copy, the CTA deep-links to the oldest eligible thread, and unit tests cover threshold ordering and sender-name fallback.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-15T00:00:00Z",
+    "source": "cron-self-generated",
+    "notes": ""
   }
 ]

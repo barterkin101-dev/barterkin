@@ -45,6 +45,24 @@ describe('getDashboardListingCapUpsellProps', () => {
       used: 2,
       limit: 3,
       remaining: 1,
+      isAtLimit: false,
+      premiumMonthlyPrice: '$9',
+      premiumAnnualSavings: '$18',
+    })
+  })
+
+  it('returns props when a free member is already at the cap', () => {
+    const result = getDashboardListingCapUpsellProps('free', [
+      makeListing('active'),
+      makeListing('paused'),
+      makeListing('draft'),
+    ])
+
+    expect(result).toMatchObject({
+      used: 3,
+      limit: 3,
+      remaining: 0,
+      isAtLimit: true,
       premiumMonthlyPrice: '$9',
       premiumAnnualSavings: '$18',
     })
@@ -82,6 +100,7 @@ describe('ListingCapUpsell', () => {
         used={2}
         limit={3}
         remaining={1}
+        isAtLimit={false}
         premiumMonthlyPrice="$9"
         premiumAnnualSavings="$18"
       />,
@@ -97,6 +116,7 @@ describe('ListingCapUpsell', () => {
       used: 2,
       limit: 3,
       remaining: 1,
+      state: 'near_limit',
     }))
 
     await user.click(cta)
@@ -105,6 +125,44 @@ describe('ListingCapUpsell', () => {
       used: 2,
       limit: 3,
       remaining: 1,
+      state: 'near_limit',
+    }))
+  })
+
+  it('renders at-cap copy and tracks the at-limit state', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ListingCapUpsell
+        used={3}
+        limit={3}
+        remaining={0}
+        isAtLimit
+        premiumMonthlyPrice="$9"
+        premiumAnnualSavings="$18"
+      />,
+    )
+
+    expect(screen.getByText("You've hit your free listing cap (3/3 used).")).toBeInTheDocument()
+    expect(screen.getByText('Free members can keep up to 3 listings. Upgrade to Premium from $9/mo to publish another listing now and remove the cap. Annual billing saves $18.')).toBeInTheDocument()
+
+    const cta = screen.getByRole('link', { name: /upgrade for more listings/i })
+    expect(cta).toHaveAttribute('href', '/dashboard/billing')
+
+    expect(mockCapture).toHaveBeenCalledWith('listing_cap_upgrade_nudge_impression', expect.objectContaining({
+      used: 3,
+      limit: 3,
+      remaining: 0,
+      state: 'at_limit',
+    }))
+
+    await user.click(cta)
+
+    expect(mockCapture).toHaveBeenCalledWith('listing_cap_upgrade_nudge_clicked', expect.objectContaining({
+      used: 3,
+      limit: 3,
+      remaining: 0,
+      state: 'at_limit',
     }))
   })
 })

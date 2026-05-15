@@ -10,6 +10,7 @@ export interface DashboardListingCapUpsellProps {
   used: number
   limit: number
   remaining: number
+  isAtLimit: boolean
   premiumMonthlyPrice: string
   premiumAnnualSavings: string
 }
@@ -25,7 +26,7 @@ export function getDashboardListingCapUpsellProps(
   const used = listings.filter((listing) => countsTowardListingLimit(listing.status)).length
   const remaining = Math.max(0, FREE_LISTING_LIMIT - used)
 
-  if (remaining !== 1) {
+  if (remaining > 1) {
     return null
   }
 
@@ -35,6 +36,7 @@ export function getDashboardListingCapUpsellProps(
     used,
     limit: FREE_LISTING_LIMIT,
     remaining,
+    isAtLimit: remaining === 0,
     premiumMonthlyPrice: formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents),
     premiumAnnualSavings: formatUsdFromCents(annualSavings.totalSavingsCents),
   }
