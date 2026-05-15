@@ -398,10 +398,10 @@
     "title": "Add fresh-listing dashboard reminder for members idle 7 days after first publish \u2014 retention/engagement",
     "description": "Show a dashboard reminder to members who published exactly one listing more than 7 days ago and have not added another since, nudging them to post a fresh offer to stay visible. Acceptance: only eligible members see it, CTA deep-links to `/listings/new`, and tests cover the 7-day threshold and ineligible states.",
     "priority": "medium",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-15T16:10:00Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Added getFreshListingReminder helper, FreshListingReminder component, wired into dashboard page, and covered eligibility + threshold behavior in unit tests. Commit: 4eb7343."
   },
   {
     "id": "132",
