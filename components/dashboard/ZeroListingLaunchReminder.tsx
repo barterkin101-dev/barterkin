@@ -1,29 +1,57 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, Rocket, Share2, Sparkles } from 'lucide-react'
+import { ArrowRight, Mail, MessageSquareText, Rocket, Share2, Sparkles } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { captureClientEvent } from '@/lib/analytics-client'
-import { buildWhatsAppReferralShareUrl } from '@/lib/referral-share'
+import {
+  buildEmailReferralShareUrl,
+  buildSmsReferralShareUrl,
+  buildWhatsAppReferralShareUrl,
+} from '@/lib/referral-share'
 import type { ZeroListingLaunchReminder as ZeroListingLaunchReminderData } from '@/lib/data/dashboard-reminders'
+
+const SHARE_CHANNELS = [
+  {
+    key: 'whatsapp',
+    label: 'WhatsApp',
+    icon: Share2,
+    buildHref: buildWhatsAppReferralShareUrl,
+  },
+  {
+    key: 'sms',
+    label: 'SMS',
+    icon: MessageSquareText,
+    buildHref: buildSmsReferralShareUrl,
+  },
+  {
+    key: 'email',
+    label: 'Email',
+    icon: Mail,
+    buildHref: buildEmailReferralShareUrl,
+  },
+] as const
 
 export function ZeroListingLaunchReminder({
   reminder,
 }: {
   reminder: ZeroListingLaunchReminderData
 }) {
-  const shareHref = reminder.referralLink
-    ? buildWhatsAppReferralShareUrl(reminder.referralLink)
-    : null
-  const hasReferral = Boolean(reminder.referralCode && shareHref)
+  const shareChannels = reminder.referralLink
+    ? SHARE_CHANNELS.map((channel) => ({
+      ...channel,
+      href: channel.buildHref(reminder.referralLink!),
+    }))
+    : []
+  const hasReferral = Boolean(reminder.referralCode && shareChannels.length > 0)
 
-  function handleShareClick() {
+  function handleShareClick(method: 'whatsapp' | 'sms' | 'email') {
     if (!reminder.referralCode) return
 
     captureClientEvent('referral_invite_shared', {
-      method: 'whatsapp',
+      method,
       referral_code: reminder.referralCode,
       share_target: 'zero_listing_launch',
     })
@@ -61,19 +89,33 @@ export function ZeroListingLaunchReminder({
           </Link>
 
           {hasReferral && (
-            <a
-              href={shareHref ?? undefined}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleShareClick}
-              className={cn(
-                buttonVariants({ variant: 'ghost', size: 'sm' }),
-                'text-sky-700 hover:text-sky-800 hover:bg-sky-100',
-              )}
-            >
-              <Share2 className="mr-1.5 h-3.5 w-3.5" />
-              Share invite
-            </a>
+            <div className="space-y-2">
+              <p className="text-right text-xs font-medium text-sky-900/80">
+                Invite a neighbor before you post
+              </p>
+              <div className="flex flex-wrap gap-2 sm:justify-end">
+                {shareChannels.map((channel) => {
+                  const Icon = channel.icon
+
+                  return (
+                    <a
+                      key={channel.key}
+                      href={channel.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => handleShareClick(channel.key)}
+                      className={cn(
+                        buttonVariants({ variant: 'ghost', size: 'sm' }),
+                        'text-sky-700 hover:text-sky-800 hover:bg-sky-100',
+                      )}
+                    >
+                      <Icon className="mr-1.5 h-3.5 w-3.5" />
+                      Share via {channel.label}
+                    </a>
+                  )
+                })}
+              </div>
+            </div>
           )}
         </div>
       </CardContent>

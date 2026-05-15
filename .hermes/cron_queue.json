@@ -342,5 +342,35 @@
     "created_at": "2026-05-15T00:00:00Z",
     "source": "cron-self-generated",
     "notes": "Added tiered 24h/48h unread-message reminder logic with oldest-thread CTA selection, stronger 48-hour dashboard copy, and regression coverage. Commit: PENDING."
+  },
+  {
+    "id": "126",
+    "title": "Expand zero-listing referral reminder into multi-channel share actions — growth/acquisition",
+    "description": "Members who have finished onboarding but still have zero listings already see a referral CTA on the dashboard. Expand that secondary action from a single WhatsApp link into a compact multi-channel share cluster using existing referral-share helpers. Acceptance: only shows when a referral code/link exists, exposes WhatsApp + SMS + Email share actions, preserves subordinate placement under the primary listing CTA, reuses existing analytics naming with method-specific payloads, and unit tests cover href generation plus click tracking.",
+    "priority": "high",
+    "status": "completed",
+    "created_at": "2026-05-15T00:30:00Z",
+    "source": "cron-self-generated",
+    "notes": "Expanded the zero-listing dashboard referral CTA into WhatsApp, SMS, and Email share actions with method-specific analytics and regression coverage. Commit: pending."
+  },
+  {
+    "id": "127",
+    "title": "Add one-click reply CTA to two-day unread reminder copy — retention/engagement",
+    "description": "Increase reply recovery for stale conversations by adding a clearer dashboard CTA label and a short context line that names the sender and age tier directly in the reminder component. Acceptance: two-day unread reminders use stronger reply-now framing than one-day reminders, no extra query path is introduced, and unit tests cover both copy variants.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-15T00:30:00Z",
+    "source": "cron-self-generated",
+    "notes": "Backlog seed generated from the existing unread-message reminder flow."
+  },
+  {
+    "id": "128",
+    "title": "Add annual-savings proof row to dashboard billing upsells — revenue/monetization",
+    "description": "Several dashboard upsells already mention Premium annual savings in copy, but the value is easy to skip. Add a compact proof row with monthly vs annual effective price where billing CTAs already render for free members. Acceptance: uses live Stripe plan config, only appears on free-tier billing nudges, and unit tests cover the rendered savings math.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-15T00:30:00Z",
+    "source": "cron-self-generated",
+    "notes": "Backlog seed generated from the existing billing CTA surfaces."
   }
 ]

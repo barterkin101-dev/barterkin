@@ -1,7 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { buildWhatsAppReferralShareUrl } from '@/lib/referral-share'
+import {
+  buildEmailReferralShareUrl,
+  buildSmsReferralShareUrl,
+  buildWhatsAppReferralShareUrl,
+} from '@/lib/referral-share'
 import { ZeroListingLaunchReminder } from '@/components/dashboard/ZeroListingLaunchReminder'
 
 const mockCapture = vi.fn()
@@ -52,10 +56,10 @@ describe('ZeroListingLaunchReminder', () => {
       />,
     )
 
-    expect(screen.queryByRole('link', { name: /share invite/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /share via whatsapp/i })).not.toBeInTheDocument()
   })
 
-  it('shows the referral share CTA when referralCode and referralLink are present', () => {
+  it('shows the referral share CTAs when referralCode and referralLink are present', () => {
     render(
       <ZeroListingLaunchReminder
         reminder={{
@@ -67,10 +71,12 @@ describe('ZeroListingLaunchReminder', () => {
       />,
     )
 
-    expect(screen.getByRole('link', { name: /share invite/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /share via whatsapp/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /share via sms/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /share via email/i })).toBeInTheDocument()
   })
 
-  it('builds a whatsapp share href and fires analytics when the share CTA is clicked', async () => {
+  it('builds share hrefs for each channel and fires analytics with the selected method', async () => {
     const user = userEvent.setup()
 
     render(
@@ -84,18 +90,42 @@ describe('ZeroListingLaunchReminder', () => {
       />,
     )
 
-    const shareLink = screen.getByRole('link', { name: /share invite/i })
+    const whatsappLink = screen.getByRole('link', { name: /share via whatsapp/i })
+    const smsLink = screen.getByRole('link', { name: /share via sms/i })
+    const emailLink = screen.getByRole('link', { name: /share via email/i })
 
-    expect(shareLink).toHaveAttribute(
+    expect(whatsappLink).toHaveAttribute(
       'href',
       buildWhatsAppReferralShareUrl('https://barterkin.com/r/ABC12345'),
     )
-    expect(shareLink).toHaveAttribute('target', '_blank')
+    expect(smsLink).toHaveAttribute(
+      'href',
+      buildSmsReferralShareUrl('https://barterkin.com/r/ABC12345'),
+    )
+    expect(emailLink).toHaveAttribute(
+      'href',
+      buildEmailReferralShareUrl('https://barterkin.com/r/ABC12345'),
+    )
+    expect(whatsappLink).toHaveAttribute('target', '_blank')
+    expect(smsLink).toHaveAttribute('target', '_blank')
+    expect(emailLink).toHaveAttribute('target', '_blank')
 
-    await user.click(shareLink)
+    await user.click(whatsappLink)
+    await user.click(smsLink)
+    await user.click(emailLink)
 
-    expect(mockCapture).toHaveBeenCalledWith('referral_invite_shared', {
+    expect(mockCapture).toHaveBeenNthCalledWith(1, 'referral_invite_shared', {
       method: 'whatsapp',
+      referral_code: 'ABC12345',
+      share_target: 'zero_listing_launch',
+    })
+    expect(mockCapture).toHaveBeenNthCalledWith(2, 'referral_invite_shared', {
+      method: 'sms',
+      referral_code: 'ABC12345',
+      share_target: 'zero_listing_launch',
+    })
+    expect(mockCapture).toHaveBeenNthCalledWith(3, 'referral_invite_shared', {
+      method: 'email',
       referral_code: 'ABC12345',
       share_target: 'zero_listing_launch',
     })
