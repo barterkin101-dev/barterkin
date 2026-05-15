@@ -69,9 +69,14 @@ describe('/dashboard/billing', () => {
 
     await renderPage()
 
-    expect(screen.getByText('Annual Premium saves $18 per year.')).toBeInTheDocument()
-    expect(screen.getByText('That is $7.50/month instead of $9/month when paid month-to-month.')).toBeInTheDocument()
-    expect(screen.getByText('Works out to $7.50/month billed yearly')).toBeInTheDocument()
+    expect(screen.getByText('Compare the monthly cost before you check out.')).toBeInTheDocument()
+    expect(screen.getByText('Annual Premium saves $18 per year, while Founding keeps the lowest monthly rate if slots are still open.')).toBeInTheDocument()
+    expect(screen.getByText('Founding')).toBeInTheDocument()
+    expect(screen.getByText('Premium monthly')).toBeInTheDocument()
+    expect(screen.getByText('Premium annual')).toBeInTheDocument()
+    expect(screen.getByText('88 of 100 slots left today')).toBeInTheDocument()
+    expect(screen.getByText('Flexible billing, highest monthly spend')).toBeInTheDocument()
+    expect(screen.getByText('$90/year billed yearly, saves $18')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /upgrade to premium annual .* \$90\/yr/i })).toBeInTheDocument()
   })
 
@@ -102,5 +107,6 @@ describe('/dashboard/billing', () => {
     await renderPage()
 
     expect(screen.queryByText('Founding pricing closes when these slots are gone.')).not.toBeInTheDocument()
+    expect(screen.getByText('Currently sold out')).toBeInTheDocument()
   })
 })

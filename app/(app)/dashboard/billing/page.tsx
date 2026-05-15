@@ -247,13 +247,40 @@ export default async function BillingPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {!isPaid ? (
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-950">
-                <p className="text-sm font-semibold">
-                  Annual Premium saves {annualSavingsLabel} per year.
-                </p>
-                <p className="mt-1 text-sm text-emerald-900/80">
-                  That is {annualEquivalentLabel} instead of {premiumMonthlyLabel} when paid month-to-month.
-                </p>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-950">
+                <div className="flex flex-col gap-1">
+                  <p className="text-sm font-semibold">
+                    Compare the monthly cost before you check out.
+                  </p>
+                  <p className="text-sm text-slate-700">
+                    Annual Premium saves {annualSavingsLabel} per year, while Founding keeps the lowest monthly rate if slots are still open.
+                  </p>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Founding</p>
+                    <p className="mt-2 text-lg font-semibold">{foundingMonthlyLabel}</p>
+                    <p className="mt-1 text-xs text-amber-800/80">
+                      {foundingAvailable
+                        ? `${foundingSlotsRemaining} of ${STRIPE_FOUNDING_MEMBER_LIMIT} slots left today`
+                        : 'Currently sold out'}
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-primary/20 bg-background p-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Premium monthly</p>
+                    <p className="mt-2 text-lg font-semibold">{premiumMonthlyLabel}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Flexible billing, highest monthly spend
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Premium annual</p>
+                    <p className="mt-2 text-lg font-semibold">{annualEquivalentLabel}</p>
+                    <p className="mt-1 text-xs text-emerald-800/80">
+                      {premiumAnnualLabel} billed yearly, saves {annualSavingsLabel}
+                    </p>
+                  </div>
+                </div>
               </div>
             ) : null}
             <BillingActions
