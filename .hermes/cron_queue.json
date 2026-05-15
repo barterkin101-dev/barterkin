@@ -368,9 +368,9 @@
     "title": "Add annual-savings proof row to dashboard billing upsells — revenue/monetization",
     "description": "Several dashboard upsells already mention Premium annual savings in copy, but the value is easy to skip. Add a compact proof row with monthly vs annual effective price where billing CTAs already render for free members. Acceptance: uses live Stripe plan config, only appears on free-tier billing nudges, and unit tests cover the rendered savings math.",
     "priority": "medium",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-15T00:30:00Z",
     "source": "cron-self-generated",
-    "notes": "Backlog seed generated from the existing billing CTA surfaces."
+    "notes": "Added a shared annual-pricing proof row across free-tier dashboard billing nudges and covered the pricing math in unit tests. Commit: cb533f9."
   }
 ]
