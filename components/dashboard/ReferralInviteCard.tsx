@@ -201,6 +201,7 @@ export function ReferralInviteCard({
   const [copied, setCopied] = useState(false)
   const [messageCopied, setMessageCopied] = useState(false)
   const [sharePending, setSharePending] = useState(false)
+  const hasReferralLink = referralLink.trim().length > 0
   const messageVariant = getReferralMessageVariant(pendingReferralCount)
   const inviteMessage = messageVariant.message(referralLink)
   const momentumCopy = getReferralMomentumCopy(convertedReferralCount, pendingReferralCount)
@@ -359,12 +360,29 @@ export function ReferralInviteCard({
           <p className="mt-2 text-sm text-muted-foreground">{momentumCopy.body}</p>
         </div>
 
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50/80 p-4">
+        <div
+          className="rounded-lg border border-emerald-200 bg-emerald-50/80 p-4"
+          aria-label="Referral next step"
+        >
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-800">
             {nextStepCopy.eyebrow}
           </div>
           <p className="mt-2 text-base font-semibold text-foreground">{nextStepCopy.title}</p>
           <p className="mt-2 text-sm text-muted-foreground">{nextStepCopy.body}</p>
+          {hasReferralLink ? (
+            <div className="mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full sm:w-auto"
+                onClick={() => handleChannelShare('sms')}
+              >
+                <Share2 className="h-4 w-4" />
+                {messageVariant.smsLabel}
+              </Button>
+            </div>
+          ) : null}
         </div>
 
         {conversionSnapshot ? (

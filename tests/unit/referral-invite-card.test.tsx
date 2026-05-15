@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
@@ -136,9 +136,11 @@ describe('ReferralInviteCard', () => {
       />,
     )
 
+    const nextStepPanel = screen.getByLabelText('Referral next step')
+
     expect(screen.getByText(/suggested follow-up message/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /follow up on whatsapp/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /follow up by sms/i })).toBeInTheDocument()
+    expect(within(nextStepPanel).getByRole('button', { name: /follow up by sms/i })).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: /copy follow-up message/i }))
 
@@ -308,7 +310,7 @@ describe('ReferralInviteCard', () => {
       />,
     )
 
-    await userEvent.click(screen.getByRole('button', { name: /follow up by sms/i }))
+    await userEvent.click(screen.getAllByRole('button', { name: /follow up by sms/i })[1])
     await userEvent.click(screen.getByRole('button', { name: /follow up by email/i }))
 
     expect(mockOpen).toHaveBeenNthCalledWith(
@@ -402,6 +404,7 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('Best next move')).toBeInTheDocument()
     expect(screen.getByText('Follow up with your 2 pending invites today')).toBeInTheDocument()
     expect(screen.getByText(/use whatsapp, sms, or email below while your invite is still warm/i)).toBeInTheDocument()
+    expect(within(screen.getByLabelText('Referral next step')).getByRole('button', { name: /follow up by sms/i })).toBeInTheDocument()
     expect(screen.getByText('Invite conversion')).toBeInTheDocument()
     expect(screen.getByText('3 of 5 tracked invites have published')).toBeInTheDocument()
     expect(screen.getByText(/proof the pitch works/i)).toBeInTheDocument()
@@ -431,6 +434,7 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText(/copy your invite message/i)).toBeInTheDocument()
     expect(screen.getByText('Send 1 fresh invite to keep your referral streak moving')).toBeInTheDocument()
     expect(screen.getByText(/start with one neighbor who is likely to publish quickly/i)).toBeInTheDocument()
+    expect(within(screen.getByLabelText('Referral next step')).getByRole('button', { name: /share by sms/i })).toBeInTheDocument()
   })
 
   it('shows the first referral milestone when no referrals have converted yet', () => {
@@ -451,6 +455,7 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('0%')).toBeInTheDocument()
     expect(screen.getByText('Start with your warmest first invite')).toBeInTheDocument()
     expect(screen.getByText(/pick one friend, neighbor, or past collaborator/i)).toBeInTheDocument()
+    expect(within(screen.getByLabelText('Referral next step')).getByRole('button', { name: /share by sms/i })).toBeInTheDocument()
     expect(screen.queryByText('Invite conversion')).not.toBeInTheDocument()
   })
 
@@ -507,6 +512,57 @@ describe('ReferralInviteCard', () => {
     ).toHaveAttribute('aria-valuenow', '100')
     expect(
       screen.queryByRole('progressbar', { name: 'Referral milestone progress' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('opens the best-next-move SMS share and tracks analytics', async () => {
+    render(
+      <ReferralInviteCard
+        referralCode="ABCDEFGH"
+        referralLink="https://barterkin.com/r/ABCDEFGH"
+        credits={5}
+        convertedReferralCount={2}
+        pendingReferralCount={1}
+      />,
+    )
+
+    await userEvent.click(
+      within(screen.getByLabelText('Referral next step')).getByRole('button', {
+        name: /follow up by sms/i,
+      }),
+    )
+
+    expect(mockOpen).toHaveBeenCalledWith(
+      buildSmsReferralShareUrl(
+        'https://barterkin.com/r/ABCDEFGH',
+        buildReferralFollowUpMessage('https://barterkin.com/r/ABCDEFGH'),
+      ),
+      '_blank',
+      'noopener,noreferrer',
+    )
+    expect(mockCapture).toHaveBeenCalledWith('referral_invite_shared', {
+      method: 'sms',
+      referral_code: 'ABCDEFGH',
+      referral_count: 2,
+      credits: 5,
+    })
+  })
+
+  it('hides the best-next-move SMS CTA when the referral link is blank', () => {
+    render(
+      <ReferralInviteCard
+        referralCode="ABCDEFGH"
+        referralLink="   "
+        credits={0}
+        convertedReferralCount={0}
+        pendingReferralCount={0}
+      />,
+    )
+
+    expect(
+      within(screen.getByLabelText('Referral next step')).queryByRole('button', {
+        name: /share by sms/i,
+      }),
     ).not.toBeInTheDocument()
   })
 })
