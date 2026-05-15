@@ -8,14 +8,14 @@ import {
 } from '@/lib/onboarding-skip'
 
 describe('/onboarding/skip route', () => {
-  it('sets the skip cookie and redirects to /directory on POST', async () => {
+  it('sets the skip cookie and redirects to /directory with a see-other response on POST', async () => {
     const request = new NextRequest('https://barterkin.com/onboarding/skip', {
       method: 'POST',
     })
 
     const response = await POST(request)
 
-    expect(response.status).toBe(307)
+    expect(response.status).toBe(303)
     expect(response.headers.get('location')).toBe('https://barterkin.com/directory')
     const cookie = response.cookies.get(ONBOARDING_SKIP_COOKIE_NAME)
     expect(cookie?.value).toBe(ONBOARDING_SKIP_COOKIE_VALUE)

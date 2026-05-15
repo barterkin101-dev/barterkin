@@ -8,7 +8,9 @@ import {
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: NextRequest) {
-  const response = NextResponse.redirect(new URL('/directory', request.url))
+  const response = NextResponse.redirect(new URL('/directory', request.url), {
+    status: 303,
+  })
   response.cookies.set(ONBOARDING_SKIP_COOKIE_NAME, ONBOARDING_SKIP_COOKIE_VALUE, {
     httpOnly: true,
     sameSite: 'lax',
