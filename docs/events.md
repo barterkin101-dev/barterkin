@@ -120,8 +120,8 @@ Google OAuth also fires this event client-side when the user launches Google sig
 
 ### `referral_invite_shared`
 
-**When fired:** When a member shares their referral link from the dashboard via native share or a channel shortcut.
-**Fires from:** `components/dashboard/ReferralInviteCard.tsx`
+**When fired:** When a member shares their referral link from the dashboard via native share or a channel shortcut, including the zero-listing launch reminder share actions.
+**Fires from:** `components/dashboard/ReferralInviteCard.tsx`, `components/dashboard/ZeroListingLaunchReminder.tsx`
 **Properties:**
 
 | Property | Type | Description |
@@ -400,7 +400,7 @@ Google OAuth also fires this event client-side when the user launches Google sig
 | `contact_blocked` | ✅ Implemented | `lib/actions/contact.ts` | 5 |
 | `referral_link_used` | ✅ Implemented | `app/auth/callback/route.ts`, `app/auth/confirm/route.ts` | 6 |
 | `referral_invite_copied` | ✅ Implemented | `components/dashboard/ReferralInviteCard.tsx` | 7 |
-| `referral_invite_shared` | ✅ Implemented | `components/dashboard/ReferralInviteCard.tsx` | 7 |
+| `referral_invite_shared` | ✅ Implemented | `components/dashboard/ReferralInviteCard.tsx`, `components/dashboard/ZeroListingLaunchReminder.tsx` | 7 |
 | `subscription_activated` | ✅ Implemented | `app/api/stripe/webhook/route.ts` | 7 |
 | `founding_slot_claimed` | ✅ Implemented | `lib/actions/billing.ts` | 7 |
 | `waitlist_founding_notified` | ✅ Implemented | `app/api/cron/notify-waitlist/route.ts` | 7 |
