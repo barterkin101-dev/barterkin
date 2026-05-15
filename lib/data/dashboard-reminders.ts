@@ -57,6 +57,12 @@ export interface FirstContactLaunchReminder {
   listingTitle: string
 }
 
+export interface FreshListingReminder {
+  href: string
+  listingTitle: string
+  daysSincePublished: number
+}
+
 export function getUnreadMessageReminder(
   conversations: ConversationRow[],
   currentProfileId: string,
@@ -279,5 +285,36 @@ export function getFirstContactLaunchReminder(
     href: '/directory',
     activeListingCount: activeListings.length,
     listingTitle: activeListings[0].title,
+  }
+}
+
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
+
+export function getFreshListingReminder(
+  onboardingCompletedAt: string | null | undefined,
+  listings: ListingRow[],
+  now = new Date(),
+): FreshListingReminder | null {
+  if (!onboardingCompletedAt) {
+    return null
+  }
+
+  const activeListings = listings.filter((listing) => listing.status === 'active')
+  if (activeListings.length !== 1) {
+    return null
+  }
+
+  const onlyListing = activeListings[0]
+  const publishedAt = new Date(onlyListing.created_at).getTime()
+  const daysSincePublished = Math.floor((now.getTime() - publishedAt) / (24 * 60 * 60 * 1000))
+
+  if (daysSincePublished < 7) {
+    return null
+  }
+
+  return {
+    href: '/dashboard/listings/new',
+    listingTitle: onlyListing.title,
+    daysSincePublished,
   }
 }

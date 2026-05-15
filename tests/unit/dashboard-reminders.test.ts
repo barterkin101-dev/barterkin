@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getDigestOptOutReminder, getFirstContactLaunchReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getSecondListingExpansionReminder, getStaleListingReminder, getUnreadMessageReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
+import { getDigestOptOutReminder, getFirstContactLaunchReminder, getFirstTradeProgressReminder, getFreshListingReminder, getOnboardingReturnReminder, getSecondListingExpansionReminder, getStaleListingReminder, getUnreadMessageReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
 
@@ -769,5 +769,107 @@ describe('getStaleListingReminder', () => {
     )
 
     expect(result).toBeNull()
+  })
+})
+
+describe('getFreshListingReminder', () => {
+  it('returns null when onboarding is incomplete', () => {
+    expect(getFreshListingReminder(null, [makeListing()], new Date('2026-05-14T09:00:00.000Z'))).toBeNull()
+  })
+
+  it('returns null when the member has zero active listings', () => {
+    expect(
+      getFreshListingReminder(
+        '2026-05-14T12:00:00.000Z',
+        [makeListing({ status: 'paused' })],
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('returns null when the member has more than one active listing', () => {
+    expect(
+      getFreshListingReminder(
+        '2026-05-14T12:00:00.000Z',
+        [
+          makeListing({ id: 'listing-1', title: 'Camera kit' }),
+          makeListing({ id: 'listing-2', title: 'Ceramic wheel' }),
+        ],
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('returns null when the only active listing is newer than 7 days', () => {
+    expect(
+      getFreshListingReminder(
+        '2026-05-14T12:00:00.000Z',
+        [
+          makeListing({
+            created_at: '2026-05-08T09:00:00.000Z',
+            title: 'Vintage camera bundle',
+          }),
+        ],
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('returns a reminder when the only active listing is exactly 7 days old', () => {
+    expect(
+      getFreshListingReminder(
+        '2026-05-14T12:00:00.000Z',
+        [
+          makeListing({
+            created_at: '2026-05-07T09:00:00.000Z',
+            title: 'Vintage camera bundle',
+          }),
+        ],
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toEqual({
+      href: '/dashboard/listings/new',
+      listingTitle: 'Vintage camera bundle',
+      daysSincePublished: 7,
+    })
+  })
+
+  it('returns a reminder when the only active listing is older than 7 days', () => {
+    expect(
+      getFreshListingReminder(
+        '2026-05-14T12:00:00.000Z',
+        [
+          makeListing({
+            created_at: '2026-04-20T09:00:00.000Z',
+            title: 'Handmade desk',
+          }),
+        ],
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toEqual({
+      href: '/dashboard/listings/new',
+      listingTitle: 'Handmade desk',
+      daysSincePublished: 24,
+    })
+  })
+
+  it('counts days from created_at', () => {
+    expect(
+      getFreshListingReminder(
+        '2026-05-14T12:00:00.000Z',
+        [
+          makeListing({
+            created_at: '2026-05-01T09:00:00.000Z',
+            updated_at: '2026-05-13T09:00:00.000Z',
+            title: 'Recently updated item',
+          }),
+        ],
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toEqual({
+      href: '/dashboard/listings/new',
+      listingTitle: 'Recently updated item',
+      daysSincePublished: 13,
+    })
   })
 })
