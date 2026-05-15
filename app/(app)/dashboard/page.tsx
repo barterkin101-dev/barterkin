@@ -7,6 +7,7 @@ import { getDiscoverFeed } from '@/lib/data/discover'
 import { getConversations, getStartedConversationCount } from '@/lib/data/messaging'
 import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder, getSecondListingExpansionReminder, getFirstContactLaunchReminder, getFreshListingReminder, getViewedListingRevisitReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
+import { getOwnedListingSaveCounts } from '@/lib/data/owned-listing-save-counts'
 import { buildReferralLink } from '@/lib/referrals'
 import { hasSkippedOnboarding, ONBOARDING_SKIP_COOKIE_NAME } from '@/lib/onboarding-skip'
 
@@ -182,22 +183,10 @@ export default async function DashboardPage() {
     )
     : null
   const listingSaveCounts = profile && listings.length > 0
-    ? await supabase
-      .from('saved_listings')
-      .select('listing_id')
-      .in('listing_id', listings.map((listing) => listing.id))
-      .then(({ data, error }) => {
-        if (error) {
-          const log = createLogger('dashboard')
-          log.error('saved listing counts error', { context: { code: error.code } })
-          return {}
-        }
-
-        return (data ?? []).reduce<Record<string, number>>((counts, row) => {
-          counts[row.listing_id] = (counts[row.listing_id] ?? 0) + 1
-          return counts
-        }, {})
-      })
+    ? await getOwnedListingSaveCounts(
+      profile.id,
+      listings.map((listing) => listing.id),
+    )
     : {}
   const staleListingReminder = getStaleListingReminder(listings, listingSaveCounts)
   const digestOptOutReminder = getDigestOptOutReminder(
