@@ -92,6 +92,7 @@ export function getUnreadMessageReminder(
   const twoDayUnreadConversations = staleUnreadConversations.filter(
     (conversation) => new Date(conversation.last_message.created_at).getTime() <= twoDayCutoff,
   )
+  const isTwoDayReminder = twoDayUnreadConversations.length > 0
   const eligibleConversations = twoDayUnreadConversations.length > 0
     ? twoDayUnreadConversations
     : staleUnreadConversations
@@ -108,15 +109,15 @@ export function getUnreadMessageReminder(
     ?? 'a member'
 
   return {
-    unreadConversationCount: staleUnreadConversations.length,
-    unreadMessageCount: staleUnreadConversations.reduce(
+    unreadConversationCount: eligibleConversations.length,
+    unreadMessageCount: eligibleConversations.reduce(
       (sum, conversation) => sum + conversation.unread_count,
       0,
     ),
     href: `/dashboard/messages/${topConversation.id}`,
     counterpartName,
     lastMessageAt: topConversation.last_message.created_at,
-    staleTier: twoDayUnreadConversations.length > 0 ? 'two-day' : 'day',
+    staleTier: isTwoDayReminder ? 'two-day' : 'day',
   }
 }
 

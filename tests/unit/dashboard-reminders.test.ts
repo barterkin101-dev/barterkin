@@ -181,10 +181,75 @@ describe('getUnreadMessageReminder', () => {
     )
 
     expect(result).toMatchObject({
-      unreadConversationCount: 2,
-      unreadMessageCount: 4,
+      unreadConversationCount: 1,
+      unreadMessageCount: 3,
       href: '/dashboard/messages/conv-second',
       counterpartName: 'sam',
+      staleTier: 'two-day',
+    })
+  })
+
+  it('keeps two-day reminder counts scoped to the 48-hour tier when fresher stale threads also exist', () => {
+    const result = getUnreadMessageReminder(
+      [
+        makeConversation({
+          id: 'conv-day-old',
+          unread_count: 2,
+          last_message: {
+            content: 'Day-old thread',
+            created_at: '2026-05-12T08:00:00.000Z',
+            sender_profile_id: 'profile-2',
+            sender: {
+              display_name: 'Alex',
+              username: 'alex',
+            },
+          },
+        }),
+        makeConversation({
+          id: 'conv-two-day',
+          unread_count: 5,
+          participants: [
+            {
+              profile_id: PROFILE_ID,
+              last_read_at: null,
+              profile: {
+                id: PROFILE_ID,
+                display_name: 'Naeem',
+                username: 'naeem',
+                avatar_url: null,
+              },
+            },
+            {
+              profile_id: 'profile-3',
+              last_read_at: null,
+              profile: {
+                id: 'profile-3',
+                display_name: 'Sam',
+                username: 'sam',
+                avatar_url: null,
+              },
+            },
+          ],
+          last_message: {
+            content: 'Two-day thread',
+            created_at: '2026-05-11T07:00:00.000Z',
+            sender_profile_id: 'profile-3',
+            sender: {
+              display_name: 'Sam',
+              username: 'sam',
+            },
+          },
+        }),
+      ],
+      PROFILE_ID,
+      new Date('2026-05-13T09:00:00.000Z'),
+    )
+
+    expect(result).toMatchObject({
+      unreadConversationCount: 1,
+      unreadMessageCount: 5,
+      href: '/dashboard/messages/conv-two-day',
+      counterpartName: 'Sam',
       staleTier: 'two-day',
     })
   })
