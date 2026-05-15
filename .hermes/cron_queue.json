@@ -391,7 +391,7 @@
     "status": "completed",
     "created_at": "2026-05-15T16:10:00Z",
     "source": "cron-self-generated",
-    "notes": "Added SMS share button inside best-next-move panel; covered existence and click tracking in unit tests. Commit: 29f7b79."
+    "notes": "Added a guarded SMS share CTA to the best-next-move panel, kept it secondary to the main share actions, and covered panel-scoped rendering plus click tracking in unit tests. Commit: 3d62ece."
   },
   {
     "id": "131",
