@@ -18,6 +18,8 @@ describe('UnreadMessageReminder', () => {
     )
 
     expect(screen.getByText(/untouched for more than 24 hours/i)).toBeInTheDocument()
+    expect(screen.getByText(/alex sent the last message over 24 hours ago/i)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /reply to alex/i })).toBeInTheDocument()
     expect(screen.getByText(/before the trade goes cold/i)).toBeInTheDocument()
   })
 
@@ -36,6 +38,9 @@ describe('UnreadMessageReminder', () => {
     )
 
     expect(screen.getByText(/untouched for more than 48 hours/i)).toBeInTheDocument()
+    expect(screen.getByText(/sam sent the last message over 48 hours ago/i)).toBeInTheDocument()
+    expect(screen.getByText(/reply now to keep this trade alive/i)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /reply to sam now/i })).toBeInTheDocument()
     expect(screen.getByText(/keep the barter moving before momentum slips/i)).toBeInTheDocument()
   })
 })
