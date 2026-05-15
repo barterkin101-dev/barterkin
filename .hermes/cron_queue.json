@@ -318,10 +318,10 @@
     "title": "Extend dashboard listing-cap upsell to free members already at cap — revenue/monetization",
     "description": "Close the monetization gap where the dashboard only nudges free members when they have exactly one listing slot left. Update the listing-cap upsell helper/component so members already at the free cap still see a clear Premium CTA, with distinct copy and analytics state for near-cap vs at-cap. Acceptance: free members at 2/3 and 3+/3 both see the nudge, paid members do not, CTA still links to /dashboard/billing, and unit tests cover both states.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-15T00:00:00Z",
     "source": "cron-self-generated",
-    "notes": "Starting: expand the existing dashboard listing-cap upsell to cover at-cap free members and add regression coverage."
+    "notes": "Extended the dashboard listing-cap Premium upsell to cover free members already at the cap, with distinct copy/state analytics and regression tests. Commit: c2c61f6."
   },
   {
     "id": "124",
