@@ -118,7 +118,7 @@ async function handleInvoicePaymentSucceeded(
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, tier')
+    .select('id, tier, billing_interval')
     .eq('stripe_subscription_id', subscriptionId)
     .maybeSingle()
 
@@ -129,10 +129,15 @@ async function handleInvoicePaymentSucceeded(
     return
   }
 
-  // Ensure tier stays active on successful payment
-  if (profile.tier === 'free') {
-    await supabase.from('profiles').update({ tier: 'premium' }).eq('id', profile.id)
-    log.info('Reactivated subscription after successful payment', { context: { profile_id: profile.id } })
+  // Recover the canonical subscription state from Stripe so reactivations
+  // restore the correct tier, interval, and renewal date.
+  if (profile.tier === 'free' || !profile.billing_interval) {
+    const stripe = getStripe()
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+    await syncSubscription(subscription, supabase)
+    log.info('Reactivated subscription after successful payment', {
+      context: { profile_id: profile.id, subscription_id: subscriptionId },
+    })
   }
 }
 
