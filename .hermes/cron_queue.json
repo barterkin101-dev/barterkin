@@ -328,10 +328,10 @@
     "title": "Add referral share CTA to post-onboarding zero-listing reminder — growth/acquisition",
     "description": "When an onboarded member still has zero listings, add a secondary referral-share CTA beside the first-listing launch reminder so early members can invite neighbors even before posting. Reuse the member referral code and existing analytics naming where possible. Acceptance: CTA only appears when the member has a referral code, copy stays subordinate to the main listing CTA, and tests cover visibility + href generation.",
     "priority": "medium",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-15T00:00:00Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Added a subordinate WhatsApp referral share CTA to the zero-listing dashboard reminder with reusable share helpers and regression coverage. Commit: cf5a3ee."
   },
   {
     "id": "125",
