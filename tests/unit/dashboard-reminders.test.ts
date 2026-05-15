@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getDigestOptOutReminder, getFirstContactLaunchReminder, getFirstTradeProgressReminder, getFreshListingReminder, getOnboardingReturnReminder, getSecondListingExpansionReminder, getStaleListingReminder, getUnreadMessageReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
+import { getDigestOptOutReminder, getFirstContactLaunchReminder, getFirstTradeProgressReminder, getFreshListingReminder, getOnboardingReturnReminder, getSecondListingExpansionReminder, getStaleListingReminder, getUnreadMessageReminder, getViewedListingRevisitReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
 
@@ -66,6 +66,21 @@ function makeListing(overrides: Partial<ListingRow>): ListingRow {
     categories: null,
     category_id: null,
     county_id: null,
+    ...overrides,
+  }
+}
+
+function makeProfileViewsSnapshot(overrides?: Partial<{
+  currentViews: number
+  previousViews: number
+  delta: number
+  trend: 'empty' | 'up' | 'down' | 'flat'
+}>) {
+  return {
+    currentViews: 3,
+    previousViews: 1,
+    delta: 2,
+    trend: 'up' as const,
     ...overrides,
   }
 }
@@ -967,6 +982,106 @@ describe('getFreshListingReminder', () => {
       href: '/dashboard/listings/new',
       listingTitle: 'Recently updated item',
       daysSincePublished: 13,
+    })
+  })
+})
+
+describe('getViewedListingRevisitReminder', () => {
+  it('returns null without profile views snapshot data', () => {
+    expect(
+      getViewedListingRevisitReminder(
+        [makeListing()],
+        {},
+        null,
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('returns null when there have been no profile views', () => {
+    expect(
+      getViewedListingRevisitReminder(
+        [makeListing()],
+        {},
+        makeProfileViewsSnapshot({
+          currentViews: 0,
+          previousViews: 0,
+          delta: 0,
+          trend: 'empty',
+        }),
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('returns null when the only active listing is newer than 5 days', () => {
+    expect(
+      getViewedListingRevisitReminder(
+        [
+          makeListing({
+            created_at: '2026-05-10T09:00:00.000Z',
+            updated_at: '2026-05-10T09:00:00.000Z',
+          }),
+        ],
+        {},
+        makeProfileViewsSnapshot(),
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('returns null when the active listing already has saves', () => {
+    expect(
+      getViewedListingRevisitReminder(
+        [makeListing({ id: 'listing-saved' })],
+        { 'listing-saved': 1 },
+        makeProfileViewsSnapshot(),
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('returns null when the listing was refreshed within the last 5 days', () => {
+    expect(
+      getViewedListingRevisitReminder(
+        [
+          makeListing({
+            created_at: '2026-05-01T09:00:00.000Z',
+            updated_at: '2026-05-12T09:00:00.000Z',
+          }),
+        ],
+        {},
+        makeProfileViewsSnapshot(),
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('returns a revisit reminder for a 5-day-old zero-save listing with profile traffic', () => {
+    expect(
+      getViewedListingRevisitReminder(
+        [
+          makeListing({
+            id: 'listing-revisit',
+            title: 'Ceramic wheel',
+            created_at: '2026-05-09T09:00:00.000Z',
+            updated_at: '2026-05-09T09:00:00.000Z',
+          }),
+        ],
+        {},
+        makeProfileViewsSnapshot({
+          currentViews: 2,
+          previousViews: 1,
+          delta: 1,
+        }),
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toEqual({
+      href: '/dashboard/listings/listing-revisit/edit',
+      listingTitle: 'Ceramic wheel',
+      listingId: 'listing-revisit',
+      daysSincePublished: 5,
+      profileViewCount: 3,
     })
   })
 })

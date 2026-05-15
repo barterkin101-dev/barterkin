@@ -1,8 +1,10 @@
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
+import type { ProfileViewsSnapshot } from '@/lib/data/profile-views'
 import { QUESTS } from '@/lib/quests'
 
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000
+const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000
 const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000
 
 export interface UnreadMessageReminder {
@@ -65,6 +67,14 @@ export interface FreshListingReminder {
   href: string
   listingTitle: string
   daysSincePublished: number
+}
+
+export interface ViewedListingRevisitReminder {
+  href: string
+  listingTitle: string
+  listingId: string
+  daysSincePublished: number
+  profileViewCount: number
 }
 
 export function getUnreadMessageReminder(
@@ -333,5 +343,49 @@ export function getFreshListingReminder(
     href: '/dashboard/listings/new',
     listingTitle: onlyListing.title,
     daysSincePublished,
+  }
+}
+
+export function getViewedListingRevisitReminder(
+  listings: ListingRow[],
+  saveCounts: Record<string, number>,
+  profileViewsSnapshot: ProfileViewsSnapshot | null,
+  now = new Date(),
+): ViewedListingRevisitReminder | null {
+  if (!profileViewsSnapshot) {
+    return null
+  }
+
+  const totalProfileViews = profileViewsSnapshot.currentViews + profileViewsSnapshot.previousViews
+  if (totalProfileViews <= 0) {
+    return null
+  }
+
+  const activeListings = listings.filter((listing) => listing.status === 'active')
+  if (activeListings.length !== 1) {
+    return null
+  }
+
+  const onlyListing = activeListings[0]
+  if ((saveCounts[onlyListing.id] ?? 0) > 0) {
+    return null
+  }
+
+  const publishedAtMs = new Date(onlyListing.created_at).getTime()
+  const refreshedAtMs = new Date(onlyListing.updated_at ?? onlyListing.created_at).getTime()
+  const nowMs = now.getTime()
+  const publishedForMs = nowMs - publishedAtMs
+  const sinceRefreshMs = nowMs - refreshedAtMs
+
+  if (publishedForMs < FIVE_DAYS_MS || sinceRefreshMs < FIVE_DAYS_MS) {
+    return null
+  }
+
+  return {
+    href: `/dashboard/listings/${onlyListing.id}/edit`,
+    listingTitle: onlyListing.title,
+    listingId: onlyListing.id,
+    daysSincePublished: Math.floor(publishedForMs / (24 * 60 * 60 * 1000)),
+    profileViewCount: totalProfileViews,
   }
 }

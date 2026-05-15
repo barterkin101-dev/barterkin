@@ -5,7 +5,7 @@ import { createLogger } from '@/lib/utils/logger'
 import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
 import { getConversations, getStartedConversationCount } from '@/lib/data/messaging'
-import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder, getSecondListingExpansionReminder, getFirstContactLaunchReminder, getFreshListingReminder } from '@/lib/data/dashboard-reminders'
+import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder, getSecondListingExpansionReminder, getFirstContactLaunchReminder, getFreshListingReminder, getViewedListingRevisitReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { buildReferralLink } from '@/lib/referrals'
 import { hasSkippedOnboarding, ONBOARDING_SKIP_COOKIE_NAME } from '@/lib/onboarding-skip'
@@ -31,6 +31,7 @@ import { SecondListingExpansionReminder } from '@/components/dashboard/SecondLis
 import { FirstContactLaunchReminder } from '@/components/dashboard/FirstContactLaunchReminder'
 import { AnnualUpgradeSavingsCard } from '@/components/dashboard/AnnualUpgradeSavingsCard'
 import { FreshListingReminder } from '@/components/dashboard/FreshListingReminder'
+import { ViewedListingRevisitReminder } from '@/components/dashboard/ViewedListingRevisitReminder'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
@@ -243,6 +244,11 @@ export default async function DashboardPage() {
   const profileViewsSnapshot = profile?.is_published
     ? await getProfileViewsSnapshot(profile.id)
     : null
+  const viewedListingRevisitReminder = getViewedListingRevisitReminder(
+    listings,
+    listingSaveCounts,
+    profileViewsSnapshot,
+  )
 
   return (
     <div className="space-y-8">
@@ -472,6 +478,10 @@ export default async function DashboardPage() {
 
       {freshListingReminder && (
         <FreshListingReminder reminder={freshListingReminder} />
+      )}
+
+      {viewedListingRevisitReminder && (
+        <ViewedListingRevisitReminder reminder={viewedListingRevisitReminder} />
       )}
 
       {profile && profileViewsSnapshot && (
