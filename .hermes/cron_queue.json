@@ -498,9 +498,9 @@
     "title": "[codex-review FIX_FIRST] [task-132 codex-fallback] document unread reminder analytics (c7444d71)",
     "description": "codex flagged issues in c7444d71. Address concerns, recommit with [task-141 fix-c7444d71] prefix.\n\nFix the unrelated `.hermes/cron_queue.json` mutation that corrupted queued task metadata while documenting unread reminder analytics. Acceptance: queue JSON is restored to valid task content, task history remains readable, and no unrelated queue entries contain pasted review transcript content.",
     "priority": "critical",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-15T06-03-46Z",
     "source": "codex-review",
-    "notes": "Restoring the corrupted queue entry payload introduced in c7444d71 and validating the queue file before completion."
+    "notes": "Restored the corrupted task metadata in .hermes/cron_queue.json and removed the pasted review transcript from the queue entry. Commit: d4fcf91."
   }
 ]
