@@ -387,6 +387,8 @@ describe('getZeroListingLaunchReminder', () => {
       rewardCredits: 5,
       referralCode: null,
       referralLink: null,
+      referralCount: 0,
+      credits: 0,
     })
   })
 
@@ -402,6 +404,8 @@ describe('getZeroListingLaunchReminder', () => {
       rewardCredits: null,
       referralCode: null,
       referralLink: null,
+      referralCount: 0,
+      credits: 0,
     })
   })
 
@@ -419,6 +423,8 @@ describe('getZeroListingLaunchReminder', () => {
       rewardCredits: 5,
       referralCode: 'ABC12345',
       referralLink: 'https://barterkin.com/r/ABC12345',
+      referralCount: 0,
+      credits: 0,
     })
   })
 
@@ -436,6 +442,8 @@ describe('getZeroListingLaunchReminder', () => {
       rewardCredits: 5,
       referralCode: null,
       referralLink: null,
+      referralCount: 0,
+      credits: 0,
     })
   })
 })

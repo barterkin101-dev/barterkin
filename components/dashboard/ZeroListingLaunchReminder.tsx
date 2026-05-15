@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight, Mail, MessageSquareText, Rocket, Share2, Sparkles } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
-import { buttonVariants } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { captureClientEvent } from '@/lib/analytics-client'
 import {
@@ -48,12 +48,20 @@ export function ZeroListingLaunchReminder({
   const hasReferral = Boolean(reminder.referralCode && shareChannels.length > 0)
 
   function handleShareClick(method: 'whatsapp' | 'sms' | 'email') {
-    if (!reminder.referralCode) return
+    if (!reminder.referralCode || !reminder.referralLink) return
+
+    const shareChannel = SHARE_CHANNELS.find((channel) => channel.key === method)
+    if (!shareChannel) {
+      return
+    }
+
+    window.open(shareChannel.buildHref(reminder.referralLink), '_blank', 'noopener,noreferrer')
 
     captureClientEvent('referral_invite_shared', {
       method,
       referral_code: reminder.referralCode,
-      share_target: 'zero_listing_launch',
+      referral_count: reminder.referralCount,
+      credits: reminder.credits,
     })
   }
 
@@ -98,20 +106,19 @@ export function ZeroListingLaunchReminder({
                   const Icon = channel.icon
 
                   return (
-                    <a
+                    <Button
                       key={channel.key}
-                      href={channel.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      type="button"
+                      variant="ghost"
+                      size="sm"
                       onClick={() => handleShareClick(channel.key)}
                       className={cn(
-                        buttonVariants({ variant: 'ghost', size: 'sm' }),
                         'text-sky-700 hover:text-sky-800 hover:bg-sky-100',
                       )}
                     >
                       <Icon className="mr-1.5 h-3.5 w-3.5" />
                       Share via {channel.label}
-                    </a>
+                    </Button>
                   )
                 })}
               </div>

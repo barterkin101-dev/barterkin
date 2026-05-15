@@ -42,6 +42,8 @@ export interface ZeroListingLaunchReminder {
   rewardCredits: number | null
   referralCode: string | null
   referralLink: string | null
+  referralCount: number
+  credits: number
 }
 
 export interface SecondListingExpansionReminder {
@@ -213,6 +215,8 @@ export function getZeroListingLaunchReminder(
   hasCompletedFirstListingQuest: boolean,
   referralCode?: string | null,
   referralLink?: string | null,
+  referralCount = 0,
+  credits = 0,
 ): ZeroListingLaunchReminder | null {
   if (!onboardingCompletedAt) {
     return null
@@ -232,6 +236,8 @@ export function getZeroListingLaunchReminder(
     rewardCredits,
     referralCode: referralCode ?? null,
     referralLink: referralLink ?? null,
+    referralCount,
+    credits,
   }
 }
 

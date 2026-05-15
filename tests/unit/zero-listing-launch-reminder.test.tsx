@@ -9,6 +9,7 @@ import {
 import { ZeroListingLaunchReminder } from '@/components/dashboard/ZeroListingLaunchReminder'
 
 const mockCapture = vi.fn()
+const mockOpen = vi.fn()
 
 vi.mock('@/lib/analytics-client', () => ({
   captureClientEvent: (...args: unknown[]) => mockCapture(...args),
@@ -17,12 +18,25 @@ vi.mock('@/lib/analytics-client', () => ({
 describe('ZeroListingLaunchReminder', () => {
   beforeEach(() => {
     mockCapture.mockClear()
+    mockOpen.mockReset()
+    Object.defineProperty(window, 'open', {
+      configurable: true,
+      writable: true,
+      value: mockOpen,
+    })
   })
 
   it('renders the main create-listing CTA', () => {
     render(
       <ZeroListingLaunchReminder
-        reminder={{ href: '/dashboard/listings/new', rewardCredits: 5, referralCode: null, referralLink: null }}
+        reminder={{
+          href: '/dashboard/listings/new',
+          rewardCredits: 5,
+          referralCode: null,
+          referralLink: null,
+          referralCount: 0,
+          credits: 0,
+        }}
       />,
     )
 
@@ -32,7 +46,14 @@ describe('ZeroListingLaunchReminder', () => {
   it('shows quest reward copy when rewardCredits is present', () => {
     render(
       <ZeroListingLaunchReminder
-        reminder={{ href: '/dashboard/listings/new', rewardCredits: 5, referralCode: null, referralLink: null }}
+        reminder={{
+          href: '/dashboard/listings/new',
+          rewardCredits: 5,
+          referralCode: null,
+          referralLink: null,
+          referralCount: 0,
+          credits: 0,
+        }}
       />,
     )
 
@@ -42,7 +63,14 @@ describe('ZeroListingLaunchReminder', () => {
   it('shows generic copy when rewardCredits is null', () => {
     render(
       <ZeroListingLaunchReminder
-        reminder={{ href: '/dashboard/listings/new', rewardCredits: null, referralCode: null, referralLink: null }}
+        reminder={{
+          href: '/dashboard/listings/new',
+          rewardCredits: null,
+          referralCode: null,
+          referralLink: null,
+          referralCount: 0,
+          credits: 0,
+        }}
       />,
     )
 
@@ -52,7 +80,14 @@ describe('ZeroListingLaunchReminder', () => {
   it('does not show the referral share CTA when referralCode is missing', () => {
     render(
       <ZeroListingLaunchReminder
-        reminder={{ href: '/dashboard/listings/new', rewardCredits: 5, referralCode: null, referralLink: null }}
+        reminder={{
+          href: '/dashboard/listings/new',
+          rewardCredits: 5,
+          referralCode: null,
+          referralLink: null,
+          referralCount: 0,
+          credits: 0,
+        }}
       />,
     )
 
@@ -67,16 +102,18 @@ describe('ZeroListingLaunchReminder', () => {
           rewardCredits: 5,
           referralCode: 'ABC12345',
           referralLink: 'https://barterkin.com/r/ABC12345',
+          referralCount: 2,
+          credits: 7,
         }}
       />,
     )
 
-    expect(screen.getByRole('link', { name: /share via whatsapp/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /share via sms/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /share via email/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /share via whatsapp/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /share via sms/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /share via email/i })).toBeInTheDocument()
   })
 
-  it('builds share hrefs for each channel and fires analytics with the selected method', async () => {
+  it('opens each share channel and fires the documented analytics payload', async () => {
     const user = userEvent.setup()
 
     render(
@@ -86,48 +123,56 @@ describe('ZeroListingLaunchReminder', () => {
           rewardCredits: 5,
           referralCode: 'ABC12345',
           referralLink: 'https://barterkin.com/r/ABC12345',
+          referralCount: 2,
+          credits: 7,
         }}
       />,
     )
 
-    const whatsappLink = screen.getByRole('link', { name: /share via whatsapp/i })
-    const smsLink = screen.getByRole('link', { name: /share via sms/i })
-    const emailLink = screen.getByRole('link', { name: /share via email/i })
-
-    expect(whatsappLink).toHaveAttribute(
-      'href',
-      buildWhatsAppReferralShareUrl('https://barterkin.com/r/ABC12345'),
-    )
-    expect(smsLink).toHaveAttribute(
-      'href',
-      buildSmsReferralShareUrl('https://barterkin.com/r/ABC12345'),
-    )
-    expect(emailLink).toHaveAttribute(
-      'href',
-      buildEmailReferralShareUrl('https://barterkin.com/r/ABC12345'),
-    )
-    expect(whatsappLink).toHaveAttribute('target', '_blank')
-    expect(smsLink).toHaveAttribute('target', '_blank')
-    expect(emailLink).toHaveAttribute('target', '_blank')
+    const whatsappLink = screen.getByRole('button', { name: /share via whatsapp/i })
+    const smsLink = screen.getByRole('button', { name: /share via sms/i })
+    const emailLink = screen.getByRole('button', { name: /share via email/i })
 
     await user.click(whatsappLink)
     await user.click(smsLink)
     await user.click(emailLink)
 
+    expect(mockOpen).toHaveBeenNthCalledWith(
+      1,
+      buildWhatsAppReferralShareUrl('https://barterkin.com/r/ABC12345'),
+      '_blank',
+      'noopener,noreferrer',
+    )
+    expect(mockOpen).toHaveBeenNthCalledWith(
+      2,
+      buildSmsReferralShareUrl('https://barterkin.com/r/ABC12345'),
+      '_blank',
+      'noopener,noreferrer',
+    )
+    expect(mockOpen).toHaveBeenNthCalledWith(
+      3,
+      buildEmailReferralShareUrl('https://barterkin.com/r/ABC12345'),
+      '_blank',
+      'noopener,noreferrer',
+    )
+
     expect(mockCapture).toHaveBeenNthCalledWith(1, 'referral_invite_shared', {
       method: 'whatsapp',
       referral_code: 'ABC12345',
-      share_target: 'zero_listing_launch',
+      referral_count: 2,
+      credits: 7,
     })
     expect(mockCapture).toHaveBeenNthCalledWith(2, 'referral_invite_shared', {
       method: 'sms',
       referral_code: 'ABC12345',
-      share_target: 'zero_listing_launch',
+      referral_count: 2,
+      credits: 7,
     })
     expect(mockCapture).toHaveBeenNthCalledWith(3, 'referral_invite_shared', {
       method: 'email',
       referral_code: 'ABC12345',
-      share_target: 'zero_listing_launch',
+      referral_count: 2,
+      credits: 7,
     })
   })
 })
