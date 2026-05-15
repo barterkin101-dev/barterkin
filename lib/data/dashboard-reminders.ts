@@ -300,6 +300,10 @@ export function getFreshListingReminder(
     return null
   }
 
+  if (listings.length !== 1) {
+    return null
+  }
+
   const activeListings = listings.filter((listing) => listing.status === 'active')
   if (activeListings.length !== 1) {
     return null

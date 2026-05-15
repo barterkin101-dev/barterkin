@@ -865,6 +865,26 @@ describe('getFreshListingReminder', () => {
     ).toBeNull()
   })
 
+  it('returns null when the member already created another listing that is no longer active', () => {
+    expect(
+      getFreshListingReminder(
+        '2026-05-14T12:00:00.000Z',
+        [
+          makeListing({
+            id: 'listing-1',
+            title: 'Camera kit',
+          }),
+          makeListing({
+            id: 'listing-2',
+            title: 'Ceramic wheel',
+            status: 'paused',
+          }),
+        ],
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
   it('returns null when the only active listing is newer than 7 days', () => {
     expect(
       getFreshListingReminder(
