@@ -209,6 +209,7 @@ export function ReferralInviteCard({
   const milestoneProgress = getReferralMilestoneProgress(convertedReferralCount)
   const conversionSnapshot = getReferralConversionSnapshot(convertedReferralCount, pendingReferralCount)
   const nextStepCopy = getReferralNextStepCopy(convertedReferralCount, pendingReferralCount)
+  const nextStepHeadingId = 'referral-next-step-heading'
 
   async function copyText(value: string, copyTarget: 'link' | 'message') {
     try {
@@ -360,14 +361,17 @@ export function ReferralInviteCard({
           <p className="mt-2 text-sm text-muted-foreground">{momentumCopy.body}</p>
         </div>
 
-        <div
+        <section
           className="rounded-lg border border-emerald-200 bg-emerald-50/80 p-4"
-          aria-label="Referral next step"
+          role="region"
+          aria-labelledby={nextStepHeadingId}
         >
           <div className="text-xs font-medium uppercase tracking-[0.18em] text-emerald-800">
             {nextStepCopy.eyebrow}
           </div>
-          <p className="mt-2 text-base font-semibold text-foreground">{nextStepCopy.title}</p>
+          <h3 id={nextStepHeadingId} className="mt-2 text-base font-semibold text-foreground">
+            {nextStepCopy.title}
+          </h3>
           <p className="mt-2 text-sm text-muted-foreground">{nextStepCopy.body}</p>
           {hasReferralLink ? (
             <div className="mt-4">
@@ -377,13 +381,14 @@ export function ReferralInviteCard({
                 size="sm"
                 className="w-full sm:w-auto"
                 onClick={() => handleChannelShare('sms')}
+                aria-label={`${messageVariant.smsLabel} from best next move`}
               >
                 <Share2 className="h-4 w-4" />
                 {messageVariant.smsLabel}
               </Button>
             </div>
           ) : null}
-        </div>
+        </section>
 
         {conversionSnapshot ? (
           <div className="rounded-lg border border-sky-200 bg-sky-50/80 p-4">
@@ -455,6 +460,7 @@ export function ReferralInviteCard({
             variant="outline"
             className="w-full sm:w-auto"
             onClick={() => handleChannelShare('sms')}
+            aria-label={`${messageVariant.smsLabel} from share options`}
           >
             <Share2 className="h-4 w-4" />
             {messageVariant.smsLabel}

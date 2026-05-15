@@ -136,11 +136,15 @@ describe('ReferralInviteCard', () => {
       />,
     )
 
-    const nextStepPanel = screen.getByLabelText('Referral next step')
+    const nextStepPanel = screen.getByRole('region', {
+      name: /follow up with your 2 pending invites today/i,
+    })
 
     expect(screen.getByText(/suggested follow-up message/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /follow up on whatsapp/i })).toBeInTheDocument()
-    expect(within(nextStepPanel).getByRole('button', { name: /follow up by sms/i })).toBeInTheDocument()
+    expect(
+      within(nextStepPanel).getByRole('button', { name: /follow up by sms from best next move/i }),
+    ).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: /copy follow-up message/i }))
 
@@ -310,7 +314,7 @@ describe('ReferralInviteCard', () => {
       />,
     )
 
-    await userEvent.click(screen.getAllByRole('button', { name: /follow up by sms/i })[1])
+    await userEvent.click(screen.getByRole('button', { name: /follow up by sms from share options/i }))
     await userEvent.click(screen.getByRole('button', { name: /follow up by email/i }))
 
     expect(mockOpen).toHaveBeenNthCalledWith(
@@ -404,7 +408,11 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('Best next move')).toBeInTheDocument()
     expect(screen.getByText('Follow up with your 2 pending invites today')).toBeInTheDocument()
     expect(screen.getByText(/use whatsapp, sms, or email below while your invite is still warm/i)).toBeInTheDocument()
-    expect(within(screen.getByLabelText('Referral next step')).getByRole('button', { name: /follow up by sms/i })).toBeInTheDocument()
+    expect(
+      within(
+        screen.getByRole('region', { name: /follow up with your 2 pending invites today/i }),
+      ).getByRole('button', { name: /follow up by sms from best next move/i }),
+    ).toBeInTheDocument()
     expect(screen.getByText('Invite conversion')).toBeInTheDocument()
     expect(screen.getByText('3 of 5 tracked invites have published')).toBeInTheDocument()
     expect(screen.getByText(/proof the pitch works/i)).toBeInTheDocument()
@@ -434,7 +442,11 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText(/copy your invite message/i)).toBeInTheDocument()
     expect(screen.getByText('Send 1 fresh invite to keep your referral streak moving')).toBeInTheDocument()
     expect(screen.getByText(/start with one neighbor who is likely to publish quickly/i)).toBeInTheDocument()
-    expect(within(screen.getByLabelText('Referral next step')).getByRole('button', { name: /share by sms/i })).toBeInTheDocument()
+    expect(
+      within(
+        screen.getByRole('region', { name: /send 1 fresh invite to keep your referral streak moving/i }),
+      ).getByRole('button', { name: /share by sms from best next move/i }),
+    ).toBeInTheDocument()
   })
 
   it('shows the first referral milestone when no referrals have converted yet', () => {
@@ -455,7 +467,11 @@ describe('ReferralInviteCard', () => {
     expect(screen.getByText('0%')).toBeInTheDocument()
     expect(screen.getByText('Start with your warmest first invite')).toBeInTheDocument()
     expect(screen.getByText(/pick one friend, neighbor, or past collaborator/i)).toBeInTheDocument()
-    expect(within(screen.getByLabelText('Referral next step')).getByRole('button', { name: /share by sms/i })).toBeInTheDocument()
+    expect(
+      within(
+        screen.getByRole('region', { name: /start with your warmest first invite/i }),
+      ).getByRole('button', { name: /share by sms from best next move/i }),
+    ).toBeInTheDocument()
     expect(screen.queryByText('Invite conversion')).not.toBeInTheDocument()
   })
 
@@ -527,8 +543,10 @@ describe('ReferralInviteCard', () => {
     )
 
     await userEvent.click(
-      within(screen.getByLabelText('Referral next step')).getByRole('button', {
-        name: /follow up by sms/i,
+      within(
+        screen.getByRole('region', { name: /follow up with your 1 pending invite today/i }),
+      ).getByRole('button', {
+        name: /follow up by sms from best next move/i,
       }),
     )
 
@@ -560,8 +578,8 @@ describe('ReferralInviteCard', () => {
     )
 
     expect(
-      within(screen.getByLabelText('Referral next step')).queryByRole('button', {
-        name: /share by sms/i,
+      within(screen.getByRole('region', { name: /start with your warmest first invite/i })).queryByRole('button', {
+        name: /share by sms from best next move/i,
       }),
     ).not.toBeInTheDocument()
   })
