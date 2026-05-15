@@ -502,5 +502,35 @@
     "created_at": "2026-05-15T06-03-46Z",
     "source": "codex-review",
     "notes": "Restored the corrupted task metadata in .hermes/cron_queue.json and removed the pasted review transcript from the queue entry. Commit: d4fcf91."
+  },
+  {
+    "id": "142",
+    "title": "Add SMS referral CTA to first-contact dashboard reminder — growth/acquisition",
+    "description": "When an onboarded member has at least one active listing but zero started conversations, add a secondary SMS referral CTA inside `FirstContactLaunchReminder` so they can invite a likely trading partner directly before browsing the directory. Reuse existing referral share helpers and `referral_invite_shared` analytics naming. Acceptance: CTA only appears when a referral link exists, remains secondary to the browse CTA, docs include the new share surface, and unit tests cover visibility plus click tracking.",
+    "priority": "high",
+    "status": "completed",
+    "created_at": "2026-05-15T09:50:00Z",
+    "source": "cron-self-generated",
+    "notes": "Added a referral-aware SMS invite CTA to the first-contact dashboard reminder, wired live referral metrics through the reminder payload, and covered analytics/doc updates in unit tests. Commit: 6809be7."
+  },
+  {
+    "id": "143",
+    "title": "Add viewed-listing revisit reminder for members with zero saves after 5 days — retention/engagement",
+    "description": "Show a dashboard reminder for members whose only active listing has been live at least 5 days, has profile views but zero saves, and has not been refreshed recently. CTA should deep-link to the listing edit flow with copy about tightening photos/title/trade terms. Acceptance: only eligible members see it, reminder uses live listing + profile-view data, and unit tests cover the 5-day threshold and zero-save gating.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-15T09:50:00Z",
+    "source": "cron-self-generated",
+    "notes": "Queued after task 142."
+  },
+  {
+    "id": "144",
+    "title": "Add annual-vs-founding proof row to billing checkout actions for free members — revenue/monetization",
+    "description": "Strengthen conversion on `/dashboard/billing` by adding a compact proof row beside free-member checkout actions that compares Founding monthly, Premium monthly, and Premium annual effective monthly pricing using live Stripe config. Acceptance: only free members see it, copy stays grounded in current plan values, and unit tests cover all displayed pricing math including sold-out founding state.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-15T09:50:00Z",
+    "source": "cron-self-generated",
+    "notes": "Queued after task 142."
   }
 ]
