@@ -14,6 +14,7 @@ export function UnreadMessageReminder({
     ? 'conversation'
     : 'conversations'
   const messageLabel = reminder.unreadMessageCount === 1 ? 'message' : 'messages'
+  const isTwoDayReminder = reminder.staleTier === 'two-day'
 
   return (
     <Card className="border-sky-200 bg-sky-50/80">
@@ -27,11 +28,15 @@ export function UnreadMessageReminder({
           </div>
           <p className="max-w-2xl text-sm text-sky-900/80">
             You have {reminder.unreadConversationCount} unread {conversationLabel} untouched for more
-            than 24 hours. {reminder.counterpartName} is still waiting for a reply.
+            than {isTwoDayReminder ? '48' : '24'} hours. {reminder.counterpartName} is still waiting for a reply.
           </p>
           <div className="flex items-center gap-2 text-xs text-sky-900/70">
             <Clock3 className="h-3.5 w-3.5" />
-            <span>Jump back into the thread before the trade goes cold.</span>
+            <span>
+              {isTwoDayReminder
+                ? 'Keep the barter moving before momentum slips.'
+                : 'Jump back into the thread before the trade goes cold.'}
+            </span>
           </div>
         </div>
 

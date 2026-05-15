@@ -102,6 +102,7 @@ describe('getUnreadMessageReminder', () => {
       href: '/dashboard/messages/conv-older',
       counterpartName: 'Alex',
       lastMessageAt: '2026-05-11T09:00:00.000Z',
+      staleTier: 'two-day',
     })
   })
 
@@ -182,8 +183,48 @@ describe('getUnreadMessageReminder', () => {
     expect(result).toMatchObject({
       unreadConversationCount: 2,
       unreadMessageCount: 4,
-      href: '/dashboard/messages/conv-priority',
+      href: '/dashboard/messages/conv-second',
+      counterpartName: 'sam',
+      staleTier: 'two-day',
+    })
+  })
+
+  it('uses the 24-hour tier when no unread thread is older than 48 hours', () => {
+    const result = getUnreadMessageReminder(
+      [
+        makeConversation({
+          id: 'conv-older-24h',
+          last_message: {
+            content: 'One day old',
+            created_at: '2026-05-12T08:00:00.000Z',
+            sender_profile_id: 'profile-2',
+            sender: {
+              display_name: 'Alex',
+              username: 'alex',
+            },
+          },
+        }),
+        makeConversation({
+          id: 'conv-newer-24h',
+          last_message: {
+            content: 'Still stale',
+            created_at: '2026-05-12T20:00:00.000Z',
+            sender_profile_id: 'profile-3',
+            sender: {
+              display_name: 'Sam',
+              username: 'sam',
+            },
+          },
+        }),
+      ],
+      PROFILE_ID,
+      new Date('2026-05-13T09:00:00.000Z'),
+    )
+
+    expect(result).toMatchObject({
+      href: '/dashboard/messages/conv-older-24h',
       counterpartName: 'Alex',
+      staleTier: 'day',
     })
   })
 
@@ -208,6 +249,7 @@ describe('getUnreadMessageReminder', () => {
       href: '/dashboard/messages/conv-valid',
       unreadConversationCount: 1,
       unreadMessageCount: 1,
+      staleTier: 'two-day',
     })
   })
 
@@ -238,6 +280,7 @@ describe('getUnreadMessageReminder', () => {
       counterpartName: 'Alex',
       unreadConversationCount: 1,
       unreadMessageCount: 2,
+      staleTier: 'two-day',
     })
   })
 
@@ -274,6 +317,7 @@ describe('getUnreadMessageReminder', () => {
       counterpartName: 'a member',
       unreadConversationCount: 1,
       unreadMessageCount: 2,
+      staleTier: 'two-day',
     })
   })
 })

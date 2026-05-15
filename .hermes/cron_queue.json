@@ -338,9 +338,9 @@
     "title": "Add unread-message streak reminder for two-day-old conversations — retention/engagement",
     "description": "Strengthen reply rates by adding a second-tier dashboard reminder for members with unread messages older than 48 hours, with copy that emphasizes keeping barter momentum alive. Build on the existing unread reminder helper rather than a separate query path. Acceptance: only unread threads older than 48 hours trigger the stronger copy, the CTA deep-links to the oldest eligible thread, and unit tests cover threshold ordering and sender-name fallback.",
     "priority": "medium",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-15T00:00:00Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Added tiered 24h/48h unread-message reminder logic with oldest-thread CTA selection, stronger 48-hour dashboard copy, and regression coverage. Commit: PENDING."
   }
 ]

@@ -11,6 +11,7 @@ export interface UnreadMessageReminder {
   href: string
   counterpartName: string
   lastMessageAt: string
+  staleTier: 'day' | 'two-day'
 }
 
 export interface StaleListingReminder {
@@ -59,7 +60,8 @@ export function getUnreadMessageReminder(
   currentProfileId: string,
   now = new Date(),
 ): UnreadMessageReminder | null {
-  const cutoff = now.getTime() - TWENTY_FOUR_HOURS_MS
+  const oneDayCutoff = now.getTime() - TWENTY_FOUR_HOURS_MS
+  const twoDayCutoff = now.getTime() - (2 * TWENTY_FOUR_HOURS_MS)
 
   const staleUnreadConversations = conversations.filter((conversation): conversation is ConversationRow & {
     last_message: NonNullable<ConversationRow['last_message']>
@@ -72,14 +74,26 @@ export function getUnreadMessageReminder(
       return false
     }
 
-    return new Date(conversation.last_message.created_at).getTime() <= cutoff
+    return new Date(conversation.last_message.created_at).getTime() <= oneDayCutoff
   })
 
   if (staleUnreadConversations.length === 0) {
     return null
   }
 
-  const topConversation = staleUnreadConversations[0]
+  const twoDayUnreadConversations = staleUnreadConversations.filter(
+    (conversation) => new Date(conversation.last_message.created_at).getTime() <= twoDayCutoff,
+  )
+  const eligibleConversations = twoDayUnreadConversations.length > 0
+    ? twoDayUnreadConversations
+    : staleUnreadConversations
+  const topConversation = eligibleConversations
+    .slice()
+    .sort(
+      (left, right) =>
+        new Date(left.last_message.created_at).getTime()
+        - new Date(right.last_message.created_at).getTime(),
+    )[0]
   const counterpartName =
     topConversation.last_message.sender?.display_name
     ?? topConversation.last_message.sender?.username
@@ -94,6 +108,7 @@ export function getUnreadMessageReminder(
     href: `/dashboard/messages/${topConversation.id}`,
     counterpartName,
     lastMessageAt: topConversation.last_message.created_at,
+    staleTier: twoDayUnreadConversations.length > 0 ? 'two-day' : 'day',
   }
 }
 
