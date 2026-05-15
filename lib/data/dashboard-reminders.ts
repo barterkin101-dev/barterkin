@@ -55,6 +55,10 @@ export interface FirstContactLaunchReminder {
   href: string
   activeListingCount: number
   listingTitle: string
+  referralCode: string | null
+  referralLink: string | null
+  referralCount: number
+  credits: number
 }
 
 export interface FreshListingReminder {
@@ -272,6 +276,10 @@ export function getFirstContactLaunchReminder(
   onboardingCompletedAt: string | null | undefined,
   listings: ListingRow[],
   conversationCount: number,
+  referralCode?: string | null,
+  referralLink?: string | null,
+  referralCount = 0,
+  credits = 0,
 ): FirstContactLaunchReminder | null {
   if (!onboardingCompletedAt || conversationCount > 0) {
     return null
@@ -286,6 +294,10 @@ export function getFirstContactLaunchReminder(
     href: '/directory',
     activeListingCount: activeListings.length,
     listingTitle: activeListings[0].title,
+    referralCode: referralCode ?? null,
+    referralLink: referralLink ?? null,
+    referralCount,
+    credits,
   }
 }
 

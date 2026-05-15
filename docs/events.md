@@ -120,8 +120,8 @@ Google OAuth also fires this event client-side when the user launches Google sig
 
 ### `referral_invite_shared`
 
-**When fired:** When a member shares their referral link from the dashboard via native share or a channel shortcut, including the zero-listing launch reminder share actions.
-**Fires from:** `components/dashboard/ReferralInviteCard.tsx`, `components/dashboard/ZeroListingLaunchReminder.tsx`
+**When fired:** When a member shares their referral link from the dashboard via native share or a channel shortcut, including the zero-listing and first-contact reminder share actions.
+**Fires from:** `components/dashboard/ReferralInviteCard.tsx`, `components/dashboard/ZeroListingLaunchReminder.tsx`, `components/dashboard/FirstContactLaunchReminder.tsx`
 **Properties:**
 
 | Property | Type | Description |
@@ -130,7 +130,7 @@ Google OAuth also fires this event client-side when the user launches Google sig
 | `referral_code` | string | The 8-char referral code being shared |
 | `referral_count` | number | How many successful referrals the member has at share time |
 | `credits` | number | Current referral credit balance shown in the card |
-| `share_surface` | string | Which UI initiated the share: `referral_invite_card` or `zero_listing_launch` |
+| `share_surface` | string | Which UI initiated the share: `referral_invite_card`, `zero_listing_launch`, or `first_contact_launch` |
 
 ---
 

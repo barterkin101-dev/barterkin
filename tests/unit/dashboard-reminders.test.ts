@@ -724,11 +724,19 @@ describe('getFirstContactLaunchReminder', () => {
           makeListing({ id: 'listing-2', title: 'Ceramic kiln', status: 'paused' }),
         ],
         0,
+        'ABC12345',
+        'https://barterkin.com/r/ABC12345',
+        2,
+        9,
       ),
     ).toEqual({
       href: '/directory',
       activeListingCount: 1,
       listingTitle: 'Vintage camera bundle',
+      referralCode: 'ABC12345',
+      referralLink: 'https://barterkin.com/r/ABC12345',
+      referralCount: 2,
+      credits: 9,
     })
   })
 
@@ -746,6 +754,10 @@ describe('getFirstContactLaunchReminder', () => {
       href: '/directory',
       activeListingCount: 2,
       listingTitle: 'Vintage camera bundle',
+      referralCode: null,
+      referralLink: null,
+      referralCount: 0,
+      credits: 0,
     })
   })
 })

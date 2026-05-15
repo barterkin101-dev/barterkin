@@ -228,6 +228,10 @@ export default async function DashboardPage() {
       profile.onboarding_completed_at,
       listings,
       startedConversationCount,
+      profile.referral_code,
+      referralLink,
+      convertedReferralCount,
+      creditBalance,
     )
     : null
   const freshListingReminder = profile
