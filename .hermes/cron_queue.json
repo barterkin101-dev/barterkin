@@ -558,10 +558,10 @@
     "title": "Add listing-share CTA to single-listing members with zero saves after 7 days — growth/acquisition",
     "description": "Members with exactly one active listing, zero saves, and 7+ days live should see a dashboard reminder to share their listing externally (WhatsApp, SMS, Email) to drive traffic. Reuse existing listing-share helpers or build compact share URLs. Acceptance: only eligible members see it, CTA uses existing share analytics, and tests cover visibility + href generation.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-15T21:33:29.510Z",
     "source": "cron-self-generated",
-    "notes": "Starting: find listing-share helpers, build dashboard reminder component, wire into page, add tests."
+    "notes": "Added ListingShareReminder dashboard component with WhatsApp/SMS/Email share CTAs for single-listing zero-save members after 7 days, wired into dashboard page, covered eligibility + href generation in unit tests. Commit: 478a088."
   },
   {
     "id": "148",
