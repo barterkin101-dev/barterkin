@@ -50,7 +50,6 @@ const TEAM = [
     image: '/team/ashley.jpg',
     initial: 'A',
     icon: Users,
-    placeholder: true,
   },
 ]
 
@@ -149,10 +148,11 @@ export default function BehindBarterkinPage() {
                 <div className="relative flex flex-col items-center rounded-2xl bg-sage-pale p-8 ring-1 ring-sage-light text-center h-full">
                   {/* Photo */}
                   <div className="relative">
-                    <Avatar className="h-28 w-28 border-2 border-sage-light">
+                    <Avatar className="h-40 w-40 border-2 border-sage-light rounded-xl">
                       <AvatarImage
-                        src={member.placeholder ? undefined : member.image}
+                        src={member.image}
                         alt={member.name}
+                        className="object-cover"
                       />
                       <AvatarFallback className="bg-forest/10 text-forest text-2xl font-serif">
                         {member.initial}
@@ -172,17 +172,9 @@ export default function BehindBarterkinPage() {
                   </p>
 
                   {/* Bio */}
-                  {member.placeholder ? (
-                    <div className="mt-4 flex-1 flex items-center justify-center">
-                      <p className="text-sm text-forest-mid/60 italic">
-                        Bio coming soon.
-                      </p>
-                    </div>
-                  ) : (
-                    <p className="mt-4 text-sm text-forest-mid leading-relaxed flex-1">
-                      {member.bio}
-                    </p>
-                  )}
+                  <p className="mt-4 text-sm text-forest-mid leading-relaxed flex-1">
+                    {member.bio}
+                  </p>
                 </div>
               </StaggerItem>
             )
