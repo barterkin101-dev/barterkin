@@ -45,7 +45,7 @@ export function WarmConversationReengagementReminder({
             You have {reminder.staleConversationCount} warm {conversationLabel} where your last message has been sitting for at least three days. Check back in with {reminder.counterpartName} before the trade loses momentum.
           </p>
           <div className="flex items-center gap-2 text-xs text-orange-950/70">
-            <Clock3 className="h-3.5 w-3.5" />
+            <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
             <span>A quick follow-up often gets a stalled barter moving again.</span>
           </div>
         </div>

@@ -621,7 +621,7 @@
     "status": "completed",
     "created_at": "2026-05-16T10-14-30Z",
     "source": "codex-review",
-    "notes": "Extracted shouldShowFoundingMemberNudge helper into lib/stripe/config.ts, wired it into dashboard page, and added 5 unit tests covering sold-out suppression, paid-tier hiding, and defensive negative-slot handling. Commit: 0760618."
+    "notes": "Extracted shouldShowFoundingMemberNudge helper into lib/stripe/config.ts, wired it into dashboard page, and added 5 unit tests covering sold-out suppression, paid-tier hiding, and defensive negative-slot handling. Commit: 0760618. Follow-up: fixed import consolidation. Commit: 1bb0df5."
   },
   {
     "id": "154",

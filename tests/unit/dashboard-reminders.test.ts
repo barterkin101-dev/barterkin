@@ -1250,4 +1250,150 @@ describe('getViewedListingRevisitReminder', () => {
       profileViewCount: 3,
     })
   })
+
+
+describe('getWarmConversationReengagementReminder', () => {
+  it('returns null when there are no conversations', () => {
+    expect(getWarmConversationReengagementReminder([], PROFILE_ID, new Date('2026-05-14T09:00:00.000Z'))).toBeNull()
+  })
+
+  it('returns null when the last message is from the counterpart', () => {
+    const conversations = [
+      makeConversation({
+        last_message: {
+          content: 'Hey',
+          created_at: '2026-05-10T09:00:00.000Z',
+          sender_profile_id: 'profile-2',
+          sender: { display_name: 'Alex', username: 'alex' },
+        },
+      }),
+    ]
+    expect(getWarmConversationReengagementReminder(conversations, PROFILE_ID, new Date('2026-05-14T09:00:00.000Z'))).toBeNull()
+  })
+
+  it('returns null when the self-sent last message is recent (< 3 days)', () => {
+    const conversations = [
+      makeConversation({
+        last_message: {
+          content: 'Hey',
+          created_at: '2026-05-13T10:00:00.000Z',
+          sender_profile_id: PROFILE_ID,
+          sender: { display_name: 'Naeem', username: 'naeem' },
+        },
+      }),
+    ]
+    expect(getWarmConversationReengagementReminder(conversations, PROFILE_ID, new Date('2026-05-14T09:00:00.000Z'))).toBeNull()
+  })
+
+  it('returns a reminder for a single stale self-sent conversation', () => {
+    const conversations = [
+      makeConversation({
+        id: 'conv-stale',
+        last_message: {
+          content: 'Still interested?',
+          created_at: '2026-05-10T09:00:00.000Z',
+          sender_profile_id: PROFILE_ID,
+          sender: { display_name: 'Naeem', username: 'naeem' },
+        },
+      }),
+    ]
+    const result = getWarmConversationReengagementReminder(conversations, PROFILE_ID, new Date('2026-05-14T09:00:00.000Z'))
+    expect(result).toEqual({
+      staleConversationCount: 1,
+      href: '/dashboard/messages/conv-stale',
+      counterpartName: 'Alex',
+      lastMessageAt: '2026-05-10T09:00:00.000Z',
+    })
+  })
+
+  it('returns the correct count for multiple stale self-sent conversations', () => {
+    const conversations = [
+      makeConversation({
+        id: 'conv-stale-1',
+        last_message: {
+          content: 'Still interested?',
+          created_at: '2026-05-10T09:00:00.000Z',
+          sender_profile_id: PROFILE_ID,
+          sender: { display_name: 'Naeem', username: 'naeem' },
+        },
+      }),
+      makeConversation({
+        id: 'conv-stale-2',
+        last_message: {
+          content: 'Following up',
+          created_at: '2026-05-09T09:00:00.000Z',
+          sender_profile_id: PROFILE_ID,
+          sender: { display_name: 'Naeem', username: 'naeem' },
+        },
+      }),
+    ]
+    const result = getWarmConversationReengagementReminder(conversations, PROFILE_ID, new Date('2026-05-14T09:00:00.000Z'))
+    expect(result?.staleConversationCount).toBe(2)
+  })
+
+  it('picks the most recent stale conversation (descending sort)', () => {
+    const conversations = [
+      makeConversation({
+        id: 'conv-older',
+        last_message: {
+          content: 'Older',
+          created_at: '2026-05-08T09:00:00.000Z',
+          sender_profile_id: PROFILE_ID,
+          sender: { display_name: 'Naeem', username: 'naeem' },
+        },
+      }),
+      makeConversation({
+        id: 'conv-newer',
+        last_message: {
+          content: 'Newer',
+          created_at: '2026-05-10T09:00:00.000Z',
+          sender_profile_id: PROFILE_ID,
+          sender: { display_name: 'Naeem', username: 'naeem' },
+        },
+      }),
+    ]
+    const result = getWarmConversationReengagementReminder(conversations, PROFILE_ID, new Date('2026-05-14T09:00:00.000Z'))
+    expect(result?.href).toBe('/dashboard/messages/conv-newer')
+    expect(result?.lastMessageAt).toBe('2026-05-10T09:00:00.000Z')
+  })
+
+  it('falls back to "a member" when counterpart has no display name or username', () => {
+    const conversations = [
+      makeConversation({
+        id: 'conv-anon',
+        participants: [
+          {
+            profile_id: PROFILE_ID,
+            last_read_at: null,
+            profile: {
+              id: PROFILE_ID,
+              display_name: 'Naeem',
+              username: 'naeem',
+              avatar_url: null,
+            },
+          },
+          {
+            profile_id: 'profile-anon',
+            last_read_at: null,
+            profile: {
+              id: 'profile-anon',
+              display_name: null,
+              username: null,
+              avatar_url: null,
+            },
+          },
+        ],
+        last_message: {
+          content: 'Hey',
+          created_at: '2026-05-10T09:00:00.000Z',
+          sender_profile_id: PROFILE_ID,
+          sender: { display_name: 'Naeem', username: 'naeem' },
+        },
+      }),
+    ]
+    const result = getWarmConversationReengagementReminder(conversations, PROFILE_ID, new Date('2026-05-14T09:00:00.000Z'))
+    expect(result?.counterpartName).toBe('a member')
+  })
+})
+
 })
