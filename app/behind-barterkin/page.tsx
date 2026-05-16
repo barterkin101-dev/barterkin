@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Leaf, Heart, Users } from 'lucide-react'
 
 import { FadeIn, Stagger, StaggerItem } from '@/components/ui/fade-in'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export const metadata: Metadata = {
   title: 'Behind Barterkin',
@@ -148,16 +147,13 @@ export default function BehindBarterkinPage() {
                 <div className="relative flex flex-col items-center rounded-2xl bg-sage-pale p-8 ring-1 ring-sage-light text-center h-full">
                   {/* Photo */}
                   <div className="relative">
-                    <Avatar className="h-40 w-40 border-2 border-sage-light rounded-xl">
-                      <AvatarImage
+                    <div className="relative h-40 w-40 overflow-hidden rounded-xl border-2 border-sage-light">
+                      <img
                         src={member.image}
                         alt={member.name}
-                        className="object-cover"
+                        className="h-full w-full object-cover"
                       />
-                      <AvatarFallback className="bg-forest/10 text-forest text-2xl font-serif">
-                        {member.initial}
-                      </AvatarFallback>
-                    </Avatar>
+                    </div>
                     <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-clay text-sage-bg shadow-sm">
                       <Icon className="h-4 w-4" aria-hidden="true" />
                     </div>
