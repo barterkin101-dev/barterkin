@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getDigestOptOutReminder, getFirstContactLaunchReminder, getFirstTradeProgressReminder, getFreshListingReminder, getListingShareReminder, getOnboardingReturnReminder, getSecondListingExpansionReminder, getStaleListingReminder, getUnreadMessageReminder, getViewedListingRevisitReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
+import { getDigestOptOutReminder, getFirstContactLaunchReminder, getFirstTradeProgressReminder, getFreshListingReminder, getListingShareReminder, getOnboardingReturnReminder, getSecondListingExpansionReminder, getStaleListingReminder, getUnreadMessageReminder, getViewedListingRevisitReminder, getWarmConversationReengagementReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
 
@@ -421,6 +421,68 @@ describe('getDigestOptOutReminder', () => {
   it('returns a reminder when published and emailDigestEnabled is false', () => {
     const result = getDigestOptOutReminder(false, true)
     expect(result).toEqual({ href: '/profile/edit' })
+  })
+})
+
+describe('getWarmConversationReengagementReminder', () => {
+  it('returns null when the member last followed up less than 3 days ago', () => {
+    const result = getWarmConversationReengagementReminder(
+      [
+        makeConversation({
+          last_message: {
+            content: 'Following up',
+            created_at: '2026-05-12T10:00:00.000Z',
+            sender_profile_id: PROFILE_ID,
+            sender: {
+              display_name: 'Naeem',
+              username: 'naeem',
+            },
+          },
+        }),
+      ],
+      PROFILE_ID,
+      new Date('2026-05-15T09:00:00.000Z'),
+    )
+
+    expect(result).toBeNull()
+  })
+
+  it('returns a reminder when the member sent the last message 3+ days ago', () => {
+    const result = getWarmConversationReengagementReminder(
+      [
+        makeConversation({
+          id: 'conv-stale-follow-up',
+          last_message: {
+            content: 'Checking back in',
+            created_at: '2026-05-12T09:00:00.000Z',
+            sender_profile_id: PROFILE_ID,
+            sender: {
+              display_name: 'Naeem',
+              username: 'naeem',
+            },
+          },
+        }),
+      ],
+      PROFILE_ID,
+      new Date('2026-05-15T09:00:00.000Z'),
+    )
+
+    expect(result).toEqual({
+      staleConversationCount: 1,
+      href: '/dashboard/messages/conv-stale-follow-up',
+      counterpartName: 'Alex',
+      lastMessageAt: '2026-05-12T09:00:00.000Z',
+    })
+  })
+
+  it('ignores stale conversations when the counterpart sent the last message', () => {
+    const result = getWarmConversationReengagementReminder(
+      [makeConversation()],
+      PROFILE_ID,
+      new Date('2026-05-15T09:00:00.000Z'),
+    )
+
+    expect(result).toBeNull()
   })
 })
 

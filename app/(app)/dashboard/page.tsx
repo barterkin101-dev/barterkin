@@ -5,7 +5,7 @@ import { createLogger } from '@/lib/utils/logger'
 import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
 import { getConversations, getStartedConversationCount } from '@/lib/data/messaging'
-import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder, getSecondListingExpansionReminder, getFirstContactLaunchReminder, getFreshListingReminder, getViewedListingRevisitReminder, getListingShareReminder } from '@/lib/data/dashboard-reminders'
+import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getWarmConversationReengagementReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder, getSecondListingExpansionReminder, getFirstContactLaunchReminder, getFreshListingReminder, getViewedListingRevisitReminder, getListingShareReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { getOwnedListingSaveCounts } from '@/lib/data/owned-listing-save-counts'
 import { buildReferralLink } from '@/lib/referrals'
@@ -24,6 +24,7 @@ import { ListingCapUpsell } from '@/components/dashboard/ListingCapUpsell'
 import { StaleListingReminder } from '@/components/dashboard/StaleListingReminder'
 import { DigestOptOutReminder } from '@/components/dashboard/DigestOptOutReminder'
 import { FirstTradeProgressReminder } from '@/components/dashboard/FirstTradeProgressReminder'
+import { WarmConversationReengagementReminder } from '@/components/dashboard/WarmConversationReengagementReminder'
 import { ContactLimitComparisonCard } from '@/components/dashboard/ContactLimitComparisonCard'
 import { ProfileViewsSnapshotCard } from '@/components/dashboard/ProfileViewsSnapshotCard'
 import { OnboardingReturnReminder } from '@/components/dashboard/OnboardingReturnReminder'
@@ -181,6 +182,12 @@ export default async function DashboardPage() {
       conversations,
       profile.id,
       completedQuests.has('quest_first_trade'),
+    )
+    : null
+  const warmConversationReengagementReminder = profile
+    ? getWarmConversationReengagementReminder(
+      conversations,
+      profile.id,
     )
     : null
   const listingSaveCounts = profile && listings.length > 0
@@ -445,6 +452,10 @@ export default async function DashboardPage() {
 
       {firstTradeProgressReminder && (
         <FirstTradeProgressReminder reminder={firstTradeProgressReminder} />
+      )}
+
+      {warmConversationReengagementReminder && (
+        <WarmConversationReengagementReminder reminder={warmConversationReengagementReminder} />
       )}
 
       {staleListingReminder && (

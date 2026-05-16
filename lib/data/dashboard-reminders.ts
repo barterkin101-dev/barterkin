@@ -39,6 +39,13 @@ export interface FirstTradeProgressReminder {
   rewardCredits: number
 }
 
+export interface WarmConversationReengagementReminder {
+  staleConversationCount: number
+  href: string
+  counterpartName: string
+  lastMessageAt: string
+}
+
 export interface ZeroListingLaunchReminder {
   href: string
   rewardCredits: number | null
@@ -234,6 +241,54 @@ export function getFirstTradeProgressReminder(
     href: `/dashboard/messages/${topConversation.id}`,
     counterpartName,
     rewardCredits,
+  }
+}
+
+export function getWarmConversationReengagementReminder(
+  conversations: ConversationRow[],
+  currentProfileId: string,
+  now = new Date(),
+): WarmConversationReengagementReminder | null {
+  const cutoff = now.getTime() - THREE_DAYS_MS
+
+  const staleSelfSentConversations = conversations.filter((conversation): conversation is ConversationRow & {
+    last_message: NonNullable<ConversationRow['last_message']>
+  } => {
+    if (!conversation.last_message) {
+      return false
+    }
+
+    if (conversation.last_message.sender_profile_id !== currentProfileId) {
+      return false
+    }
+
+    return new Date(conversation.last_message.created_at).getTime() <= cutoff
+  })
+
+  if (staleSelfSentConversations.length === 0) {
+    return null
+  }
+
+  const topConversation = staleSelfSentConversations
+    .slice()
+    .sort(
+      (left, right) =>
+        new Date(left.last_message.created_at).getTime()
+        - new Date(right.last_message.created_at).getTime(),
+    )[0]
+  const counterpart = topConversation.participants.find(
+    (participant) => participant.profile_id !== currentProfileId,
+  )
+  const counterpartName =
+    counterpart?.profile?.display_name
+    ?? counterpart?.profile?.username
+    ?? 'a member'
+
+  return {
+    staleConversationCount: staleSelfSentConversations.length,
+    href: `/dashboard/messages/${topConversation.id}`,
+    counterpartName,
+    lastMessageAt: topConversation.last_message.created_at,
   }
 }
 
