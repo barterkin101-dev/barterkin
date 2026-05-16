@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getDigestOptOutReminder, getFirstContactLaunchReminder, getFirstTradeProgressReminder, getFreshListingReminder, getOnboardingReturnReminder, getSecondListingExpansionReminder, getStaleListingReminder, getUnreadMessageReminder, getViewedListingRevisitReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
+import { getDigestOptOutReminder, getFirstContactLaunchReminder, getFirstTradeProgressReminder, getFreshListingReminder, getListingShareReminder, getOnboardingReturnReminder, getSecondListingExpansionReminder, getStaleListingReminder, getUnreadMessageReminder, getViewedListingRevisitReminder, getZeroListingLaunchReminder } from '@/lib/data/dashboard-reminders'
 import type { ListingRow } from '@/lib/data/listings.types'
 import type { ConversationRow } from '@/lib/data/messaging'
 
@@ -861,6 +861,110 @@ describe('getStaleListingReminder', () => {
     )
 
     expect(result).toBeNull()
+  })
+})
+
+describe('getListingShareReminder', () => {
+  it('returns null when the only active listing is newer than 7 days', () => {
+    expect(
+      getListingShareReminder(
+        [
+          makeListing({
+            created_at: '2026-05-08T09:00:00.000Z',
+            title: 'Vintage camera bundle',
+          }),
+        ],
+        {},
+        'https://barterkin.com',
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('returns a share reminder for a 7-day-old zero-save single listing', () => {
+    expect(
+      getListingShareReminder(
+        [
+          makeListing({
+            id: 'listing-share',
+            title: 'Vintage camera bundle',
+            created_at: '2026-05-07T09:00:00.000Z',
+          }),
+        ],
+        {},
+        'https://barterkin.com',
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toEqual({
+      href: '/listings/listing-share',
+      listingTitle: 'Vintage camera bundle',
+      listingId: 'listing-share',
+      shareUrl: 'https://barterkin.com/listings/listing-share',
+    })
+  })
+
+  it('returns null when the single active listing already has saves', () => {
+    expect(
+      getListingShareReminder(
+        [
+          makeListing({
+            id: 'listing-saved',
+            title: 'Vintage camera bundle',
+            created_at: '2026-05-01T09:00:00.000Z',
+          }),
+        ],
+        { 'listing-saved': 2 },
+        'https://barterkin.com',
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('returns null when there are multiple active listings', () => {
+    expect(
+      getListingShareReminder(
+        [
+          makeListing({ id: 'listing-1', title: 'Camera kit', created_at: '2026-05-01T09:00:00.000Z' }),
+          makeListing({ id: 'listing-2', title: 'Ceramic wheel', created_at: '2026-05-01T09:00:00.000Z' }),
+        ],
+        {},
+        'https://barterkin.com',
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('returns null when there are zero active listings', () => {
+    expect(
+      getListingShareReminder(
+        [makeListing({ status: 'paused' })],
+        {},
+        'https://barterkin.com',
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toBeNull()
+  })
+
+  it('strips trailing slash from siteUrl when building shareUrl', () => {
+    expect(
+      getListingShareReminder(
+        [
+          makeListing({
+            id: 'listing-share',
+            title: 'Vintage camera bundle',
+            created_at: '2026-05-07T09:00:00.000Z',
+          }),
+        ],
+        {},
+        'https://barterkin.com/',
+        new Date('2026-05-14T09:00:00.000Z'),
+      ),
+    ).toEqual({
+      href: '/listings/listing-share',
+      listingTitle: 'Vintage camera bundle',
+      listingId: 'listing-share',
+      shareUrl: 'https://barterkin.com/listings/listing-share',
+    })
   })
 })
 

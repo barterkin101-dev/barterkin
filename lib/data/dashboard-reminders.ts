@@ -77,6 +77,13 @@ export interface ViewedListingRevisitReminder {
   profileViewCount: number
 }
 
+export interface ListingShareReminder {
+  href: string
+  listingTitle: string
+  listingId: string
+  shareUrl: string
+}
+
 export function getUnreadMessageReminder(
   conversations: ConversationRow[],
   currentProfileId: string,
@@ -387,5 +394,39 @@ export function getViewedListingRevisitReminder(
     listingId: onlyListing.id,
     daysSincePublished: Math.floor(publishedForMs / (24 * 60 * 60 * 1000)),
     profileViewCount: totalProfileViews,
+  }
+}
+
+export function getListingShareReminder(
+  listings: ListingRow[],
+  saveCounts: Record<string, number>,
+  siteUrl: string,
+  now = new Date(),
+): ListingShareReminder | null {
+  const activeListings = listings.filter((listing) => listing.status === 'active')
+  if (activeListings.length !== 1) {
+    return null
+  }
+
+  const onlyListing = activeListings[0]
+  if ((saveCounts[onlyListing.id] ?? 0) > 0) {
+    return null
+  }
+
+  const publishedAtMs = new Date(onlyListing.created_at).getTime()
+  const nowMs = now.getTime()
+  const publishedForMs = nowMs - publishedAtMs
+
+  if (publishedForMs < SEVEN_DAYS_MS) {
+    return null
+  }
+
+  const shareUrl = `${siteUrl.replace(/\/$/, '')}/listings/${onlyListing.id}`
+
+  return {
+    href: `/listings/${onlyListing.id}`,
+    listingTitle: onlyListing.title,
+    listingId: onlyListing.id,
+    shareUrl,
   }
 }

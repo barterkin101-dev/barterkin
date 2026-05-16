@@ -5,7 +5,7 @@ import { createLogger } from '@/lib/utils/logger'
 import { getMyListings, getListings } from '@/lib/data/listings'
 import { getDiscoverFeed } from '@/lib/data/discover'
 import { getConversations, getStartedConversationCount } from '@/lib/data/messaging'
-import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder, getSecondListingExpansionReminder, getFirstContactLaunchReminder, getFreshListingReminder, getViewedListingRevisitReminder } from '@/lib/data/dashboard-reminders'
+import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder, getSecondListingExpansionReminder, getFirstContactLaunchReminder, getFreshListingReminder, getViewedListingRevisitReminder, getListingShareReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { getOwnedListingSaveCounts } from '@/lib/data/owned-listing-save-counts'
 import { buildReferralLink } from '@/lib/referrals'
@@ -33,6 +33,7 @@ import { FirstContactLaunchReminder } from '@/components/dashboard/FirstContactL
 import { AnnualUpgradeSavingsCard } from '@/components/dashboard/AnnualUpgradeSavingsCard'
 import { FreshListingReminder } from '@/components/dashboard/FreshListingReminder'
 import { ViewedListingRevisitReminder } from '@/components/dashboard/ViewedListingRevisitReminder'
+import { ListingShareReminder } from '@/components/dashboard/ListingShareReminder'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
@@ -237,6 +238,11 @@ export default async function DashboardPage() {
     listings,
     listingSaveCounts,
     profileViewsSnapshot,
+  )
+  const listingShareReminder = getListingShareReminder(
+    listings,
+    listingSaveCounts,
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com',
   )
 
   return (
@@ -471,6 +477,10 @@ export default async function DashboardPage() {
 
       {viewedListingRevisitReminder && (
         <ViewedListingRevisitReminder reminder={viewedListingRevisitReminder} />
+      )}
+
+      {listingShareReminder && (
+        <ListingShareReminder reminder={listingShareReminder} />
       )}
 
       {profile && profileViewsSnapshot && (
