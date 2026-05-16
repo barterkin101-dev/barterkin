@@ -36,7 +36,7 @@ import { FreshListingReminder } from '@/components/dashboard/FreshListingReminde
 import { ViewedListingRevisitReminder } from '@/components/dashboard/ViewedListingRevisitReminder'
 import { ListingShareReminder } from '@/components/dashboard/ListingShareReminder'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
-import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
+import { STRIPE_FOUNDING_MEMBER_LIMIT, shouldShowFoundingMemberNudge } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
 import { updateLoginStreak } from '@/lib/actions/quests'
 import { getProfileViewsSnapshot } from '@/lib/data/profile-views'
