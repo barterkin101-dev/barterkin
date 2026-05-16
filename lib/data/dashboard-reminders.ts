@@ -318,6 +318,7 @@ export function getFirstContactLaunchReminder(
   }
 }
 
+const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
 
 export function getFreshListingReminder(

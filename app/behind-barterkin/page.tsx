@@ -42,7 +42,6 @@ const TEAM = [
     image: '/team/naeem.jpg',
     initial: 'N',
     icon: Heart,
-    placeholder: true,
   },
   {
     name: 'Ashley',
