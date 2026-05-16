@@ -568,10 +568,10 @@
     "title": "Add warm-conversation re-engagement reminder for 3-day idle threads — retention/engagement",
     "description": "Show a dashboard reminder for members with conversations where the last message is from the member themselves and is 3+ days old, nudging them to follow up. Build on existing conversation data already fetched for the dashboard. Acceptance: only self-sent stale threads trigger it, CTA deep-links to the conversation, and tests cover threshold + sender direction.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-15T21:33:29.510Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Added a dashboard reminder for 3-day self-sent stale conversations with CTA deep-links and unit coverage for threshold, sender direction, and tracking. Commit: a0086c9."
   },
   {
     "id": "149",
