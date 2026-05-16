@@ -34,11 +34,11 @@ export function WarmConversationReengagementReminder({
   }
 
   return (
-    <Card className="border-orange-200 bg-orange-50/80">
+    <Card className="border-orange-200 bg-orange-50/80" role="region" aria-label="Warm conversation re-engagement reminder">
       <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-orange-950">
-            <Send className="h-5 w-5 text-orange-700" />
+            <Send className="h-5 w-5 text-orange-700" aria-hidden="true" />
             <h2 className="font-semibold">Your follow-up has been sitting for 3+ days</h2>
           </div>
           <p className="max-w-2xl text-sm text-orange-950/80">

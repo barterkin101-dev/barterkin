@@ -273,8 +273,8 @@ export function getWarmConversationReengagementReminder(
     .slice()
     .sort(
       (left, right) =>
-        new Date(left.last_message.created_at).getTime()
-        - new Date(right.last_message.created_at).getTime(),
+        new Date(right.last_message.created_at).getTime()
+        - new Date(left.last_message.created_at).getTime(),
     )[0]
   const counterpart = topConversation.participants.find(
     (participant) => participant.profile_id !== currentProfileId,

@@ -162,6 +162,30 @@ Google OAuth also fires this event client-side when the user launches Google sig
 
 ---
 
+### `warm_conversation_reengagement_reminder_impression`
+
+**When fired:** When the warm conversation re-engagement reminder card is rendered on the dashboard.
+**Fires from:** `components/dashboard/WarmConversationReengagementReminder.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `stale_conversation_count` | number | How many conversations have a self-sent last message older than 3 days |
+
+---
+
+### `warm_conversation_reengagement_reminder_clicked`
+
+**When fired:** When a member clicks the "Send a follow-up" CTA on the warm conversation re-engagement reminder card.
+**Fires from:** `components/dashboard/WarmConversationReengagementReminder.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `stale_conversation_count` | number | How many conversations have a self-sent last message older than 3 days |
+
+---
+
 ### `referral_converted`
 
 **When fired:** After an invited member publishes their profile and the inviter earns the conversion reward.
