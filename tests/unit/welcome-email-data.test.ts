@@ -3,7 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const mockMaybeSingle = vi.fn()
 const mockEq = vi.fn(() => ({ maybeSingle: mockMaybeSingle }))
 const mockSelect = vi.fn(() => ({ eq: mockEq }))
-const mockFrom = vi.fn(() => ({ select: mockSelect, update: vi.fn(() => ({ eq: mockEq })) }))
+const mockUpdateEq = vi.fn()
+const mockUpdate = vi.fn(() => ({ eq: mockUpdateEq }))
+const mockFrom = vi.fn(() => ({ select: mockSelect, update: mockUpdate }))
 
 const mockAdminClient = {
   from: mockFrom,
@@ -103,7 +105,7 @@ describe('recordWelcomeEmailSent', () => {
   })
 
   it('returns ok after successful update', async () => {
-    mockEq.mockResolvedValueOnce({ error: null })
+    mockUpdateEq.mockResolvedValueOnce({ error: null })
 
     const result = await recordWelcomeEmailSent('profile-1')
 
@@ -111,7 +113,7 @@ describe('recordWelcomeEmailSent', () => {
   })
 
   it('returns error when update fails', async () => {
-    mockEq.mockResolvedValueOnce({ error: { message: 'update failed' } })
+    mockUpdateEq.mockResolvedValueOnce({ error: { message: 'update failed' } })
 
     const result = await recordWelcomeEmailSent('profile-1')
 
