@@ -443,7 +443,7 @@ export default async function DashboardPage() {
           foundingMonthlyCents={BILLING_PLAN_AMOUNTS.foundingMonthlyCents}
           premiumMonthlyCents={BILLING_PLAN_AMOUNTS.premiumMonthlyCents}
           premiumAnnualCents={BILLING_PLAN_AMOUNTS.premiumAnnualCents}
-          urgencyCountdown={foundingSlotsRemaining <= 5 ? 24 : foundingSlotsRemaining <= 10 ? 48 : undefined}
+          
         />
       )}
 

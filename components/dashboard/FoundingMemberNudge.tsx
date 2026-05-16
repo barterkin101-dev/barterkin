@@ -11,7 +11,6 @@ interface FoundingMemberNudgeProps {
   foundingMonthlyCents: number
   premiumMonthlyCents: number
   premiumAnnualCents: number
-  urgencyCountdown?: number
 }
 
 export function FoundingMemberNudge({
@@ -19,7 +18,6 @@ export function FoundingMemberNudge({
   foundingMonthlyCents,
   premiumMonthlyCents,
   premiumAnnualCents,
-  urgencyCountdown,
 }: FoundingMemberNudgeProps) {
   const normalizedSlotsRemaining = Math.min(
     STRIPE_FOUNDING_MEMBER_LIMIT,
@@ -70,9 +68,9 @@ export function FoundingMemberNudge({
                 {isUrgent ? 'Almost gone — ' : ''}
                 {normalizedSlotsRemaining} founding {normalizedSlotsRemaining === 1 ? 'slot' : 'slots'} left
               </h3>
-              {isUrgent && urgencyCountdown != null && urgencyCountdown > 0 && (
+              {isUrgent && (
                 <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">
-                  {urgencyCountdown}h left
+                  {normalizedSlotsRemaining <= 5 ? 'Only ' : 'Just '}{normalizedSlotsRemaining} left
                 </span>
               )}
             </div>
