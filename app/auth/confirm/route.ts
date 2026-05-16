@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createLogger } from '@/lib/utils/logger'
 import { captureEvent } from '@/lib/analytics'
 import { normalizeReferralCode } from '@/lib/referrals'
+import { sendWelcomeEmail } from '@/lib/actions/welcome-email'
 
 /**
  * AUTH-02: Magic-link verification.
@@ -33,6 +34,8 @@ export async function GET(request: NextRequest) {
         })
         // Capture referral if ?ref= present in URL
         await captureReferralFromQuery(request, supabase, user.id)
+        // Send welcome email (non-blocking, idempotent)
+        void sendWelcomeEmail(user.id)
       }
       redirect(next)
     }

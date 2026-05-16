@@ -746,6 +746,7 @@ export type Database = {
           tiktok_handle: string | null
           updated_at: string
           username: string | null
+          welcome_email_sent_at: string | null
         }
         Insert: {
           accepting_contact?: boolean
@@ -781,6 +782,7 @@ export type Database = {
           tiktok_handle?: string | null
           updated_at?: string
           username?: string | null
+          welcome_email_sent_at?: string | null
         }
         Update: {
           accepting_contact?: boolean
@@ -816,6 +818,7 @@ export type Database = {
           tiktok_handle?: string | null
           updated_at?: string
           username?: string | null
+          welcome_email_sent_at?: string | null
         }
         Relationships: [
           {

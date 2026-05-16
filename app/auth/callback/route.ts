@@ -5,6 +5,7 @@ import { createLogger } from '@/lib/utils/logger'
 import { getClientIp, limitOAuthCallback } from '@/lib/rate-limit-public'
 import { captureEvent } from '@/lib/analytics'
 import { REFERRAL_COOKIE_NAME, normalizeReferralCode } from '@/lib/referrals'
+import { sendWelcomeEmail } from '@/lib/actions/welcome-email'
 
 /**
  * AUTH-01: Google OAuth callback.
@@ -41,6 +42,8 @@ export async function GET(request: NextRequest) {
         })
         // Capture referral if cookie present
         await captureReferral(request, supabase, user.id)
+        // Send welcome email (non-blocking, idempotent)
+        void sendWelcomeEmail(user.id)
       }
       return NextResponse.redirect(`${origin}${next}`)
     }

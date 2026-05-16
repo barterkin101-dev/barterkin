@@ -628,8 +628,37 @@
     "title": "[codex-review FIX_FIRST] [task-151 fix-a0086c92] Document warm conversation events, f (b8fd5f51)",
     "description": "codex flagged issues in b8fd5f51. Address concerns, recommit with [task-154 fix-b8fd5f51] prefix.\n\nimg. Commit: 5419e77.\"\n   595\t  },\n   596\t  {\n   597\t    \"id\": \"151\",\n   598\t    \"title\": \"[codex-review FIX_FIRST] [task-148 codex-fallback] add warm conversation reminder (a0086c92)\",\n   599\t    \"description\": \"codex flagged issues in a0086c92. Address concerns, recommit with [task-151 fix-a0086c92] prefix.\\n\\nhReminder.tsx:29:    captureClientEvent('referral_invite_shared', {\\ncomponents/dashboard/FirstTradeProgressReminder.tsx:29:            {` ${reminder.counterpartName}`} and turn that momentum into your first completed trade.\\ncomponents/dashboard/DigestOptOutReminder.tsx:20:    captureClientEvent('digest_opt_out_reminder_impression', {\\ncomponents/dashboard/DigestOptOutReminder.tsx:26:    captureClientEvent('digest_opt_out_reminder_clicked', {\\ntests/unit/dashboard-reminders.test.ts:118:      counterpartName: 'Alex',\\ntests/unit/dashboard-reminders.test.ts:119:      lastMessageAt: '2026-05-11T09:00:00.000Z',\\ntests/unit/dashboard-reminders.test.ts:202:      counterpartName: 'sam',\\ntests/unit/dashboard-reminders.test.ts:267:      counterpartName: 'Sam',\\ntests/unit/dashboard-reminders.test.ts:306:      counterpartName: 'Alex',\\ntests/unit/dashboard-reminders.test.ts:360:      counterpartName: 'Alex',\\ntests/unit/dashboard-reminders.test.ts:397:      counterpartName: 'a member',\\ntests/unit/dashboard-reminders.test.ts:471:      staleConversationCount: 1,\\ntests/unit/dashboard-reminders.test.ts:473:      counterpartName: 'Alex',\\nexec\\n/bin/bash -lc \\\"rg -n \\\\\\\"warm_conversation_reengagement_reminder|unread_message_reminder|first_trade_progress\\\\\\\" -g '\\\"'!node_modules'\\\"' .\\\" in /root/barterkin succeeded in 0ms:\\n./docs/events.md:137:### `unread_message_reminder_impression`\\n./docs/events.md:151:### `unread_message_reminder_clicked`\\n./docs/events.md:413:| `unread_message_reminder_impression` | \\u2705 Implemented | `components/dashboard/UnreadMessageReminder.tsx` | 7 |\\n./docs/events.md:414:| `unread_message_reminder_clicked` | \\u2705 Implemented | `component",
     "priority": "critical",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-16T10-14-30Z",
-    "source": "codex-review"
+    "source": "codex-review",
+    "notes": "Added aria-hidden=\"true\" to Clock3 icon in WarmConversationReengagementReminder, added 7 unit tests for getWarmConversationReengagementReminder covering null cases, single/multiple stale conversations, most-recent sort order, and anonymous counterpart fallback. Commit: fdd737b."
+  },
+  {
+    "id": "155",
+    "title": "Add welcome email on signup completion — retention/engagement",
+    "description": "Send a personalized welcome email immediately after a member completes signup (magic link or OAuth). Use the existing Resend infrastructure and email component pattern. Email should greet the member by name, explain what Barterkin is, highlight the first quest (publish a listing = 5 credits), and deep-link to /onboarding or /listings/new. Add a `welcome_email_sent` tracking column to profiles to prevent duplicates. Acceptance: email sends on first login only, uses member's display name, includes quest CTA, Resend delivery is logged, and unit tests cover the send logic + duplicate suppression.",
+    "priority": "high",
+    "status": "in_progress",
+    "created_at": "2026-05-16T16:03:56.308Z",
+    "source": "cron-self-generated",
+    "notes": "Starting: building welcome email template, profile column, and send logic."
+  },
+  {
+    "id": "156",
+    "title": "Add onboarding abandonment drip email for incomplete members — retention/engagement",
+    "description": "Create a cron-triggered email drip for members who signed up but never completed onboarding (onboarding_completed_at is null after 24 hours). Email should be warm and personal, remind them of the value they're missing, and deep-link back to /onboarding with their return state preserved. Use the existing ReEngagementEmail pattern or build a new OnboardingAbandonmentEmail component. Add a `onboarding_reminder_sent_at` timestamp to profiles to prevent spam. Acceptance: only sends to members with null onboarding_completed_at + created_at > 24h, sends at most once, deep-link works, and unit tests cover eligibility + suppression.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-16T16:03:56.308Z",
+    "source": "cron-self-generated"
+  },
+  {
+    "id": "157",
+    "title": "Add PostHog conversion funnel events for signup-to-first-listing journey — growth/retention",
+    "description": "Instrument the full signup-to-first-listing funnel with PostHog events so we can measure drop-off at each step. Add events for: signup_started, signup_completed, onboarding_started, onboarding_completed, first_listing_viewed, first_listing_created, first_contact_sent, first_trade_completed. Ensure each event includes the member's tier, referral source, and AB test variant. Update docs/events.md with the new schema. Acceptance: all events fire from the correct pages/actions, include consistent properties, docs are updated, and existing tests still pass.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-16T16:03:56.308Z",
+    "source": "cron-self-generated"
   }
 ]
