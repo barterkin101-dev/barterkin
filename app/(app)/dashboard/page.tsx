@@ -139,7 +139,7 @@ export default async function DashboardPage() {
     ? buildReferralLink(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com', profile.referral_code)
     : null
   const foundingSlotsRemaining = Math.max(0, STRIPE_FOUNDING_MEMBER_LIMIT - foundingCountResult)
-  const showFoundingNudge = profile?.tier === 'free' && foundingSlotsRemaining > 0
+  const showFoundingNudge = shouldShowFoundingMemberNudge(profile?.tier, foundingSlotsRemaining)
   const contactLimitStatus = profile && profile.tier === 'free'
     ? await getContactLimitStatus(profile.id, profile.tier)
     : null

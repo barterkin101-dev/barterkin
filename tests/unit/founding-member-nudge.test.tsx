@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'
+import { shouldShowFoundingMemberNudge } from '@/lib/stripe/config'
 
 const FOUNDING_MONTHLY_CENTS = 500
 const PREMIUM_MONTHLY_CENTS = 900
@@ -124,4 +125,32 @@ describe('FoundingMemberNudge', () => {
     expect(screen.getByText(/Save \$2\/mo vs Premium monthly/)).toBeInTheDocument()
     expect(screen.queryByText(/Save .* Premium annual/)).not.toBeInTheDocument()
   })
+
+
+describe('shouldShowFoundingMemberNudge', () => {
+  it('returns true for free members when slots remain', () => {
+    expect(shouldShowFoundingMemberNudge('free', 5)).toBe(true)
+    expect(shouldShowFoundingMemberNudge('free', 1)).toBe(true)
+    expect(shouldShowFoundingMemberNudge('free', 100)).toBe(true)
+  })
+
+  it('returns false when sold out (slotsRemaining === 0)', () => {
+    expect(shouldShowFoundingMemberNudge('free', 0)).toBe(false)
+  })
+
+  it('returns false for paid tiers regardless of slots', () => {
+    expect(shouldShowFoundingMemberNudge('premium', 10)).toBe(false)
+    expect(shouldShowFoundingMemberNudge('founding', 10)).toBe(false)
+  })
+
+  it('returns false for null/undefined tier', () => {
+    expect(shouldShowFoundingMemberNudge(null, 10)).toBe(false)
+    expect(shouldShowFoundingMemberNudge(undefined, 10)).toBe(false)
+  })
+
+  it('returns false for negative slots (defensive)', () => {
+    expect(shouldShowFoundingMemberNudge('free', -3)).toBe(false)
+  })
+})
+
 })

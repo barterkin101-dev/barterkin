@@ -1,7 +1,7 @@
 [
   {
     "id": "91",
-    "title": "Add first-trade completion quest with credit reward — retention/gamification",
+    "title": "Add first-trade completion quest with credit reward \u2014 retention/gamification",
     "description": "Add a new quest `quest_first_trade` worth 15 credits, awarded automatically when a member marks their first trade as mutually completed. Update `lib/quests.ts` with the new quest def, wire it into the trade completion flow in `lib/actions/trade-completions.ts`, and add unit tests covering the award logic (idempotent, only on first trade). Track completion in PostHog. Acceptance: quest appears in dashboard QuestCard, credits awarded on first mutual trade completion, no duplicate awards, tests pass.",
     "priority": "high",
     "status": "completed",
@@ -9,7 +9,7 @@
   },
   {
     "id": "92",
-    "title": "Add directory upgrade banner when free members hit contact limit — monetization",
+    "title": "Add directory upgrade banner when free members hit contact limit \u2014 monetization",
     "description": "Show a sticky banner on /directory and /listings for free members who have exhausted their monthly contact limit. Banner surfaces Premium pricing, savings math, and a direct CTA to /dashboard/billing. Use live contact-limit status from `lib/data/contact-limit.ts`. Track impression and click in PostHog. Acceptance: banner only shows for free members at limit, uses live plan values, links to billing, unit tests cover visibility logic and CTA.",
     "priority": "high",
     "status": "completed",
@@ -17,7 +17,7 @@
   },
   {
     "id": "93",
-    "title": "Add listing feature/boost credit sink for premium members — monetization/engagement",
+    "title": "Add listing feature/boost credit sink for premium members \u2014 monetization/engagement",
     "description": "Let premium members spend 5 credits to 'feature' a listing for 7 days. Featured listings get a visual badge and a small ranking boost in discover/directory. Add `featured_until` timestamp to listings table, a 'Feature this listing' action in the listing edit flow, and deduct credits via the existing credit ledger. Gate to premium members only. Acceptance: feature action visible only to premium, credits deducted, badge renders on featured listings, ranking boost applied, unit tests cover gating and credit deduction.",
     "priority": "medium",
     "status": "completed",
@@ -26,7 +26,7 @@
   {
     "id": "94",
     "title": "[codex-review FIX_FIRST] [task-67 codex-fallback] add unread message reminder banner (03f870fe)",
-    "description": "codex flagged issues in 03f870fe. Address concerns, recommit with [task-94 fix-03f870fe] prefix.\n\n47\t\n    48\t  const needsDailyLoginSync = profile ? !isUtcDateToday(profile.last_login_at) : false\n    49\t  const streakResult = needsDailyLoginSync ? await updateLoginStreak() : null\n    50\t\n    51\t  const [listings, messageCount, , referralRows, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations] = profile ? await Promise.all([\n    52\t    getMyListings(profile.id),\n    53\t    supabase\n    54\t      .from('conversation_participants')\n    55\t      .select('conversation_id', { count: 'exact', head: true })\n    56\t      .eq('profile_id', profile.id)\n    57\t      .then(({ count, error }) => {\n    58\t        if (error) {\n    59\t          const log = createLogger('dashboard')\nexec\n/bin/bash -lc \"nl -ba lib/data/dashboard-reminders.ts | sed -n '1,140p'\" in /root/barterkin succeeded in 0ms:\n     1\timport type { ListingRow } from '@/lib/data/listings.types'\n     2\timport type { ConversationRow } from '@/lib/data/messaging'\n     3\t\n     4\tconst TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000\n     5\tconst FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000\n     6\t\n     7\texport interface UnreadMessageReminder {\n     8\t  unreadConversationCount: number\n     9\t  unreadMessageCount: number\n    10\t  href: string\n    11\t  counterpartName: string\n    12\t  lastMessageAt: string\n    13\t}\n    14\t\n    15\texport interface StaleListingReminder {\n    16\t  staleListingCount: number\n    17\t  href: string\n    18\t  listingTitle: string\n    19\t  listingId: string\n    20\t  staleSince: string\ncodex\nThere’s a potentially stronger correctness angle than the banner itself: the conversation data helper depends on reading the other participant row out of `conversation_participants`. I’m verifying whether later migrations relaxed that RLS policy, because if not the reminder can never know the counterpart name and may already be relying on inaccessible rows.\nexec\n/bin/bash -lc 'rg -n \"conversation_participants.*policy|create policy .*conversation_participants|alter polic",
+    "description": "codex flagged issues in 03f870fe. Address concerns, recommit with [task-94 fix-03f870fe] prefix.\n\n47\t\n    48\t  const needsDailyLoginSync = profile ? !isUtcDateToday(profile.last_login_at) : false\n    49\t  const streakResult = needsDailyLoginSync ? await updateLoginStreak() : null\n    50\t\n    51\t  const [listings, messageCount, , referralRows, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations] = profile ? await Promise.all([\n    52\t    getMyListings(profile.id),\n    53\t    supabase\n    54\t      .from('conversation_participants')\n    55\t      .select('conversation_id', { count: 'exact', head: true })\n    56\t      .eq('profile_id', profile.id)\n    57\t      .then(({ count, error }) => {\n    58\t        if (error) {\n    59\t          const log = createLogger('dashboard')\nexec\n/bin/bash -lc \"nl -ba lib/data/dashboard-reminders.ts | sed -n '1,140p'\" in /root/barterkin succeeded in 0ms:\n     1\timport type { ListingRow } from '@/lib/data/listings.types'\n     2\timport type { ConversationRow } from '@/lib/data/messaging'\n     3\t\n     4\tconst TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000\n     5\tconst FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000\n     6\t\n     7\texport interface UnreadMessageReminder {\n     8\t  unreadConversationCount: number\n     9\t  unreadMessageCount: number\n    10\t  href: string\n    11\t  counterpartName: string\n    12\t  lastMessageAt: string\n    13\t}\n    14\t\n    15\texport interface StaleListingReminder {\n    16\t  staleListingCount: number\n    17\t  href: string\n    18\t  listingTitle: string\n    19\t  listingId: string\n    20\t  staleSince: string\ncodex\nThere\u2019s a potentially stronger correctness angle than the banner itself: the conversation data helper depends on reading the other participant row out of `conversation_participants`. I\u2019m verifying whether later migrations relaxed that RLS policy, because if not the reminder can never know the counterpart name and may already be relying on inaccessible rows.\nexec\n/bin/bash -lc 'rg -n \"conversation_participants.*policy|create policy .*conversation_participants|alter polic",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-14T09-28-01Z",
@@ -36,7 +36,7 @@
   {
     "id": "95",
     "title": "[codex-review FIX_FIRST] [task-66 codex-fallback] add referral share tracking (f6a216d4)",
-    "description": "codex flagged issues in f6a216d4. Address concerns, recommit with [task-95 fix-f6a216d4] prefix.\n\nre stayed stable in this commit. I’m checking the dashboard callsite and test/runtime constraints now, especially browser API assumptions and whether the tests would miss a real production failure.\nexec\n/bin/bash -lc \"sed -n '360,430p' app/'(app)'/dashboard/page.tsx\" in /root/barterkin succeeded in 0ms:\n\n      {staleListingReminder && (\n        <StaleListingReminder reminder={staleListingReminder} />\n      )}\n\n      {digestOptOutReminder && (\n        <DigestOptOutReminder href={digestOptOutReminder.href} />\n      )}\n\n      {profile && profileViewsSnapshot && (\n        <ProfileViewsSnapshotCard\n          isPublished={profile.is_published}\n          snapshot={profileViewsSnapshot}\n        />\n      )}\n\n      {/* Profile completion nudge */}\n      {profile && (\n        <Card className={profile.is_published ? 'border-border' : 'border-amber-200 bg-amber-50'}>\n          <CardContent className=\"p-6\">\nexec\n/bin/bash -lc \"git show f6a216d4eb9940756fbaaf5a8fd6c62ab6c851e0:tests/unit/referral-invite-card.test.tsx | sed -n '1,220p'\" in /root/barterkin succeeded in 0ms:\nimport { render, screen, waitFor } from '@testing-library/react'\nimport userEvent from '@testing-library/user-event'\nimport { beforeEach, describe, expect, it, vi } from 'vitest'\nimport { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'\n\nconst mockCapture = vi.fn()\nconst mockWriteText = vi.fn()\nconst mockShare = vi.fn()\n\nvi.mock('@/lib/analytics-client', () => ({\n  captureClientEvent: (...args: unknown[]) => mockCapture(...args),\n}))\n\ndescribe('ReferralInviteCard', () => {\n  beforeEach(() => {\n    mockCapture.mockClear()\n    mockWriteText.mockReset()\n    mockShare.mockReset()\n\n    Object.defineProperty(window.navigator, 'clipboard', {\nexec\n/bin/bash -lc 'cat package.json' in /root/barterkin succeeded in 0ms:\n{\n  \"name\": \"barterkin\",\n  \"version\": \"0.1.0.0\",\n  \"private\": true,\n  \"engines\": {\n    \"node\": \">=20.0.0\",\n    \"pnpm\": \">=10.0.0\"\n  },\n  \"scripts\": {\n    \"dev\": \"next dev\",\n    \"build\": \"",
+    "description": "codex flagged issues in f6a216d4. Address concerns, recommit with [task-95 fix-f6a216d4] prefix.\n\nre stayed stable in this commit. I\u2019m checking the dashboard callsite and test/runtime constraints now, especially browser API assumptions and whether the tests would miss a real production failure.\nexec\n/bin/bash -lc \"sed -n '360,430p' app/'(app)'/dashboard/page.tsx\" in /root/barterkin succeeded in 0ms:\n\n      {staleListingReminder && (\n        <StaleListingReminder reminder={staleListingReminder} />\n      )}\n\n      {digestOptOutReminder && (\n        <DigestOptOutReminder href={digestOptOutReminder.href} />\n      )}\n\n      {profile && profileViewsSnapshot && (\n        <ProfileViewsSnapshotCard\n          isPublished={profile.is_published}\n          snapshot={profileViewsSnapshot}\n        />\n      )}\n\n      {/* Profile completion nudge */}\n      {profile && (\n        <Card className={profile.is_published ? 'border-border' : 'border-amber-200 bg-amber-50'}>\n          <CardContent className=\"p-6\">\nexec\n/bin/bash -lc \"git show f6a216d4eb9940756fbaaf5a8fd6c62ab6c851e0:tests/unit/referral-invite-card.test.tsx | sed -n '1,220p'\" in /root/barterkin succeeded in 0ms:\nimport { render, screen, waitFor } from '@testing-library/react'\nimport userEvent from '@testing-library/user-event'\nimport { beforeEach, describe, expect, it, vi } from 'vitest'\nimport { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'\n\nconst mockCapture = vi.fn()\nconst mockWriteText = vi.fn()\nconst mockShare = vi.fn()\n\nvi.mock('@/lib/analytics-client', () => ({\n  captureClientEvent: (...args: unknown[]) => mockCapture(...args),\n}))\n\ndescribe('ReferralInviteCard', () => {\n  beforeEach(() => {\n    mockCapture.mockClear()\n    mockWriteText.mockReset()\n    mockShare.mockReset()\n\n    Object.defineProperty(window.navigator, 'clipboard', {\nexec\n/bin/bash -lc 'cat package.json' in /root/barterkin succeeded in 0ms:\n{\n  \"name\": \"barterkin\",\n  \"version\": \"0.1.0.0\",\n  \"private\": true,\n  \"engines\": {\n    \"node\": \">=20.0.0\",\n    \"pnpm\": \">=10.0.0\"\n  },\n  \"scripts\": {\n    \"dev\": \"next dev\",\n    \"build\": \"",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-14T09-28-01Z",
@@ -56,7 +56,7 @@
   {
     "id": "97",
     "title": "[codex-review FIX_FIRST] [task-64 codex-fallback] ship quest streaks and secure rewar (498a8672)",
-    "description": "codex flagged issues in 498a8672. Address concerns, recommit with [task-97 fix-498a8672] prefix.\n\nsql:150:grant execute on function public.find_conversation_between(uuid, uuid) to service_role;\nlib/actions/profile.types.ts:32:export type SkillOfferedRow = Database['public']['Tables']['skills_offered']['Row']\nlib/actions/profile.types.ts:36:  skills_offered: SkillOfferedRow[]\nsupabase/migrations/20260514090000_referral_conversion_rewards.sql:4:create or replace function public.award_referral_credits(p_invitee_id uuid)\nsupabase/migrations/20260514090000_referral_conversion_rewards.sql:38:  insert into public.credit_ledger (profile_id, amount, reason, referral_id)\nsupabase/migrations/20260514090000_referral_conversion_rewards.sql:45:comment on function public.award_referral_credits(uuid) is\nsupabase/migrations/20260420224326_directory_search.sql:3:-- Depends on: 003_profile_tables.sql (profiles, skills_offered, skills_wanted, public.current_user_is_verified())\ncodex\nI’ve isolated a likely SQL security issue and I’m confirming whether it’s already mitigated elsewhere or if this migration leaves the RPCs callable beyond authenticated users. I’m also checking whether the daily streak logic matches “UTC day” as claimed, or just elapsed hours.\nexec\n/bin/bash -lc \"sed -n '1,180p' supabase/migrations/20260513010000_referral_credits.sql\" in /root/barterkin succeeded in 0ms:\n-- Referral credit tracking for the invite-a-friend viral loop.\n-- Awards credits to both inviter and invitee when onboarding completes.\n\n-- Add credits column to profiles for quick balance lookups.\nalter table public.profiles\n  add column if not exists credits integer not null default 0;\n\n-- Track who referred whom and whether credit has been awarded.\ncreate table if not exists public.referrals (\n  id uuid primary key default gen_random_uuid(),\n  inviter_id uuid not null references public.profiles(id) on delete cascade,\n  invitee_id uuid not null references public.profiles(id) on delete cascade,\n  invitee_referral_code text not null,\n  credited_at timestamptz,\n  created_at timestamptz not null default ",
+    "description": "codex flagged issues in 498a8672. Address concerns, recommit with [task-97 fix-498a8672] prefix.\n\nsql:150:grant execute on function public.find_conversation_between(uuid, uuid) to service_role;\nlib/actions/profile.types.ts:32:export type SkillOfferedRow = Database['public']['Tables']['skills_offered']['Row']\nlib/actions/profile.types.ts:36:  skills_offered: SkillOfferedRow[]\nsupabase/migrations/20260514090000_referral_conversion_rewards.sql:4:create or replace function public.award_referral_credits(p_invitee_id uuid)\nsupabase/migrations/20260514090000_referral_conversion_rewards.sql:38:  insert into public.credit_ledger (profile_id, amount, reason, referral_id)\nsupabase/migrations/20260514090000_referral_conversion_rewards.sql:45:comment on function public.award_referral_credits(uuid) is\nsupabase/migrations/20260420224326_directory_search.sql:3:-- Depends on: 003_profile_tables.sql (profiles, skills_offered, skills_wanted, public.current_user_is_verified())\ncodex\nI\u2019ve isolated a likely SQL security issue and I\u2019m confirming whether it\u2019s already mitigated elsewhere or if this migration leaves the RPCs callable beyond authenticated users. I\u2019m also checking whether the daily streak logic matches \u201cUTC day\u201d as claimed, or just elapsed hours.\nexec\n/bin/bash -lc \"sed -n '1,180p' supabase/migrations/20260513010000_referral_credits.sql\" in /root/barterkin succeeded in 0ms:\n-- Referral credit tracking for the invite-a-friend viral loop.\n-- Awards credits to both inviter and invitee when onboarding completes.\n\n-- Add credits column to profiles for quick balance lookups.\nalter table public.profiles\n  add column if not exists credits integer not null default 0;\n\n-- Track who referred whom and whether credit has been awarded.\ncreate table if not exists public.referrals (\n  id uuid primary key default gen_random_uuid(),\n  inviter_id uuid not null references public.profiles(id) on delete cascade,\n  invitee_id uuid not null references public.profiles(id) on delete cascade,\n  invitee_referral_code text not null,\n  credited_at timestamptz,\n  created_at timestamptz not null default ",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-14T09-28-01Z",
@@ -66,7 +66,7 @@
   {
     "id": "98",
     "title": "[codex-review FIX_FIRST] [task-64 codex-fallback] wire quest awards into actions (cd839e98)",
-    "description": "codex flagged issues in cd839e98. Address concerns, recommit with [task-98 fix-cd839e98] prefix.\n\nsucceeded in 0ms:\n   170\t\n   171\t  if (values.images.length > 0) {\n   172\t    const imageRows = values.images.map((url, i) => ({\n   173\t      listing_id: listing.id,\n   174\t      url,\n   175\t      sort_order: i,\n   176\t    }))\n   177\t    const { error: insertImagesErr } = await supabase\n   178\t      .from('listing_images')\n   179\t      .insert(imageRows)\n   180\t    if (insertImagesErr) {\n   181\t      const log = createLogger('listings')\n   182\t      log.warn('image insert failed', { error: insertImagesErr, context: { code: insertImagesErr.code } })\n   183\t    }\n   184\t  }\n   185\t\n   186\t  revalidatePath('/dashboard/listings')\n   187\t  revalidatePath('/listings')\n   188\t  revalidatePath(`/listings/${listing.id}`)\n   189\t\nexec\n/bin/bash -lc \"nl -ba lib/actions/profile.ts | sed -n '228,350p'\" in /root/barterkin succeeded in 0ms:\n   228\texport async function setPublished(\n   229\t  _prev: SetPublishedResult | null,\n   230\t  formData: FormData,\n   231\t): Promise<SetPublishedResult> {\n   232\t  const supabase = await createClient()\n   233\t  const {\n   234\t    data: { user },\n   235\t    error: authError,\n   236\t  } = await supabase.auth.getUser()\n   237\t  if (authError || !user) return { ok: false, error: 'Not authenticated.' }\n   238\t\n   239\t  const parsed = SetPublishedSchema.safeParse({\n   240\t    profileId: formData.get('profileId'),\n   241\t    publish: formData.get('publish'),\n   242\t  })\n   243\t  if (!parsed.success) return { ok: false, error: 'Invalid request.' }\n   244\t  const { profileId, publish } = parsed.data\n   245\t  const shouldPublish = publish === 'true'\n   246\t\n   247\t  // If unpublishing, RLS allows it directly.\ncodex\nI found one real semantic/data-integrity problem in the new hook: the listing quest is triggered on “any new listing” and the quest service only checks “has at least one listing,” so it can award a “first listing” bonus to members creating their second or tenth listing after rollout. I’m pulling exact lines for that and checking whether there’",
+    "description": "codex flagged issues in cd839e98. Address concerns, recommit with [task-98 fix-cd839e98] prefix.\n\nsucceeded in 0ms:\n   170\t\n   171\t  if (values.images.length > 0) {\n   172\t    const imageRows = values.images.map((url, i) => ({\n   173\t      listing_id: listing.id,\n   174\t      url,\n   175\t      sort_order: i,\n   176\t    }))\n   177\t    const { error: insertImagesErr } = await supabase\n   178\t      .from('listing_images')\n   179\t      .insert(imageRows)\n   180\t    if (insertImagesErr) {\n   181\t      const log = createLogger('listings')\n   182\t      log.warn('image insert failed', { error: insertImagesErr, context: { code: insertImagesErr.code } })\n   183\t    }\n   184\t  }\n   185\t\n   186\t  revalidatePath('/dashboard/listings')\n   187\t  revalidatePath('/listings')\n   188\t  revalidatePath(`/listings/${listing.id}`)\n   189\t\nexec\n/bin/bash -lc \"nl -ba lib/actions/profile.ts | sed -n '228,350p'\" in /root/barterkin succeeded in 0ms:\n   228\texport async function setPublished(\n   229\t  _prev: SetPublishedResult | null,\n   230\t  formData: FormData,\n   231\t): Promise<SetPublishedResult> {\n   232\t  const supabase = await createClient()\n   233\t  const {\n   234\t    data: { user },\n   235\t    error: authError,\n   236\t  } = await supabase.auth.getUser()\n   237\t  if (authError || !user) return { ok: false, error: 'Not authenticated.' }\n   238\t\n   239\t  const parsed = SetPublishedSchema.safeParse({\n   240\t    profileId: formData.get('profileId'),\n   241\t    publish: formData.get('publish'),\n   242\t  })\n   243\t  if (!parsed.success) return { ok: false, error: 'Invalid request.' }\n   244\t  const { profileId, publish } = parsed.data\n   245\t  const shouldPublish = publish === 'true'\n   246\t\n   247\t  // If unpublishing, RLS allows it directly.\ncodex\nI found one real semantic/data-integrity problem in the new hook: the listing quest is triggered on \u201cany new listing\u201d and the quest service only checks \u201chas at least one listing,\u201d so it can award a \u201cfirst listing\u201d bonus to members creating their second or tenth listing after rollout. I\u2019m pulling exact lines for that and checking whether there\u2019",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-14T09-28-01Z",
@@ -75,7 +75,7 @@
   },
   {
     "id": "99",
-    "title": "Add referral momentum nudge to dashboard invite card — growth/acquisition",
+    "title": "Add referral momentum nudge to dashboard invite card \u2014 growth/acquisition",
     "description": "Upgrade the dashboard referral card to show a clear 'next reward' nudge based on pending and converted referrals. Surface immediate payout math (for example, how many credits pending invites could unlock), prioritize the highest-converting share actions, and add tests for the new states. Acceptance: members with pending referrals see a concrete conversion nudge, members with no pending referrals see a next-invite prompt, analytics/tracking remain intact, tests pass.",
     "priority": "high",
     "status": "completed",
@@ -85,7 +85,7 @@
   },
   {
     "id": "100",
-    "title": "Add weekly digest win-back CTA for opted-out members — retention/engagement",
+    "title": "Add weekly digest win-back CTA for opted-out members \u2014 retention/engagement",
     "description": "Turn the existing digest opt-out reminder into a stronger re-subscribe card with a preview of what members miss, a one-click enable action, and PostHog tracking. Acceptance: only opted-out members see it, action updates preferences, and tests cover visibility plus success state.",
     "priority": "medium",
     "status": "completed",
@@ -95,7 +95,7 @@
   },
   {
     "id": "101",
-    "title": "Add free-plan billing nudge when members approach listing cap — revenue/monetization",
+    "title": "Add free-plan billing nudge when members approach listing cap \u2014 revenue/monetization",
     "description": "Show a targeted premium upgrade nudge on the dashboard listings area when free members are one listing away from their cap. Use live plan values, explain the unlocked capacity, and link directly to billing. Acceptance: only free members near the cap see it, pricing math is live, click tracking is added, and tests cover visibility rules.",
     "priority": "high",
     "status": "completed",
@@ -105,7 +105,7 @@
   },
   {
     "id": "102",
-    "title": "Add referral follow-up CTA state to dashboard invite card — growth/acquisition",
+    "title": "Add referral follow-up CTA state to dashboard invite card \u2014 growth/acquisition",
     "description": "When members already have pending referrals, switch the dashboard invite card from cold-invite copy to follow-up copy and relabel the top private share CTAs around follow-up behavior. Preserve existing analytics and add unit tests for the pending-follow-up state. Acceptance: pending referrals show follow-up wording, WhatsApp/SMS CTAs are relabeled for follow-up, copy-message uses the follow-up text, tests pass.",
     "priority": "high",
     "status": "completed",
@@ -115,7 +115,7 @@
   },
   {
     "id": "103",
-    "title": "Add first-trade progress reminder to active conversations — retention/engagement",
+    "title": "Add first-trade progress reminder to active conversations \u2014 retention/engagement",
     "description": "Surface a lightweight dashboard or inbox reminder for members who have active conversations but have not yet completed the `quest_first_trade` quest. Point them back into their warmest conversation and explain the 15-credit reward. Acceptance: only eligible members see it, links deep-link into messages, quest reward copy is accurate, and tests cover visibility logic.",
     "priority": "high",
     "status": "completed",
@@ -125,7 +125,7 @@
   },
   {
     "id": "104",
-    "title": "Add low-contact-count upgrade nudge after free-member outreach — revenue/monetization",
+    "title": "Add low-contact-count upgrade nudge after free-member outreach \u2014 revenue/monetization",
     "description": "After a free member sends a contact request and has 1 or fewer monthly contacts left, show a post-send upgrade nudge with the exact remaining count and a direct CTA to billing. Acceptance: only free members near exhaustion see it, remaining-contact math uses live data, analytics are tracked, and tests cover the visibility thresholds.",
     "priority": "high",
     "status": "completed",
@@ -135,7 +135,7 @@
   },
   {
     "id": "105",
-    "title": "Add next referral milestone progress to dashboard invite card — growth/acquisition",
+    "title": "Add next referral milestone progress to dashboard invite card \u2014 growth/acquisition",
     "description": "Upgrade the dashboard referral card to show the next referral milestone based on converted invites, including how many more publishes are needed and the total credits unlocked at that milestone. Keep the existing share analytics intact and add unit tests for zero, mid, and completed milestone states. Acceptance: members see a concrete next milestone CTA, copy changes with converted count, milestone-complete state is handled cleanly, and tests pass.",
     "priority": "high",
     "status": "completed",
@@ -145,7 +145,7 @@
   },
   {
     "id": "106",
-    "title": "Add onboarding return reminder card for skipped members — retention/engagement",
+    "title": "Add onboarding return reminder card for skipped members \u2014 retention/engagement",
     "description": "Show a dashboard reminder card to signed-in members whose `onboarding_completed_at` is still null and who skipped setup, with a one-click CTA back to `/onboarding`. Acceptance: only incomplete members see it, copy explains the remaining setup value, CTA deep-links back into onboarding, and tests cover visibility.",
     "priority": "high",
     "status": "completed",
@@ -155,7 +155,7 @@
   },
   {
     "id": "107",
-    "title": "Add annual savings breakout to dashboard billing CTAs — revenue/monetization",
+    "title": "Add annual savings breakout to dashboard billing CTAs \u2014 revenue/monetization",
     "description": "Strengthen dashboard upgrade surfaces by adding a compact annual-vs-monthly savings breakout anywhere we already link to `/dashboard/billing`, starting with the listing-cap and contact-limit nudges. Acceptance: copy uses live Stripe-config-derived values, free members see the savings context before clicking through, and unit tests cover the rendered math.",
     "priority": "medium",
     "status": "completed",
@@ -165,7 +165,7 @@
   },
   {
     "id": "108",
-    "title": "Add visual referral milestone progress bar to dashboard invite card — growth/acquisition",
+    "title": "Add visual referral milestone progress bar to dashboard invite card \u2014 growth/acquisition",
     "description": "Turn the referral milestone copy on the dashboard into a more motivating progress module with a visual progress bar toward the next tracked milestone and a compact published-referral count label. Keep existing share analytics intact and add unit tests for zero-progress, mid-progress, and fully-cleared milestone states. Acceptance: members see a progress bar whenever a next milestone exists, the progress math matches converted referrals, milestone-cleared state renders cleanly, and tests pass.",
     "priority": "high",
     "status": "completed",
@@ -175,7 +175,7 @@
   },
   {
     "id": "109",
-    "title": "Add zero-listing dashboard launch CTA for onboarded members — retention/engagement",
+    "title": "Add zero-listing dashboard launch CTA for onboarded members \u2014 retention/engagement",
     "description": "Show a dashboard reminder card for members who completed onboarding but still have zero active listings, pushing them into `/listings/new` with concrete copy about publishing their first offer and earning quest credits. Acceptance: only eligible members see it, CTA deep-links to listing creation, quest-credit copy is accurate, and tests cover visibility rules.",
     "priority": "high",
     "status": "completed",
@@ -185,7 +185,7 @@
   },
   {
     "id": "110",
-    "title": "Add annual-upgrade savings card for monthly premium members on dashboard billing surfaces — revenue/monetization",
+    "title": "Add annual-upgrade savings card for monthly premium members on dashboard billing surfaces \u2014 revenue/monetization",
     "description": "Show monthly Premium members a compact dashboard card that quantifies annual-plan savings and links directly to `/dashboard/billing` to switch plans. Acceptance: only monthly premium members see it, savings math uses live Stripe config values, click tracking is added, and tests cover visibility plus copy.",
     "priority": "high",
     "status": "completed",
@@ -195,7 +195,7 @@
   },
   {
     "id": "111",
-    "title": "Add next-step action panel to dashboard referral card — growth/acquisition",
+    "title": "Add next-step action panel to dashboard referral card \u2014 growth/acquisition",
     "description": "Improve the dashboard referral card with a dedicated 'best next move' panel that changes based on referral state: pending invites should push follow-up behavior, converted-only state should push one fresh invite, and zero-referral state should coach the first warm invite. Keep existing share analytics intact and add unit tests for each state. Acceptance: the panel renders state-specific copy, existing share/copy flows still work, and tests pass.",
     "priority": "high",
     "status": "completed",
@@ -205,7 +205,7 @@
   },
   {
     "id": "112",
-    "title": "Add second-listing expansion reminder for single-listing members — retention/engagement",
+    "title": "Add second-listing expansion reminder for single-listing members \u2014 retention/engagement",
     "description": "Show a dashboard reminder for members who have exactly one active listing and completed onboarding, nudging them to publish a second listing so they appear in more search contexts. Acceptance: only eligible members see it, CTA deep-links to `/listings/new`, copy references broader trade coverage, and tests cover visibility rules.",
     "priority": "high",
     "status": "completed",
@@ -215,7 +215,7 @@
   },
   {
     "id": "113",
-    "title": "Add founding-plan annual savings comparison to free-member nudge — revenue/monetization",
+    "title": "Add founding-plan annual savings comparison to free-member nudge \u2014 revenue/monetization",
     "description": "Strengthen the free-member founding upsell by quantifying the monthly Premium comparison and annualized savings directly inside `FoundingMemberNudge`. Acceptance: copy uses live plan values, founding urgency remains intact, and unit tests cover the savings math and urgent/non-urgent states.",
     "priority": "medium",
     "status": "completed",
@@ -225,7 +225,7 @@
   },
   {
     "id": "114",
-    "title": "Add referral invite conversion snapshot to dashboard invite card — growth/acquisition",
+    "title": "Add referral invite conversion snapshot to dashboard invite card \u2014 growth/acquisition",
     "description": "Strengthen the dashboard referral card with a compact conversion snapshot that shows how many tracked invites have already published, a visual progress bar, and state-specific follow-up copy based on the current conversion rate. Keep existing share analytics intact and add unit tests for zero-tracked, mixed, and fully-converted invite states. Acceptance: members see a conversion module whenever they have tracked invites, zero-invite state stays clean, copy changes with conversion strength, and tests pass.",
     "priority": "high",
     "status": "completed",
@@ -235,7 +235,7 @@
   },
   {
     "id": "115",
-    "title": "Add first-contact launch reminder for listed members with zero conversations — retention/engagement",
+    "title": "Add first-contact launch reminder for listed members with zero conversations \u2014 retention/engagement",
     "description": "Show a dashboard reminder for members who have at least one active listing, completed onboarding, and still have zero conversation starts, pushing them to /directory with copy about landing the first trade conversation. Acceptance: only eligible members see it, CTA deep-links to /directory, copy is specific to starting the first conversation, and tests cover visibility rules.",
     "priority": "high",
     "status": "completed",
@@ -245,7 +245,7 @@
   },
   {
     "id": "116",
-    "title": "Add annual savings breakout to monthly Premium billing portal CTA — revenue/monetization",
+    "title": "Add annual savings breakout to monthly Premium billing portal CTA \u2014 revenue/monetization",
     "description": "Strengthen monetization by adding a compact annual-upgrade savings explainer next to the billing portal/manage billing surface for active monthly Premium members, reusing live Stripe config math. Acceptance: only monthly Premium members see it, copy quantifies annual equivalent monthly cost and yearly savings, click tracking fires on the upgrade CTA, and tests cover visibility plus rendered pricing math.",
     "priority": "high",
     "status": "completed",
@@ -256,7 +256,7 @@
   {
     "id": "117",
     "title": "[codex-review FIX_FIRST] [task-115 codex-fallback] add first-contact dashboard remind (4f6df465)",
-    "description": "codex flagged issues in 4f6df465. Address concerns, recommit with [task-117 fix-4f6df465] prefix.\n\nlex-row\">\n   193\t                  <MessageButton\n   194\t                    recipientProfileId={listing.profiles.id}\n   195\t                    recipientDisplayName={listing.profiles.display_name ?? listing.profiles.username ?? 'Seller'}\n   196\t                    recipientAcceptingContact={listing.profiles.accepting_contact ?? true}\n   197\t                    listingId={listing.id}\n   198\t                  />\n   199\t                  <Link\nexec\n/bin/bash -lc \"nl -ba 'components/profile/ProfileCard.tsx' | sed -n '80,105p'\" in /root/barterkin succeeded in 0ms:\n    80\t            </p>\n    81\t          )}\n    82\t          <RatingSummary avg={ratingAvg ?? null} count={ratingCount ?? 0} />\n    83\t        </div>\n    84\t      </CardHeader>\n    85\t\n    86\t      <CardContent className=\"space-y-8 p-6 pt-0 lg:p-8 lg:pt-0\">\n    87\t        {/* Contact CTA slot — shown to authenticated non-owners only */}\n    88\t        {showViewerActions && acceptingContact != null && (\n    89\t          <div className=\"flex flex-col gap-2 sm:flex-row\">\n    90\t            <MessageButton\n    91\t              recipientProfileId={profileId!}\n    92\t              recipientDisplayName={profile.display_name ?? 'Member'}\n    93\t              recipientAcceptingContact={acceptingContact}\n    94\t            />\n    95\t          </div>\n    96\t        )}\n    97\t\n    98\t        {profile.bio && (\n    99\t          <p className=\"text-base leading-[1.5] text-forest-deep\">{profile.bio}</p>\nexec\n/bin/bash -lc \"rg -n \\\"messageCount\\\" 'app/(app)/dashboard/page.tsx'\" in /root/barterkin succeeded in 0ms:\n65:  const [listings, messageCount, , referralRows, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations] = profile ? await Promise.all([\n273:            <div className=\"text-2xl font-bold\">{messageCount}</div>\nexec\n/bin/bash -lc \"nl -ba 'components/dashboard/FirstContactLaunchReminder.tsx'\" in /root/barterkin succeeded in 0ms:\n     1\timport Link from 'next/link'\n     2\timpo",
+    "description": "codex flagged issues in 4f6df465. Address concerns, recommit with [task-117 fix-4f6df465] prefix.\n\nlex-row\">\n   193\t                  <MessageButton\n   194\t                    recipientProfileId={listing.profiles.id}\n   195\t                    recipientDisplayName={listing.profiles.display_name ?? listing.profiles.username ?? 'Seller'}\n   196\t                    recipientAcceptingContact={listing.profiles.accepting_contact ?? true}\n   197\t                    listingId={listing.id}\n   198\t                  />\n   199\t                  <Link\nexec\n/bin/bash -lc \"nl -ba 'components/profile/ProfileCard.tsx' | sed -n '80,105p'\" in /root/barterkin succeeded in 0ms:\n    80\t            </p>\n    81\t          )}\n    82\t          <RatingSummary avg={ratingAvg ?? null} count={ratingCount ?? 0} />\n    83\t        </div>\n    84\t      </CardHeader>\n    85\t\n    86\t      <CardContent className=\"space-y-8 p-6 pt-0 lg:p-8 lg:pt-0\">\n    87\t        {/* Contact CTA slot \u2014 shown to authenticated non-owners only */}\n    88\t        {showViewerActions && acceptingContact != null && (\n    89\t          <div className=\"flex flex-col gap-2 sm:flex-row\">\n    90\t            <MessageButton\n    91\t              recipientProfileId={profileId!}\n    92\t              recipientDisplayName={profile.display_name ?? 'Member'}\n    93\t              recipientAcceptingContact={acceptingContact}\n    94\t            />\n    95\t          </div>\n    96\t        )}\n    97\t\n    98\t        {profile.bio && (\n    99\t          <p className=\"text-base leading-[1.5] text-forest-deep\">{profile.bio}</p>\nexec\n/bin/bash -lc \"rg -n \\\"messageCount\\\" 'app/(app)/dashboard/page.tsx'\" in /root/barterkin succeeded in 0ms:\n65:  const [listings, messageCount, , referralRows, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations] = profile ? await Promise.all([\n273:            <div className=\"text-2xl font-bold\">{messageCount}</div>\nexec\n/bin/bash -lc \"nl -ba 'components/dashboard/FirstContactLaunchReminder.tsx'\" in /root/barterkin succeeded in 0ms:\n     1\timport Link from 'next/link'\n     2\timpo",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-14T21-04-44Z",
@@ -296,7 +296,7 @@
   {
     "id": "121",
     "title": "[codex-review FIX_FIRST] [task-108 codex-fallback] add referral milestone progress ba (74a91dda)",
-    "description": "codex flagged issues in 74a91dda. Address concerns, recommit with [task-121 fix-74a91dda] prefix.\n\nprogress.tsx:26:export { Progress }\ncodex\nI have the component and tests; next I’m checking the `Progress` implementation and the rendered milestone section to verify that the new percentage math is actually exposed correctly to users and assistive tech.\nexec\n/bin/bash -lc \"sed -n '1,200p' components/ui/progress.tsx\" in /root/barterkin succeeded in 0ms:\nimport * as React from \"react\"\nimport * as ProgressPrimitive from \"@radix-ui/react-progress\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Progress = React.forwardRef<\n  React.ElementRef<typeof ProgressPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>\n>(({ className, value, ...props }, ref) => (\n  <ProgressPrimitive.Root\n    ref={ref}\n    className={cn(\n      \"relative h-4 w-full overflow-hidden rounded-full bg-secondary\",\n      className\n    )}\n    {...props}\n  >\n    <ProgressPrimitive.Indicator\n      className=\"h-full w-full flex-1 bg-primary transition-all\"\n      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}\nexec\n/bin/bash -lc \"sed -n '260,520p' tests/unit/referral-invite-card.test.tsx\" in /root/barterkin succeeded in 0ms:\n    expect(mockOpen).toHaveBeenNthCalledWith(\n      3,\n      buildTelegramReferralShareUrl('https://barterkin.com/r/ABCDEFGH'),\n      '_blank',\n      'noopener,noreferrer',\n    )\n    expect(mockOpen).toHaveBeenNthCalledWith(\n      4,\n      buildLinkedInReferralShareUrl('https://barterkin.com/r/ABCDEFGH'),\n      '_blank',\n      'noopener,noreferrer',\n    )\n    expect(mockCapture).toHaveBeenNthCalledWith(1, 'referral_invite_shared', {\n      method: 'facebook',\n      referral_code: 'ABCDEFGH',\n      referral_count: 8,\n      credits: 6,\n    })\n    expect(mockCapture).toHaveBeenNthCalledWith(2, 'referral_invite_shared', {\n      method: 'whatsapp',\nexec\n/bin/bash -lc \"sed -n '260,430p' components/dashboard/ReferralInviteCard.tsx\" in /root/barterkin succeeded in 0ms:\n  referralCode: string\n  referralLink: string\n  credits: number\n  convertedReferralCount: number",
+    "description": "codex flagged issues in 74a91dda. Address concerns, recommit with [task-121 fix-74a91dda] prefix.\n\nprogress.tsx:26:export { Progress }\ncodex\nI have the component and tests; next I\u2019m checking the `Progress` implementation and the rendered milestone section to verify that the new percentage math is actually exposed correctly to users and assistive tech.\nexec\n/bin/bash -lc \"sed -n '1,200p' components/ui/progress.tsx\" in /root/barterkin succeeded in 0ms:\nimport * as React from \"react\"\nimport * as ProgressPrimitive from \"@radix-ui/react-progress\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst Progress = React.forwardRef<\n  React.ElementRef<typeof ProgressPrimitive.Root>,\n  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>\n>(({ className, value, ...props }, ref) => (\n  <ProgressPrimitive.Root\n    ref={ref}\n    className={cn(\n      \"relative h-4 w-full overflow-hidden rounded-full bg-secondary\",\n      className\n    )}\n    {...props}\n  >\n    <ProgressPrimitive.Indicator\n      className=\"h-full w-full flex-1 bg-primary transition-all\"\n      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}\nexec\n/bin/bash -lc \"sed -n '260,520p' tests/unit/referral-invite-card.test.tsx\" in /root/barterkin succeeded in 0ms:\n    expect(mockOpen).toHaveBeenNthCalledWith(\n      3,\n      buildTelegramReferralShareUrl('https://barterkin.com/r/ABCDEFGH'),\n      '_blank',\n      'noopener,noreferrer',\n    )\n    expect(mockOpen).toHaveBeenNthCalledWith(\n      4,\n      buildLinkedInReferralShareUrl('https://barterkin.com/r/ABCDEFGH'),\n      '_blank',\n      'noopener,noreferrer',\n    )\n    expect(mockCapture).toHaveBeenNthCalledWith(1, 'referral_invite_shared', {\n      method: 'facebook',\n      referral_code: 'ABCDEFGH',\n      referral_count: 8,\n      credits: 6,\n    })\n    expect(mockCapture).toHaveBeenNthCalledWith(2, 'referral_invite_shared', {\n      method: 'whatsapp',\nexec\n/bin/bash -lc \"sed -n '260,430p' components/dashboard/ReferralInviteCard.tsx\" in /root/barterkin succeeded in 0ms:\n  referralCode: string\n  referralLink: string\n  credits: number\n  convertedReferralCount: number",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-14T21-04-44Z",
@@ -306,7 +306,7 @@
   {
     "id": "122",
     "title": "[codex-review FIX_FIRST] [task-106 codex-fallback] add onboarding return reminder (ec982c97)",
-    "description": "codex flagged issues in ec982c97. Address concerns, recommit with [task-122 fix-ec982c97] prefix.\n\ntoProfileCompletenessInput } from '@/lib/schemas/profile'\nimport { WizardLayout } from '@/components/onboarding/WizardLayout'\nimport { StepProfile } from '@/components/onboarding/StepProfile'\nimport { StepDirectory } from '@/components/onboarding/StepDirectory'\nimport { StepContact } from '@/components/onboarding/StepContact'\n\nexport const dynamic = 'force-dynamic'\nexport const metadata = { title: 'Get started' }\n\n/**\n * Onboarding wizard page.\n *\n * D-01: lives under route group (onboarding) so it inherits a distraction-free layout with no AppNav.\n * D-13: 3 linear steps (Profile / Directory / Contact) — no welcome screen.\n * D-14: progress indicator (rendered in WizardLayout) shows Step N of 3.\n * D-15: only Step 1 has a hard gate (profile must be complete).\n *\n * searchParams.step determines which step renders:\nexec\n/bin/bash -lc \"sed -n '1,120p' app/'(app)'/layout.tsx\" in /root/barterkin succeeded in 0ms:\nimport type { Metadata } from 'next'\nimport { createClient } from '@/lib/supabase/server'\nimport { Toaster } from '@/components/ui/sonner'\nimport { AppNav } from '@/components/layout/AppNav'\nimport { getNotifications } from '@/lib/data/notifications'\nimport { getSiteUpdates } from '@/lib/data/site-updates'\n\nexport const metadata: Metadata = {\n  title: { default: 'Barterkin', template: '%s -- Barterkin' },\n}\n\nexport default async function AppLayout({ children }: { children: React.ReactNode }) {\n  const supabase = await createClient()\n  // M-01 fix: getUser() revalidates the JWT against Supabase Auth — not spoofable via cookie.\n  // CLAUDE.md bans getClaims()/getSession() for trust decisions; nav identity is a trust decision\n  // because it gates the profile lookup and unseen-contact badge.\n  const { data: { user } } = await supabase.auth.getUser()\n  const userId = user?.id ?? null\n  const email = user?.email ?? null\n\nexec\n/bin/bash -lc \"find . -maxdepth 2 \\\\( -name 'middleware.ts' -o -name 'proxy.ts' \\\\) -print\" in /root/barterkin succeeded in 0ms:\n./proxy.ts\nco",
+    "description": "codex flagged issues in ec982c97. Address concerns, recommit with [task-122 fix-ec982c97] prefix.\n\ntoProfileCompletenessInput } from '@/lib/schemas/profile'\nimport { WizardLayout } from '@/components/onboarding/WizardLayout'\nimport { StepProfile } from '@/components/onboarding/StepProfile'\nimport { StepDirectory } from '@/components/onboarding/StepDirectory'\nimport { StepContact } from '@/components/onboarding/StepContact'\n\nexport const dynamic = 'force-dynamic'\nexport const metadata = { title: 'Get started' }\n\n/**\n * Onboarding wizard page.\n *\n * D-01: lives under route group (onboarding) so it inherits a distraction-free layout with no AppNav.\n * D-13: 3 linear steps (Profile / Directory / Contact) \u2014 no welcome screen.\n * D-14: progress indicator (rendered in WizardLayout) shows Step N of 3.\n * D-15: only Step 1 has a hard gate (profile must be complete).\n *\n * searchParams.step determines which step renders:\nexec\n/bin/bash -lc \"sed -n '1,120p' app/'(app)'/layout.tsx\" in /root/barterkin succeeded in 0ms:\nimport type { Metadata } from 'next'\nimport { createClient } from '@/lib/supabase/server'\nimport { Toaster } from '@/components/ui/sonner'\nimport { AppNav } from '@/components/layout/AppNav'\nimport { getNotifications } from '@/lib/data/notifications'\nimport { getSiteUpdates } from '@/lib/data/site-updates'\n\nexport const metadata: Metadata = {\n  title: { default: 'Barterkin', template: '%s -- Barterkin' },\n}\n\nexport default async function AppLayout({ children }: { children: React.ReactNode }) {\n  const supabase = await createClient()\n  // M-01 fix: getUser() revalidates the JWT against Supabase Auth \u2014 not spoofable via cookie.\n  // CLAUDE.md bans getClaims()/getSession() for trust decisions; nav identity is a trust decision\n  // because it gates the profile lookup and unseen-contact badge.\n  const { data: { user } } = await supabase.auth.getUser()\n  const userId = user?.id ?? null\n  const email = user?.email ?? null\n\nexec\n/bin/bash -lc \"find . -maxdepth 2 \\\\( -name 'middleware.ts' -o -name 'proxy.ts' \\\\) -print\" in /root/barterkin succeeded in 0ms:\n./proxy.ts\nco",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-14T21-04-44Z",
@@ -315,7 +315,7 @@
   },
   {
     "id": "123",
-    "title": "Extend dashboard listing-cap upsell to free members already at cap — revenue/monetization",
+    "title": "Extend dashboard listing-cap upsell to free members already at cap \u2014 revenue/monetization",
     "description": "Close the monetization gap where the dashboard only nudges free members when they have exactly one listing slot left. Update the listing-cap upsell helper/component so members already at the free cap still see a clear Premium CTA, with distinct copy and analytics state for near-cap vs at-cap. Acceptance: free members at 2/3 and 3+/3 both see the nudge, paid members do not, CTA still links to /dashboard/billing, and unit tests cover both states.",
     "priority": "high",
     "status": "completed",
@@ -325,7 +325,7 @@
   },
   {
     "id": "124",
-    "title": "Add referral share CTA to post-onboarding zero-listing reminder — growth/acquisition",
+    "title": "Add referral share CTA to post-onboarding zero-listing reminder \u2014 growth/acquisition",
     "description": "When an onboarded member still has zero listings, add a secondary referral-share CTA beside the first-listing launch reminder so early members can invite neighbors even before posting. Reuse the member referral code and existing analytics naming where possible. Acceptance: CTA only appears when the member has a referral code, copy stays subordinate to the main listing CTA, and tests cover visibility + href generation.",
     "priority": "medium",
     "status": "completed",
@@ -335,7 +335,7 @@
   },
   {
     "id": "125",
-    "title": "Add unread-message streak reminder for two-day-old conversations — retention/engagement",
+    "title": "Add unread-message streak reminder for two-day-old conversations \u2014 retention/engagement",
     "description": "Strengthen reply rates by adding a second-tier dashboard reminder for members with unread messages older than 48 hours, with copy that emphasizes keeping barter momentum alive. Build on the existing unread reminder helper rather than a separate query path. Acceptance: only unread threads older than 48 hours trigger the stronger copy, the CTA deep-links to the oldest eligible thread, and unit tests cover threshold ordering and sender-name fallback.",
     "priority": "medium",
     "status": "completed",
@@ -345,7 +345,7 @@
   },
   {
     "id": "126",
-    "title": "Expand zero-listing referral reminder into multi-channel share actions — growth/acquisition",
+    "title": "Expand zero-listing referral reminder into multi-channel share actions \u2014 growth/acquisition",
     "description": "Members who have finished onboarding but still have zero listings already see a referral CTA on the dashboard. Expand that secondary action from a single WhatsApp link into a compact multi-channel share cluster using existing referral-share helpers. Acceptance: only shows when a referral code/link exists, exposes WhatsApp + SMS + Email share actions, preserves subordinate placement under the primary listing CTA, reuses existing analytics naming with method-specific payloads, and unit tests cover href generation plus click tracking.",
     "priority": "high",
     "status": "completed",
@@ -355,7 +355,7 @@
   },
   {
     "id": "127",
-    "title": "Add one-click reply CTA to two-day unread reminder copy — retention/engagement",
+    "title": "Add one-click reply CTA to two-day unread reminder copy \u2014 retention/engagement",
     "description": "Increase reply recovery for stale conversations by adding a clearer dashboard CTA label and a short context line that names the sender and age tier directly in the reminder component. Acceptance: two-day unread reminders use stronger reply-now framing than one-day reminders, no extra query path is introduced, and unit tests cover both copy variants.",
     "priority": "medium",
     "status": "completed",
@@ -365,7 +365,7 @@
   },
   {
     "id": "128",
-    "title": "Add annual-savings proof row to dashboard billing upsells — revenue/monetization",
+    "title": "Add annual-savings proof row to dashboard billing upsells \u2014 revenue/monetization",
     "description": "Several dashboard upsells already mention Premium annual savings in copy, but the value is easy to skip. Add a compact proof row with monthly vs annual effective price where billing CTAs already render for free members. Acceptance: uses live Stripe plan config, only appears on free-tier billing nudges, and unit tests cover the rendered savings math.",
     "priority": "medium",
     "status": "completed",
@@ -375,7 +375,7 @@
   },
   {
     "id": "129",
-    "title": "Add founding-plan effective monthly savings row to free-member nudge — revenue/monetization",
+    "title": "Add founding-plan effective monthly savings row to free-member nudge \u2014 revenue/monetization",
     "description": "Strengthen the free-member founding upsell by adding a compact proof row inside `FoundingMemberNudge` that shows founding effective monthly price versus Premium monthly and Premium annual effective monthly pricing. Acceptance: copy uses live Stripe config, founding urgency remains intact, and unit tests cover the savings math plus cases where only one comparison is positive.",
     "priority": "high",
     "status": "completed",
@@ -385,7 +385,7 @@
   },
   {
     "id": "130",
-    "title": "Add SMS referral CTA to dashboard best-next-move panel — growth/acquisition",
+    "title": "Add SMS referral CTA to dashboard best-next-move panel \u2014 growth/acquisition",
     "description": "Extend the referral card's best-next-move panel with a compact SMS share CTA when a referral link is available, using the existing referral share helpers and analytics event naming. Acceptance: CTA only appears when a referral link exists, remains secondary to the main share action, and tests cover href generation plus click tracking.",
     "priority": "medium",
     "status": "completed",
@@ -395,7 +395,7 @@
   },
   {
     "id": "131",
-    "title": "Add fresh-listing dashboard reminder for members idle 7 days after first publish — retention/engagement",
+    "title": "Add fresh-listing dashboard reminder for members idle 7 days after first publish \u2014 retention/engagement",
     "description": "Show a dashboard reminder to members who published exactly one listing more than 7 days ago and have not added another since, nudging them to post a fresh offer to stay visible. Acceptance: only eligible members see it, CTA deep-links to `/listings/new`, and tests cover the 7-day threshold and ineligible states.",
     "priority": "medium",
     "status": "completed",
@@ -416,7 +416,7 @@
   {
     "id": "133",
     "title": "[codex-review FIX_FIRST] [task-126 codex-fallback] expand zero-listing referral share (469f28d0)",
-    "description": "codex flagged issues in 469f28d0. Address concerns, recommit with [task-133 fix-469f28d0] prefix.\n\nLaunchReminder(\n  onboardingCompletedAt: string | null | undefined,\n  listings: ListingRow[],\n  hasCompletedFirstListingQuest: boolean,\n  referralCode?: string | null,\n  referralLink?: string | null,\n): ZeroListingLaunchReminder | null {\n  if (!onboardingCompletedAt) {\n    return null\n  }\n\n  const activeListingCount = listings.filter((listing) => listing.status === 'active').length\n  if (activeListingCount > 0) {\n    return null\n  }\n\n  const rewardCredits = !hasCompletedFirstListingQuest && listings.length === 0\n    ? (QUESTS.find((quest) => quest.key === 'quest_first_listing')?.credits ?? 5)\n    : null\n\ncodex\nI’ve got two concrete review angles now: the event payload no longer matches the documented/shared `referral_invite_shared` contract, and this component switched from the app’s `window.open(...); capture...` share pattern to direct anchor navigation, which makes click tracking less reliable for `mailto:`/`sms:` in production.\nexec\n/bin/bash -lc \"nl -ba components/dashboard/ZeroListingLaunchReminder.tsx | sed -n '1,180p'\" in /root/barterkin succeeded in 0ms:\n     1\t'use client'\n     2\t\n     3\timport Link from 'next/link'\n     4\timport { ArrowRight, Mail, MessageSquareText, Rocket, Share2, Sparkles } from 'lucide-react'\n     5\timport { Card, CardContent } from '@/components/ui/card'\n     6\timport { buttonVariants } from '@/components/ui/button'\n     7\timport { cn } from '@/lib/utils'\n     8\timport { captureClientEvent } from '@/lib/analytics-client'\n     9\timport {\n    10\t  buildEmailReferralShareUrl,\n    11\t  buildSmsReferralShareUrl,\n    12\t  buildWhatsAppReferralShareUrl,\n    13\t} from '@/lib/referral-share'\n    14\timport type { ZeroListingLaunchReminder as ZeroListingLaunchReminderData } from '@/lib/data/dashboard-reminders'\n    15\t\n    16\tconst SHARE_CHANNELS = [\n    17\t  {\n    18\t    key: 'whatsapp',\n    19\t    label: 'WhatsApp',\n    20\t    icon: Share2,\nexec\n/bin/bash -lc \"nl -ba docs/events.md | sed -n '121,138p'\" in /root/barterkin succeeded in 0ms:\n   ",
+    "description": "codex flagged issues in 469f28d0. Address concerns, recommit with [task-133 fix-469f28d0] prefix.\n\nLaunchReminder(\n  onboardingCompletedAt: string | null | undefined,\n  listings: ListingRow[],\n  hasCompletedFirstListingQuest: boolean,\n  referralCode?: string | null,\n  referralLink?: string | null,\n): ZeroListingLaunchReminder | null {\n  if (!onboardingCompletedAt) {\n    return null\n  }\n\n  const activeListingCount = listings.filter((listing) => listing.status === 'active').length\n  if (activeListingCount > 0) {\n    return null\n  }\n\n  const rewardCredits = !hasCompletedFirstListingQuest && listings.length === 0\n    ? (QUESTS.find((quest) => quest.key === 'quest_first_listing')?.credits ?? 5)\n    : null\n\ncodex\nI\u2019ve got two concrete review angles now: the event payload no longer matches the documented/shared `referral_invite_shared` contract, and this component switched from the app\u2019s `window.open(...); capture...` share pattern to direct anchor navigation, which makes click tracking less reliable for `mailto:`/`sms:` in production.\nexec\n/bin/bash -lc \"nl -ba components/dashboard/ZeroListingLaunchReminder.tsx | sed -n '1,180p'\" in /root/barterkin succeeded in 0ms:\n     1\t'use client'\n     2\t\n     3\timport Link from 'next/link'\n     4\timport { ArrowRight, Mail, MessageSquareText, Rocket, Share2, Sparkles } from 'lucide-react'\n     5\timport { Card, CardContent } from '@/components/ui/card'\n     6\timport { buttonVariants } from '@/components/ui/button'\n     7\timport { cn } from '@/lib/utils'\n     8\timport { captureClientEvent } from '@/lib/analytics-client'\n     9\timport {\n    10\t  buildEmailReferralShareUrl,\n    11\t  buildSmsReferralShareUrl,\n    12\t  buildWhatsAppReferralShareUrl,\n    13\t} from '@/lib/referral-share'\n    14\timport type { ZeroListingLaunchReminder as ZeroListingLaunchReminderData } from '@/lib/data/dashboard-reminders'\n    15\t\n    16\tconst SHARE_CHANNELS = [\n    17\t  {\n    18\t    key: 'whatsapp',\n    19\t    label: 'WhatsApp',\n    20\t    icon: Share2,\nexec\n/bin/bash -lc \"nl -ba docs/events.md | sed -n '121,138p'\" in /root/barterkin succeeded in 0ms:\n   ",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-15T04-20-15Z",
@@ -436,7 +436,7 @@
   {
     "id": "135",
     "title": "[codex-review FIX_FIRST] [task-124 codex-fallback] add zero-listing referral share CT (cf5a3ee6)",
-    "description": "codex flagged issues in cf5a3ee6. Address concerns, recommit with [task-135 fix-cf5a3ee6] prefix.\n\nNGTH = 8\nconst REFERRAL_CODE_PATTERN = /^[A-Z0-9]{8}$/\n\nexport const REFERRAL_COOKIE_NAME = 'barterkin_referral'\nexport const REFERRAL_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30\n\nexport function normalizeReferralCode(code: string | null | undefined): string | null {\n  if (!code) return null\n\n  const normalized = code.trim().toUpperCase()\n  return REFERRAL_CODE_PATTERN.test(normalized) ? normalized : null\n}\n\nexport function buildReferralLink(siteUrl: string, referralCode: string): string {\n  const normalized = normalizeReferralCode(referralCode)\n  if (!normalized) {\n    throw new Error(`Referral codes must be ${REFERRAL_CODE_LENGTH} uppercase letters or digits.`)\n  }\n\n  const baseUrl = siteUrl.trim().replace(/\\/+$/, '')\nexec\n/bin/bash -lc \"sed -n '1,220p' docs/events.md\" in /root/barterkin succeeded in 0ms:\n# Analytics Events\n\n> **Last updated:** 2026-05-11  \n> **Project:** PostHog project id `387571` (US host: `https://us.i.posthog.com`)\n\nPostHog is the source of truth for product metrics on Barterkin. Events fired in this file MUST match the schema documented here — any drift between code and this doc is a bug.\n\n**Firing pattern:** Server-side via `posthog-node` from server actions, client-side via `posthog-js` from client components. All events are non-blocking (wrapped in try/catch) and never throw.\n\n**Related docs:** `docs/API.md` (API routes + server actions), `docs/infrastructure.md` (logging, rate limiting, health checks)\n\n**Last updated:** 2026-05-13\n\n---\n\n## Implemented Events\n\n### `signup_started`\n\n**When fired:** After a magic link OTP email is successfully queued (Supabase returns success).\nexec\n/bin/bash -lc \"sed -n '1,220p' tests/unit/zero-listing-launch-reminder.test.tsx\" in /root/barterkin succeeded in 0ms:\nimport { render, screen } from '@testing-library/react'\nimport userEvent from '@testing-library/user-event'\nimport { describe, expect, it, vi, beforeEach } from 'vitest'\nimport {\n  buildEmailReferralShareUrl,\n  buildSmsReferralShareUrl,\n  buildWha",
+    "description": "codex flagged issues in cf5a3ee6. Address concerns, recommit with [task-135 fix-cf5a3ee6] prefix.\n\nNGTH = 8\nconst REFERRAL_CODE_PATTERN = /^[A-Z0-9]{8}$/\n\nexport const REFERRAL_COOKIE_NAME = 'barterkin_referral'\nexport const REFERRAL_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30\n\nexport function normalizeReferralCode(code: string | null | undefined): string | null {\n  if (!code) return null\n\n  const normalized = code.trim().toUpperCase()\n  return REFERRAL_CODE_PATTERN.test(normalized) ? normalized : null\n}\n\nexport function buildReferralLink(siteUrl: string, referralCode: string): string {\n  const normalized = normalizeReferralCode(referralCode)\n  if (!normalized) {\n    throw new Error(`Referral codes must be ${REFERRAL_CODE_LENGTH} uppercase letters or digits.`)\n  }\n\n  const baseUrl = siteUrl.trim().replace(/\\/+$/, '')\nexec\n/bin/bash -lc \"sed -n '1,220p' docs/events.md\" in /root/barterkin succeeded in 0ms:\n# Analytics Events\n\n> **Last updated:** 2026-05-11  \n> **Project:** PostHog project id `387571` (US host: `https://us.i.posthog.com`)\n\nPostHog is the source of truth for product metrics on Barterkin. Events fired in this file MUST match the schema documented here \u2014 any drift between code and this doc is a bug.\n\n**Firing pattern:** Server-side via `posthog-node` from server actions, client-side via `posthog-js` from client components. All events are non-blocking (wrapped in try/catch) and never throw.\n\n**Related docs:** `docs/API.md` (API routes + server actions), `docs/infrastructure.md` (logging, rate limiting, health checks)\n\n**Last updated:** 2026-05-13\n\n---\n\n## Implemented Events\n\n### `signup_started`\n\n**When fired:** After a magic link OTP email is successfully queued (Supabase returns success).\nexec\n/bin/bash -lc \"sed -n '1,220p' tests/unit/zero-listing-launch-reminder.test.tsx\" in /root/barterkin succeeded in 0ms:\nimport { render, screen } from '@testing-library/react'\nimport userEvent from '@testing-library/user-event'\nimport { describe, expect, it, vi, beforeEach } from 'vitest'\nimport {\n  buildEmailReferralShareUrl,\n  buildSmsReferralShareUrl,\n  buildWha",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-15T04-20-15Z",
@@ -505,7 +505,7 @@
   },
   {
     "id": "142",
-    "title": "Add SMS referral CTA to first-contact dashboard reminder — growth/acquisition",
+    "title": "Add SMS referral CTA to first-contact dashboard reminder \u2014 growth/acquisition",
     "description": "When an onboarded member has at least one active listing but zero started conversations, add a secondary SMS referral CTA inside `FirstContactLaunchReminder` so they can invite a likely trading partner directly before browsing the directory. Reuse existing referral share helpers and `referral_invite_shared` analytics naming. Acceptance: CTA only appears when a referral link exists, remains secondary to the browse CTA, docs include the new share surface, and unit tests cover visibility plus click tracking.",
     "priority": "high",
     "status": "completed",
@@ -515,7 +515,7 @@
   },
   {
     "id": "143",
-    "title": "Add viewed-listing revisit reminder for members with zero saves after 5 days — retention/engagement",
+    "title": "Add viewed-listing revisit reminder for members with zero saves after 5 days \u2014 retention/engagement",
     "description": "Show a dashboard reminder for members whose only active listing has been live at least 5 days, has profile views but zero saves, and has not been refreshed recently. CTA should deep-link to the listing edit flow with copy about tightening photos/title/trade terms. Acceptance: only eligible members see it, reminder uses live listing + profile-view data, and unit tests cover the 5-day threshold and zero-save gating.",
     "priority": "high",
     "status": "completed",
@@ -525,7 +525,7 @@
   },
   {
     "id": "144",
-    "title": "Add annual-vs-founding proof row to billing checkout actions for free members — revenue/monetization",
+    "title": "Add annual-vs-founding proof row to billing checkout actions for free members \u2014 revenue/monetization",
     "description": "Strengthen conversion on `/dashboard/billing` by adding a compact proof row beside free-member checkout actions that compares Founding monthly, Premium monthly, and Premium annual effective monthly pricing using live Stripe config. Acceptance: only free members see it, copy stays grounded in current plan values, and unit tests cover all displayed pricing math including sold-out founding state.",
     "priority": "medium",
     "status": "completed",
@@ -555,7 +555,7 @@
   },
   {
     "id": "147",
-    "title": "Add listing-share CTA to single-listing members with zero saves after 7 days — growth/acquisition",
+    "title": "Add listing-share CTA to single-listing members with zero saves after 7 days \u2014 growth/acquisition",
     "description": "Members with exactly one active listing, zero saves, and 7+ days live should see a dashboard reminder to share their listing externally (WhatsApp, SMS, Email) to drive traffic. Reuse existing listing-share helpers or build compact share URLs. Acceptance: only eligible members see it, CTA uses existing share analytics, and tests cover visibility + href generation.",
     "priority": "high",
     "status": "completed",
@@ -565,7 +565,7 @@
   },
   {
     "id": "148",
-    "title": "Add warm-conversation re-engagement reminder for 3-day idle threads — retention/engagement",
+    "title": "Add warm-conversation re-engagement reminder for 3-day idle threads \u2014 retention/engagement",
     "description": "Show a dashboard reminder for members with conversations where the last message is from the member themselves and is 3+ days old, nudging them to follow up. Build on existing conversation data already fetched for the dashboard. Acceptance: only self-sent stale threads trigger it, CTA deep-links to the conversation, and tests cover threshold + sender direction.",
     "priority": "high",
     "status": "completed",
@@ -575,7 +575,7 @@
   },
   {
     "id": "149",
-    "title": "Add founding-plan urgency countdown to free-member billing nudge — revenue/monetization",
+    "title": "Add founding-plan urgency countdown to free-member billing nudge \u2014 revenue/monetization",
     "description": "Strengthen the FoundingMemberNudge by adding a live slots-remaining countdown with scarcity copy (e.g., \"Only X left at /mo\"). Use the existing foundingCountResult already computed on the dashboard. Acceptance: countdown renders only when slots remain, copy updates as slots decrease, and unit tests cover 1-slot-left and sold-out states.",
     "priority": "high",
     "status": "completed",
@@ -586,7 +586,7 @@
   {
     "id": "150",
     "title": "[codex-review FIX_FIRST] [team-photos] Square crop all team photos, larger avatars (1 (7135cef2)",
-    "description": "codex flagged issues in 7135cef2. Address concerns, recommit with [task-150 fix-7135cef2] prefix.\n\nand PostHog click/impression tracking. Commit: 926d193.\"\n  },\n  {\n    \"id\": \"93\",\n    \"title\": \"Add listing feature/boost credit sink for premium members — monetization/engagement\",\nexec\n/bin/bash -lc \"nl -ba app/behind-barterkin/page.tsx | sed -n '20,210p'\" in /root/barterkinexec\n/bin/bash -lc \"nl -ba .hermes/agent-health-monitor.py | sed -n '170,230p'\" in /root/barterkin succeeded in 0ms:\n   170\t    result = run([\n   171\t        \"hermes\", \"send\", \"telegram\", TELEGRAM_GROUP,\n   172\t        \"--message\", message,\n   173\t    ])\n   174\t    return result.returncode == 0\n   175\t\n   176\t\n   177\tdef check_queue_health() -> list[dict]:\n   178\t    \"\"\"Check for tasks stuck in_progress too long.\"\"\"\n   179\t    queue_path = WORK_DIR / \".hermes\" / \"cron_queue.json\"\n   180\t    if not queue_path.exists():\n   181\t        return []\n   182\t    try:\n   183\t        tasks = json.loads(queue_path.read_text())\n   184\t    except Exception:\n   185\t        return []\n   186\t\n   187\t    stuck = []\n   188\t    now = datetime.now(timezone.utc)\n   189\t    for task in tasks:\n succeeded in 0ms:\n    20\t  },\n    21\t  twitter: {\n    22\t    card: 'summary_large_image',\n    23\t    title: 'Behind Barterkin',\n    24\t    description:\n    25\t      'Meet the people behind Barterkin. Learn where the movement started and who is building community across Georgia.',\n    26\t  },\n    27\t}\n    28\t\n    29\tconst TEAM = [\n    30\t  {\n    31\t    name: 'Kerry Elise',\n    32\t    role: 'Co-Creator',\n    33\t    bio: 'Kerry Elise is an herbalist and holistic nutrition educator whose work centers on simple, natural approaches to health and everyday living. Bartering is an extension of that philosophy; rooted in community, mutual support, and recognizing the value of what each person already has to offer. Barterkin is a way to bring those connections to a wider network across Georgia.',\n    34\t    image: '/team/kerry-elise.jpg',\n    35\t    initial: 'K',\n    36\t    icon: Leaf,\n    37\t  },\n    38\t  {\n    39\t    name: 'Naeem',\ncode",
+    "description": "codex flagged issues in 7135cef2. Address concerns, recommit with [task-150 fix-7135cef2] prefix.\n\nand PostHog click/impression tracking. Commit: 926d193.\"\n  },\n  {\n    \"id\": \"93\",\n    \"title\": \"Add listing feature/boost credit sink for premium members \u2014 monetization/engagement\",\nexec\n/bin/bash -lc \"nl -ba app/behind-barterkin/page.tsx | sed -n '20,210p'\" in /root/barterkinexec\n/bin/bash -lc \"nl -ba .hermes/agent-health-monitor.py | sed -n '170,230p'\" in /root/barterkin succeeded in 0ms:\n   170\t    result = run([\n   171\t        \"hermes\", \"send\", \"telegram\", TELEGRAM_GROUP,\n   172\t        \"--message\", message,\n   173\t    ])\n   174\t    return result.returncode == 0\n   175\t\n   176\t\n   177\tdef check_queue_health() -> list[dict]:\n   178\t    \"\"\"Check for tasks stuck in_progress too long.\"\"\"\n   179\t    queue_path = WORK_DIR / \".hermes\" / \"cron_queue.json\"\n   180\t    if not queue_path.exists():\n   181\t        return []\n   182\t    try:\n   183\t        tasks = json.loads(queue_path.read_text())\n   184\t    except Exception:\n   185\t        return []\n   186\t\n   187\t    stuck = []\n   188\t    now = datetime.now(timezone.utc)\n   189\t    for task in tasks:\n succeeded in 0ms:\n    20\t  },\n    21\t  twitter: {\n    22\t    card: 'summary_large_image',\n    23\t    title: 'Behind Barterkin',\n    24\t    description:\n    25\t      'Meet the people behind Barterkin. Learn where the movement started and who is building community across Georgia.',\n    26\t  },\n    27\t}\n    28\t\n    29\tconst TEAM = [\n    30\t  {\n    31\t    name: 'Kerry Elise',\n    32\t    role: 'Co-Creator',\n    33\t    bio: 'Kerry Elise is an herbalist and holistic nutrition educator whose work centers on simple, natural approaches to health and everyday living. Bartering is an extension of that philosophy; rooted in community, mutual support, and recognizing the value of what each person already has to offer. Barterkin is a way to bring those connections to a wider network across Georgia.',\n    34\t    image: '/team/kerry-elise.jpg',\n    35\t    initial: 'K',\n    36\t    icon: Leaf,\n    37\t  },\n    38\t  {\n    39\t    name: 'Naeem',\ncode",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-16T07-07-34Z",
@@ -596,7 +596,7 @@
   {
     "id": "151",
     "title": "[codex-review FIX_FIRST] [task-148 codex-fallback] add warm conversation reminder (a0086c92)",
-    "description": "codex flagged issues in a0086c92. Address concerns, recommit with [task-151 fix-a0086c92] prefix.\n\nhReminder.tsx:29:    captureClientEvent('referral_invite_shared', {\ncomponents/dashboard/FirstTradeProgressReminder.tsx:29:            {` ${reminder.counterpartName}`} and turn that momentum into your first completed trade.\ncomponents/dashboard/DigestOptOutReminder.tsx:20:    captureClientEvent('digest_opt_out_reminder_impression', {\ncomponents/dashboard/DigestOptOutReminder.tsx:26:    captureClientEvent('digest_opt_out_reminder_clicked', {\ntests/unit/dashboard-reminders.test.ts:118:      counterpartName: 'Alex',\ntests/unit/dashboard-reminders.test.ts:119:      lastMessageAt: '2026-05-11T09:00:00.000Z',\ntests/unit/dashboard-reminders.test.ts:202:      counterpartName: 'sam',\ntests/unit/dashboard-reminders.test.ts:267:      counterpartName: 'Sam',\ntests/unit/dashboard-reminders.test.ts:306:      counterpartName: 'Alex',\ntests/unit/dashboard-reminders.test.ts:360:      counterpartName: 'Alex',\ntests/unit/dashboard-reminders.test.ts:397:      counterpartName: 'a member',\ntests/unit/dashboard-reminders.test.ts:471:      staleConversationCount: 1,\ntests/unit/dashboard-reminders.test.ts:473:      counterpartName: 'Alex',\nexec\n/bin/bash -lc \"rg -n \\\"warm_conversation_reengagement_reminder|unread_message_reminder|first_trade_progress\\\" -g '\"'!node_modules'\"' .\" in /root/barterkin succeeded in 0ms:\n./docs/events.md:137:### `unread_message_reminder_impression`\n./docs/events.md:151:### `unread_message_reminder_clicked`\n./docs/events.md:413:| `unread_message_reminder_impression` | ✅ Implemented | `components/dashboard/UnreadMessageReminder.tsx` | 7 |\n./docs/events.md:414:| `unread_message_reminder_clicked` | ✅ Implemented | `components/dashboard/UnreadMessageReminder.tsx` | 7 |\n./components/dashboard/UnreadMessageReminder.tsx:33:    captureClientEvent('unread_message_reminder_impression', {\n./components/dashboard/UnreadMessageReminder.tsx:41:    captureClientEvent('unread_message_reminder_clicked', {\n./components/dashboard/WarmConversationReengagementReminder.tsx:25:    capture",
+    "description": "codex flagged issues in a0086c92. Address concerns, recommit with [task-151 fix-a0086c92] prefix.\n\nhReminder.tsx:29:    captureClientEvent('referral_invite_shared', {\ncomponents/dashboard/FirstTradeProgressReminder.tsx:29:            {` ${reminder.counterpartName}`} and turn that momentum into your first completed trade.\ncomponents/dashboard/DigestOptOutReminder.tsx:20:    captureClientEvent('digest_opt_out_reminder_impression', {\ncomponents/dashboard/DigestOptOutReminder.tsx:26:    captureClientEvent('digest_opt_out_reminder_clicked', {\ntests/unit/dashboard-reminders.test.ts:118:      counterpartName: 'Alex',\ntests/unit/dashboard-reminders.test.ts:119:      lastMessageAt: '2026-05-11T09:00:00.000Z',\ntests/unit/dashboard-reminders.test.ts:202:      counterpartName: 'sam',\ntests/unit/dashboard-reminders.test.ts:267:      counterpartName: 'Sam',\ntests/unit/dashboard-reminders.test.ts:306:      counterpartName: 'Alex',\ntests/unit/dashboard-reminders.test.ts:360:      counterpartName: 'Alex',\ntests/unit/dashboard-reminders.test.ts:397:      counterpartName: 'a member',\ntests/unit/dashboard-reminders.test.ts:471:      staleConversationCount: 1,\ntests/unit/dashboard-reminders.test.ts:473:      counterpartName: 'Alex',\nexec\n/bin/bash -lc \"rg -n \\\"warm_conversation_reengagement_reminder|unread_message_reminder|first_trade_progress\\\" -g '\"'!node_modules'\"' .\" in /root/barterkin succeeded in 0ms:\n./docs/events.md:137:### `unread_message_reminder_impression`\n./docs/events.md:151:### `unread_message_reminder_clicked`\n./docs/events.md:413:| `unread_message_reminder_impression` | \u2705 Implemented | `components/dashboard/UnreadMessageReminder.tsx` | 7 |\n./docs/events.md:414:| `unread_message_reminder_clicked` | \u2705 Implemented | `components/dashboard/UnreadMessageReminder.tsx` | 7 |\n./components/dashboard/UnreadMessageReminder.tsx:33:    captureClientEvent('unread_message_reminder_impression', {\n./components/dashboard/UnreadMessageReminder.tsx:41:    captureClientEvent('unread_message_reminder_clicked', {\n./components/dashboard/WarmConversationReengagementReminder.tsx:25:    capture",
     "priority": "critical",
     "status": "completed",
     "created_at": "2026-05-16T07-07-34Z",
@@ -606,10 +606,29 @@
   {
     "id": "152",
     "title": "[codex-review FIX_FIRST] [task-149] Add founding-plan urgency countdown badge to free (0f3d0d46)",
-    "description": "codex flagged issues in 0f3d0d46. Address concerns, recommit with [task-152 fix-0f3d0d46] prefix.\n\nunit/founding-member-nudge.test.tsx:82:      <FoundingMemberNudge\n./tests/unit/founding-member-nudge.test.tsx:95:      <FoundingMemberNudge\n./tests/unit/founding-member-nudge.test.tsx:114:      <FoundingMemberNudge\n./tests/unit/admin-revenue-page.test.tsx:47:      foundingSlotsRemaining: 94,\n./tests/unit/admin-revenue-page.test.tsx:85:      foundingSlotsRemaining: 100,\n./app/(app)/dashboard/page.tsx:18:import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'\n./app/(app)/dashboard/page.tsx:39:import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'\ncodex\nThe key path is narrower than it looks: the dashboard now shows a static `24h`/`48h` badge derived only from remaining-slot thresholds. I’m checking the existing tests next, because the commit message claims a countdown behavior and sold-out/1-slot coverage.\nexec\n/bin/bash -lc \"sed -n '1,220p' tests/unit/founding-member-nudge.test.tsx\" in /root/barterkin succeeded in 0ms:\nimport { render, screen } from '@testing-library/react'\nimport { describe, expect, it } from 'vitest'\nimport { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'\n\nconst FOUNDING_MONTHLY_CENTS = 500\nconst PREMIUM_MONTHLY_CENTS = 900\nconst PREMIUM_ANNUAL_CENTS = 9000\n\ndescribe('FoundingMemberNudge', () => {\n  it('renders urgent state when slots remaining <= 10', () => {\n    render(\n      <FoundingMemberNudge\n        slotsRemaining={5}\n        foundingMonthlyCents={FOUNDING_MONTHLY_CENTS}\n        premiumMonthlyCents={PREMIUM_MONTHLY_CENTS}\n        premiumAnnualCents={PREMIUM_ANNUAL_CENTS}\n      />,\n    )\n    expect(screen.getByText(/Almost gone/)).toBeInTheDocument()\n    expect(screen.getByText(/5 founding slots left/)).toBeInTheDocument()\nexec\n/bin/bash -lc \"nl -ba components/dashboard/FoundingMemberNudge.tsx | sed -n '1,180p'\" in /root/barterkin succeeded in 0ms:\n     1\timport Link from 'next/link'\n     2\timport { Zap, ArrowRight } from 'lucide-react'\n     3\timport { Card, CardContent } from '@/c",
+    "description": "codex flagged issues in 0f3d0d46. Address concerns, recommit with [task-152 fix-0f3d0d46] prefix.\n\nunit/founding-member-nudge.test.tsx:82:      <FoundingMemberNudge\n./tests/unit/founding-member-nudge.test.tsx:95:      <FoundingMemberNudge\n./tests/unit/founding-member-nudge.test.tsx:114:      <FoundingMemberNudge\n./tests/unit/admin-revenue-page.test.tsx:47:      foundingSlotsRemaining: 94,\n./tests/unit/admin-revenue-page.test.tsx:85:      foundingSlotsRemaining: 100,\n./app/(app)/dashboard/page.tsx:18:import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'\n./app/(app)/dashboard/page.tsx:39:import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'\ncodex\nThe key path is narrower than it looks: the dashboard now shows a static `24h`/`48h` badge derived only from remaining-slot thresholds. I\u2019m checking the existing tests next, because the commit message claims a countdown behavior and sold-out/1-slot coverage.\nexec\n/bin/bash -lc \"sed -n '1,220p' tests/unit/founding-member-nudge.test.tsx\" in /root/barterkin succeeded in 0ms:\nimport { render, screen } from '@testing-library/react'\nimport { describe, expect, it } from 'vitest'\nimport { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'\n\nconst FOUNDING_MONTHLY_CENTS = 500\nconst PREMIUM_MONTHLY_CENTS = 900\nconst PREMIUM_ANNUAL_CENTS = 9000\n\ndescribe('FoundingMemberNudge', () => {\n  it('renders urgent state when slots remaining <= 10', () => {\n    render(\n      <FoundingMemberNudge\n        slotsRemaining={5}\n        foundingMonthlyCents={FOUNDING_MONTHLY_CENTS}\n        premiumMonthlyCents={PREMIUM_MONTHLY_CENTS}\n        premiumAnnualCents={PREMIUM_ANNUAL_CENTS}\n      />,\n    )\n    expect(screen.getByText(/Almost gone/)).toBeInTheDocument()\n    expect(screen.getByText(/5 founding slots left/)).toBeInTheDocument()\nexec\n/bin/bash -lc \"nl -ba components/dashboard/FoundingMemberNudge.tsx | sed -n '1,180p'\" in /root/barterkin succeeded in 0ms:\n     1\timport Link from 'next/link'\n     2\timport { Zap, ArrowRight } from 'lucide-react'\n     3\timport { Card, CardContent } from '@/c",
     "priority": "critical",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-16T08-09-54Z",
+    "source": "codex-review",
+    "notes": "Fixed: removed fake \"24h left\" / \"48h left\" time countdown that implied slot expiration. Replaced with honest slot-based urgency badge (\"Only X left\" / \"Just X left\"). Commit: 7da4abd."
+  },
+  {
+    "id": "153",
+    "title": "[codex-review FIX_FIRST] [task-152 fix-0f3d0d46] Remove fake time countdown, use hone (7da4abd2)",
+    "description": "codex flagged issues in 7da4abd2. Address concerns, recommit with [task-153 fix-7da4abd2] prefix.\n\nInTheDocument()\n succeeded in 191ms:\napp/(app)/dashboard/page.tsx:18:import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'\napp/(app)/dashboard/page.tsx:141:  const foundingSlotsRemaining = Math.max(0, STRIPE_FOUNDING_MEMBER_LIMIT - foundingCountResult)\napp/(app)/dashboard/page.tsx:142:  const showFoundingNudge = profile?.tier === 'free' && foundingSlotsRemaining > 0\napp/(app)/dashboard/page.tsx:440:      {showFoundingNudge && (\napp/(app)/dashboard/page.tsx:441:        <FoundingMemberNudge\napp/(app)/dashboard/page.tsx:442:          slotsRemaining={foundingSlotsRemaining}\ntests/unit/admin-revenue-page.test.tsx:47:      foundingSlotsRemaining: 94,\ntests/unit/admin-revenue-page.test.tsx:85:      foundingSlotsRemaining: 100,\ntests/unit/founding-member-nudge.test.tsx:3:import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'\ntests/unit/founding-member-nudge.test.tsx:9:describe('FoundingMemberNudge', () => {\ntests/unit/founding-member-nudge.test.tsx:12:      <FoundingMemberNudge\ntests/unit/founding-member-nudge.test.tsx:25:      <FoundingMemberNudge\ntests/unit/founding-member-nudge.test.tsx:38:      <FoundingMemberNudge\ntests/unit/founding-member-nudge.test.tsx:57:      <FoundingMemberNudge\ntests/unit/founding-member-nudge.test.tsx:69:      <FoundingMemberNudge\ntests/unit/founding-member-nudge.test.tsx:82:      <FoundingMemberNudge\ntests/unit/founding-member-nudge.test.tsx:95:      <FoundingMemberNudge\ntests/unit/founding-member-nudge.test.tsx:114:      <FoundingMemberNudge\ncodex\nThe current unit tests still only assert the headline copy. I\u2019m checking whether any test covers the sold-out suppression path on the dashboard, since that was part of the earlier review thread and is the place a real regression would show up.\nexec\n/bin/bash -lc \"sed -n '1,180p' tests/unit/admin-revenue-page.test.tsx\" in /root/barterkin succeeded in 0ms:\nimport { beforeEach, describe, expect, it, vi } from 'vitest'\nimport { render, screen } from '",
+    "priority": "critical",
+    "status": "pending",
+    "created_at": "2026-05-16T10-14-30Z",
+    "source": "codex-review"
+  },
+  {
+    "id": "154",
+    "title": "[codex-review FIX_FIRST] [task-151 fix-a0086c92] Document warm conversation events, f (b8fd5f51)",
+    "description": "codex flagged issues in b8fd5f51. Address concerns, recommit with [task-154 fix-b8fd5f51] prefix.\n\nimg. Commit: 5419e77.\"\n   595\t  },\n   596\t  {\n   597\t    \"id\": \"151\",\n   598\t    \"title\": \"[codex-review FIX_FIRST] [task-148 codex-fallback] add warm conversation reminder (a0086c92)\",\n   599\t    \"description\": \"codex flagged issues in a0086c92. Address concerns, recommit with [task-151 fix-a0086c92] prefix.\\n\\nhReminder.tsx:29:    captureClientEvent('referral_invite_shared', {\\ncomponents/dashboard/FirstTradeProgressReminder.tsx:29:            {` ${reminder.counterpartName}`} and turn that momentum into your first completed trade.\\ncomponents/dashboard/DigestOptOutReminder.tsx:20:    captureClientEvent('digest_opt_out_reminder_impression', {\\ncomponents/dashboard/DigestOptOutReminder.tsx:26:    captureClientEvent('digest_opt_out_reminder_clicked', {\\ntests/unit/dashboard-reminders.test.ts:118:      counterpartName: 'Alex',\\ntests/unit/dashboard-reminders.test.ts:119:      lastMessageAt: '2026-05-11T09:00:00.000Z',\\ntests/unit/dashboard-reminders.test.ts:202:      counterpartName: 'sam',\\ntests/unit/dashboard-reminders.test.ts:267:      counterpartName: 'Sam',\\ntests/unit/dashboard-reminders.test.ts:306:      counterpartName: 'Alex',\\ntests/unit/dashboard-reminders.test.ts:360:      counterpartName: 'Alex',\\ntests/unit/dashboard-reminders.test.ts:397:      counterpartName: 'a member',\\ntests/unit/dashboard-reminders.test.ts:471:      staleConversationCount: 1,\\ntests/unit/dashboard-reminders.test.ts:473:      counterpartName: 'Alex',\\nexec\\n/bin/bash -lc \\\"rg -n \\\\\\\"warm_conversation_reengagement_reminder|unread_message_reminder|first_trade_progress\\\\\\\" -g '\\\"'!node_modules'\\\"' .\\\" in /root/barterkin succeeded in 0ms:\\n./docs/events.md:137:### `unread_message_reminder_impression`\\n./docs/events.md:151:### `unread_message_reminder_clicked`\\n./docs/events.md:413:| `unread_message_reminder_impression` | \\u2705 Implemented | `components/dashboard/UnreadMessageReminder.tsx` | 7 |\\n./docs/events.md:414:| `unread_message_reminder_clicked` | \\u2705 Implemented | `component",
+    "priority": "critical",
+    "status": "pending",
+    "created_at": "2026-05-16T10-14-30Z",
     "source": "codex-review"
   }
 ]

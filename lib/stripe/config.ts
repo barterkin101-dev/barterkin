@@ -52,4 +52,11 @@ export function getStripePublishableKey(): string {
   return key
 }
 
+
+export function shouldShowFoundingMemberNudge(
+  tier: string | null | undefined,
+  slotsRemaining: number,
+): boolean {
+  return tier === 'free' && slotsRemaining > 0
+}
 export const STRIPE_FOUNDING_MEMBER_LIMIT = 100
