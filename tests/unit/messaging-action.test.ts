@@ -39,6 +39,7 @@ import { revalidatePath } from 'next/cache'
 import { limitSendMessage } from '@/lib/rate-limit'
 import { awardQuest } from '@/lib/actions/quests'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
+import { captureEvent } from '@/lib/analytics'
 
 import {
   sendMessage,
@@ -244,6 +245,10 @@ describe('sendMessage', () => {
     expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith('/dashboard/messages')
     expect(vi.mocked(revalidatePath)).toHaveBeenCalledWith(`/dashboard/messages/${CONV_UUID}`)
     expect(vi.mocked(awardQuest)).toHaveBeenCalledWith('quest_first_message')
+    expect(vi.mocked(captureEvent)).toHaveBeenCalledWith('u1', 'first_contact_sent', {
+      conversation_id: CONV_UUID,
+      credits: 2,
+    })
   })
 
   it('returns unknown error on insert failure', async () => {
@@ -436,6 +441,14 @@ describe('createConversation', () => {
       { conversation_id: CONV_UUID, profile_id: OTHER_UUID },
     ])
     expect(vi.mocked(awardQuest)).toHaveBeenCalledWith('quest_first_message')
+    expect(vi.mocked(captureEvent)).toHaveBeenCalledWith('u1', 'conversation_created', {
+      conversation_id: CONV_UUID,
+      listing_id: null,
+    })
+    expect(vi.mocked(captureEvent)).toHaveBeenCalledWith('u1', 'first_contact_sent', {
+      conversation_id: CONV_UUID,
+      credits: 2,
+    })
   })
 
   it('returns a post-send billing nudge when a free member is down to one contact start', async () => {
