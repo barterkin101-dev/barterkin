@@ -177,6 +177,12 @@ export async function markTradeComplete(
         context: { conversationId, error: questResult.error },
       })
     }
+    if (questResult.ok && questResult.awarded) {
+      void captureEvent(user.id, 'first_trade_completed', {
+        conversation_id: conversationId,
+        credits: questResult.credits,
+      })
+    }
 
     await sendTradeReviewPrompts(conversationId)
   }

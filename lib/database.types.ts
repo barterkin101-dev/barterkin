@@ -725,12 +725,18 @@ export type Database = {
           credits: number
           display_name: string | null
           email_digest_enabled: boolean
+          first_contact_sent_at: string | null
+          first_listing_created_at: string | null
+          first_listing_viewed_at: string | null
+          first_trade_completed_at: string | null
           founding_member: boolean
           id: string
           is_published: boolean
           last_login_at: string | null
           login_streak: number
           onboarding_completed_at: string | null
+          onboarding_reminder_sent_at: string | null
+          onboarding_started_at: string | null
           owner_id: string
           phone_number: string | null
           phone_verified: boolean
@@ -761,12 +767,22 @@ export type Database = {
           credits?: number
           display_name?: string | null
           email_digest_enabled?: boolean
+          first_contact_sent_at?: string | null
+          first_listing_created_at?: string | null
+          first_listing_viewed_at?: string | null
+          first_trade_completed_at?: string | null
+          first_contact_sent_at?: string | null
+          first_listing_created_at?: string | null
+          first_listing_viewed_at?: string | null
+          first_trade_completed_at?: string | null
           founding_member?: boolean
           id?: string
           is_published?: boolean
           last_login_at?: string | null
           login_streak?: number
           onboarding_completed_at?: string | null
+          onboarding_reminder_sent_at?: string | null
+          onboarding_started_at?: string | null
           owner_id: string
           phone_number?: string | null
           phone_verified?: boolean
@@ -804,6 +820,8 @@ export type Database = {
           last_login_at?: string | null
           login_streak?: number
           onboarding_completed_at?: string | null
+          onboarding_reminder_sent_at?: string | null
+          onboarding_started_at?: string | null
           owner_id?: string
           phone_number?: string | null
           phone_verified?: boolean

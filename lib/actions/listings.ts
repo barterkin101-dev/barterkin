@@ -221,6 +221,12 @@ export async function saveListing(
         context: { listingId: listing.id, error: questResult.error },
       })
     }
+    if (questResult.ok && questResult.awarded) {
+      void captureEvent(user.id, 'first_listing_created', {
+        listing_id: listing.id,
+        credits: questResult.credits,
+      })
+    }
   }
 
   return { ok: true, listingId: listing.id }

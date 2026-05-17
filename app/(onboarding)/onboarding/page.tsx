@@ -5,6 +5,7 @@ import { WizardLayout } from '@/components/onboarding/WizardLayout'
 import { StepProfile } from '@/components/onboarding/StepProfile'
 import { StepDirectory } from '@/components/onboarding/StepDirectory'
 import { StepContact } from '@/components/onboarding/StepContact'
+import { captureEvent } from '@/lib/analytics'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Get started' }
@@ -46,6 +47,18 @@ export default async function OnboardingPage({
 
   // Already completed — middleware should have skipped redirect, but guard here too.
   if (profile?.onboarding_completed_at) redirect('/directory')
+
+  // Funnel analytics: track onboarding start (idempotent — only fires once)
+  if (profile && !profile.onboarding_started_at) {
+    void captureEvent(user.id, 'onboarding_started', {
+      method: profile.onboarding_completed_at ? 'return' : 'first',
+    })
+    await supabase
+      .from('profiles')
+      .update({ onboarding_started_at: new Date().toISOString() })
+      .eq('owner_id', user.id)
+      .is('onboarding_started_at', null)
+  }
 
   const { step: rawStep } = await searchParams
   const parsed = parseInt(rawStep ?? '1', 10)

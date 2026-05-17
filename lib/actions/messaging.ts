@@ -95,6 +95,12 @@ export async function sendMessage(
       context: { conversationId: values.conversationId, error: questResult.error },
     })
   }
+  if (questResult.ok && questResult.awarded) {
+    void captureEvent(user.id, 'first_contact_sent', {
+      conversation_id: values.conversationId,
+      credits: questResult.credits,
+    })
+  }
 
   return { ok: true, messageId: message.id }
 }
@@ -260,5 +266,6 @@ export async function markConversationRead(
   }
 
   revalidatePath('/dashboard/messages')
+
   return { ok: true }
 }

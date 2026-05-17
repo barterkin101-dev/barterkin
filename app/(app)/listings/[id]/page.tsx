@@ -12,6 +12,7 @@ import { MessageCircle, MapPin, ArrowLeft } from 'lucide-react'
 import { MessageButton } from '@/components/messaging/MessageButton'
 import { ListingJsonLd } from '@/components/seo/ListingJsonLd'
 import { ListingShareActions } from '@/components/listings/ListingShareActions'
+import { captureEvent } from '@/lib/analytics'
 
 interface ListingDetailPageProps {
   params: Promise<{ id: string }>
@@ -76,6 +77,25 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+
+  // Funnel analytics: track first listing view (idempotent)
+  if (user && listing.profiles?.id) {
+    const { data: viewerProfile } = await supabase
+      .from('profiles')
+      .select('first_listing_viewed_at')
+      .eq('owner_id', user.id)
+      .maybeSingle()
+    if (viewerProfile && !viewerProfile.first_listing_viewed_at) {
+      void captureEvent(user.id, 'first_listing_viewed', {
+        listing_id: listing.id,
+      })
+      await supabase
+        .from('profiles')
+        .update({ first_listing_viewed_at: new Date().toISOString() })
+        .eq('owner_id', user.id)
+        .is('first_listing_viewed_at', null)
+    }
+  }
 
   const isOwn = user
     ? listing.profiles?.id

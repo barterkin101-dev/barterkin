@@ -41,7 +41,78 @@ Google OAuth also fires this event client-side when the user launches Google sig
 **Properties:**
 
 | Property | Type | Description |
+|----
+### `onboarding_started`
+
+**When fired:** When an authenticated member loads the onboarding wizard for the first time.
+**Fires from:** `app/(onboarding)/onboarding/page.tsx`
+**Properties:**
+
+| Property | Type | Description |
 |----------|------|-------------|
+| `method` | string | `first` for initial start; `return` if they came back after skipping |
+
+---
+
+### `onboarding_completed`
+
+**When fired:** When the onboarding wizard marks completion (Step 3 render triggers `markOnboardingComplete()`).
+**Fires from:** `lib/actions/onboarding.ts`
+**Properties:** none
+
+---
+
+### `first_listing_viewed`
+
+**When fired:** When a member views any listing detail page for the first time.
+**Fires from:** `app/(app)/listings/[id]/page.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `listing_id` | string | UUID of the listing viewed |
+
+---
+
+### `first_listing_created`
+
+**When fired:** When a member creates their first listing (quest award point).
+**Fires from:** `lib/actions/listings.ts`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `listing_id` | string | UUID of the created listing |
+| `credits` | number | Credits awarded (from quest_first_listing) |
+
+---
+
+### `first_contact_sent`
+
+**When fired:** When a member sends their first message (quest award point).
+**Fires from:** `lib/actions/messaging.ts` (`sendMessage` and `createConversation`)
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `conversation_id` | string | UUID of the conversation |
+| `credits` | number | Credits awarded (from quest_first_message) |
+
+---
+
+### `first_trade_completed`
+
+**When fired:** When a member completes their first mutual trade (quest award point).
+**Fires from:** `lib/actions/trade-completions.ts`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `conversation_id` | string | UUID of the conversation |
+| `credits` | number | Credits awarded (from quest_first_trade) |
+
+---
+------|------|-------------|
 | `method` | string | Signup method: `magic_link` or `google_oauth` |
 | `landing_experiment` | string | Present only for landing-page experiment traffic. Currently `landing_hero_copy`. |
 | `landing_hero_variant` | string | Present only for landing-page experiment traffic. Variant key assigned on landing. |
@@ -439,6 +510,12 @@ Google OAuth also fires this event client-side when the user launches Google sig
 | `trade_marked_complete` | ✅ Implemented | `lib/actions/trade-completions.ts` | 8 |
 | `trade_mutually_completed` | ✅ Implemented | `lib/actions/trade-completions.ts` | 8 |
 | `trade_review_submitted` | ✅ Implemented | `lib/actions/trade-completions.ts` | 8 |
+| `onboarding_started` | ✅ Implemented | `app/(onboarding)/onboarding/page.tsx` | 7 |
+| `onboarding_completed` | ✅ Implemented | `lib/actions/onboarding.ts` | 7 |
+| `first_listing_viewed` | ✅ Implemented | `app/(app)/listings/[id]/page.tsx` | 7 |
+| `first_listing_created` | ✅ Implemented | `lib/actions/listings.ts` | 7 |
+| `first_contact_sent` | ✅ Implemented | `lib/actions/messaging.ts` | 7 |
+| `first_trade_completed` | ✅ Implemented | `lib/actions/trade-completions.ts` | 7 |
 | `trade_completion_rate` | ✅ Implemented | `lib/actions/trade-completions.ts` | 3 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
 | `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |

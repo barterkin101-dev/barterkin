@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { ONBOARDING_SKIP_COOKIE_NAME } from '@/lib/onboarding-skip'
 import { createLogger } from '@/lib/utils/logger'
+import { captureEvent } from '@/lib/analytics'
 
 /**
  * markOnboardingComplete — writes profiles.onboarding_completed_at = now() for the current user.
@@ -40,6 +41,9 @@ export async function markOnboardingComplete(): Promise<{ ok: boolean }> {
     log.error('markOnboardingComplete update failed', { context: { code: error.code } })
     return { ok: false }
   }
+
+  // Funnel analytics: track onboarding completion
+  void captureEvent(user.id, 'onboarding_completed', {})
 
   const cookieStore = await cookies()
   cookieStore.delete(ONBOARDING_SKIP_COOKIE_NAME)
