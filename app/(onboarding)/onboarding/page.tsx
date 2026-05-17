@@ -41,7 +41,7 @@ export default async function OnboardingPage({
   // Fetch profile + skill count in a single query. maybeSingle() allows null (new user with no profile row yet — RESEARCH OQ2).
   const { data: profile } = await supabase
     .from('profiles')
-    .select('display_name, avatar_url, county_id, category_id, onboarding_completed_at, skills_offered(id)')
+    .select('display_name, avatar_url, county_id, category_id, onboarding_completed_at, onboarding_started_at, skills_offered(id)')
     .eq('owner_id', user.id)
     .maybeSingle()
 

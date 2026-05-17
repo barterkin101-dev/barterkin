@@ -222,6 +222,12 @@ export async function createConversation(
       context: { conversationId, error: questResult.error },
     })
   }
+  if (questResult.ok && questResult.awarded) {
+    void captureEvent(user.id, 'first_contact_sent', {
+      conversation_id: conversationId,
+      credits: questResult.credits,
+    })
+  }
 
   const postContactUpgradeNudge = senderProfile.tier === 'free'
     ? getPostContactUpgradeNudgeProps(

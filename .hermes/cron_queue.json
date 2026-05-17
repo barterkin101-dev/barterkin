@@ -672,5 +672,15 @@
     "created_at": "2026-05-17T00-12-44Z",
     "source": "codex-review",
     "notes": "Fixed TypeScript build errors in dashboard-reminders.test.ts, discover-feed-tabs.test.tsx, listing-json-ld.test.tsx, saved-listings-page.test.tsx, and stripe-webhook-route.test.ts. Commit: 41464f5."
+  },
+  {
+    "id": "159",
+    "title": "[codex-review FIX_FIRST] [task-157] Add PostHog conversion funnel events for signup-t (a6ed1a80)",
+    "description": "codex flagged issues in a6ed1a80. Address concerns, recommit with [task-159 fix-a6ed1a80] prefix.\n\nrding/StepDirectory'\nimport { StepContact } from '@/components/onboarding/StepContact'\n\nexport const dynamic = 'force-dynamic'\nexport const metadata = { title: 'Get started' }\n\n/**\n * Onboarding wizard page.\n *\n * D-01: lives under route group (onboarding) so it inherits a distraction-free layout with no AppNav.\n * D-13: 3 linear steps (Profile / Directory / Contact) — no welcome screen.\n * D-14: progress indicator (rendered in WizardLayout) shows Step N of 3.\n * D-15: only Step 1 has a hard gate (profile must be complete).\n *\n * searchParams.step determines which step renders:\ncodex\nTwo concrete issues emerged. One is a real instrumentation hole in `createConversation`; the other is a duplication bug in onboarding start tracking caused by reading a column the query never selects. I’m pulling exact line references now and checking whether tests would have caught either.\nexec\n/bin/bash -lc \"nl -ba lib/actions/messaging.ts | sed -n '190,235p'\" in /root/barterkin succeeded in 0ms:\n   190\t      return { ok: false, error: 'Something went wrong.' }\n   191\t    }\n   192\t  }\n   193\t\n   194\t  // Insert initial message\n   195\t  const { data: message, error: msgErr } = await supabase\n   196\t    .from('messages')\n   197\t    .insert({\n   198\t      conversation_id: conversationId,\n   199\t      sender_profile_id: senderProfile.id,\n   200\t      content: values.initialMessage,\n   201\t    })\n   202\t    .select('id')\n   203\t    .single()\n   204\t\n   205\t  if (msgErr || !message) {\n   206\t    const log = createLogger('messaging')\n   207\t    log.error('createConversation message insert failed', { error: msgErr, context: { code: msgErr?.code } })\n   208\t    return { ok: false, error: 'Something went wrong sending your message.' }\n   209\t  }\nexec\n/bin/bash -lc \"nl -ba docs/events.md | sed -n '32,115p'\" in /root/barterkin succeeded in 0ms:\n    32\t---\n    33\t\n    34\t### `signup_completed`\n    35\t\n    36\t**When fired:**\n    37\t- Non-OTP path: after successful user creation in `signUpAction()`\n",
+    "priority": "critical",
+    "status": "completed",
+    "created_at": "2026-05-17T08-09-49Z",
+    "source": "codex-review",
+    "notes": "Fixed two funnel event instrumentation holes: (1) added first_contact_sent PostHog event to createConversation where the first message quest is actually awarded, (2) added onboarding_started_at to the select query in onboarding page so the onboarding_started event fires only once instead of on every page load. Commit: d45d4c1."
   }
 ]
