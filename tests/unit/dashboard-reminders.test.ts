@@ -59,6 +59,7 @@ function makeListing(overrides: Partial<ListingRow>): ListingRow {
     status: 'active',
     created_at: '2026-04-20T09:00:00.000Z',
     updated_at: '2026-04-20T09:00:00.000Z',
+    featured_until: null,
     boosted_until: null,
     images: [],
     profiles: null,
@@ -94,6 +95,7 @@ describe('getUnreadMessageReminder', () => {
             content: 'Fresh ping',
             created_at: '2026-05-13T08:30:00.000Z',
             sender_profile_id: 'profile-2',
+            sender: { display_name: 'Alex', username: 'alex' },
           },
         }),
       ],
@@ -129,6 +131,7 @@ describe('getUnreadMessageReminder', () => {
             content: 'My follow-up',
             created_at: '2026-05-11T09:00:00.000Z',
             sender_profile_id: PROFILE_ID,
+            sender: { display_name: 'Naeem', username: 'naeem' },
           },
         }),
       ],
@@ -477,7 +480,7 @@ describe('getWarmConversationReengagementReminder', () => {
 
   it('ignores stale conversations when the counterpart sent the last message', () => {
     const result = getWarmConversationReengagementReminder(
-      [makeConversation()],
+      [makeConversation({})],
       PROFILE_ID,
       new Date('2026-05-15T09:00:00.000Z'),
     )
@@ -714,7 +717,7 @@ describe('getFirstTradeProgressReminder', () => {
 
 describe('getSecondListingExpansionReminder', () => {
   it('returns null when onboarding is incomplete', () => {
-    expect(getSecondListingExpansionReminder(null, [makeListing()], 1)).toBeNull()
+    expect(getSecondListingExpansionReminder(null, [makeListing({})], 1)).toBeNull()
   })
 
   it('returns null when the member has zero active listings', () => {
@@ -769,7 +772,7 @@ describe('getSecondListingExpansionReminder', () => {
 
 describe('getFirstContactLaunchReminder', () => {
   it('returns null when onboarding is incomplete', () => {
-    expect(getFirstContactLaunchReminder(null, [makeListing()], 0)).toBeNull()
+    expect(getFirstContactLaunchReminder(null, [makeListing({})], 0)).toBeNull()
   })
 
   it('returns null when the member has no active listings', () => {
@@ -786,7 +789,7 @@ describe('getFirstContactLaunchReminder', () => {
     expect(
       getFirstContactLaunchReminder(
         '2026-05-14T12:00:00.000Z',
-        [makeListing()],
+        [makeListing({})],
         1,
       ),
     ).toBeNull()
@@ -1032,7 +1035,7 @@ describe('getListingShareReminder', () => {
 
 describe('getFreshListingReminder', () => {
   it('returns null when onboarding is incomplete', () => {
-    expect(getFreshListingReminder(null, [makeListing()], new Date('2026-05-14T09:00:00.000Z'))).toBeNull()
+    expect(getFreshListingReminder(null, [makeListing({})], new Date('2026-05-14T09:00:00.000Z'))).toBeNull()
   })
 
   it('returns null when the member has zero active listings', () => {
@@ -1156,7 +1159,7 @@ describe('getViewedListingRevisitReminder', () => {
   it('returns null without profile views snapshot data', () => {
     expect(
       getViewedListingRevisitReminder(
-        [makeListing()],
+        [makeListing({})],
         {},
         null,
         new Date('2026-05-14T09:00:00.000Z'),
@@ -1167,7 +1170,7 @@ describe('getViewedListingRevisitReminder', () => {
   it('returns null when there have been no profile views', () => {
     expect(
       getViewedListingRevisitReminder(
-        [makeListing()],
+        [makeListing({})],
         {},
         makeProfileViewsSnapshot({
           currentViews: 0,

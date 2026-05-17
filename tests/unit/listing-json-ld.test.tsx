@@ -16,6 +16,8 @@ function makeListing(overrides: Partial<ListingRow> = {}): ListingRow {
     price_estimate: '$500',
     status: 'active',
     created_at: '2024-01-15T10:00:00Z',
+    updated_at: '2024-01-15T10:00:00Z',
+    featured_until: null,
     boosted_until: null,
     images: [
       { id: 'img-1', url: 'https://example.com/guitar.jpg', sort_order: 0 },

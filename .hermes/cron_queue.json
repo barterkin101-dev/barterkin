@@ -648,9 +648,10 @@
     "title": "Add onboarding abandonment drip email for incomplete members \u2014 retention/engagement",
     "description": "Create a cron-triggered email drip for members who signed up but never completed onboarding (onboarding_completed_at is null after 24 hours). Email should be warm and personal, remind them of the value they're missing, and deep-link back to /onboarding with their return state preserved. Use the existing ReEngagementEmail pattern or build a new OnboardingAbandonmentEmail component. Add a `onboarding_reminder_sent_at` timestamp to profiles to prevent spam. Acceptance: only sends to members with null onboarding_completed_at + created_at > 24h, sends at most once, deep-link works, and unit tests cover eligibility + suppression.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-16T16:03:56.308Z",
-    "source": "cron-self-generated"
+    "source": "cron-self-generated",
+    "notes": "Added onboarding abandonment drip email with Resend template, data layer, action, cron route, DB migration, and unit tests. Commit: 331f1fb."
   },
   {
     "id": "157",
@@ -660,5 +661,14 @@
     "status": "pending",
     "created_at": "2026-05-16T16:03:56.308Z",
     "source": "cron-self-generated"
+  },
+  {
+    "id": "158",
+    "title": "[codex-review FIX_FIRST] [task-156] Add onboarding abandonment drip email for incompl (331f1fb2)",
+    "description": "codex flagged issues in 331f1fb2. Address concerns, recommit with [task-158 fix-331f1fb2] prefix.\n\ntsbuildinfo': EROFS: read-only file system, open '/root/barterkin/tsconfig.tsbuildinfo'.\nlib/data/onboarding-abandonment.ts(62,17): error TS2353: Object literal may only specify known properties, and 'onboarding_reminder_sent_at' does not exist in type 'RejectExcessProperties<{ accepting_contact?: boolean | undefined; availability?: string | null | undefined; avatar_url?: string | null | undefined; banned?: boolean | undefined; bio?: string | null | undefined; ... 28 more ...; welcome_email_sent_at?: string | ... 1 more ... | undefined; }, { ...; }>'.\ntests/unit/dashboard-reminders.test.ts(51,3): error TS2322: Type '{ id: string; profile_id: string; title: string; description: string; condition: string | null; trade_terms: string | null; price_estimate: string | null; status: string; created_at: string; ... 8 more ...; county_id: number | null; }' is not assignable to type 'ListingRow'.\n  Types of property 'featured_until' are incompatible.\n    Type 'string | null | undefined' is not assignable to type 'string | null'.\n      Type 'undefined' is not assignable to type 'string | null'.\ntests/unit/dashboard-reminders.test.ts(93,11): error TS2741: Property 'sender' is missing in type '{ content: string; created_at: string; sender_profile_id: string; }' but required in type '{ content: string; created_at: string; sender_profile_id: string; sender: { display_name: string | null; username: string | null; } | null; }'.\ntests/unit/dashboard-reminders.test.ts(128,11): error TS2741: Property 'sender' is missing in type '{ content: string; created_at: string; sender_profile_id: string; }' but required in type '{ content: string; created_at: string; sender_profile_id: string; sender: { display_name: string | null; username: string | null; } | null; }'.\ntests/unit/dashboard-reminders.test.ts(480,8): error TS2554: Expected 1 arguments, but got 0.\ntests/unit/dashboard-reminders.test.ts(717,53): error TS2554: Expected 1 arguments, but got 0.\ntests/unit/dashboard-reminders.test.ts(77",
+    "priority": "critical",
+    "status": "pending",
+    "created_at": "2026-05-17T00-12-44Z",
+    "source": "codex-review"
   }
 ]

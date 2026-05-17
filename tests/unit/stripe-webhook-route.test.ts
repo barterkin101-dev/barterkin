@@ -61,7 +61,7 @@ describe('POST /api/stripe/webhook', () => {
       data: {
         object: {
           subscription: 'sub_123',
-        },
+        } as unknown as Stripe.Invoice,
       },
     } satisfies Partial<Stripe.Event>)
 
@@ -78,10 +78,10 @@ describe('POST /api/stripe/webhook', () => {
         data: [
           {
             current_period_end: 1_800_000_000,
-            price: { recurring: { interval: 'month' } },
-          },
+            price: { recurring: { interval: 'month' } as unknown as Stripe.Price.Recurring } as unknown as Stripe.Price,
+          } as unknown as Stripe.SubscriptionItem,
         ],
-      },
+      } as unknown as Stripe.ApiList<Stripe.SubscriptionItem>,
     } satisfies Partial<Stripe.Subscription>)
 
     const response = await POST(new Request('https://barterkin.com/api/stripe/webhook', {

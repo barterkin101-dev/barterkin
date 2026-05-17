@@ -4,6 +4,7 @@ import type { ProfileViewsSnapshot } from '@/lib/data/profile-views'
 import { QUESTS } from '@/lib/quests'
 
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000
+const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000
 const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000
 const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000
 
@@ -373,7 +374,6 @@ export function getFirstContactLaunchReminder(
   }
 }
 
-const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
 
 export function getFreshListingReminder(
