@@ -712,5 +712,26 @@
     "created_at": "2026-05-17T16-08-04Z",
     "source": "codex-review",
     "notes": "Commit db296d10 already addressed all codex-review concerns: removed dead code branch (onboarding_completed_at ternary), strengthened test mocks, verified UPDATE chain and SELECT shape. Tests pass (591 passed). No additional changes needed."
+  },
+  {
+    "id": "163",
+    "title": "Add referral program landing page with shareable link generator — growth",
+    "description": "Create a /referrals page in the app route group that shows the member's unique referral code, a copy-to-clipboard button for the referral link, and a dashboard of how many people they've referred and their reward status. Use existing lib/referrals.ts and lib/referral-share.ts. Surface referral credits earned. Track 'referral_page_viewed' and 'referral_link_copied' in PostHog. Acceptance: page loads with live referral data, copy button works, analytics fire, unit tests cover data fetching and copy interaction.",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "id": "164",
+    "title": "Add weekly digest email for unread messages and new listings — retention",
+    "description": "Build a Resend-powered weekly digest email that goes to members with unread messages or new listings in their county since last visit. Create lib/actions/digest.ts with a server action that queries unread message count + new listings by county, formats a simple HTML email via Resend, and sends it. Add an API route at /api/cron/weekly-digest that calls this action (to be wired to Vercel cron later). Include unsubscribe link. Acceptance: email renders correctly, only sends to active members, respects unsubscribe, unit tests cover query logic and email formatting.",
+    "priority": "high",
+    "status": "pending"
+  },
+  {
+    "id": "165",
+    "title": "Add annual Premium plan with 2-month discount — revenue",
+    "description": "Extend the existing Stripe checkout flow to support an annual Premium plan alongside monthly. Update lib/stripe/config.ts with annual price ID, modify app/(app)/dashboard/billing/page.tsx to show both plans with savings math (e.g., 'Save 17% with annual'), and update the checkout session route to accept a 'plan' parameter (monthly vs annual). Ensure the webhook handles both subscription types. Acceptance: both plans visible on billing page, checkout works for annual, webhook correctly sets plan tier, unit tests cover plan selection and pricing display.",
+    "priority": "high",
+    "status": "pending"
   }
 ]
