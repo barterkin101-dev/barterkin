@@ -48,11 +48,10 @@ export default async function OnboardingPage({
   // Already completed — middleware should have skipped redirect, but guard here too.
   if (profile?.onboarding_completed_at) redirect('/directory')
 
-  // Funnel analytics: track onboarding start (idempotent — only fires once)
+  // Funnel analytics: track onboarding start (idempotent — only fires once).
+  // method is always 'first' here because completed profiles redirect above.
   if (profile && !profile.onboarding_started_at) {
-    void captureEvent(user.id, 'onboarding_started', {
-      method: profile.onboarding_completed_at ? 'return' : 'first',
-    })
+    void captureEvent(user.id, 'onboarding_started', { method: 'first' })
     await supabase
       .from('profiles')
       .update({ onboarding_started_at: new Date().toISOString() })

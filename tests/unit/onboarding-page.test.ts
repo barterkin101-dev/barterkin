@@ -41,7 +41,8 @@ beforeEach(() => {
 
 describe('onboarding page analytics', () => {
   it('fires onboarding_started event only when onboarding_started_at is null', async () => {
-    const updateEq = vi.fn().mockReturnValue({ is: vi.fn().mockResolvedValue({ error: null }) })
+    const updateIs = vi.fn().mockResolvedValue({ error: null })
+    const updateEq = vi.fn().mockReturnValue({ is: updateIs })
     const updateFn = vi.fn().mockReturnValue({ eq: updateEq })
 
     const profileMaybeSingle = vi.fn().mockResolvedValue({
@@ -78,6 +79,9 @@ describe('onboarding page analytics', () => {
     expect(updateFn).toHaveBeenCalledWith(
       expect.objectContaining({ onboarding_started_at: expect.any(String) }),
     )
+    // Verify the UPDATE chain includes the idempotent guard (.is null)
+    expect(updateEq).toHaveBeenCalledWith('owner_id', 'user-1')
+    expect(updateIs).toHaveBeenCalledWith('onboarding_started_at', null)
   })
 
   it('does NOT fire onboarding_started when onboarding_started_at is already set', async () => {
@@ -156,5 +160,37 @@ describe('onboarding page analytics', () => {
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith('/login')
     expect(vi.mocked(captureEvent)).not.toHaveBeenCalled()
+  })
+
+  it('uses skills_offered count for profile completeness', async () => {
+    const profileMaybeSingle = vi.fn().mockResolvedValue({
+      data: {
+        display_name: 'Naeem',
+        avatar_url: null,
+        county_id: 1,
+        category_id: 1,
+        onboarding_completed_at: null,
+        onboarding_started_at: '2026-05-10T12:00:00.000Z',
+        skills_offered: [{ id: 'skill-1' }, { id: 'skill-2' }],
+      },
+      error: null,
+    })
+    const profileEq = vi.fn().mockReturnValue({ maybeSingle: profileMaybeSingle })
+    const profileSelect = vi.fn().mockReturnValue({ eq: profileEq })
+
+    const fromMock = vi.fn().mockReturnValue({
+      select: profileSelect,
+    })
+
+    makeClient({ from: fromMock })
+
+    const { default: OnboardingPage } = await import('@/app/(onboarding)/onboarding/page')
+    // Should not throw — profile has skills so completeness check passes
+    await OnboardingPage({ searchParams: Promise.resolve({ step: '1' }) })
+
+    // Verify the SELECT query was called with the correct column list
+    expect(profileSelect).toHaveBeenCalledWith(
+      'display_name, avatar_url, county_id, category_id, onboarding_completed_at, onboarding_started_at, skills_offered(id)',
+    )
   })
 })
