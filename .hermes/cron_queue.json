@@ -718,8 +718,8 @@
     "title": "Add referral program landing page with shareable link generator \u2014 growth",
     "description": "Create a /referrals page in the app route group that shows the member's unique referral code, a copy-to-clipboard button for the referral link, and a dashboard of how many people they've referred and their reward status. Use existing lib/referrals.ts and lib/referral-share.ts. Surface referral credits earned. Track 'referral_page_viewed' and 'referral_link_copied' in PostHog. Acceptance: page loads with live referral data, copy button works, analytics fire, unit tests cover data fetching and copy interaction.",
     "priority": "high",
-    "status": "in_progress",
-    "notes": "Starting: build /referrals page with shareable link generator, referral stats, and analytics."
+    "status": "completed",
+    "notes": "Added /referrals page with shareable link generator, referral stats dashboard, multi-channel share CTAs, and PostHog analytics. Commit: 446f16b."
   },
   {
     "id": "164",
@@ -734,5 +734,15 @@
     "description": "Extend the existing Stripe checkout flow to support an annual Premium plan alongside monthly. Update lib/stripe/config.ts with annual price ID, modify app/(app)/dashboard/billing/page.tsx to show both plans with savings math (e.g., 'Save 17% with annual'), and update the checkout session route to accept a 'plan' parameter (monthly vs annual). Ensure the webhook handles both subscription types. Acceptance: both plans visible on billing page, checkout works for annual, webhook correctly sets plan tier, unit tests cover plan selection and pricing display.",
     "priority": "high",
     "status": "pending"
+  },
+  {
+    "id": "166",
+    "title": "[codex-review FIX_FIRST] [task-163] Add referral program landing page with shareable  (446f16b8)",
+    "description": "codex flagged issues in 446f16b8. Address concerns, recommit with [task-166 fix-446f16b8] prefix.\n\nboard.</p>\n    57\t      </div>\n    58\t    )\n    59\t  }\n    60\t\n    61\t  const { data: profile } = await supabase\n    62\t    .from('profiles')\n    63\t    .select('id, display_name, username, avatar_url, bio, rating_avg, rating_count, is_published, email_digest_enabled, county_id, category_id, referral_code, tier, billing_interval, last_login_at, login_streak, onboarding_completed_at, skills_offered(id)')\n    64\t    .eq('owner_id', user.id)\n    65\t    .maybeSingle()\n    66\t\n    67\t  const needsDailyLoginSync = profile ? !isUtcDateToday(profile.last_login_at) : false\n    68\t  const streakResult = needsDailyLoginSync ? await updateLoginStreak() : null\n    69\t\n    70\t  const [listings, messageCount, , referralRows, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations, startedConversationCount] = profile ? await Promise.all([\n    71\t    getMyListings(profile.id),\n    72\t    supabase\n    73\t      .from('conversation_participants')\n    74\t      .select('conversation_id', { count: 'exact', head: true })\n    75\t      .eq('profile_id', profile.id)\ncodex\nI\u2019ve isolated one concrete correctness bug already: the page calls the stat \u201cCredits earned\u201d but sums the entire `credit_ledger`, not referral earnings. I\u2019m pulling exact line numbers and checking whether there\u2019s a second issue stronger than the missing tests.\nexec\n/bin/bash -lc \"nl -ba app/'(app)'/referrals/page.tsx | sed -n '1,120p' && printf '\\\\n---\\\\n' && nl -ba components/referrals/ReferralProgramClient.tsx | sed -n '1,260p' && printf '\\\\n---\\\\n' && nl -ba components/referrals/ReferralProgramClient.tsx | sed -n '261,420p'\" in /root/barterkin succeeded in 0ms:",
+    "priority": "critical",
+    "status": "completed",
+    "created_at": "2026-05-17T20-16-54Z",
+    "source": "codex-review",
+    "notes": "Fixed referral page credit stat to filter credit_ledger by referral-only reasons (referral_bonus, referral_welcome, quest_referral_converted) instead of summing entire ledger. Added unit tests for the page data fetching. Commit: 7dbd5ef."
   }
 ]

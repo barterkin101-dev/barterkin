@@ -45,20 +45,22 @@ export default async function ReferralsPage() {
   const convertedReferralCount = referrals.filter((r) => Boolean(r.credited_at)).length
   const pendingReferralCount = referrals.length - convertedReferralCount
 
-  // Fetch credit balance
+  // Fetch referral-specific credit balance
+  const REFERRAL_CREDIT_REASONS = ['referral_bonus', 'referral_welcome', 'quest_referral_converted']
   const { data: creditRows } = await supabase
     .from('credit_ledger')
     .select('amount')
     .eq('profile_id', profile.id)
+    .in('reason', REFERRAL_CREDIT_REASONS)
 
-  const creditBalance = (creditRows ?? []).reduce((sum, row) => sum + (row.amount ?? 0), 0)
+  const referralCreditBalance = (creditRows ?? []).reduce((sum, row) => sum + (row.amount ?? 0), 0)
 
   // Track page view
   await captureEvent(user.id, 'referral_page_viewed', {
     referral_code: referralCode,
     converted_referrals: convertedReferralCount,
     pending_referrals: pendingReferralCount,
-    credits: creditBalance,
+    credits: referralCreditBalance,
   })
 
   return (
@@ -76,7 +78,7 @@ export default async function ReferralsPage() {
         referralCode={referralCode}
         referralLink={referralLink}
         displayName={profile.display_name}
-        credits={creditBalance}
+        credits={referralCreditBalance}
         convertedReferralCount={convertedReferralCount}
         pendingReferralCount={pendingReferralCount}
       />
