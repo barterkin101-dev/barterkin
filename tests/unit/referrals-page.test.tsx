@@ -160,4 +160,65 @@ describe('/referrals', () => {
     const creditsCard = screen.getByText('Credits earned').closest('[data-slot="card"]')
     expect(creditsCard).toHaveTextContent('0')
   })
+
+  it('renders with zeros when referral query errors', async () => {
+    const profileQuery = {
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          maybeSingle: vi.fn().mockResolvedValue({
+            data: {
+              id: 'profile-1',
+              referral_code: 'AB12CD34',
+              display_name: 'Test User',
+            },
+          }),
+        })),
+      })),
+    }
+
+    const referralQuery = {
+      select: vi.fn(() => ({
+        eq: vi.fn().mockResolvedValue({
+          data: null,
+          error: { code: '42P01', message: 'relation does not exist' },
+        }),
+      })),
+    }
+
+    const creditQuery = {
+      select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+          in: vi.fn().mockResolvedValue({
+            data: null,
+            error: { code: '42P01', message: 'relation does not exist' },
+          }),
+        })),
+      })),
+    }
+
+    let callCount = 0
+    vi.mocked(createClient).mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: 'user-1' } },
+        }),
+      },
+      from: vi.fn((table: string) => {
+        callCount++
+        if (table === 'profiles' && callCount === 1) return profileQuery
+        if (table === 'referrals') return referralQuery
+        if (table === 'credit_ledger') return creditQuery
+        return {}
+      }),
+    } as never)
+
+    await renderPage()
+
+    // Should still render with zeros, not crash
+    const zeros = screen.getAllByText('0')
+    expect(zeros.length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText('Credits earned')).toBeInTheDocument()
+    expect(screen.getByText('Converted')).toBeInTheDocument()
+    expect(screen.getByText('Pending')).toBeInTheDocument()
+  })
 })

@@ -3,6 +3,7 @@ import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { buildReferralLink } from '@/lib/referrals'
 import { captureEvent } from '@/lib/analytics'
+import { createLogger } from '@/lib/utils/logger'
 import { ReferralProgramClient } from '@/components/referrals/ReferralProgramClient'
 
 export const metadata: Metadata = {
@@ -36,10 +37,15 @@ export default async function ReferralsPage() {
     : null
 
   // Fetch referral stats
-  const { data: referralRows } = await supabase
+  const { data: referralRows, error: referralErr } = await supabase
     .from('referrals')
     .select('id, credited_at')
     .eq('inviter_id', profile.id)
+
+  if (referralErr) {
+    const log = createLogger('referrals')
+    log.error('referral stats query failed', { error: referralErr, context: { code: referralErr.code } })
+  }
 
   const referrals = referralRows ?? []
   const convertedReferralCount = referrals.filter((r) => Boolean(r.credited_at)).length
@@ -47,11 +53,16 @@ export default async function ReferralsPage() {
 
   // Fetch referral-specific credit balance
   const REFERRAL_CREDIT_REASONS = ['referral_bonus', 'referral_welcome', 'quest_referral_converted']
-  const { data: creditRows } = await supabase
+  const { data: creditRows, error: creditErr } = await supabase
     .from('credit_ledger')
     .select('amount')
     .eq('profile_id', profile.id)
     .in('reason', REFERRAL_CREDIT_REASONS)
+
+  if (creditErr) {
+    const log = createLogger('referrals')
+    log.error('referral credit query failed', { error: creditErr, context: { code: creditErr.code } })
+  }
 
   const referralCreditBalance = (creditRows ?? []).reduce((sum, row) => sum + (row.amount ?? 0), 0)
 
