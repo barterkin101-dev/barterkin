@@ -646,6 +646,71 @@ export type Database = {
           },
         ]
       }
+      listing_save_email_notifications: {
+        Row: {
+          id: string
+          saved_listing_id: string
+          listing_id: string
+          saver_profile_id: string
+          seller_profile_id: string
+          status: string
+          sent_at: string | null
+          error_message: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          saved_listing_id: string
+          listing_id: string
+          saver_profile_id: string
+          seller_profile_id: string
+          status?: string
+          sent_at?: string | null
+          error_message?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          saved_listing_id?: string
+          listing_id?: string
+          saver_profile_id?: string
+          seller_profile_id?: string
+          status?: string
+          sent_at?: string | null
+          error_message?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_save_email_notifications_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_save_email_notifications_saver_profile_id_fkey"
+            columns: ["saver_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_save_email_notifications_seller_profile_id_fkey"
+            columns: ["seller_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_save_email_notifications_saved_listing_id_fkey"
+            columns: ["saved_listing_id"]
+            isOneToOne: false
+            referencedRelation: "saved_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       message_email_notifications: {
         Row: {
           id: string
