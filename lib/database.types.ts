@@ -771,10 +771,6 @@ export type Database = {
           first_listing_created_at?: string | null
           first_listing_viewed_at?: string | null
           first_trade_completed_at?: string | null
-          first_contact_sent_at?: string | null
-          first_listing_created_at?: string | null
-          first_listing_viewed_at?: string | null
-          first_trade_completed_at?: string | null
           founding_member?: boolean
           id?: string
           is_published?: boolean
@@ -799,7 +795,6 @@ export type Database = {
           updated_at?: string
           username?: string | null
           welcome_email_sent_at?: string | null
-          onboarding_reminder_sent_at?: string | null
         }
         Update: {
           accepting_contact?: boolean
@@ -814,6 +809,10 @@ export type Database = {
           credits?: number
           display_name?: string | null
           email_digest_enabled?: boolean
+          first_contact_sent_at?: string | null
+          first_listing_created_at?: string | null
+          first_listing_viewed_at?: string | null
+          first_trade_completed_at?: string | null
           founding_member?: boolean
           id?: string
           is_published?: boolean
@@ -838,7 +837,6 @@ export type Database = {
           updated_at?: string
           username?: string | null
           welcome_email_sent_at?: string | null
-          onboarding_reminder_sent_at?: string | null
         }
         Relationships: [
           {
