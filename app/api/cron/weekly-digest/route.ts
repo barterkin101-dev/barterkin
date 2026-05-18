@@ -128,6 +128,7 @@ export async function POST(request: Request) {
             siteUrl,
             unreadCount,
             messagesUrl: `${siteUrl}/dashboard/messages`,
+            unsubscribeUrl: `${siteUrl}/unsubscribe?id=${recipient.id}`,
           }),
         })
 

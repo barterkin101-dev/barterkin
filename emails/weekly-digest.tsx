@@ -21,6 +21,7 @@ export interface WeeklyDigestEmailProps {
   siteUrl: string
   unreadCount?: number
   messagesUrl?: string
+  unsubscribeUrl?: string
 }
 
 export function WeeklyDigestEmail({
@@ -31,6 +32,7 @@ export function WeeklyDigestEmail({
   siteUrl,
   unreadCount = 0,
   messagesUrl,
+  unsubscribeUrl,
 }: WeeklyDigestEmailProps) {
   const previewText = unreadCount > 0
     ? `You have ${unreadCount} unread message${unreadCount === 1 ? '' : 's'} and ${listings.length} new listing${listings.length === 1 ? '' : 's'}`
@@ -179,6 +181,14 @@ export function WeeklyDigestEmail({
 
             <Text style={{ color: '#3a7032', fontSize: 12, lineHeight: 1.5, margin: 0 }}>
               You&apos;re receiving this because weekly digest emails are enabled on your Barterkin profile.
+              {unsubscribeUrl && (
+                <>
+                  {' '}
+                  <a href={unsubscribeUrl} style={{ color: '#c4956a' }}>
+                    Unsubscribe
+                  </a>
+                </>
+              )}
             </Text>
             <Text style={{ color: '#3a7032', fontSize: 12, lineHeight: 1.5, margin: '8px 0 0 0' }}>
               Georgia Barter Network ·{' '}

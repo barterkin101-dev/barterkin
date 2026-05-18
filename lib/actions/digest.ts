@@ -17,6 +17,7 @@ import {
 } from '@/lib/data/digest'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { createLogger } from '@/lib/utils/logger'
+import { buildUnsubscribeUrl } from '@/lib/digest-unsubscribe'
 
 const log = createLogger('digest-action')
 
@@ -94,6 +95,7 @@ export async function sendDigestToProfile(profileId: string): Promise<SendDigest
 
     // Send email
     const resend = new Resend(apiKey)
+    const unsubscribeUrl = buildUnsubscribeUrl(profileId, siteUrl)
     await resend.emails.send({
       from: 'Barterkin <hello@barterkin.com>',
       to: [email],
@@ -106,6 +108,7 @@ export async function sendDigestToProfile(profileId: string): Promise<SendDigest
         siteUrl,
         unreadCount,
         messagesUrl: `${siteUrl}/dashboard/messages`,
+        unsubscribeUrl,
       }),
     })
 

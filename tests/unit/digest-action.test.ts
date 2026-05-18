@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const {
   mockSendEmail,
@@ -59,6 +59,7 @@ describe('sendDigestToProfile', () => {
     vi.resetAllMocks()
     vi.stubEnv('RESEND_API_KEY', 'test-resend-key')
     vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://barterkin.com')
+    vi.stubEnv('DIGEST_UNSUBSCRIBE_SECRET', 'test-unsubscribe-secret')
   })
 
   afterEach(() => {
@@ -197,6 +198,7 @@ describe('sendWeeklyDigests', () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.stubEnv('RESEND_API_KEY', 'test-resend-key')
+    vi.stubEnv('DIGEST_UNSUBSCRIBE_SECRET', 'test-unsubscribe-secret')
   })
 
   afterEach(() => {
