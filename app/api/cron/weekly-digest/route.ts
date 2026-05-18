@@ -5,6 +5,7 @@ import { captureEvent } from '@/lib/analytics'
 import {
   getDigestListingsForProfile,
   getDigestRecipients,
+  getUnreadMessageCountForProfile,
   recordDigestSent,
   type DigestListing,
 } from '@/lib/data/digest'
@@ -114,16 +115,19 @@ export async function POST(request: Request) {
 
       try {
         const headline = buildHeadline(listings)
+        const unreadCount = await getUnreadMessageCountForProfile(recipient.id)
         await resend.emails.send({
           from: 'Barterkin <hello@barterkin.com>',
           to: [email],
-          subject: headline,
+          subject: unreadCount > 0 ? `You have ${unreadCount} unread message${unreadCount === 1 ? '' : 's'} — ${headline}` : headline,
           react: WeeklyDigestEmail({
             recipientName: recipient.display_name ?? recipient.username,
             headline,
             listings,
             browseUrl: `${siteUrl}/listings`,
             siteUrl,
+            unreadCount,
+            messagesUrl: `${siteUrl}/dashboard/messages`,
           }),
         })
 

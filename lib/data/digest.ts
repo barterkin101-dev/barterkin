@@ -157,3 +157,62 @@ export async function recordDigestSent(
     return { ok: false, error: 'unknown' }
   }
 }
+
+/**
+ * Count unread messages for a profile across all their conversations.
+ * Uses the admin client to bypass RLS.
+ */
+export async function getUnreadMessageCountForProfile(profileId: string): Promise<number> {
+  const admin = getSupabaseAdmin()
+  const log = createLogger('digest')
+
+  try {
+    // Get all conversations this profile participates in
+    const { data: participantRows, error: partErr } = await admin
+      .from('conversation_participants')
+      .select('conversation_id, last_read_at')
+      .eq('profile_id', profileId)
+
+    if (partErr) {
+      log.error('getUnreadMessageCount: failed to fetch participant rows', {
+        error: partErr,
+        context: { profile_id: profileId },
+      })
+      return 0
+    }
+
+    const conversations = participantRows ?? []
+    if (conversations.length === 0) return 0
+
+    let totalUnread = 0
+
+    for (const conv of conversations) {
+      const { data: messages, error: msgErr } = await admin
+        .from('messages')
+        .select('id, sender_profile_id, created_at')
+        .eq('conversation_id', conv.conversation_id)
+        .neq('sender_profile_id', profileId)
+
+      if (msgErr) {
+        log.warn('getUnreadMessageCount: failed to fetch messages', {
+          error: msgErr,
+          context: { conversation_id: conv.conversation_id },
+        })
+        continue
+      }
+
+      const unreadInConv = (messages ?? []).filter((m) => {
+        if (!conv.last_read_at) return true
+        return new Date(m.created_at) > new Date(conv.last_read_at)
+      }).length
+
+      totalUnread += unreadInConv
+    }
+
+    return totalUnread
+  } catch (err) {
+    log.error('getUnreadMessageCountForProfile unexpected error', { error: err, context: { profile_id: profileId } })
+    return 0
+  }
+}
+

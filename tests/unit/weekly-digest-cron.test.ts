@@ -31,6 +31,7 @@ vi.mock('@/lib/supabase/admin', () => ({
 vi.mock('@/lib/data/digest', () => ({
   getDigestRecipients: mockGetDigestRecipients,
   getDigestListingsForProfile: mockGetDigestListingsForProfile,
+  getUnreadMessageCountForProfile: vi.fn().mockResolvedValue(0),
   recordDigestSent: mockRecordDigestSent,
 }))
 

@@ -19,6 +19,8 @@ export interface WeeklyDigestEmailProps {
   listings: DigestListing[]
   browseUrl: string
   siteUrl: string
+  unreadCount?: number
+  messagesUrl?: string
 }
 
 export function WeeklyDigestEmail({
@@ -27,8 +29,12 @@ export function WeeklyDigestEmail({
   listings,
   browseUrl,
   siteUrl,
+  unreadCount = 0,
+  messagesUrl,
 }: WeeklyDigestEmailProps) {
-  const previewText = `${listings.length} new ${listings.length === 1 ? 'listing' : 'listings'} on Barterkin this week`
+  const previewText = unreadCount > 0
+    ? `You have ${unreadCount} unread message${unreadCount === 1 ? '' : 's'} and ${listings.length} new listing${listings.length === 1 ? '' : 's'}`
+    : `${listings.length} new ${listings.length === 1 ? 'listing' : 'listings'} on Barterkin this week`
 
   return (
     <Html lang="en">
@@ -79,6 +85,35 @@ export function WeeklyDigestEmail({
             >
               {headline}
             </Heading>
+
+            {unreadCount > 0 && messagesUrl && (
+              <Section
+                style={{
+                  backgroundColor: '#fff8e1',
+                  border: '1px solid #ffe082',
+                  borderRadius: 6,
+                  padding: '16px',
+                  marginBottom: 24,
+                }}
+              >
+                <Text
+                  style={{
+                    color: '#1e4420',
+                    fontSize: 16,
+                    fontWeight: 600,
+                    margin: '0 0 8px 0',
+                  }}
+                >
+                  You have {unreadCount} unread message{unreadCount === 1 ? '' : 's'}
+                </Text>
+                <Link
+                  href={messagesUrl}
+                  style={{ color: '#c4956a', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}
+                >
+                  Check your messages →
+                </Link>
+              </Section>
+            )}
 
             <Text style={{ color: '#1e4420', fontSize: 15, lineHeight: 1.6, margin: '0 0 24px 0' }}>
               {recipientName ? `${recipientName}, here are` : 'Here are'} {listings.length} new{' '}
