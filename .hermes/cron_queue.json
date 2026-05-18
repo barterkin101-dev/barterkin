@@ -782,9 +782,10 @@
     "title": "Add digest unsubscribe link and preference page — retention",
     "description": "Add a one-click unsubscribe link to the weekly digest email that sets email_digest_enabled=false on the profile. Create an /unsubscribe page that handles token-based unsubscribe (no login required) with a confirmation message. Add a token generation helper using a hash of profile_id + secret. Update the WeeklyDigestEmail template to include the unsubscribe footer link. Acceptance: unsubscribe works without login, sets preference correctly, shows confirmation, and tests cover token validation + preference update.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-18T12:17:54.814Z",
-    "source": "cron-self-generated"
+    "source": "cron-self-generated",
+    "notes": "Added HMAC token-based unsubscribe flow: lib/digest-unsubscribe.ts, /api/unsubscribe route, /unsubscribe confirmation page, updated WeeklyDigestEmail with footer link, wired into digest action + cron route. 14 new unit tests. Commit: ff55faf."
   },
   {
     "id": "171",
