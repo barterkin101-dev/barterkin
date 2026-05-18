@@ -792,7 +792,7 @@
     "title": "Add listing-save email notification for sellers — retention/engagement",
     "description": "Send an email notification when a member saves someone's listing. Use the existing message_email_notifications queue pattern. Create a listing_save_notifications table, an email template (ListingSavedEmail), and a server action that checks for pending notifications and sends them via Resend. Deduplicate: one notification per listing per day per saver. Acceptance: sellers get notified when their listing is saved, notifications are deduplicated, and tests cover the send logic + deduplication.",
     "priority": "medium",
-    "status": "pending",
+    "status": "in_progress",
     "created_at": "2026-05-18T12:17:54.814Z",
     "source": "cron-self-generated"
   },
