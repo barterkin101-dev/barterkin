@@ -852,9 +852,9 @@
     "title": "Add public pricing page at /pricing — revenue/monetization",
     "description": "Pricing is currently hidden behind auth on the dashboard billing page. Create a public /pricing page (no auth required) that shows all plans: Free (3 listings, 10 contacts/mo), Premium Monthly ($9/mo, unlimited listings, 100 contacts/mo), Premium Annual ($75/yr, save 17%), and Founding ($5/mo, limited slots). Include a feature comparison table, plan cards with CTAs to /signup, and social proof (member count, founding slots remaining). Track pricing_page_viewed and pricing_cta_clicked in PostHog. Add the page to the sitemap. Acceptance: page is public, renders correctly on mobile, CTAs link to signup with plan preselection, analytics fire, and unit tests cover rendering + CTA behavior.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-19T06:11:22.785Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Added public /pricing page with Free, Premium Annual, and Founding Member plan cards, feature comparison table, FAQ, social proof with live member count, and PostHog analytics. 10 unit tests added. Commit: acb6d25."
   }
 ]

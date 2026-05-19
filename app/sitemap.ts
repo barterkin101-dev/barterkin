@@ -38,6 +38,7 @@ const STATIC_ROUTES = [
   '/login',
   '/signup',
   '/onboarding',
+  '/pricing',
   '/legal/tos',
   '/legal/privacy',
   '/legal/guidelines',
