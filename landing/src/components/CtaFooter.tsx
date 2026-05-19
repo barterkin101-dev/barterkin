@@ -1,5 +1,6 @@
 import { motion } from 'motion/react'
 import { FOOTER_LINKS } from '@/lib/constants'
+import { captureLandingEvent } from '@/lib/analytics'
 
 const FOREST = 'hsl(120 28% 17%)'
 const CLAY   = 'hsl(27 55% 55%)'
@@ -39,12 +40,14 @@ export function CtaFooter() {
               href="https://barterkin.com/signup"
               style={{ background: CLAY }}
               className="text-white rounded-xl px-8 py-3.5 text-sm font-medium hover:opacity-90 transition-opacity"
+              onClick={() => captureLandingEvent('signup_clicked', { location: 'cta_footer_primary' })}
             >
               Join Barterkin
             </a>
             <a
               href="https://barterkin.com/guidelines"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => captureLandingEvent('guidelines_clicked', { location: 'cta_footer_secondary' })}
             >
               Read the community guidelines
             </a>
@@ -68,7 +71,9 @@ export function CtaFooter() {
               </span>
             ))}
           </nav>
-          <a href="https://barterkin.com/signin" className="text-white/45 hover:text-white/80 transition-colors">
+          <a href="https://barterkin.com/signin" className="text-white/45 hover:text-white/80 transition-colors"
+            onClick={() => captureLandingEvent('signin_clicked', { location: 'footer_bar' })}
+          >
             Sign in
           </a>
         </div>

@@ -1,5 +1,7 @@
 import { motion } from 'motion/react'
 import { ArrowUpRight } from 'lucide-react'
+import { useEffect } from 'react'
+import { captureLandingEvent, getHeroVariant } from '@/lib/analytics'
 
 const FOREST = 'hsl(120 28% 17%)'
 const CLAY   = 'hsl(27 55% 55%)'
@@ -38,6 +40,11 @@ const COLLAGE = [
 ]
 
 export function Hero() {
+  useEffect(() => {
+    const variant = getHeroVariant()
+    captureLandingEvent('landing_hero_variant_viewed', { variant })
+  }, [])
+
   return (
     <section style={{ background: FOREST }} className="overflow-hidden">
       <div className="max-w-[var(--max)] mx-auto px-[var(--gutter)] pt-36 pb-24 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -91,12 +98,14 @@ export function Hero() {
               href="https://barterkin.com/signup"
               style={{ background: CLAY }}
               className="inline-flex items-center gap-2 text-white rounded-xl px-6 py-3 text-sm font-medium hover:opacity-90 transition-opacity"
+              onClick={() => captureLandingEvent('signup_clicked', { location: 'hero_primary' })}
             >
               Join the network <ArrowUpRight className="size-4" />
             </a>
             <a
               href="#directory"
               className="inline-flex items-center gap-2 border border-white/20 text-white/80 rounded-xl px-6 py-3 text-sm font-normal hover:bg-white/5 transition-colors"
+              onClick={() => captureLandingEvent('directory_clicked', { location: 'hero_secondary' })}
             >
               Browse the directory
             </a>

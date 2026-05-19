@@ -826,5 +826,35 @@
     "created_at": "2026-05-18T22-20-44Z",
     "source": "codex-review",
     "notes": "Fixed cron route unsubscribe URL to use safeBuildUnsubscribeUrl with HMAC token instead of hardcoded tokenless URL. Added safeBuildUnsubscribeUrl helper to lib/digest-unsubscribe.ts. Updated tests."
+  },
+  {
+    "id": "175",
+    "title": "Add PostHog analytics to landing page (Vite project) — growth",
+    "description": "The landing page is a separate Vite project with zero analytics. Add posthog-js to landing/package.json, create a lightweight analytics client wrapper, initialize PostHog in main.tsx with the same config pattern as the main app, and instrument all key CTAs: Join Barterkin (signup_clicked), Sign in (signin_clicked), Directory (directory_clicked), Community Guidelines (guidelines_clicked), and Founding Member CTA (founding_cta_clicked). Also track landing_hero_variant_viewed with the A/B variant. Add .env support for NEXT_PUBLIC_POSTHOG_KEY and NEXT_PUBLIC_POSTHOG_HOST. Build the landing and verify events fire. Acceptance: all CTAs fire distinct PostHog events, variant exposure is tracked, build passes, and no console errors.",
+    "priority": "high",
+    "status": "in_progress",
+    "created_at": "2026-05-19T06:11:22.785Z",
+    "source": "cron-self-generated",
+    "notes": "Starting: add posthog-js to landing, create analytics wrapper, instrument CTAs."
+  },
+  {
+    "id": "176",
+    "title": "Add new listing alerts / saved searches — retention",
+    "description": "Members browse the directory once and never return. Add a saved_searches table (profile_id, query, category_id, county_id, email_alert_enabled, created_at) with RLS. Add a 'Save this search' button on the directory page that stores the current filters. Create a cron route at /api/cron/listing-alerts that finds new listings created since the last alert check matching saved searches, and sends a 'New listings matching your search' email via Resend. Add a dashboard section to manage saved searches (view, delete, toggle alerts). Track saved_search_created, listing_alert_sent, and saved_search_deleted in PostHog. Acceptance: members can save searches, alerts fire when matching listings are created, emails render correctly, dashboard management works, and unit tests cover all paths.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-19T06:11:22.785Z",
+    "source": "cron-self-generated",
+    "notes": ""
+  },
+  {
+    "id": "177",
+    "title": "Add public pricing page at /pricing — revenue/monetization",
+    "description": "Pricing is currently hidden behind auth on the dashboard billing page. Create a public /pricing page (no auth required) that shows all plans: Free (3 listings, 10 contacts/mo), Premium Monthly ($9/mo, unlimited listings, 100 contacts/mo), Premium Annual ($75/yr, save 17%), and Founding ($5/mo, limited slots). Include a feature comparison table, plan cards with CTAs to /signup, and social proof (member count, founding slots remaining). Track pricing_page_viewed and pricing_cta_clicked in PostHog. Add the page to the sitemap. Acceptance: page is public, renders correctly on mobile, CTAs link to signup with plan preselection, analytics fire, and unit tests cover rendering + CTA behavior.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-19T06:11:22.785Z",
+    "source": "cron-self-generated",
+    "notes": ""
   }
 ]

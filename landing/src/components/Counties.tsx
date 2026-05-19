@@ -1,4 +1,5 @@
 import { motion } from 'motion/react'
+import { captureLandingEvent } from '@/lib/analytics'
 
 const COUNTIES = [
   'Appling County', 'Clarke County', 'Cobb County', 'DeKalb County',
@@ -68,6 +69,7 @@ export function Counties() {
           <a
             href="https://barterkin.com/directory"
             className="inline-block border border-border rounded-full px-6 py-2.5 text-sm font-body text-foreground/60 hover:text-foreground hover:border-foreground/25 transition-colors bg-white"
+            onClick={() => captureLandingEvent('directory_clicked', { location: 'counties_section' })}
           >
             See the full directory
           </a>

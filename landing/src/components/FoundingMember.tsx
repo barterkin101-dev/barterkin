@@ -1,4 +1,5 @@
 import { motion } from 'motion/react'
+import { captureLandingEvent } from '@/lib/analytics'
 
 const CLAY = 'hsl(27 55% 55%)'
 
@@ -23,6 +24,7 @@ export function FoundingMember() {
             href="https://barterkin.com/signup"
             style={{ background: CLAY }}
             className="inline-block text-white rounded-xl px-8 py-3.5 text-sm font-medium hover:opacity-90 transition-opacity"
+            onClick={() => captureLandingEvent('founding_cta_clicked', { location: 'founding_member_section' })}
           >
             Claim your spot
           </a>

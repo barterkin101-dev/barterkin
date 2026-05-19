@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { captureLandingEvent } from '@/lib/analytics'
 import { motion, AnimatePresence } from 'motion/react'
 import { Menu, X } from 'lucide-react'
 
@@ -31,6 +32,7 @@ export function Navbar() {
               href="https://barterkin.com/signup"
               style={{ background: CLAY }}
               className="text-white rounded-lg px-5 py-2 text-sm font-medium hover:opacity-90 transition-opacity"
+              onClick={() => captureLandingEvent('signup_clicked', { location: 'navbar_desktop' })}
             >
               Join
             </a>
@@ -64,7 +66,10 @@ export function Navbar() {
               href="https://barterkin.com/signup"
               style={{ background: CLAY }}
               className="text-white rounded-lg px-7 py-3 text-sm font-medium"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false)
+                captureLandingEvent('signup_clicked', { location: 'navbar_mobile' })
+              }}
             >
               Join
             </a>
