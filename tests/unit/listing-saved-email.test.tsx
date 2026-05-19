@@ -43,4 +43,30 @@ describe('ListingSavedEmail', () => {
     )
     expect(container.textContent).toContain('bob saved your listing')
   })
+
+  it('renders with unsubscribe link', () => {
+    const { container } = render(
+      <ListingSavedEmail
+        sellerName="Alice"
+        saverName="Bob"
+        saverUsername="bob"
+        listingTitle="Vintage Camera"
+        listingUrl="https://barterkin.com/listings/123"
+        siteUrl="https://barterkin.com"
+        unsubscribeUrl="https://barterkin.com/unsubscribe?id=abc&token=xyz"
+      />,
+    )
+    expect(container.textContent).toContain('Unsubscribe from these notifications')
+  })
+
+  it('renders without unsubscribe link when not provided', () => {
+    const { container } = render(
+      <ListingSavedEmail
+        listingTitle="Vintage Camera"
+        listingUrl="https://barterkin.com/listings/123"
+        siteUrl="https://barterkin.com"
+      />,
+    )
+    expect(container.textContent).not.toContain('Unsubscribe from these notifications')
+  })
 })

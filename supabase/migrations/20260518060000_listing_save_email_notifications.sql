@@ -68,6 +68,11 @@ begin
   from public.listings l
   where l.id = new.listing_id;
 
+  -- Skip if listing no longer exists (race condition with delete)
+  if _listing_id is null or _seller_profile_id is null then
+    return new;
+  end if;
+
   -- Don't notify if someone saves their own listing
   if new.user_id = _seller_profile_id then
     return new;

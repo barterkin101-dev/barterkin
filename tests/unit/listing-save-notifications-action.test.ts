@@ -73,6 +73,55 @@ describe('sendListingSaveNotifications', () => {
     expect(mockRecordSent).toHaveBeenCalledWith('notif-1')
   })
 
+  it('sends notification even when unsubscribe URL generation fails', async () => {
+    mockGetPending.mockResolvedValue({
+      notifications: [
+        {
+          notification: { id: 'notif-1' },
+          seller: { id: 'seller-1', display_name: 'Alice', username: 'alice', owner_id: 'owner-1' },
+          listing: { id: 'listing-1', title: 'Vintage Camera' },
+          saver: { id: 'saver-1', display_name: 'Bob', username: 'bob' },
+        },
+      ],
+      error: null,
+    })
+    mockRpc.mockResolvedValue({ data: 'alice@example.com', error: null })
+
+    // Ensure DIGEST_UNSUBSCRIBE_SECRET is not set to test fallback behavior
+    delete process.env.DIGEST_UNSUBSCRIBE_SECRET
+
+    const result = await sendListingSaveNotifications()
+    expect(result.ok).toBe(true)
+    expect(result.sent).toBe(1)
+    expect(result.failed).toBe(0)
+    expect(result.skipped).toBe(0)
+  })
+
+  it('skips analytics when seller owner_id is empty', async () => {
+    const { captureEvent } = await import('@/lib/analytics')
+    mockGetPending.mockResolvedValue({
+      notifications: [
+        {
+          notification: { id: 'notif-1' },
+          seller: { id: 'seller-1', display_name: 'Alice', username: 'alice', owner_id: '' },
+          listing: { id: 'listing-1', title: 'Vintage Camera' },
+          saver: { id: 'saver-1', display_name: 'Bob', username: 'bob' },
+        },
+      ],
+      error: null,
+    })
+    mockRpc.mockResolvedValue({ data: 'alice@example.com', error: null })
+
+    const result = await sendListingSaveNotifications()
+    expect(result.ok).toBe(true)
+    expect(result.sent).toBe(1)
+    expect(captureEvent).not.toHaveBeenCalledWith(
+      '',
+      'listing_save_notification_sent',
+      expect.any(Object),
+    )
+  })
+
   it('skips when no email found', async () => {
     mockGetPending.mockResolvedValue({
       notifications: [

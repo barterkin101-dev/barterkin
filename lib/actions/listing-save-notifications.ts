@@ -15,6 +15,7 @@ import {
 } from '@/lib/data/listing-save-notifications'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { createLogger } from '@/lib/utils/logger'
+import { buildUnsubscribeUrl } from '@/lib/digest-unsubscribe'
 
 const log = createLogger('listing-save-notifications')
 
@@ -78,6 +79,18 @@ export async function sendListingSaveNotifications(): Promise<{
     }
 
     try {
+      let unsubscribeUrl: string | null = null
+      try {
+        if (item.seller.owner_id) {
+          unsubscribeUrl = buildUnsubscribeUrl(item.seller.owner_id, siteUrl)
+        }
+      } catch (unsubErr) {
+        log.warn('Failed to build unsubscribe URL', {
+          error: unsubErr,
+          context: { seller_profile_id: item.seller.id },
+        })
+      }
+
       await resend.emails.send({
         from: 'Barterkin <hello@barterkin.com>',
         to: [email],
@@ -89,6 +102,7 @@ export async function sendListingSaveNotifications(): Promise<{
           listingTitle: item.listing.title,
           listingUrl: `${siteUrl}/listings/${item.listing.id}`,
           siteUrl,
+          unsubscribeUrl,
         }),
       })
 
@@ -102,11 +116,13 @@ export async function sendListingSaveNotifications(): Promise<{
         continue
       }
 
-      void captureEvent(item.seller.owner_id, 'listing_save_notification_sent', {
-        listing_id: item.listing.id,
-        saver_profile_id: item.saver.id,
-        method: 'resend',
-      })
+      if (item.seller.owner_id) {
+        void captureEvent(item.seller.owner_id, 'listing_save_notification_sent', {
+          listing_id: item.listing.id,
+          saver_profile_id: item.saver.id,
+          method: 'resend',
+        })
+      }
 
       sent++
     } catch (err) {

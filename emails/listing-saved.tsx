@@ -19,6 +19,7 @@ export interface ListingSavedEmailProps {
   listingTitle: string
   listingUrl: string
   siteUrl: string
+  unsubscribeUrl?: string | null
 }
 
 export function ListingSavedEmail({
@@ -28,6 +29,7 @@ export function ListingSavedEmail({
   listingTitle,
   listingUrl,
   siteUrl,
+  unsubscribeUrl,
 }: ListingSavedEmailProps) {
   const displayName = saverName ?? saverUsername ?? 'Someone'
   const previewText = `${displayName} saved your listing "${listingTitle}" on Barterkin`
@@ -153,6 +155,20 @@ export function ListingSavedEmail({
                 {siteUrl.replace(/^https?:\/\//, '')}
               </a>
             </Text>
+            {unsubscribeUrl && (
+              <Text
+                style={{
+                  color: '#3a7032',
+                  fontSize: 12,
+                  lineHeight: 1.5,
+                  margin: '8px 0 0 0',
+                }}
+              >
+                <a href={unsubscribeUrl} style={{ color: '#c4956a' }}>
+                  Unsubscribe from these notifications
+                </a>
+              </Text>
+            )}
           </Section>
         </Container>
       </Body>
