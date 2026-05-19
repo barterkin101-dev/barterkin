@@ -30,6 +30,67 @@ describe('BillingActions', () => {
     })
   })
 
+  it('shows switch-to-annual for monthly premium members', async () => {
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        ok: true,
+        url: 'https://billing.stripe.com/portal/switch',
+      }),
+    })
+
+    render(
+      <BillingActions
+        canManageBilling={true}
+        tier="premium"
+        billingInterval="monthly"
+        foundingAvailable={false}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: /switch to annual/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /manage billing/i })).toBeInTheDocument()
+
+    await userEvent.setup().click(screen.getByRole('button', { name: /switch to annual/i }))
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/stripe/customer-portal',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ flow: 'switch_to_annual' }),
+      }),
+    )
+    expect(assignMock).toHaveBeenCalledWith('https://billing.stripe.com/portal/switch')
+  })
+
+  it('hides switch-to-annual for annual premium members', () => {
+    render(
+      <BillingActions
+        canManageBilling={true}
+        tier="premium"
+        billingInterval="annual"
+        foundingAvailable={false}
+      />,
+    )
+
+    expect(screen.queryByRole('button', { name: /switch to annual/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /manage billing/i })).toBeInTheDocument()
+  })
+
+  it('hides switch-to-annual for founding members', () => {
+    render(
+      <BillingActions
+        canManageBilling={true}
+        tier="founding"
+        billingInterval="monthly"
+        foundingAvailable={false}
+      />,
+    )
+
+    expect(screen.queryByRole('button', { name: /switch to annual/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /manage billing/i })).toBeInTheDocument()
+  })
+
   it('defaults to annual premium checkout', async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
@@ -39,7 +100,7 @@ describe('BillingActions', () => {
       }),
     })
 
-    render(<BillingActions canManageBilling={false} tier="free" foundingAvailable={true} />)
+    render(<BillingActions canManageBilling={false} tier="free" billingInterval={null} foundingAvailable={true} />)
 
     await userEvent.setup().click(screen.getByRole('button', { name: /upgrade to premium annual/i }))
 
@@ -62,7 +123,7 @@ describe('BillingActions', () => {
       }),
     })
 
-    render(<BillingActions canManageBilling={false} tier="free" foundingAvailable={false} />)
+    render(<BillingActions canManageBilling={false} tier="free" billingInterval={null} foundingAvailable={false} />)
 
     const user = userEvent.setup()
     await user.click(screen.getByRole('button', { name: /monthly/i }))
@@ -87,7 +148,7 @@ describe('BillingActions', () => {
       }),
     })
 
-    render(<BillingActions canManageBilling={false} tier="free" foundingAvailable={false} />)
+    render(<BillingActions canManageBilling={false} tier="free" billingInterval={null} foundingAvailable={false} />)
 
     await userEvent.setup().click(screen.getByRole('button', { name: /upgrade to premium annual/i }))
 

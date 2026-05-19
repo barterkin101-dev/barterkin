@@ -7,16 +7,18 @@ import { cn } from '@/lib/utils'
 import { BILLING_PLAN_AMOUNTS, formatUsdFromCents, getPremiumAnnualSavings } from '@/lib/stripe/config'
 import { Button } from '@/components/ui/button'
 
-type BillingActionType = 'checkout-premium' | 'checkout-founding' | 'portal' | null
+type BillingActionType = 'checkout-premium' | 'checkout-founding' | 'portal' | 'switch-to-annual' | null
 type PremiumInterval = 'annual' | 'monthly'
 
 export function BillingActions({
   canManageBilling,
   tier,
+  billingInterval,
   foundingAvailable,
 }: {
   canManageBilling: boolean
   tier: string
+  billingInterval: string | null | undefined
   foundingAvailable: boolean
 }) {
   const [pendingAction, setPendingAction] = useState<BillingActionType>(null)
@@ -56,6 +58,7 @@ export function BillingActions({
   const premiumPending = pendingAction === 'checkout-premium'
   const foundingPending = pendingAction === 'checkout-founding'
   const portalPending = pendingAction === 'portal'
+  const switchToAnnualPending = pendingAction === 'switch-to-annual'
   const anyPending = pendingAction !== null
   const annualSavings = getPremiumAnnualSavings()
   const premiumMonthlyLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents)}/month`
@@ -63,10 +66,27 @@ export function BillingActions({
   const foundingMonthlyLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.foundingMonthlyCents)}/month`
   const annualSavingsLabel = formatUsdFromCents(annualSavings.totalSavingsCents)
 
-  // Paid users only see portal
+  // Paid users see portal + switch-to-annual (if monthly premium)
   if (isPaid) {
+    const showSwitchToAnnual = tier === 'premium' && billingInterval === 'monthly'
+
     return (
       <div className="flex flex-col gap-3 sm:flex-row">
+        {showSwitchToAnnual && (
+          <Button
+            type="button"
+            size="lg"
+            disabled={!canManageBilling || anyPending}
+            onClick={() =>
+              startBillingFlow('/api/stripe/customer-portal', 'switch-to-annual', {
+                flow: 'switch_to_annual',
+              })
+            }
+          >
+            {switchToAnnualPending ? <LoaderCircle className="size-4 animate-spin" /> : null}
+            Switch to Annual — Save {annualSavingsLabel}/year
+          </Button>
+        )}
         <Button
           type="button"
           size="lg"

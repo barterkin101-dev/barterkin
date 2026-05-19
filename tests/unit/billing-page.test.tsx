@@ -20,10 +20,12 @@ async function renderPage() {
 function mockBillingData({
   tier,
   stripeCustomerId = null,
+  billingInterval = null,
   foundingCount = 12,
 }: {
   tier: 'free' | 'premium' | 'founding'
   stripeCustomerId?: string | null
+  billingInterval?: string | null
   foundingCount?: number
 }) {
   const profileQuery = {
@@ -35,6 +37,7 @@ function mockBillingData({
             tier,
             stripe_customer_id: stripeCustomerId,
             subscription_current_period_end: null,
+            billing_interval: billingInterval,
           },
         }),
       })),
@@ -92,12 +95,22 @@ describe('/dashboard/billing', () => {
   })
 
   it('hides the upgrade savings callout for paid members', async () => {
-    mockBillingData({ tier: 'premium', stripeCustomerId: 'cus_123' })
+    mockBillingData({ tier: 'premium', stripeCustomerId: 'cus_123', billingInterval: 'monthly' })
 
     await renderPage()
 
     expect(screen.queryByText('Annual Premium saves $18 per year.')).not.toBeInTheDocument()
     expect(screen.queryByText('Founding pricing closes when these slots are gone.')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /manage billing/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /switch to annual/i })).toBeInTheDocument()
+  })
+
+  it('hides switch-to-annual for annual premium members', async () => {
+    mockBillingData({ tier: 'premium', stripeCustomerId: 'cus_123', billingInterval: 'annual' })
+
+    await renderPage()
+
+    expect(screen.queryByRole('button', { name: /switch to annual/i })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /manage billing/i })).toBeInTheDocument()
   })
 

@@ -40,7 +40,7 @@ export default async function BillingPage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('id, tier, stripe_customer_id, subscription_current_period_end')
+    .select('id, tier, stripe_customer_id, subscription_current_period_end, billing_interval')
     .eq('owner_id', user.id)
     .maybeSingle()
 
@@ -286,6 +286,7 @@ export default async function BillingPage() {
             <BillingActions
               canManageBilling={canManageBilling}
               tier={tier}
+              billingInterval={profile?.billing_interval}
               foundingAvailable={foundingAvailable}
             />
             {!canManageBilling ? (
