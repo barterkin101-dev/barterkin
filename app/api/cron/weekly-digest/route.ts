@@ -11,6 +11,7 @@ import {
 } from '@/lib/data/digest'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { createLogger } from '@/lib/utils/logger'
+import { safeBuildUnsubscribeUrl } from '@/lib/digest-unsubscribe'
 
 // Node runtime — resend SDK uses Node APIs.
 export const runtime = 'nodejs'
@@ -128,7 +129,7 @@ export async function POST(request: Request) {
             siteUrl,
             unreadCount,
             messagesUrl: `${siteUrl}/dashboard/messages`,
-            unsubscribeUrl: `${siteUrl}/unsubscribe?id=${recipient.id}`,
+            unsubscribeUrl: safeBuildUnsubscribeUrl(recipient.id, siteUrl),
           }),
         })
 

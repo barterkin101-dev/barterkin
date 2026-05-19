@@ -39,6 +39,11 @@ vi.mock('@/lib/analytics', () => ({
   captureEvent: mockCaptureEvent,
 }))
 
+vi.mock('@/lib/digest-unsubscribe', () => ({
+  safeBuildUnsubscribeUrl: vi.fn((profileId, siteUrl) => 
+`${siteUrl}/unsubscribe?id=${profileId}&token=test-token`),
+}))
+
 vi.mock('@/lib/utils/logger', () => ({
   createLogger: vi.fn(() => ({
     info: vi.fn(),

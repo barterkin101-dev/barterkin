@@ -65,3 +65,15 @@ export function buildUnsubscribeUrl(profileId: string, siteUrl: string): string 
   url.searchParams.set('token', token)
   return url.toString()
 }
+
+/**
+ * Build unsubscribe URL safely — returns null if secret is missing.
+ * Use this in contexts where a missing secret should not crash the caller.
+ */
+export function safeBuildUnsubscribeUrl(profileId: string, siteUrl: string): string | null {
+  try {
+    return buildUnsubscribeUrl(profileId, siteUrl)
+  } catch {
+    return null
+  }
+}
