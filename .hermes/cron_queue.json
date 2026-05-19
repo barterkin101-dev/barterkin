@@ -832,10 +832,10 @@
     "title": "Add PostHog analytics to landing page (Vite project) — growth",
     "description": "The landing page is a separate Vite project with zero analytics. Add posthog-js to landing/package.json, create a lightweight analytics client wrapper, initialize PostHog in main.tsx with the same config pattern as the main app, and instrument all key CTAs: Join Barterkin (signup_clicked), Sign in (signin_clicked), Directory (directory_clicked), Community Guidelines (guidelines_clicked), and Founding Member CTA (founding_cta_clicked). Also track landing_hero_variant_viewed with the A/B variant. Add .env support for NEXT_PUBLIC_POSTHOG_KEY and NEXT_PUBLIC_POSTHOG_HOST. Build the landing and verify events fire. Acceptance: all CTAs fire distinct PostHog events, variant exposure is tracked, build passes, and no console errors.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-19T06:11:22.785Z",
     "source": "cron-self-generated",
-    "notes": "Starting: add posthog-js to landing, create analytics wrapper, instrument CTAs."
+    "notes": "PostHog analytics fully implemented in landing page: initPostHog() in main.tsx, captureLandingEvent() wrapper, all CTA events instrumented (signup_clicked, signin_clicked, directory_clicked, guidelines_clicked, founding_cta_clicked), landing_hero_variant_viewed with A/B variant tracking, ANALYTICS.md docs, .env.example, 10 unit tests across analytics lib + Hero component. Build passes, all tests pass. Commit: b38d1fe."
   },
   {
     "id": "176",
