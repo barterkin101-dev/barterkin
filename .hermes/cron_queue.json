@@ -882,9 +882,29 @@
     "title": "Add gift Premium subscription flow — revenue/monetization",
     "description": "Let members buy Premium as a gift for another member. Add a \"Gift Premium\" section on the billing page with recipient email input. Create a Stripe checkout session with gift metadata, a gift_purchases table (purchaser_id, recipient_email, status, redeemed_at), and a gift redemption flow via a signed URL. Send a GiftPremiumEmail via Resend with the redemption link. Track premium_gift_purchased and premium_gift_redeemed in PostHog. Acceptance: gift checkout works, email sends, redemption activates Premium, and tests cover purchase + redemption flows.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-20T10:05:55.496Z",
     "source": "cron-self-generated",
-    "notes": "Started: analyzing codebase for gift Premium flow implementation"
+    "notes": "Added gift_purchases table to lib/database.types.ts to fix type safety. Full gift flow already implemented: checkout session, webhook handler, gift_purchases DB table, email template, redemption API + page + form, billing page integration, and unit tests. Commit: b967a05."
+  },
+  {
+    "id": "181",
+    "title": "Add public county browse page with member counts and SEO — growth",
+    "description": "Create a public /counties page that lists all Georgia counties with member counts, linking to county-specific filtered directory views. Add SEO metadata, structured data, and a sitemap entry. Track page views in PostHog. Acceptance: page renders all counties with accurate member counts, links to filtered directory, passes Lighthouse SEO audit, and has unit tests for data fetching.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-20T10:05:55.496Z",
+    "source": "cron-self-generated",
+    "notes": ""
+  },
+  {
+    "id": "182",
+    "title": "Add onboarding completion rate analytics dashboard — retention",
+    "description": "Build an admin analytics view showing onboarding funnel metrics: signup → profile creation → first listing → first contact → first trade. Use PostHog funnel analytics or compute from profiles table. Add a simple admin-only page at /admin/onboarding with charts. Acceptance: funnel shows conversion rates at each step, data is accurate, page is admin-gated, and has basic unit tests.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-20T10:05:55.496Z",
+    "source": "cron-self-generated",
+    "notes": ""
   }
 ]

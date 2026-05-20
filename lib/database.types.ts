@@ -1735,6 +1735,66 @@ export type Database = {
           },
         ]
       }
+      gift_purchases: {
+        Row: {
+          id: string
+          purchaser_id: string
+          recipient_email: string
+          status: string
+          redeemed_at: string | null
+          redeemed_by_profile_id: string | null
+          stripe_checkout_session_id: string | null
+          stripe_subscription_id: string | null
+          tier: string
+          billing_interval: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          purchaser_id: string
+          recipient_email: string
+          status?: string
+          redeemed_at?: string | null
+          redeemed_by_profile_id?: string | null
+          stripe_checkout_session_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          billing_interval?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          purchaser_id?: string
+          recipient_email?: string
+          status?: string
+          redeemed_at?: string | null
+          redeemed_by_profile_id?: string | null
+          stripe_checkout_session_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          billing_interval?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_purchases_purchaser_id_fkey"
+            columns: ["purchaser_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gift_purchases_redeemed_by_profile_id_fkey"
+            columns: ["redeemed_by_profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
