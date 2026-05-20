@@ -10,9 +10,9 @@ const log = createLogger('stripe-checkout-api')
 
 /**
  * POST /api/stripe/checkout-session
- * Creates a Stripe Checkout session for subscription upgrade.
+ * Creates a Stripe Checkout session for subscription upgrade or gift purchase.
  * Auth: requires authenticated user.
- * Body: { priceId?: 'premium' | 'annual' | 'founding' }
+ * Body: { priceId?: 'premium' | 'annual' | 'founding', gift?: boolean, recipientEmail?: string }
  */
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -35,11 +35,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Already subscribed.' }, { status: 409 })
   }
 
-  let body: { priceId?: string } = {}
+  let body: { priceId?: string; gift?: boolean; recipientEmail?: string } = {}
   try {
     body = await request.json()
   } catch {
     // empty body is fine — defaults to premium
+  }
+
+  const isGift = body.gift === true
+  const recipientEmail = isGift ? body.recipientEmail?.trim() : undefined
+
+  if (isGift && !recipientEmail) {
+    return NextResponse.json({ ok: false, error: 'Recipient email is required for gift purchases.' }, { status: 400 })
   }
 
   const requestedPlan =
@@ -104,6 +111,10 @@ export async function POST(request: NextRequest) {
         .eq('id', profile.id)
     }
 
+    const successUrl = isGift
+      ? `${siteUrl}/dashboard/billing?gift=success`
+      : `${siteUrl}/dashboard/billing/success?tier=${requestedTier}&billing=${billingInterval}`
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
@@ -113,13 +124,15 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${siteUrl}/dashboard/billing/success?tier=${requestedTier}&billing=${billingInterval}`,
+      success_url: successUrl,
       cancel_url: `${siteUrl}/dashboard/billing?canceled=1`,
       metadata: {
         profile_id: profile.id,
         user_id: user.id,
         tier: requestedTier,
         billing_interval: billingInterval,
+        gift: isGift ? 'true' : 'false',
+        recipient_email: recipientEmail ?? '',
       },
       subscription_data: {
         metadata: {
@@ -127,13 +140,37 @@ export async function POST(request: NextRequest) {
           user_id: user.id,
           tier: requestedTier,
           billing_interval: billingInterval,
+          gift: isGift ? 'true' : 'false',
+          recipient_email: recipientEmail ?? '',
         },
       },
     })
 
+    // If this is a gift, create the gift_purchase record
+    if (isGift && recipientEmail) {
+      const { error: giftError } = await supabase
+        .from('gift_purchases')
+        .insert({
+          purchaser_id: profile.id,
+          recipient_email: recipientEmail,
+          status: 'pending',
+          stripe_checkout_session_id: session.id,
+          tier: requestedTier,
+          billing_interval: billingInterval,
+        })
+
+      if (giftError) {
+        log.error('Failed to create gift_purchase record', {
+          context: { error: giftError.message, profile_id: profile.id },
+        })
+        // Don't fail the checkout — the webhook will handle it
+      }
+    }
+
     captureEvent(profile.id, 'checkout_session_created', {
       tier: requestedTier,
       billing_interval: billingInterval,
+      gift: isGift,
     })
 
     return NextResponse.json({ ok: true, url: session.url })

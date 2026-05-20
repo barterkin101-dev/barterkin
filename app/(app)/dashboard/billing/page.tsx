@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { CheckCircle2, CreditCard, ShieldCheck, Sparkles, Zap } from 'lucide-react'
+import { CheckCircle2, CreditCard, Gift, ShieldCheck, Sparkles, Zap } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { BillingActions } from '@/components/dashboard/BillingActions'
+import { GiftPurchaseForm } from '@/components/gift/GiftPurchaseForm'
 import { FREE_LISTING_LIMIT } from '@/lib/listing-limits'
 import {
   BILLING_PLAN_AMOUNTS,
@@ -43,6 +44,26 @@ export default async function BillingPage() {
     .select('id, tier, stripe_customer_id, subscription_current_period_end, billing_interval')
     .eq('owner_id', user.id)
     .maybeSingle()
+
+  let giftPurchases: Array<{
+    id: string
+    recipient_email: string
+    status: string
+    tier: string
+    billing_interval: string
+    created_at: string
+  }> | null = null
+  try {
+    const result = await supabase
+      .from('gift_purchases')
+      .select('id, recipient_email, status, tier, billing_interval, created_at')
+      .eq('purchaser_id', profile?.id ?? '')
+      .order('created_at', { ascending: false })
+      .limit(5)
+    giftPurchases = result.data
+  } catch {
+    giftPurchases = null
+  }
 
   const tier = profile?.tier ?? 'free'
   const isPaid = tier === 'premium' || tier === 'founding'
@@ -295,6 +316,58 @@ export default async function BillingPage() {
                   ? 'The billing portal unlocks after your first successful checkout.'
                   : `The billing portal unlocks after your first successful checkout. Annual Premium bills ${premiumAnnualLabel} upfront and saves ${annualSavingsLabel} versus monthly.`}
               </p>
+            ) : null}
+          </CardContent>
+        </Card>
+
+        {/* Gift Premium */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Gift className="size-5 text-primary" />
+              Gift Premium
+            </CardTitle>
+            <CardDescription>
+              Buy Premium for a friend, family member, or trading partner. They&apos;ll receive an email with a redemption link.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <GiftPurchaseForm />
+            {giftPurchases && giftPurchases.length > 0 ? (
+              <div className="mt-6 space-y-3">
+                <p className="text-sm font-medium">Your recent gifts</p>
+                <div className="space-y-2">
+                  {giftPurchases.map((gift) => (
+                    <div
+                      key={gift.id}
+                      className="flex items-center justify-between rounded-lg border bg-muted/20 px-3 py-2"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium">{gift.recipient_email}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {gift.tier === 'founding' ? 'Founding' : 'Premium'} ·{' '}
+                          {gift.billing_interval === 'annual' ? 'Annual' : 'Monthly'}
+                        </p>
+                      </div>
+                      <Badge
+                        variant={
+                          gift.status === 'redeemed'
+                            ? 'default'
+                            : gift.status === 'expired'
+                              ? 'secondary'
+                              : 'outline'
+                        }
+                      >
+                        {gift.status === 'redeemed'
+                          ? 'Redeemed'
+                          : gift.status === 'expired'
+                            ? 'Expired'
+                            : 'Pending'}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ) : null}
           </CardContent>
         </Card>

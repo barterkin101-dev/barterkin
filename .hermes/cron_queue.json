@@ -882,8 +882,9 @@
     "title": "Add gift Premium subscription flow — revenue/monetization",
     "description": "Let members buy Premium as a gift for another member. Add a \"Gift Premium\" section on the billing page with recipient email input. Create a Stripe checkout session with gift metadata, a gift_purchases table (purchaser_id, recipient_email, status, redeemed_at), and a gift redemption flow via a signed URL. Send a GiftPremiumEmail via Resend with the redemption link. Track premium_gift_purchased and premium_gift_redeemed in PostHog. Acceptance: gift checkout works, email sends, redemption activates Premium, and tests cover purchase + redemption flows.",
     "priority": "high",
-    "status": "pending",
+    "status": "in_progress",
     "created_at": "2026-05-20T10:05:55.496Z",
-    "source": "cron-self-generated"
+    "source": "cron-self-generated",
+    "notes": "Started: analyzing codebase for gift Premium flow implementation"
   }
 ]

@@ -73,6 +73,15 @@ async function handleCheckoutSessionCompleted(
   session: Stripe.Checkout.Session,
   supabase: Awaited<ReturnType<typeof createClient>>,
 ) {
+  const isGift = session.metadata?.gift === 'true'
+  const recipientEmail = session.metadata?.recipient_email
+
+  // Handle gift purchases
+  if (isGift && recipientEmail) {
+    await handleGiftCheckoutCompleted(session, supabase)
+    return
+  }
+
   const profileId = session.metadata?.profile_id
   if (!profileId) {
     log.warn('checkout.session.completed missing profile_id', { context: { session_id: session.id } })
@@ -106,6 +115,69 @@ async function handleCheckoutSessionCompleted(
     tier,
     source: 'stripe_webhook',
     event_type: 'checkout.session.completed',
+  })
+}
+
+async function handleGiftCheckoutCompleted(
+  session: Stripe.Checkout.Session,
+  supabase: Awaited<ReturnType<typeof createClient>>,
+) {
+  const purchaserProfileId = session.metadata?.profile_id
+  const recipientEmail = session.metadata?.recipient_email
+  const subscriptionId = session.subscription as string | null
+
+  if (!purchaserProfileId || !recipientEmail) {
+    log.warn('Gift checkout missing metadata', { context: { session_id: session.id } })
+    return
+  }
+
+  // Update the gift_purchase record
+  const { data: giftPurchase, error: giftError } = await supabase
+    .from('gift_purchases')
+    .update({
+      stripe_subscription_id: subscriptionId,
+      status: 'pending',
+    })
+    .eq('stripe_checkout_session_id', session.id)
+    .select('id, purchaser_id, recipient_email, tier, billing_interval')
+    .maybeSingle()
+
+  if (giftError) {
+    log.error('Failed to update gift_purchase after checkout', {
+      context: { error: giftError.message, session_id: session.id },
+    })
+  }
+
+  log.info('Gift purchase confirmed', {
+    context: {
+      gift_purchase_id: giftPurchase?.id,
+      purchaser_id: purchaserProfileId,
+      recipient_email: recipientEmail,
+    },
+  })
+
+  // Send the gift email
+  try {
+    const { sendGiftPremiumEmail } = await import('@/lib/actions/gift-premium')
+    const result = await sendGiftPremiumEmail(giftPurchase?.id ?? '')
+    if (!result.ok) {
+      log.error('Failed to send gift email', {
+        context: { error: result.error, gift_purchase_id: giftPurchase?.id },
+      })
+    }
+  } catch (err) {
+    log.error('Failed to import/send gift email', {
+      context: { error: err instanceof Error ? err.message : 'Unknown', session_id: session.id },
+    })
+  }
+
+  // Track gift purchase
+  void captureEvent(purchaserProfileId, 'premium_gift_purchased', {
+    gift_purchase_id: giftPurchase?.id,
+    recipient_email: recipientEmail,
+    tier: session.metadata?.tier ?? 'premium',
+    billing_interval: session.metadata?.billing_interval ?? 'monthly',
+    session_id: session.id,
   })
 }
 
