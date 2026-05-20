@@ -872,9 +872,10 @@
     "title": "Add recently viewed listings to dashboard — retention",
     "description": "Add a \"Recently Viewed\" card to the dashboard showing the last 5 listings the member viewed. Create a listing_views table (profile_id, listing_id, viewed_at) with RLS and a trigger that keeps only the 20 most recent views per member. Add a data helper in lib/data/listing-views.ts and a dashboard component. Track listing_revisited_from_dashboard in PostHog. Acceptance: views are recorded on listing detail page, dashboard shows recent views with links, old views are pruned, and tests cover all paths.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-20T10:05:55.496Z",
-    "source": "cron-self-generated"
+    "source": "cron-self-generated",
+    "notes": "Added listing_views table with RLS, pruning trigger, upsert tracking on listing detail page, getRecentListingViews data helper, RecentlyViewedCard dashboard component, listing_revisited_from_dashboard analytics, and 3 unit tests. Commits: a26ec3d, f7671b5."
   },
   {
     "id": "180",
