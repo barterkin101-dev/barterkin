@@ -298,7 +298,7 @@ describe('billing API routes', () => {
         from: mockFrom,
       } as unknown as Awaited<ReturnType<typeof createClient>>)
 
-      const res = await portalPOST()
+      const res = await portalPOST(makeRequest())
       expect(res.status).toBe(401)
       expect(await res.json()).toEqual({ ok: false, error: 'Not authenticated.' })
     })
@@ -309,7 +309,7 @@ describe('billing API routes', () => {
         error: null,
       })
 
-      const res = await portalPOST()
+      const res = await portalPOST(makeRequest())
       expect(res.status).toBe(404)
       expect(await res.json()).toEqual({ ok: false, error: 'No billing account found.' })
     })
@@ -324,7 +324,7 @@ describe('billing API routes', () => {
         url: 'https://billing.stripe.com/test',
       })
 
-      const res = await portalPOST()
+      const res = await portalPOST(makeRequest())
       const json = await res.json()
 
       expect(res.status).toBe(200)

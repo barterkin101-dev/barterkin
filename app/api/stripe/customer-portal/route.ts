@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
         sessionConfig.flow_data = {
           type: 'subscription_update',
           subscription_update: {
-            subscription: profile.stripe_subscription_id ?? undefined,
+            subscription: profile.stripe_subscription_id!,
             items: [
               {
                 id: 'item_1',

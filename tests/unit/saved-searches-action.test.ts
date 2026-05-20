@@ -137,7 +137,7 @@ describe('removeSavedSearch', () => {
 
     const result = await removeSavedSearch(null, fd)
     expect(result.ok).toBe(true)
-    expect(mockCaptureEvent).toHaveBeenCalledWith(null, 'saved_search_deleted', { search_id: 'ss-1' })
+    expect(mockCaptureEvent).toHaveBeenCalledWith('system', 'saved_search_deleted', { search_id: 'ss-1' })
     expect(mockRevalidatePath).toHaveBeenCalledWith('/dashboard')
     expect(mockRevalidatePath).toHaveBeenCalledWith('/directory')
   })
@@ -172,7 +172,7 @@ describe('toggleSearchAlert', () => {
 
     const result = await toggleSearchAlert(null, fd)
     expect(result.ok).toBe(true)
-    expect(mockCaptureEvent).toHaveBeenCalledWith(null, 'saved_search_alert_toggled', {
+    expect(mockCaptureEvent).toHaveBeenCalledWith('system', 'saved_search_alert_toggled', {
       search_id: 'ss-1',
       enabled: true,
     })
@@ -186,7 +186,7 @@ describe('toggleSearchAlert', () => {
 
     const result = await toggleSearchAlert(null, fd)
     expect(result.ok).toBe(true)
-    expect(mockCaptureEvent).toHaveBeenCalledWith(null, 'saved_search_alert_toggled', {
+    expect(mockCaptureEvent).toHaveBeenCalledWith('system', 'saved_search_alert_toggled', {
       search_id: 'ss-1',
       enabled: false,
     })

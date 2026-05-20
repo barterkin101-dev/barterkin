@@ -99,7 +99,7 @@ export async function removeSavedSearch(
     return { ok: false, error: error ?? 'Failed to remove saved search.' }
   }
 
-  void captureEvent(null, 'saved_search_deleted', { search_id: searchId })
+  void captureEvent('system', 'saved_search_deleted', { search_id: searchId })
 
   revalidatePath('/dashboard')
   revalidatePath('/directory')
@@ -129,7 +129,7 @@ export async function toggleSearchAlert(
     return { ok: false, error: error ?? 'Failed to update alert setting.' }
   }
 
-  void captureEvent(null, 'saved_search_alert_toggled', {
+  void captureEvent('system', 'saved_search_alert_toggled', {
     search_id: searchId,
     enabled,
   })

@@ -87,7 +87,7 @@ export default async function PricingPage() {
   const annualSavingsLabel = formatUsdFromCents(annualSavings.totalSavingsCents)
   const annualMonthlyEquivalent = formatUsdFromCents(annualSavings.monthlyEquivalentCents)
 
-  captureEvent('pricing_page_viewed', {
+  void captureEvent('system', 'pricing_page_viewed', {
     founding_slots_remaining: foundingSlotsRemaining,
     member_count: totalMembers,
   })

@@ -129,7 +129,7 @@ export async function POST(request: Request) {
             siteUrl,
             unreadCount,
             messagesUrl: `${siteUrl}/dashboard/messages`,
-            unsubscribeUrl: safeBuildUnsubscribeUrl(recipient.id, siteUrl),
+            unsubscribeUrl: safeBuildUnsubscribeUrl(recipient.id, siteUrl) ?? undefined,
           }),
         })
 
