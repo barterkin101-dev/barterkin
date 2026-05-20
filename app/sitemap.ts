@@ -33,6 +33,7 @@ const STATIC_ROUTES = [
   '',
   '/about',
   '/behind-barterkin',
+  '/categories',
   '/directory',
   '/listings',
   '/login',

@@ -144,6 +144,6 @@ describe('sitemap', () => {
     )
 
     expect(entries.find((entry) => entry.url === 'https://www.barterkin.com/m/null')).toBeUndefined()
-    expect(entries).toHaveLength(46)
+    expect(entries).toHaveLength(47)
   })
 })
