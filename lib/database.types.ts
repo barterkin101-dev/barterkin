@@ -1088,6 +1088,103 @@ export type Database = {
           },
         ]
       }
+      saved_searches: {
+        Row: {
+          id: string
+          profile_id: string
+          query: string | null
+          category_id: number | null
+          county_id: number | null
+          email_alert_enabled: boolean
+          last_alert_sent_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          profile_id: string
+          query?: string | null
+          category_id?: number | null
+          county_id?: number | null
+          email_alert_enabled?: boolean
+          last_alert_sent_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          profile_id?: string
+          query?: string | null
+          category_id?: number | null
+          county_id?: number | null
+          email_alert_enabled?: boolean
+          last_alert_sent_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_searches_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_searches_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_searches_county_id_fkey"
+            columns: ["county_id"]
+            isOneToOne: false
+            referencedRelation: "counties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_alerts: {
+        Row: {
+          id: string
+          saved_search_id: string
+          profile_id: string
+          listings_count: number
+          sent_at: string
+        }
+        Insert: {
+          id?: string
+          saved_search_id: string
+          profile_id: string
+          listings_count?: number
+          sent_at?: string
+        }
+        Update: {
+          id?: string
+          saved_search_id?: string
+          profile_id?: string
+          listings_count?: number
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_alerts_saved_search_id_fkey"
+            columns: ["saved_search_id"]
+            isOneToOne: false
+            referencedRelation: "saved_searches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_alerts_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trade_completions: {
         Row: {
           id: string

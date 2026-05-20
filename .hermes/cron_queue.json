@@ -842,10 +842,10 @@
     "title": "Add new listing alerts / saved searches — retention",
     "description": "Members browse the directory once and never return. Add a saved_searches table (profile_id, query, category_id, county_id, email_alert_enabled, created_at) with RLS. Add a 'Save this search' button on the directory page that stores the current filters. Create a cron route at /api/cron/listing-alerts that finds new listings created since the last alert check matching saved searches, and sends a 'New listings matching your search' email via Resend. Add a dashboard section to manage saved searches (view, delete, toggle alerts). Track saved_search_created, listing_alert_sent, and saved_search_deleted in PostHog. Acceptance: members can save searches, alerts fire when matching listings are created, emails render correctly, dashboard management works, and unit tests cover all paths.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-19T06:11:22.785Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Added saved_searches + listing_alerts DB migration with RLS, data layer (lib/data/saved-searches.ts), actions (lib/actions/saved-searches.ts, lib/actions/listing-alerts.ts), components (SaveSearchButton, SavedSearchesCard), cron route (/api/cron/listing-alerts), email template (emails/listing-alert.tsx), delete API route (/api/saved-searches/delete), directory page integration, and 6 unit test files. All tests pass (710 passed). Commit: 7734044."
   },
   {
     "id": "177",

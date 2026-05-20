@@ -11,6 +11,7 @@ import { DirectoryGrid } from '@/components/directory/DirectoryGrid'
 import { DirectoryPagination } from '@/components/directory/DirectoryPagination'
 import { BlockedToast } from '@/components/directory/BlockedToast'
 import { BrowseUpgradeBanner } from '@/components/browse/BrowseUpgradeBanner'
+import { SaveSearchButton } from '@/components/directory/SaveSearchButton'
 
 export const metadata: Metadata = {
   title: 'Directory',
@@ -80,12 +81,22 @@ export default async function DirectoryPage({
       {browseUpgradeBanner && <BrowseUpgradeBanner {...browseUpgradeBanner} />}
 
       <div className="mt-8 space-y-4">
-        <DirectoryFilters
-          initialCategorySlug={filters.categorySlug}
-          initialCountyFips={filters.countyFips}
-          initialQ={filters.q}
-          activeFilterCount={filters.activeFilterCount}
-        />
+        <div className="flex items-center justify-between gap-4">
+          <DirectoryFilters
+            initialCategorySlug={filters.categorySlug}
+            initialCountyFips={filters.countyFips}
+            initialQ={filters.q}
+            activeFilterCount={filters.activeFilterCount}
+          />
+          {profile && (
+            <SaveSearchButton
+              profileId={profile.id}
+              query={filters.q}
+              categoryId={filters.categoryId}
+              countyId={filters.countyId}
+            />
+          )}
+        </div>
         <ActiveFilterChips
           categorySlug={filters.categorySlug}
           countyFips={filters.countyFips}
