@@ -856,5 +856,32 @@
     "created_at": "2026-05-19T06:11:22.785Z",
     "source": "cron-self-generated",
     "notes": "Added public /pricing page with Free, Premium Annual, and Founding Member plan cards, feature comparison table, FAQ, social proof with live member count, and PostHog analytics. 10 unit tests added. Commit: acb6d25."
+  },
+  {
+    "id": "178",
+    "title": "Add public category browse page with member counts and SEO — growth",
+    "description": "Create a /categories page (no auth required) that shows all listing categories with live member counts, top skills in each category, and a CTA to sign up. Use static generation with revalidate. Add category-specific OG images. Track category_page_viewed and category_cta_clicked in PostHog. Add to sitemap. Acceptance: page is public, renders correctly on mobile, SEO meta per category, analytics fire, and unit tests cover rendering + data fetching.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-20T10:05:55.496Z",
+    "source": "cron-self-generated"
+  },
+  {
+    "id": "179",
+    "title": "Add recently viewed listings to dashboard — retention",
+    "description": "Add a \"Recently Viewed\" card to the dashboard showing the last 5 listings the member viewed. Create a listing_views table (profile_id, listing_id, viewed_at) with RLS and a trigger that keeps only the 20 most recent views per member. Add a data helper in lib/data/listing-views.ts and a dashboard component. Track listing_revisited_from_dashboard in PostHog. Acceptance: views are recorded on listing detail page, dashboard shows recent views with links, old views are pruned, and tests cover all paths.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-20T10:05:55.496Z",
+    "source": "cron-self-generated"
+  },
+  {
+    "id": "180",
+    "title": "Add gift Premium subscription flow — revenue/monetization",
+    "description": "Let members buy Premium as a gift for another member. Add a \"Gift Premium\" section on the billing page with recipient email input. Create a Stripe checkout session with gift metadata, a gift_purchases table (purchaser_id, recipient_email, status, redeemed_at), and a gift redemption flow via a signed URL. Send a GiftPremiumEmail via Resend with the redemption link. Track premium_gift_purchased and premium_gift_redeemed in PostHog. Acceptance: gift checkout works, email sends, redemption activates Premium, and tests cover purchase + redemption flows.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-20T10:05:55.496Z",
+    "source": "cron-self-generated"
   }
 ]
