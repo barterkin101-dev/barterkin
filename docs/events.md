@@ -517,6 +517,7 @@ Google OAuth also fires this event client-side when the user launches Google sig
 | `first_contact_sent` | ✅ Implemented | `lib/actions/messaging.ts` | 7 |
 | `first_trade_completed` | ✅ Implemented | `lib/actions/trade-completions.ts` | 7 |
 | `trade_completion_rate` | ✅ Implemented | `lib/actions/trade-completions.ts` | 3 |
+| `listing_revisited_from_dashboard` | ✅ Implemented | `components/dashboard/RecentlyViewedCard.tsx` | 8 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
 | `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |
 
