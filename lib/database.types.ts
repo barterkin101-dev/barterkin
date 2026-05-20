@@ -1185,6 +1185,42 @@ export type Database = {
           },
         ]
       }
+      listing_views: {
+        Row: {
+          id: string
+          profile_id: string
+          listing_id: string
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          profile_id: string
+          listing_id: string
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          profile_id?: string
+          listing_id?: string
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_views_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_views_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trade_completions: {
         Row: {
           id: string

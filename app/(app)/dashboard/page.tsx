@@ -8,6 +8,7 @@ import { getConversations, getStartedConversationCount } from '@/lib/data/messag
 import { getStaleListingReminder, getUnreadMessageReminder, getDigestOptOutReminder, getFirstTradeProgressReminder, getWarmConversationReengagementReminder, getOnboardingReturnReminder, getZeroListingLaunchReminder, getSecondListingExpansionReminder, getFirstContactLaunchReminder, getFreshListingReminder, getViewedListingRevisitReminder, getListingShareReminder } from '@/lib/data/dashboard-reminders'
 import { getContactLimitStatus } from '@/lib/data/contact-limit'
 import { getOwnedListingSaveCounts } from '@/lib/data/owned-listing-save-counts'
+import { getRecentListingViews } from '@/lib/data/listing-views'
 import { buildReferralLink } from '@/lib/referrals'
 import { hasSkippedOnboarding, ONBOARDING_SKIP_COOKIE_NAME } from '@/lib/onboarding-skip'
 
@@ -35,6 +36,7 @@ import { AnnualUpgradeSavingsCard } from '@/components/dashboard/AnnualUpgradeSa
 import { FreshListingReminder } from '@/components/dashboard/FreshListingReminder'
 import { ViewedListingRevisitReminder } from '@/components/dashboard/ViewedListingRevisitReminder'
 import { ListingShareReminder } from '@/components/dashboard/ListingShareReminder'
+import { RecentlyViewedCard } from '@/components/dashboard/RecentlyViewedCard'
 import { toProfileCompletenessInput } from '@/lib/schemas/profile'
 import { STRIPE_FOUNDING_MEMBER_LIMIT, shouldShowFoundingMemberNudge } from '@/lib/stripe/config'
 import { QUESTS, isUtcDateToday } from '@/lib/quests'
@@ -67,7 +69,7 @@ export default async function DashboardPage() {
   const needsDailyLoginSync = profile ? !isUtcDateToday(profile.last_login_at) : false
   const streakResult = needsDailyLoginSync ? await updateLoginStreak() : null
 
-  const [listings, messageCount, , referralRows, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations, startedConversationCount] = profile ? await Promise.all([
+  const [listings, messageCount, , referralRows, creditBalance, foundingCountResult, discoverResult, latestResult, questCompletions, conversations, startedConversationCount, recentViews] = profile ? await Promise.all([
     getMyListings(profile.id),
     supabase
       .from('conversation_participants')
@@ -133,7 +135,8 @@ export default async function DashboardPage() {
       .eq('profile_id', profile.id),
     getConversations(profile.id),
     getStartedConversationCount(profile.id),
-  ]) : [[], 0, 0, [], 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }, { data: [], error: null }, [], 0]
+    getRecentListingViews(profile.id, 5),
+  ]) : [[], 0, 0, [], 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }, { data: [], error: null }, [], 0, []]
   const activeListings = listings.filter((l) => l.status === 'active')
   const referralLink = profile?.referral_code
     ? buildReferralLink(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com', profile.referral_code)
@@ -493,6 +496,10 @@ export default async function DashboardPage() {
 
       {listingShareReminder && (
         <ListingShareReminder reminder={listingShareReminder} />
+      )}
+
+      {recentViews.length > 0 && (
+        <RecentlyViewedCard views={recentViews} />
       )}
 
       {profile && profileViewsSnapshot && (

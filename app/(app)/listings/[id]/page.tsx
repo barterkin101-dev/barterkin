@@ -82,7 +82,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
   if (user && listing.profiles?.id) {
     const { data: viewerProfile } = await supabase
       .from('profiles')
-      .select('first_listing_viewed_at')
+      .select('id, first_listing_viewed_at')
       .eq('owner_id', user.id)
       .maybeSingle()
     if (viewerProfile && !viewerProfile.first_listing_viewed_at) {
@@ -94,6 +94,19 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
         .update({ first_listing_viewed_at: new Date().toISOString() })
         .eq('owner_id', user.id)
         .is('first_listing_viewed_at', null)
+    }
+    // Record recently viewed listing (upsert updates timestamp on repeat views)
+    if (viewerProfile?.id && viewerProfile.id !== listing.profiles.id) {
+      await supabase
+        .from('listing_views')
+        .upsert(
+          {
+            profile_id: viewerProfile.id,
+            listing_id: listing.id,
+            viewed_at: new Date().toISOString(),
+          },
+          { onConflict: 'profile_id,listing_id' },
+        )
     }
   }
 

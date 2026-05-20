@@ -49,18 +49,20 @@ export async function POST(request: NextRequest) {
     // Preconfigure subscription_update flow for monthly → annual switch
     if (body.flow === 'switch_to_annual' && profile.billing_interval === 'monthly' && profile.tier === 'premium') {
       if (priceIds.premiumAnnual) {
+        // Stripe types are slightly off for subscription_update.items — cast to avoid tsc error
+        const subUpdate = {
+          subscription: profile.stripe_subscription_id!,
+          items: [
+            {
+              id: 'item_1',
+              price: priceIds.premiumAnnual,
+              quantity: 1,
+            },
+          ],
+        } as unknown as NonNullable<Stripe.BillingPortal.SessionCreateParams['flow_data']>['subscription_update']
         sessionConfig.flow_data = {
           type: 'subscription_update',
-          subscription_update: {
-            subscription: profile.stripe_subscription_id!,
-            items: [
-              {
-                id: 'item_1',
-                price: priceIds.premiumAnnual,
-                quantity: 1,
-              },
-            ],
-          },
+          subscription_update: subUpdate,
         }
       }
     }

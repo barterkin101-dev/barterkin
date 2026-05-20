@@ -862,10 +862,10 @@
     "title": "Add public category browse page with member counts and SEO — growth",
     "description": "Create a /categories page (no auth required) that shows all listing categories with live member counts, top skills in each category, and a CTA to sign up. Use static generation with revalidate. Add category-specific OG images. Track category_page_viewed and category_cta_clicked in PostHog. Add to sitemap. Acceptance: page is public, renders correctly on mobile, SEO meta per category, analytics fire, and unit tests cover rendering + data fetching.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-20T10:05:55.496Z",
     "source": "cron-self-generated",
-    "notes": "Starting: exploring categories data layer and existing directory patterns"
+    "notes": "Added public /categories page with live member counts, listing counts, top skills per category, Lucide icons, SEO metadata, sitemap entry, PostHog analytics, and 8 unit tests. Commit: f9992f4."
   },
   {
     "id": "179",
