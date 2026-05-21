@@ -4,10 +4,10 @@
     "title": "Add trade completion celebration modal with mutual review prompt — retention/engagement",
     "description": "When both parties mark a trade as mutually completed, show a celebration modal that congratulates them and prompts both to leave a review. Reuse the existing ratings system (ratings table + getRatingsForProfile). Add a TradeCompletionCelebration component that appears on the conversation page after mutual completion, with CTAs to rate the other party and share the success. Track trade_completion_celebrated and review_prompt_dismissed in PostHog. Add a server action to create the rating from the modal. Acceptance: modal shows only once per trade, review form submits via existing ratings action, celebration is dismissible, and tests cover visibility + submission.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-21T16:00:00Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Added TradeCompletionCelebration modal component with PartyPopper icon, star rating, review form, localStorage dismissal tracking, and PostHog analytics. Wired into message thread page. 9 unit tests covering visibility, dismissal, star selection, and form fields. Commit: b2f8aff."
   },
   {
     "id": "183",
