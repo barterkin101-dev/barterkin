@@ -7,6 +7,7 @@ import { ConversationThread } from '@/components/messaging/ConversationThread'
 import { MessageComposer } from '@/components/messaging/MessageComposer'
 import { PostContactUpgradeNudge } from '@/components/messaging/PostContactUpgradeNudge'
 import { TradeCompletionPanel } from '@/components/messaging/TradeCompletionPanel'
+import { TradeCompletionCelebration } from '@/components/messaging/TradeCompletionCelebration'
 import type { MessageRow } from '@/lib/data/messaging'
 import type { Database } from '@/lib/database.types'
 import type { PostContactUpgradeNudgeProps } from '@/lib/post-contact-upgrade-nudge'
@@ -205,6 +206,14 @@ export default function MessageThreadPage() {
       <TradeCompletionPanel
         conversationId={conversationId}
         actorStatus={actorStatus}
+        otherProfileId={otherProfileId}
+        otherDisplayName={otherDisplayName}
+        listingId={listingId}
+        hasReviewed={hasReviewed}
+      />
+      <TradeCompletionCelebration
+        conversationId={conversationId}
+        isCompleted={actorStatus === 'completed'}
         otherProfileId={otherProfileId}
         otherDisplayName={otherDisplayName}
         listingId={listingId}

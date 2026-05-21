@@ -476,6 +476,32 @@ Google OAuth also fires this event client-side when the user launches Google sig
 
 ---
 
+### `trade_completion_celebrated`
+
+**When fired:** When the celebration modal opens after a trade is mutually completed.
+**Fires from:** `components/messaging/TradeCompletionCelebration.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `conversation_id` | string | UUID of the conversation |
+| `has_reviewed` | boolean | Whether the user has already submitted a review |
+
+---
+
+### `review_prompt_dismissed`
+
+**When fired:** When the user dismisses the trade completion celebration modal without submitting a review.
+**Fires from:** `components/messaging/TradeCompletionCelebration.tsx`
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `conversation_id` | string | UUID of the conversation |
+| `dismissed_after` | string | Context of dismissal, e.g. `celebration_modal` |
+
+---
+
 ### `test_event` *(Phase 1 wiring validation)*
 
 **When fired:** Home-page button click in dev/test environments.
@@ -517,6 +543,8 @@ Google OAuth also fires this event client-side when the user launches Google sig
 | `first_contact_sent` | ✅ Implemented | `lib/actions/messaging.ts` | 7 |
 | `first_trade_completed` | ✅ Implemented | `lib/actions/trade-completions.ts` | 7 |
 | `trade_completion_rate` | ✅ Implemented | `lib/actions/trade-completions.ts` | 3 |
+| `trade_completion_celebrated` | ✅ Implemented | `components/messaging/TradeCompletionCelebration.tsx` | 8 |
+| `review_prompt_dismissed` | ✅ Implemented | `components/messaging/TradeCompletionCelebration.tsx` | 8 |
 | `listing_revisited_from_dashboard` | ✅ Implemented | `components/dashboard/RecentlyViewedCard.tsx` | 8 |
 | `test_event` | ✅ Implemented | `components/fire-test-event.tsx` | 1 |
 | `contact_initiated` | 📋 Schema only | Supabase Edge Function (future) | 5 |
