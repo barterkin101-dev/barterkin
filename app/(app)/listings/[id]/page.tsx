@@ -13,6 +13,8 @@ import { MessageButton } from '@/components/messaging/MessageButton'
 import { ListingJsonLd } from '@/components/seo/ListingJsonLd'
 import { ListingShareActions } from '@/components/listings/ListingShareActions'
 import { captureEvent } from '@/lib/analytics'
+import { PremiumPreviewToggle } from '@/components/listings/PremiumPreviewToggle'
+import { getPremiumPreviewProps } from '@/lib/premium-preview'
 
 interface ListingDetailPageProps {
   params: Promise<{ id: string }>
@@ -115,6 +117,16 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
       ? await isOwnListing(supabase, listing.profiles.id)
       : false
     : false
+
+  const { data: viewerProfile } = user
+    ? await supabase
+        .from('profiles')
+        .select('tier')
+        .eq('owner_id', user.id)
+        .maybeSingle()
+    : { data: null }
+
+  const premiumPreview = getPremiumPreviewProps(viewerProfile?.tier)
 
   return (
     <>
@@ -239,6 +251,10 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                 </div>
               ) : null}
             </div>
+
+            {premiumPreview.showToggle && (
+              <PremiumPreviewToggle listingId={listing.id} />
+            )}
 
             <ListingShareActions
               listingId={listing.id}

@@ -24,9 +24,9 @@
     "title": "Add Premium preview toggle on listing detail pages for free members — revenue/monetization",
     "description": "Show a 'Preview Premium' banner on listing detail pages for free members that toggles a simulated Premium view: featured badge styling, verified badge, and a 'Your listing could look like this' CTA. Use CSS-only preview (no data changes). Track premium_preview_toggled and premium_preview_cta_clicked in PostHog. Acceptance: toggle only shows for free members, preview is visually distinct, CTA links to /dashboard/billing, and tests cover visibility + toggle behavior.",
     "priority": "high",
-    "status": "pending",
+    "status": "in_progress",
     "created_at": "2026-05-21T16:00:00Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Started implementation: need to inspect listing detail page and existing Premium/Free member detection."
   }
 ]
