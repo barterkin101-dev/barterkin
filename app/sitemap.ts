@@ -34,6 +34,7 @@ const STATIC_ROUTES = [
   '/about',
   '/behind-barterkin',
   '/categories',
+  '/counties',
   '/directory',
   '/listings',
   '/login',
