@@ -7,6 +7,7 @@ import {
   getStatCounts,
 } from '@/lib/data/landing'
 import { getRecentActivity } from '@/lib/data/landing-activity'
+import { getFeaturedTestimonials } from '@/lib/data/testimonials'
 import { createClient } from '@/lib/supabase/server'
 
 import { CountyCoverage } from '@/components/landing/CountyCoverage'
@@ -18,6 +19,7 @@ import { FoundingOfferCTA } from '@/components/landing/FoundingOfferCTA'
 import { LandingNav } from '@/components/landing/LandingNav'
 import { SecondaryCTA } from '@/components/landing/SecondaryCTA'
 import { RecentActivity } from '@/components/landing/RecentActivity'
+import { Testimonials } from '@/components/landing/Testimonials'
 
 export const dynamic = 'force-dynamic'
 
@@ -58,6 +60,7 @@ export default async function LandingPage() {
     foundingCountResult,
     activityResult,
     heroAssignment,
+    testimonialsResult,
   ] =
     await Promise.all([
       getFoundingMembers(),
@@ -70,6 +73,7 @@ export default async function LandingPage() {
         .eq('tier', 'founding'),
       getRecentActivity(),
       getLandingHeroVariantAssignment(),
+      getFeaturedTestimonials(),
     ])
 
   const isAuthed = !!claimsResult.data?.claims?.sub
@@ -90,6 +94,7 @@ export default async function LandingPage() {
         />
         <FoundingOfferCTA slotsRemaining={foundingSlotsRemaining} isAuthed={isAuthed} />
         <HowItWorks />
+        <Testimonials testimonials={testimonialsResult.testimonials} />
         <RecentActivity items={activityResult.items} />
         <FoundingMemberStrip profiles={foundersResult.profiles} />
         <CountyCoverage counties={countyResult.counties} />

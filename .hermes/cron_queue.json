@@ -14,19 +14,19 @@
     "title": "Add member testimonials section to landing page — growth/acquisition",
     "description": "Create a testimonials table (profile_id, quote, trade_context, created_at, is_featured) with RLS. Add an admin-reviewed submission flow where members can submit a testimonial after completing a trade. Display 3-5 featured testimonials on the landing page below the HowItWorks section. Track testimonial_page_viewed and testimonial_cta_clicked in PostHog. Acceptance: testimonials render on landing page, submission is gated to members with completed trades, admin can feature/unfeature, and tests cover rendering + submission.",
     "priority": "medium",
-    "status": "pending",
+    "status": "in_progress",
     "created_at": "2026-05-21T16:00:00Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Started: building testimonials table, RLS, data layer, action layer, landing page section, and tests."
   },
   {
     "id": "184",
     "title": "Add Premium preview toggle on listing detail pages for free members — revenue/monetization",
     "description": "Show a 'Preview Premium' banner on listing detail pages for free members that toggles a simulated Premium view: featured badge styling, verified badge, and a 'Your listing could look like this' CTA. Use CSS-only preview (no data changes). Track premium_preview_toggled and premium_preview_cta_clicked in PostHog. Acceptance: toggle only shows for free members, preview is visually distinct, CTA links to /dashboard/billing, and tests cover visibility + toggle behavior.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-21T16:00:00Z",
     "source": "cron-self-generated",
-    "notes": "Started implementation: need to inspect listing detail page and existing Premium/Free member detection."
+    "notes": "Added PremiumPreviewToggle client component with Switch, featured/verified badge preview, and CTA to /dashboard/billing. Tracks premium_preview_banner_impression, premium_preview_toggled, and premium_preview_cta_clicked in PostHog. getPremiumPreviewProps helper gates toggle to free members only. Wired into listings/[id]/page.tsx. 11 unit tests covering visibility logic, toggle behavior, badge rendering, CTA link, and analytics tracking. Commit: 11ef0c0."
   }
 ]
