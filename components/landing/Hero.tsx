@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Sprout } from 'lucide-react'
+import { Sprout, Gift } from 'lucide-react'
 
 import { type LandingHeroVariant, LANDING_HERO_VARIANTS } from '@/lib/ab-testing-shared'
 import { Badge } from '@/components/ui/badge'
@@ -8,6 +8,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { FadeIn, Stagger, StaggerItem } from '@/components/ui/fade-in'
 import { WaitlistForm } from './WaitlistForm'
+import { captureClientEvent } from '@/lib/analytics-client'
 
 export interface HeroStats {
   totalProfiles: number
@@ -136,6 +137,16 @@ export function Hero({ stats, isAuthed, variant }: HeroProps) {
                     {' '}· No spam, ever.
                   </p>
                 </>
+              )}
+              {isAuthed && (
+                <Link
+                  href="/referrals"
+                  onClick={() => captureClientEvent('landing_referral_cta_clicked', { variant, is_authed: true })}
+                  className="inline-flex items-center gap-2 text-sm text-clay hover:text-clay/80 underline underline-offset-4 transition-colors"
+                >
+                  <Gift className="h-4 w-4" aria-hidden="true" />
+                  Invite friends — earn 10 credits each
+                </Link>
               )}
             </div>
           </FadeIn>

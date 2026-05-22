@@ -1,32 +1,32 @@
 [
   {
-    "id": "188",
-    "title": "Add Share Profile actions to member profile pages — growth/acquisition",
-    "description": "Add social sharing buttons to public member profile pages (/m/[username]) so members can share their own or others' profiles. Include: Copy profile link, Share on X, Share on Facebook, Share on WhatsApp. Track profile_shared event in PostHog with share_target. Add a ProfileShareActions client component similar to ListingShareActions. Show the share section below the profile card on member pages. For own profile, show 'Share your profile' CTA. For others' profiles, show 'Share this member'. Acceptance: share buttons render on profile pages, copy link works, social shares open correct URLs, analytics fire, and tests cover rendering + event tracking.",
+    "id": "191",
+    "title": "Add Invite Friends CTA to landing page hero — growth/acquisition",
+    "description": "Add a viral 'Invite friends, earn credits' CTA to the landing page Hero component. Currently the landing page has no referral loop above the fold. Add a secondary button below the primary CTA that says 'Invite friends — earn 10 credits each' linking to /referrals. Track landing_referral_cta_clicked in PostHog. Only show for authenticated users (unauth users see 'Join to earn credits' instead). Style as a subtle link-button with a gift icon. Acceptance: CTA renders in Hero, links work, analytics fire, and tests cover rendering + click tracking.",
     "priority": "high",
-    "status": "completed",
-    "created_at": "2026-05-22T20:04:08.388Z",
-    "source": "cron-self-generated",
-    "notes": "Added ProfileShareActions component with X, Facebook, WhatsApp, copy link, and native share. Integrated into /m/[username] page. All 783 tests pass. Commit: 149047e"
-  },
-  {
-    "id": "189",
-    "title": "Add login streak milestone rewards banner to dashboard — retention/engagement",
-    "description": "Enhance the dashboard QuestCard streak display with milestone rewards. Show a celebratory banner when the user hits streak milestones (3, 7, 14, 30 days). Add streak_milestone_reached PostHog event. Display 'Next milestone in N days' progress. Add a small flame animation or pulse effect on the streak counter. If streak is 0, show a 'Start your streak today' nudge. Acceptance: streak milestones render correctly, progress shows, analytics fire on milestone view, and tests cover streak display logic.",
-    "priority": "medium",
     "status": "in_progress",
-    "created_at": "2026-05-22T20:04:08.388Z",
+    "created_at": "2026-05-22T22:05:00.000Z",
     "source": "cron-self-generated",
-    "notes": "Starting: Adding login streak milestone rewards banner to dashboard"
+    "notes": ""
   },
   {
-    "id": "190",
-    "title": "Add Premium upsell interstitial when free user hits contact limit — revenue/monetization",
-    "description": "When a free user reaches their 10 monthly contact limit and tries to send a message, show a Premium upsell modal instead of silently failing. Modal should explain: 'You've used all 10 free contacts this month. Upgrade to Premium for 100 contacts/month + unlimited listings + verified badge.' Include pricing ($9/mo) and a CTA button linking to /dashboard/billing. Track contact_limit_upsell_shown and contact_limit_upsell_clicked in PostHog. Acceptance: modal shows at limit, CTA works, analytics fire, and tests cover the limit-gate + upsell flow.",
-    "priority": "high",
-    "status": "completed",
-    "created_at": "2026-05-22T20:04:08.388Z",
+    "id": "192",
+    "title": "Add 'New listings in your county' email digest trigger — retention/engagement",
+    "description": "Create a new cron job that sends a 'New listings in your county' email to users who haven't visited in 3+ days but have listings in their county. Query profiles with last_login_at > 3 days ago, county_id set, and is_published = true. Find listings created in the last 7 days in their county. Send a personalized email via Resend with up to 3 new listings. Track new_listing_digest_sent in PostHog. Add unsubscribe link. Acceptance: cron job runs, emails send, analytics fire, and tests cover the query + email rendering.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-22T22:05:00.000Z",
     "source": "cron-self-generated",
-    "notes": "Added ContactLimitUpsellModal that shows when free users hit their 10/mo contact limit. Modified createConversation to pre-check limits and return upsell data. Modified MessageButton to display modal. All 783 tests pass. Commit: 966098c"
+    "notes": ""
+  },
+  {
+    "id": "193",
+    "title": "Add Gift Premium CTA to landing page — revenue/monetization",
+    "description": "Add a 'Gift Premium' promotional section to the landing page below the HowItWorks section. Section should explain: 'Give the gift of Premium — 100 contacts, unlimited listings, verified badge.' Include a CTA button linking to /gift/redeem with a query param ?source=landing. Track landing_gift_premium_cta_clicked in PostHog. Style as a warm card with a gift icon. Acceptance: section renders on landing page, CTA works, analytics fire, and tests cover rendering + click tracking.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-22T22:05:00.000Z",
+    "source": "cron-self-generated",
+    "notes": ""
   }
 ]
