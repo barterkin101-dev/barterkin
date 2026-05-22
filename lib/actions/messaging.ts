@@ -143,6 +143,26 @@ export async function createConversation(
     return { ok: false, error: "You can't message yourself." }
   }
 
+  // Contact limit gate: free users at limit cannot start new conversations
+  const contactLimitStatus = await getContactLimitStatus(senderProfile.id, senderProfile.tier)
+  if (senderProfile.tier === 'free' && contactLimitStatus.isAtLimit) {
+    const { BILLING_PLAN_AMOUNTS, formatUsdFromCents, getPremiumAnnualSavings } = await import('@/lib/stripe/config')
+    const { PREMIUM_CONTACT_LIMIT } = await import('@/lib/contact-limits')
+    return {
+      ok: false,
+      error: 'contact_limit_reached',
+      fieldErrors: {
+        _upsell: JSON.stringify({
+          used: contactLimitStatus.used,
+          limit: contactLimitStatus.limit,
+          premiumMonthlyPrice: formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents),
+          premiumAnnualSavings: formatUsdFromCents(getPremiumAnnualSavings().totalSavingsCents),
+          premiumContactLimit: PREMIUM_CONTACT_LIMIT,
+        }),
+      },
+    }
+  }
+
   // Check for existing conversation between these two
   const { data: existingConv, error: existingErr } = await supabase.rpc(
     'find_conversation_between',

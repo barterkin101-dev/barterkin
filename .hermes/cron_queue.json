@@ -4,10 +4,10 @@
     "title": "Add Share Profile actions to member profile pages — growth/acquisition",
     "description": "Add social sharing buttons to public member profile pages (/m/[username]) so members can share their own or others' profiles. Include: Copy profile link, Share on X, Share on Facebook, Share on WhatsApp. Track profile_shared event in PostHog with share_target. Add a ProfileShareActions client component similar to ListingShareActions. Show the share section below the profile card on member pages. For own profile, show 'Share your profile' CTA. For others' profiles, show 'Share this member'. Acceptance: share buttons render on profile pages, copy link works, social shares open correct URLs, analytics fire, and tests cover rendering + event tracking.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-22T20:04:08.388Z",
     "source": "cron-self-generated",
-    "notes": "Starting: Creating ProfileShareActions component and integrating into member profile page"
+    "notes": "Added ProfileShareActions component with X, Facebook, WhatsApp, copy link, and native share. Integrated into /m/[username] page. All 783 tests pass. Commit: 149047e"
   },
   {
     "id": "189",
@@ -23,8 +23,9 @@
     "title": "Add Premium upsell interstitial when free user hits contact limit — revenue/monetization",
     "description": "When a free user reaches their 10 monthly contact limit and tries to send a message, show a Premium upsell modal instead of silently failing. Modal should explain: 'You've used all 10 free contacts this month. Upgrade to Premium for 100 contacts/month + unlimited listings + verified badge.' Include pricing ($9/mo) and a CTA button linking to /dashboard/billing. Track contact_limit_upsell_shown and contact_limit_upsell_clicked in PostHog. Acceptance: modal shows at limit, CTA works, analytics fire, and tests cover the limit-gate + upsell flow.",
     "priority": "high",
-    "status": "pending",
+    "status": "in_progress",
     "created_at": "2026-05-22T20:04:08.388Z",
-    "source": "cron-self-generated"
+    "source": "cron-self-generated",
+    "notes": "Starting: Adding Premium upsell modal when free users hit contact limit"
   }
 ]

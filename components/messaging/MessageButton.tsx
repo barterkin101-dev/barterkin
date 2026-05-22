@@ -31,6 +31,14 @@ export function MessageButton({
   listingId,
 }: MessageButtonProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [showUpsell, setShowUpsell] = useState(false)
+  const [upsellProps, setUpsellProps] = useState<{
+    used: number
+    limit: number
+    premiumMonthlyPrice: string
+    premiumAnnualSavings: string
+    premiumContactLimit: number
+  } | null>(null)
   const [message, setMessage] = useState('')
   const router = useRouter()
 
@@ -48,6 +56,23 @@ export function MessageButton({
         </AlertDescription>
       </Alert>
     )
+  }
+
+  // Handle contact limit reached error
+  if (state && !state.ok && state.error === 'contact_limit_reached' && state.fieldErrors?._upsell) {
+    try {
+      const upsell = JSON.parse(state.fieldErrors._upsell)
+      setUpsellProps(upsell)
+      setShowUpsell(true)
+      setIsOpen(false)
+      captureClientEvent('contact_limit_upsell_shown', {
+        used: upsell.used,
+        limit: upsell.limit,
+        premium_monthly_price: upsell.premiumMonthlyPrice,
+      })
+    } catch {
+      // Ignore parse errors
+    }
   }
 
   // On success, navigate to the new conversation thread
@@ -90,7 +115,17 @@ export function MessageButton({
       : 'text-forest-mid'
 
   return (
-    <Sheet open={isOpen} onOpenChange={handleOpenChange}>
+    <>
+      <ContactLimitUpsellModal
+        open={showUpsell}
+        onOpenChange={setShowUpsell}
+        used={upsellProps?.used ?? 0}
+        limit={upsellProps?.limit ?? 10}
+        premiumMonthlyPrice={upsellProps?.premiumMonthlyPrice ?? '$9'}
+        premiumAnnualSavings={upsellProps?.premiumAnnualSavings ?? '$18'}
+        premiumContactLimit={upsellProps?.premiumContactLimit ?? 100}
+      />
+      <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         <Button className="h-11 w-full sm:w-auto bg-forest hover:bg-forest-deep text-sage-bg">
           Message {recipientDisplayName}
@@ -158,5 +193,6 @@ export function MessageButton({
         </form>
       </SheetContent>
     </Sheet>
+    </>
   )
 }
