@@ -1,8 +1,7 @@
 import type { MetadataRoute } from 'next'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.barterkin.com'
-
 export default function robots(): MetadataRoute.Robots {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.barterkin.com'
   return {
     rules: {
       userAgent: '*',
@@ -17,6 +16,6 @@ export default function robots(): MetadataRoute.Robots {
         '/~offline',
       ],
     },
-    sitemap: `${SITE_URL}/sitemap.xml`,
+    sitemap: `${siteUrl}/sitemap.xml`,
   }
 }
