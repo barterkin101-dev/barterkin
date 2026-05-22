@@ -14,18 +14,19 @@
     "title": "Add login streak milestone rewards banner to dashboard — retention/engagement",
     "description": "Enhance the dashboard QuestCard streak display with milestone rewards. Show a celebratory banner when the user hits streak milestones (3, 7, 14, 30 days). Add streak_milestone_reached PostHog event. Display 'Next milestone in N days' progress. Add a small flame animation or pulse effect on the streak counter. If streak is 0, show a 'Start your streak today' nudge. Acceptance: streak milestones render correctly, progress shows, analytics fire on milestone view, and tests cover streak display logic.",
     "priority": "medium",
-    "status": "pending",
+    "status": "in_progress",
     "created_at": "2026-05-22T20:04:08.388Z",
-    "source": "cron-self-generated"
+    "source": "cron-self-generated",
+    "notes": "Starting: Adding login streak milestone rewards banner to dashboard"
   },
   {
     "id": "190",
     "title": "Add Premium upsell interstitial when free user hits contact limit — revenue/monetization",
     "description": "When a free user reaches their 10 monthly contact limit and tries to send a message, show a Premium upsell modal instead of silently failing. Modal should explain: 'You've used all 10 free contacts this month. Upgrade to Premium for 100 contacts/month + unlimited listings + verified badge.' Include pricing ($9/mo) and a CTA button linking to /dashboard/billing. Track contact_limit_upsell_shown and contact_limit_upsell_clicked in PostHog. Acceptance: modal shows at limit, CTA works, analytics fire, and tests cover the limit-gate + upsell flow.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-22T20:04:08.388Z",
     "source": "cron-self-generated",
-    "notes": "Starting: Adding Premium upsell modal when free users hit contact limit"
+    "notes": "Added ContactLimitUpsellModal that shows when free users hit their 10/mo contact limit. Modified createConversation to pre-check limits and return upsell data. Modified MessageButton to display modal. All 783 tests pass. Commit: 966098c"
   }
 ]
