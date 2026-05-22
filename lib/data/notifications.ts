@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 
 export interface NotificationRow {
   id: string
-  type: 'message' | 'ticket' | 'dispute' | 'admin' | 'trade'
+  type: 'message' | 'ticket' | 'dispute' | 'admin' | 'trade' | 'listing_save' | 'review' | 'referral' | 'system'
   title: string
   body: string
   link: string | null
@@ -192,8 +192,32 @@ export async function getNotifications(profileId: string): Promise<{
     })
   }
 
+  // Fetch persistent in-app notifications from the new table
+  const { data: persistentNotifications, error: persistentErr } = await supabase
+    .from('in_app_notifications')
+    .select('id, type, title, body, link_url, is_read, created_at')
+    .eq('profile_id', profileId)
+    .order('created_at', { ascending: false })
+    .limit(20)
+
+  if (persistentErr) {
+    const log = createLogger('notifications')
+    log.warn('getNotifications persistent error', { context: { code: persistentErr.code } })
+  }
+
+  const persistentRows: NotificationRow[] = (persistentNotifications ?? []).map((n) => ({
+    id: n.id,
+    type: n.type as NotificationRow['type'],
+    title: n.title,
+    body: n.body,
+    link: n.link_url,
+    is_read: n.is_read,
+    created_at: n.created_at,
+    resource_id: null,
+  }))
+
   // Combine, deduplicate, sort by created_at desc
-  const all = [...messageNotifications, ...ticketNotifications, ...disputeNotifications, ...tradeNotifications]
+  const all = [...persistentRows, ...messageNotifications, ...ticketNotifications, ...disputeNotifications, ...tradeNotifications]
   all.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
   const unreadCount = all.filter((n) => !n.is_read).length

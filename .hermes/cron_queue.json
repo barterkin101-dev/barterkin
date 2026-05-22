@@ -4,10 +4,10 @@
     "title": "Add public sitemap.xml and robots.txt for SEO — growth/acquisition",
     "description": "Generate a dynamic sitemap.xml at /sitemap.xml that includes all public routes: landing, about, pricing, categories, counties, directory, listings, and public member profiles. Add a robots.txt at /robots.txt that allows all crawlers and points to the sitemap. Use Next.js built-in sitemap.ts convention (app/sitemap.ts) and robots.ts (app/robots.ts). Include lastmod dates for dynamic content (listings, profiles) based on updated_at. Acceptance: sitemap renders valid XML with correct URLs, robots.txt allows all and references sitemap, and tests verify both endpoints return correct content types.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-22T16:00:00Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Fixed robots.ts SITE_URL const to runtime read; tests pass. Commit: 9f34cab"
   },
   {
     "id": "186",

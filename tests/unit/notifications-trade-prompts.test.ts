@@ -83,6 +83,18 @@ describe('getNotifications trade review prompts', () => {
         }
       }
 
+      if (table === 'in_app_notifications') {
+        return {
+          select: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              order: vi.fn(() => ({
+                limit: vi.fn().mockResolvedValue({ data: [], error: null }),
+              })),
+            })),
+          })),
+        }
+      }
+
       throw new Error(`Unexpected table: ${table}`)
     })
 
