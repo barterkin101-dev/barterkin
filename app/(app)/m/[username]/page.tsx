@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { ProfileCard } from '@/components/profile/ProfileCard'
+import { ProfileShareActions } from '@/components/profile/ProfileShareActions'
 import { RatingCard } from '@/components/ratings/RatingCard'
 import { getRatingsForProfile } from '@/lib/data/ratings'
 import type { ProfileWithRelations } from '@/lib/actions/profile.types'
@@ -118,6 +119,9 @@ export default async function MemberProfilePage({
   }
 
   const { ratings, avg, count } = await getRatingsForProfile(profileRow.id)
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com'
+  const shareUrl = new URL(`/m/${username}`, siteUrl).toString()
+  const isOwnProfile = viewerOwnerId === profileRow.owner_id
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
@@ -129,6 +133,13 @@ export default async function MemberProfilePage({
         acceptingContact={profileRow.accepting_contact}
         ratingAvg={avg}
         ratingCount={count}
+      />
+
+      <ProfileShareActions
+        username={username}
+        displayName={profileRow.display_name ?? username}
+        shareUrl={shareUrl}
+        isOwnProfile={isOwnProfile}
       />
 
       {count > 0 && (

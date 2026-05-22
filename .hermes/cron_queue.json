@@ -1,32 +1,30 @@
 [
   {
-    "id": "185",
-    "title": "Add public sitemap.xml and robots.txt for SEO — growth/acquisition",
-    "description": "Generate a dynamic sitemap.xml at /sitemap.xml that includes all public routes: landing, about, pricing, categories, counties, directory, listings, and public member profiles. Add a robots.txt at /robots.txt that allows all crawlers and points to the sitemap. Use Next.js built-in sitemap.ts convention (app/sitemap.ts) and robots.ts (app/robots.ts). Include lastmod dates for dynamic content (listings, profiles) based on updated_at. Acceptance: sitemap renders valid XML with correct URLs, robots.txt allows all and references sitemap, and tests verify both endpoints return correct content types.",
+    "id": "188",
+    "title": "Add Share Profile actions to member profile pages — growth/acquisition",
+    "description": "Add social sharing buttons to public member profile pages (/m/[username]) so members can share their own or others' profiles. Include: Copy profile link, Share on X, Share on Facebook, Share on WhatsApp. Track profile_shared event in PostHog with share_target. Add a ProfileShareActions client component similar to ListingShareActions. Show the share section below the profile card on member pages. For own profile, show 'Share your profile' CTA. For others' profiles, show 'Share this member'. Acceptance: share buttons render on profile pages, copy link works, social shares open correct URLs, analytics fire, and tests cover rendering + event tracking.",
     "priority": "high",
-    "status": "completed",
-    "created_at": "2026-05-22T16:00:00Z",
+    "status": "in_progress",
+    "created_at": "2026-05-22T20:04:08.388Z",
     "source": "cron-self-generated",
-    "notes": "Fixed robots.ts SITE_URL const to runtime read; tests pass. Commit: 9f34cab"
+    "notes": "Starting: Creating ProfileShareActions component and integrating into member profile page"
   },
   {
-    "id": "186",
-    "title": "Add in-app notifications dropdown to AppNav — retention/engagement",
-    "description": "Create a notifications bell icon in AppNav that shows a dropdown of recent in-app notifications (unread messages, listing saves, trade completions, reviews, referrals). Add a notifications table (profile_id, type, title, body, link_url, is_read, created_at) with RLS. Add a server action to mark notifications as read. Display unread count badge on the bell. Track notification_bell_clicked, notification_marked_read in PostHog. Acceptance: bell shows in AppNav, dropdown renders notifications, unread badge updates, mark-as-read works, and tests cover rendering + action.",
-    "priority": "high",
-    "status": "completed",
-    "created_at": "2026-05-22T16:00:00Z",
-    "source": "cron-self-generated",
-    "notes": "Feature already implemented in prior run. Fixed failing tests by adding in_app_notifications mock to notifications-data.test.ts and notifications-trade-prompts.test.ts. All 783 tests pass. Commit: TBD"
-  },
-  {
-    "id": "187",
-    "title": "Add Gift Premium CTA to dashboard quick-actions grid — revenue/monetization",
-    "description": "Add a 'Gift Premium' card to the dashboard quick-actions grid that links to /dashboard/billing#gift. Use a Gift icon, show 'Buy Premium for a friend' copy, and track gift_premium_dashboard_cta_clicked in PostHog. Only show for authenticated users (all tiers). Acceptance: card renders in quick-actions grid, links to billing page with hash anchor, analytics fires, and tests cover visibility + link correctness.",
+    "id": "189",
+    "title": "Add login streak milestone rewards banner to dashboard — retention/engagement",
+    "description": "Enhance the dashboard QuestCard streak display with milestone rewards. Show a celebratory banner when the user hits streak milestones (3, 7, 14, 30 days). Add streak_milestone_reached PostHog event. Display 'Next milestone in N days' progress. Add a small flame animation or pulse effect on the streak counter. If streak is 0, show a 'Start your streak today' nudge. Acceptance: streak milestones render correctly, progress shows, analytics fire on milestone view, and tests cover streak display logic.",
     "priority": "medium",
     "status": "pending",
-    "created_at": "2026-05-22T16:00:00Z",
-    "source": "cron-self-generated",
-    "notes": ""
+    "created_at": "2026-05-22T20:04:08.388Z",
+    "source": "cron-self-generated"
+  },
+  {
+    "id": "190",
+    "title": "Add Premium upsell interstitial when free user hits contact limit — revenue/monetization",
+    "description": "When a free user reaches their 10 monthly contact limit and tries to send a message, show a Premium upsell modal instead of silently failing. Modal should explain: 'You've used all 10 free contacts this month. Upgrade to Premium for 100 contacts/month + unlimited listings + verified badge.' Include pricing ($9/mo) and a CTA button linking to /dashboard/billing. Track contact_limit_upsell_shown and contact_limit_upsell_clicked in PostHog. Acceptance: modal shows at limit, CTA works, analytics fire, and tests cover the limit-gate + upsell flow.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-22T20:04:08.388Z",
+    "source": "cron-self-generated"
   }
 ]
