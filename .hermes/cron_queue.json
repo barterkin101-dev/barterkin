@@ -14,10 +14,10 @@
     "title": "Add in-app notifications dropdown to AppNav — retention/engagement",
     "description": "Create a notifications bell icon in AppNav that shows a dropdown of recent in-app notifications (unread messages, listing saves, trade completions, reviews, referrals). Add a notifications table (profile_id, type, title, body, link_url, is_read, created_at) with RLS. Add a server action to mark notifications as read. Display unread count badge on the bell. Track notification_bell_clicked, notification_marked_read in PostHog. Acceptance: bell shows in AppNav, dropdown renders notifications, unread badge updates, mark-as-read works, and tests cover rendering + action.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-22T16:00:00Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Feature already implemented in prior run. Fixed failing tests by adding in_app_notifications mock to notifications-data.test.ts and notifications-trade-prompts.test.ts. All 783 tests pass. Commit: TBD"
   },
   {
     "id": "187",

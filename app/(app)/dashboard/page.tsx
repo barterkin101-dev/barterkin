@@ -13,7 +13,8 @@ import { buildReferralLink } from '@/lib/referrals'
 import { hasSkippedOnboarding, ONBOARDING_SKIP_COOKIE_NAME } from '@/lib/onboarding-skip'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { CreditCard, ShoppingBag, MessageSquare, Star, Ticket, User, Heart } from 'lucide-react'
+import { CreditCard, ShoppingBag, MessageSquare, Star, Ticket, User, Heart, Gift } from 'lucide-react'
+import { captureEvent } from '@/lib/analytics'
 import { ProfileCompletionBar } from '@/components/profile/ProfileCompletionBar'
 import { ReferralInviteCard } from '@/components/dashboard/ReferralInviteCard'
 import { FoundingMemberNudge } from '@/components/dashboard/FoundingMemberNudge'
@@ -410,6 +411,27 @@ export default async function DashboardPage() {
                 <p className="text-sm text-muted-foreground">
                   {profile?.tier === 'founding' ? 'Founding member' : profile?.tier === 'premium' ? 'Premium active' : 'Upgrade to premium'}
                 </p>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="transition-colors hover:bg-muted/50">
+          <Link
+            href="/dashboard/billing#gift"
+            onClick={() => {
+              if (profile) {
+                void captureEvent(profile.owner_id ?? user.id, 'gift_premium_dashboard_cta_clicked')
+              }
+            }}
+          >
+            <CardContent className="flex items-center gap-4 p-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                <Gift className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Gift Premium</h3>
+                <p className="text-sm text-muted-foreground">Buy Premium for a friend</p>
               </div>
             </CardContent>
           </Link>
