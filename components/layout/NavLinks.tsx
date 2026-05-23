@@ -9,6 +9,7 @@ import { NotificationBell } from './NotificationBell'
 import { SiteUpdateBell } from './SiteUpdateBell'
 import { FeatureRequestButton } from './FeatureRequestButton'
 import { cn } from '@/lib/utils'
+import { captureClientEvent } from '@/lib/analytics-client'
 import type { NotificationRow } from '@/lib/data/notifications'
 import type { SiteUpdateRow } from '@/lib/data/site-updates'
 
@@ -36,6 +37,7 @@ export function NavLinks({
   const isListings = pathname.startsWith('/listings')
   const isDashboard = pathname.startsWith('/dashboard')
   const isProfile = pathname.startsWith('/profile')
+  const isMessages = pathname.startsWith('/dashboard/messages')
   const initial = (displayName ?? '?').charAt(0).toUpperCase()
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -53,7 +55,12 @@ export function NavLinks({
     {
       href: '/dashboard',
       label: 'Dashboard',
-      isActive: isDashboard,
+      isActive: isDashboard && !isMessages,
+    },
+    {
+      href: '/dashboard/messages',
+      label: 'Messages',
+      isActive: isMessages,
       badge: unseenMessageCount > 0 ? (unseenMessageCount > 9 ? '9+' : unseenMessageCount) : null,
     },
     {
@@ -63,6 +70,15 @@ export function NavLinks({
       avatar: true,
     },
   ]
+
+  function handleMessagesClick() {
+    if (unseenMessageCount > 0) {
+      captureClientEvent('message_notification_badge_seen', {
+        unseen_count: unseenMessageCount,
+        source: 'nav_click',
+      })
+    }
+  }
 
   return (
     <>
@@ -102,13 +118,25 @@ export function NavLinks({
         <Link
           href="/dashboard"
           className={cn(
-            'relative text-sm',
-            isDashboard
+            'text-sm',
+            isDashboard && !isMessages
               ? 'text-forest-deep border-b-2 border-clay pb-1'
               : 'text-forest-mid hover:text-forest-deep',
           )}
         >
           Dashboard
+        </Link>
+        <Link
+          href="/dashboard/messages"
+          onClick={handleMessagesClick}
+          className={cn(
+            'relative text-sm',
+            isMessages
+              ? 'text-forest-deep border-b-2 border-clay pb-1'
+              : 'text-forest-mid hover:text-forest-deep',
+          )}
+        >
+          Messages
           {unseenMessageCount > 0 && (
             <span
               aria-hidden="true"
@@ -201,7 +229,12 @@ export function NavLinks({
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={() => {
+                    setMobileOpen(false)
+                    if (item.href === '/dashboard/messages' && unseenMessageCount > 0) {
+                      handleMessagesClick()
+                    }
+                  }}
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors',
                     item.isActive
