@@ -20,6 +20,7 @@ import { LandingNav } from '@/components/landing/LandingNav'
 import { SecondaryCTA } from '@/components/landing/SecondaryCTA'
 import { RecentActivity } from '@/components/landing/RecentActivity'
 import { Testimonials } from '@/components/landing/Testimonials'
+import { GiftPremiumCTA } from '@/components/landing/GiftPremiumCTA'
 
 export const dynamic = 'force-dynamic'
 
@@ -94,6 +95,7 @@ export default async function LandingPage() {
         />
         <FoundingOfferCTA slotsRemaining={foundingSlotsRemaining} isAuthed={isAuthed} />
         <HowItWorks />
+        <GiftPremiumCTA isAuthed={isAuthed} />
         <Testimonials testimonials={testimonialsResult.testimonials} />
         <RecentActivity items={activityResult.items} />
         <FoundingMemberStrip profiles={foundersResult.profiles} />
