@@ -4,10 +4,10 @@
     "title": "Add Invite Friends CTA to landing page hero — growth/acquisition",
     "description": "Add a viral 'Invite friends, earn credits' CTA to the landing page Hero component. Currently the landing page has no referral loop above the fold. Add a secondary button below the primary CTA that says 'Invite friends — earn 10 credits each' linking to /referrals. Track landing_referral_cta_clicked in PostHog. Only show for authenticated users (unauth users see 'Join to earn credits' instead). Style as a subtle link-button with a gift icon. Acceptance: CTA renders in Hero, links work, analytics fire, and tests cover rendering + click tracking.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-22T22:05:00.000Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Added referral CTA link below hero primary CTAs for authenticated users. Uses Gift icon, links to /referrals, tracks landing_referral_cta_clicked in PostHog. All 783 tests pass. Commit: abccd0a"
   },
   {
     "id": "192",
