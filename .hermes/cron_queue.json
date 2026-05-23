@@ -14,10 +14,10 @@
     "title": "Add 'New listings in your county' email digest trigger — retention/engagement",
     "description": "Create a new cron job that sends a 'New listings in your county' email to users who haven't visited in 3+ days but have listings in their county. Query profiles with last_login_at > 3 days ago, county_id set, and is_published = true. Find listings created in the last 7 days in their county. Send a personalized email via Resend with up to 3 new listings. Track new_listing_digest_sent in PostHog. Add unsubscribe link. Acceptance: cron job runs, emails send, analytics fire, and tests cover the query + email rendering.",
     "priority": "medium",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-22T22:05:00.000Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Created new listing digest cron for 3+ day inactive members. Includes: migration (new_listing_digest_sends table + RPC), data layer, email template, API route, and tests. All 797 tests pass. Commit: 373ead9"
   },
   {
     "id": "193",
