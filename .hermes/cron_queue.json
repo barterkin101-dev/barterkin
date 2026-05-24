@@ -64,10 +64,10 @@
     "title": "Add 'Invite your county' viral growth loop — growth/acquisition",
     "description": "Create a new landing page section and email campaign that lets members invite people from their county. Add an 'Invite your county' CTA on the dashboard that opens a modal with a pre-written message + shareable link (e.g., barterkin.com/join?ref=USER_ID&county=COUNTY_ID). Track invite_link_copied and invite_sent in PostHog. When 3+ people from the same county join via referral, send the referrer a 'County unlocked' email and award 25 credits. Acceptance: CTA renders, modal works, link includes ref + county, analytics fire, credit award logic tested.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-24T10:05:00.000Z",
     "source": "cron-self-generated",
-    "notes": "Started implementation: dashboard CTA, modal, shareable link, analytics, county unlock email + credit award."
+    "notes": "Fully implemented: InviteCountyCard on dashboard, InviteCountyModal with copy/share (WhatsApp, Email), county-specific referral links, PostHog tracking (invite_link_copied, invite_sent, invite_county_card_opened). County unlock DB migration with RPC functions (count_county_referrals, check_and_award_county_unlock), credit award via credit_ledger. All 824 tests pass. Commit: 0a65e87"
   },
   {
     "id": "198",
