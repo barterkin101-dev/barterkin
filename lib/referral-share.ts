@@ -73,3 +73,13 @@ export function buildSmsReferralShareUrl(
 
   return `sms:?${params.toString()}`
 }
+
+
+export function buildCountyReferralInviteMessage(referralLink: string, countyName: string): string {
+  return `I'm on Barterkin, a local skill-trading network for neighbors in ${countyName}. Join with my invite link: ${referralLink}`
+}
+
+export function buildCountyReferralLink(siteUrl: string, referralCode: string, countyId: number): string {
+  const baseUrl = siteUrl.trim().replace(/\/+$/, '')
+  return `${baseUrl}/r/${referralCode}?county=${countyId}`
+}

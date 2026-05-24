@@ -48,6 +48,8 @@ import { getDashboardListingCapUpsellProps } from '@/lib/dashboard-listing-cap-u
 import { getPremiumAnnualSavings, formatUsdFromCents, BILLING_PLAN_AMOUNTS } from '@/lib/stripe/config'
 import { getPremiumBillingInterval } from '@/lib/data/billing'
 import { getDashboardAnnualUpgradeSavingsProps } from '@/lib/dashboard-annual-upgrade-savings'
+import { getCountyReferralStats } from '@/lib/data/county-referrals'
+import { InviteCountyCard } from '@/components/dashboard/InviteCountyCard'
 
 export default async function DashboardPage() {
   const cookieStore = await cookies()
@@ -139,6 +141,8 @@ export default async function DashboardPage() {
     getStartedConversationCount(profile.id),
     getRecentListingViews(profile.id, 5),
   ]) : [[], 0, 0, [], 0, 0, { listings: [], error: null }, { listings: [], totalCount: 0, error: null }, { data: [], error: null }, [], 0, []]
+  const countyReferralStats = profile?.county_id ? await getCountyReferralStats(profile.id) : { stats: [], error: null }
+  const countyStat = countyReferralStats.stats[0]
   const activeListings = listings.filter((l) => l.status === 'active')
   const referralLink = profile?.referral_code
     ? buildReferralLink(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com', profile.referral_code)
@@ -546,6 +550,18 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       )}
+
+      {countyStat && profile?.referral_code && (
+        <InviteCountyCard
+          countyId={countyStat.countyId}
+          countyName={countyStat.countyName}
+          referralCode={profile.referral_code}
+          referralCount={countyStat.referralCount}
+          unlocked={countyStat.unlocked}
+          creditsAwarded={countyStat.creditsAwarded}
+        />
+      )}
+
 
       {profile?.referral_code && (
         <ReferralInviteCard
