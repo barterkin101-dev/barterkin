@@ -54,8 +54,38 @@
     "title": "Add Stripe Checkout for one-time Premium lifetime purchase — revenue/monetization",
     "description": "Add a one-time 'Lifetime Premium' purchase option alongside the subscription. Create a new Stripe product/price for a one-time payment (e.g., $199 lifetime). Add a toggle on the pricing page between Monthly and Lifetime. Update the checkout session API to support both subscription and payment_intent modes. On successful payment, set subscription_tier='lifetime' and subscription_status='active' on the profile. Add a 'Lifetime' badge to profiles. Acceptance: pricing page shows both options, checkout works for lifetime, profile updates correctly, badge renders, tests cover checkout flow + profile update.",
     "priority": "medium",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-23T08:30:00.000Z",
+    "source": "cron-self-generated",
+    "notes": "Already fully implemented. Lifetime premium exists end-to-end: checkout API (payment mode), webhook (sets tier=lifetime + subscription_status=lifetime), pricing page card, billing page plan comparison + Go Lifetime CTA, success page handling, LifetimeBadge component, DB migration. All 824 tests pass."
+  },
+  {
+    "id": "197",
+    "title": "Add 'Invite your county' viral growth loop — growth/acquisition",
+    "description": "Create a new landing page section and email campaign that lets members invite people from their county. Add an 'Invite your county' CTA on the dashboard that opens a modal with a pre-written message + shareable link (e.g., barterkin.com/join?ref=USER_ID&county=COUNTY_ID). Track invite_link_copied and invite_sent in PostHog. When 3+ people from the same county join via referral, send the referrer a 'County unlocked' email and award 25 credits. Acceptance: CTA renders, modal works, link includes ref + county, analytics fire, credit award logic tested.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-24T10:05:00.000Z",
+    "source": "cron-self-generated",
+    "notes": ""
+  },
+  {
+    "id": "198",
+    "title": "Add weekly activity digest email — retention/engagement",
+    "description": "Build a weekly cron job that sends a personalized activity digest to active members. Include: new messages received, profile views this week, listing saves, and new members in their county. Use the existing email template system (Resend + React Email). Track weekly_digest_sent and weekly_digest_opened in PostHog. Add an unsubscribe link. Acceptance: cron runs weekly, email renders with real data, analytics fire, tests cover query + template rendering.",
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-05-24T10:05:00.000Z",
+    "source": "cron-self-generated",
+    "notes": ""
+  },
+  {
+    "id": "199",
+    "title": "Add Premium upsell nudge on free plan limits — revenue/monetization",
+    "description": "Add contextual Premium upsell nudges when free members hit limits. When a free member tries to create a 4th listing (FREE_LISTING_LIMIT=3), show a modal: 'Upgrade to Premium for unlimited listings' with a CTA to /dashboard/billing. When they try to send an 11th contact, show a similar nudge. Track upsell_modal_shown and upsell_modal_clicked in PostHog. Acceptance: modals show at correct limits, CTAs work, analytics fire, tests cover trigger conditions.",
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-05-24T10:05:00.000Z",
     "source": "cron-self-generated",
     "notes": ""
   }
