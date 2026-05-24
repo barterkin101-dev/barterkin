@@ -26,15 +26,16 @@ export default async function BillingSuccessPage({
     .maybeSingle()
 
   const tier = profile?.tier ?? 'free'
-  const isPaid = tier === 'premium' || tier === 'founding'
+  const isPaid = tier === 'premium' || tier === 'founding' || tier === 'lifetime'
+  const isLifetime = tier === 'lifetime'
   const displayName = profile?.display_name ?? 'there'
 
   // If someone lands here but isn't paid yet (webhook lag), show a "processing" state
   // instead of redirecting so they don't get confused.
   const { tier: queryTier } = await searchParams
-  const expectedTier = queryTier === 'founding' ? 'founding' : 'premium'
-  const expectedTierLabel = expectedTier === 'founding' ? 'Founding Member' : 'Premium'
-  const activeTierLabel = tier === 'founding' ? 'Founding Member' : 'Premium'
+  const expectedTier = queryTier === 'founding' ? 'founding' : queryTier === 'lifetime' ? 'lifetime' : 'premium'
+  const expectedTierLabel = expectedTier === 'founding' ? 'Founding Member' : expectedTier === 'lifetime' ? 'Lifetime' : 'Premium'
+  const activeTierLabel = tier === 'founding' ? 'Founding Member' : tier === 'lifetime' ? 'Lifetime' : 'Premium'
 
   if (profile?.id) {
     void captureEventFireAndForget(profile.id, 'billing_success_viewed', {

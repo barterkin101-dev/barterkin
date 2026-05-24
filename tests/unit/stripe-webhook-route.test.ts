@@ -100,4 +100,41 @@ describe('POST /api/stripe/webhook', () => {
     }))
     expect(mockUpdateEq).toHaveBeenCalledWith('id', 'prof_1')
   })
+
+  it('sets lifetime tier and subscription_status on checkout.session.completed for lifetime payment', async () => {
+    mockConstructEvent.mockReturnValue({
+      id: 'evt_lifetime',
+      type: 'checkout.session.completed',
+      data: {
+        object: {
+          id: 'cs_lifetime',
+          customer: 'cus_lifetime',
+          subscription: null,
+          metadata: {
+            profile_id: 'prof_lifetime',
+            tier: 'lifetime',
+            billing_interval: '',
+            gift: 'false',
+            recipient_email: '',
+          },
+        } as unknown as Stripe.Checkout.Session,
+      },
+    } satisfies Partial<Stripe.Event>)
+
+    const response = await POST(new Request('https://barterkin.com/api/stripe/webhook', {
+      method: 'POST',
+      body: JSON.stringify({}),
+      headers: { 'stripe-signature': 'sig_test' },
+    }) as never)
+
+    expect(response.status).toBe(200)
+    expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      tier: 'lifetime',
+      billing_interval: null,
+      stripe_customer_id: 'cus_lifetime',
+      stripe_subscription_id: null,
+      subscription_status: 'lifetime',
+    }))
+    expect(mockUpdateEq).toHaveBeenCalledWith('id', 'prof_lifetime')
+  })
 })

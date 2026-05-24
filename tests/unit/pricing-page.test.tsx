@@ -58,15 +58,17 @@ describe('/pricing', () => {
     vi.clearAllMocks()
   })
 
-  it('renders all three plan cards', async () => {
+  it('renders all four plan cards', async () => {
     mockPricingData()
 
     await renderPage()
 
     // Use getAllByText since "Free" appears in both card title and table header
     expect(screen.getAllByText('Free').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText('Premium Monthly')).toBeInTheDocument()
     expect(screen.getByText('Premium Annual')).toBeInTheDocument()
-    expect(screen.getByText('Founding Member')).toBeInTheDocument()
+    // "Lifetime" appears in both card title and table header — use getAllByText
+    expect(screen.getAllByText('Lifetime').length).toBeGreaterThanOrEqual(1)
   })
 
   it('shows correct pricing', async () => {
@@ -76,8 +78,7 @@ describe('/pricing', () => {
 
     expect(screen.getByText('$0')).toBeInTheDocument()
     expect(screen.getByText('$7.50')).toBeInTheDocument()
-    // $5 appears in multiple contexts (price + savings), use getAllByText
-    expect(screen.getAllByText('$5').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText('$199')).toBeInTheDocument()
   })
 
   it('shows annual savings callout', async () => {
@@ -88,21 +89,14 @@ describe('/pricing', () => {
     expect(screen.getByText('Save $18/year vs monthly')).toBeInTheDocument()
   })
 
-  it('shows founding slots remaining', async () => {
-    mockPricingData({ foundingCount: 12 })
+  it('shows lifetime plan card', async () => {
+    mockPricingData()
 
     await renderPage()
 
-    expect(screen.getByText('88 of 100 slots left')).toBeInTheDocument()
-  })
-
-  it('shows sold out state when founding slots are gone', async () => {
-    mockPricingData({ foundingCount: 100 })
-
-    await renderPage()
-
-    expect(screen.getByText('Currently sold out')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /sold out/i })).toBeDisabled()
+    expect(screen.getAllByText('Lifetime').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText('$199')).toBeInTheDocument()
+    expect(screen.getByText('Never pay again')).toBeInTheDocument()
   })
 
   it('shows member count in social proof', async () => {
@@ -143,8 +137,8 @@ describe('/pricing', () => {
     const annualCta = screen.getByRole('link', { name: /choose annual/i })
     expect(annualCta).toHaveAttribute('href', '/signup?plan=premium-annual')
 
-    const foundingCta = screen.getByRole('link', { name: /claim founding/i })
-    expect(foundingCta).toHaveAttribute('href', '/signup?plan=founding')
+    const lifetimeCta = screen.getByRole('link', { name: /go lifetime/i })
+    expect(lifetimeCta).toHaveAttribute('href', '/signup?plan=lifetime')
   })
 
   it('shows free CTA linking to signup', async () => {

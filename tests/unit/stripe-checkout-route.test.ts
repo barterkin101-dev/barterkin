@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 process.env.STRIPE_SECRET_KEY = 'sk_test_xxx'
 process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID = 'price_test_xxx'
+process.env.STRIPE_LIFETIME_PRICE_ID = 'price_lifetime'
 process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_xxx'
 process.env.NEXT_PUBLIC_SITE_URL = 'https://barterkin.com'
 
@@ -66,6 +67,9 @@ describe('POST /api/stripe/checkout-session', () => {
           eq: vi.fn().mockReturnValue({
             maybeSingle: mockMaybeSingle,
           }),
+        }),
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockResolvedValue({ error: null }),
         }),
       }
     })
@@ -136,5 +140,56 @@ describe('POST /api/stripe/checkout-session', () => {
     expect(body).toEqual({ ok: false, error: 'SUPABASE_SERVICE_ROLE_KEY missing' })
     expect(mockStripeCustomersCreate).not.toHaveBeenCalled()
     expect(mockStripeCheckoutSessionsCreate).not.toHaveBeenCalled()
+  })
+
+  it('rejects checkout for already-subscribed users (including lifetime)', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({
+      data: { id: 'prof-1', display_name: 'Test', stripe_customer_id: 'cus_123', tier: 'lifetime' },
+      error: null,
+    })
+
+    const req = new Request('https://barterkin.com/api/stripe/checkout-session', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ priceId: 'lifetime' }),
+    })
+
+    const res = await POST(req as never)
+    const body = await res.json()
+
+    expect(res.status).toBe(409)
+    expect(body.error).toContain('Already subscribed')
+    expect(mockStripeCustomersCreate).not.toHaveBeenCalled()
+    expect(mockStripeCheckoutSessionsCreate).not.toHaveBeenCalled()
+  })
+
+  it('creates a payment-mode checkout session for lifetime plan', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({
+      data: { id: 'prof-1', display_name: 'Test', stripe_customer_id: null, tier: 'free' },
+      error: null,
+    })
+
+    mockStripeCustomersCreate.mockResolvedValueOnce({ id: 'cus_new' })
+    mockStripeCheckoutSessionsCreate.mockResolvedValueOnce({ id: 'cs_lifetime', url: 'https://checkout.stripe.com/lifetime' })
+
+    const req = new Request('https://barterkin.com/api/stripe/checkout-session', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ priceId: 'lifetime' }),
+    })
+
+    const res = await POST(req as never)
+    const body = await res.json()
+
+    expect(res.status).toBe(200)
+    expect(body.ok).toBe(true)
+    expect(body.url).toBe('https://checkout.stripe.com/lifetime')
+    expect(mockStripeCheckoutSessionsCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: 'payment',
+        line_items: [{ price: 'price_lifetime', quantity: 1 }],
+        metadata: expect.objectContaining({ tier: 'lifetime', billing_interval: '' }),
+      }),
+    )
   })
 })

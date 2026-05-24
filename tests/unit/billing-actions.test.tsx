@@ -91,6 +91,21 @@ describe('BillingActions', () => {
     expect(screen.getByRole('button', { name: /manage billing/i })).toBeInTheDocument()
   })
 
+  it('shows lifetime active state for lifetime members', () => {
+    render(
+      <BillingActions
+        canManageBilling={false}
+        tier="lifetime"
+        billingInterval={null}
+        foundingAvailable={false}
+      />,
+    )
+
+    expect(screen.getByText('Lifetime Premium is active')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /manage billing/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /switch to annual/i })).not.toBeInTheDocument()
+  })
+
   it('defaults to annual premium checkout', async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
@@ -137,6 +152,29 @@ describe('BillingActions', () => {
       }),
     )
     expect(assignMock).toHaveBeenCalledWith('https://checkout.stripe.com/monthly')
+  })
+
+  it('starts lifetime checkout when lifetime button is clicked', async () => {
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: vi.fn().mockResolvedValue({
+        ok: true,
+        url: 'https://checkout.stripe.com/lifetime',
+      }),
+    })
+
+    render(<BillingActions canManageBilling={false} tier="free" billingInterval={null} foundingAvailable={false} />)
+
+    await userEvent.setup().click(screen.getByRole('button', { name: /go lifetime/i }))
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/stripe/checkout-session',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ priceId: 'lifetime' }),
+      }),
+    )
+    expect(assignMock).toHaveBeenCalledWith('https://checkout.stripe.com/lifetime')
   })
 
   it('shows a toast when billing startup fails', async () => {

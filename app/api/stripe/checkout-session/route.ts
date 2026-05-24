@@ -5,6 +5,7 @@ import { getStripe, getPriceIds } from '@/lib/stripe/server'
 import { createLogger } from '@/lib/utils/logger'
 import { captureEvent } from '@/lib/analytics'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
+import type Stripe from 'stripe'
 
 const log = createLogger('stripe-checkout-api')
 
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Profile not found.' }, { status: 404 })
   }
 
-  if (profile.tier === 'premium' || profile.tier === 'founding') {
+  if (profile.tier === 'premium' || profile.tier === 'founding' || profile.tier === 'lifetime') {
     return NextResponse.json({ ok: false, error: 'Already subscribed.' }, { status: 409 })
   }
 
@@ -54,7 +55,9 @@ export async function POST(request: NextRequest) {
       ? 'founding'
       : body.priceId === 'annual'
         ? 'annual'
-        : 'premium'
+        : body.priceId === 'lifetime'
+          ? 'lifetime'
+          : 'premium'
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://barterkin.com'
 
@@ -85,17 +88,20 @@ export async function POST(request: NextRequest) {
         ? priceIds.foundingMonthly
         : requestedPlan === 'annual'
           ? priceIds.premiumAnnual
-          : priceIds.premiumMonthly
+          : requestedPlan === 'lifetime'
+            ? priceIds.lifetime
+            : priceIds.premiumMonthly
 
     if (!selectedPriceId) {
       return NextResponse.json(
-        { ok: false, error: 'Annual billing is not configured yet.' },
+        { ok: false, error: 'That plan is not configured yet.' },
         { status: 503 },
       )
     }
 
-    const requestedTier = requestedPlan === 'founding' ? 'founding' : 'premium'
-    const billingInterval = requestedPlan === 'annual' ? 'annual' : 'monthly'
+    const requestedTier = requestedPlan === 'founding' ? 'founding' : requestedPlan === 'lifetime' ? 'lifetime' : 'premium'
+    const billingInterval = requestedPlan === 'annual' ? 'annual' : requestedPlan === 'lifetime' ? null : 'monthly'
+    const checkoutMode = requestedPlan === 'lifetime' ? 'payment' : 'subscription'
 
     let customerId = profile.stripe_customer_id
     if (!customerId) {
@@ -113,11 +119,11 @@ export async function POST(request: NextRequest) {
 
     const successUrl = isGift
       ? `${siteUrl}/dashboard/billing?gift=success`
-      : `${siteUrl}/dashboard/billing/success?tier=${requestedTier}&billing=${billingInterval}`
+      : `${siteUrl}/dashboard/billing/success?tier=${requestedTier}${billingInterval ? `&billing=${billingInterval}` : ''}`
 
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       customer: customerId,
-      mode: 'subscription',
+      mode: checkoutMode as 'subscription' | 'payment',
       line_items: [
         {
           price: selectedPriceId,
@@ -130,21 +136,26 @@ export async function POST(request: NextRequest) {
         profile_id: profile.id,
         user_id: user.id,
         tier: requestedTier,
-        billing_interval: billingInterval,
+        billing_interval: billingInterval ?? '',
         gift: isGift ? 'true' : 'false',
         recipient_email: recipientEmail ?? '',
       },
-      subscription_data: {
+    }
+
+    if (checkoutMode === 'subscription') {
+      sessionConfig.subscription_data = {
         metadata: {
           profile_id: profile.id,
           user_id: user.id,
           tier: requestedTier,
-          billing_interval: billingInterval,
+          billing_interval: billingInterval ?? '',
           gift: isGift ? 'true' : 'false',
           recipient_email: recipientEmail ?? '',
         },
-      },
-    })
+      }
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig)
 
     // If this is a gift, create the gift_purchase record
     if (isGift && recipientEmail) {

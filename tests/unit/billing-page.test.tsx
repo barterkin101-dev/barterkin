@@ -73,7 +73,7 @@ describe('/dashboard/billing', () => {
     await renderPage()
 
     expect(screen.getByText('Compare the monthly cost before you check out.')).toBeInTheDocument()
-    expect(screen.getByText('Annual Premium saves $18 per year, while Founding keeps the lowest monthly rate if slots are still open.')).toBeInTheDocument()
+    expect(screen.getByText('Annual Premium saves $18 per year, while Founding keeps the lowest monthly rate if slots are still open. Lifetime is a one-time payment for permanent access.')).toBeInTheDocument()
     expect(screen.getByText('Founding')).toBeInTheDocument()
     expect(screen.getByText('Premium monthly')).toBeInTheDocument()
     expect(screen.getByText('Premium annual')).toBeInTheDocument()

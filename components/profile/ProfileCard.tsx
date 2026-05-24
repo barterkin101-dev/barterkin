@@ -7,6 +7,7 @@ import type { ProfileWithRelations } from '@/lib/actions/profile.types'
 import { MessageButton } from '@/components/messaging/MessageButton'
 import { OverflowMenu } from '@/components/profile/OverflowMenu'
 import { FoundingMemberBadge } from '@/components/profile/FoundingMemberBadge'
+import { LifetimeBadge } from '@/components/profile/LifetimeBadge'
 import { PhoneVerifiedBadge } from '@/components/profile/PhoneVerifiedBadge'
 import { RatingSummary } from '@/components/ratings/RatingSummary'
 
@@ -61,7 +62,8 @@ export function ProfileCard({
             </h1>
             <div className="flex flex-wrap items-center justify-end gap-2">
               {profile.phone_verified ? <PhoneVerifiedBadge /> : null}
-              {profile.founding_member || profile.tier === 'founding' ? <FoundingMemberBadge /> : null}
+              {profile.tier === 'lifetime' ? <LifetimeBadge /> : null}
+              {(profile.founding_member || profile.tier === 'founding') && profile.tier !== 'lifetime' ? <FoundingMemberBadge /> : null}
             </div>
             {/* 3-dot overflow menu (Block + Report) — hidden on own profile */}
             {showViewerActions && (

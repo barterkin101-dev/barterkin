@@ -198,7 +198,7 @@ describe('billing API routes', () => {
       const json = await res.json()
 
       expect(res.status).toBe(503)
-      expect(json).toEqual({ ok: false, error: 'Annual billing is not configured yet.' })
+      expect(json).toEqual({ ok: false, error: 'That plan is not configured yet.' })
       expect(mockStripeCustomersCreate).not.toHaveBeenCalled()
       expect(mockStripeCheckoutSessionsCreate).not.toHaveBeenCalled()
 

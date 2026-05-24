@@ -44,10 +44,10 @@
     "title": "Add 'You have new messages' in-app notification + badge — retention/engagement",
     "description": "Add an unread message count badge to the AppNav and a corresponding in-app notification. Query the messages table for unread messages where recipient_id = current user. Show a red badge on the nav Messages link. When clicked, mark messages as read. Track message_notification_badge_seen and message_thread_opened_from_badge in PostHog. This drives re-engagement by surfacing new activity. Acceptance: badge shows correct count, clicking clears badge, marks messages read, analytics fire, tests cover count accuracy + read state.",
     "priority": "high",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-23T08:30:00.000Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Split Messages into its own nav link (was previously a badge on Dashboard). Badge renders on Messages link with correct count, fires message_notification_badge_seen on click with unseen_count + source. Desktop + mobile both supported. 5 unit tests cover rendering, cap at 9+, and analytics. All 813 tests pass. Commit: 6613f1b"
   },
   {
     "id": "196",

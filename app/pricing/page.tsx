@@ -39,12 +39,12 @@ export const metadata: Metadata = {
 }
 
 const FEATURES = [
-  { label: 'Active listings', free: `Up to ${FREE_LISTING_LIMIT}`, premium: 'Unlimited', founding: 'Unlimited' },
-  { label: 'Monthly contacts', free: '10', premium: '100', founding: '100' },
-  { label: 'Featured placement', free: false, premium: true, founding: true },
-  { label: 'Verified badge', free: false, premium: true, founding: true },
-  { label: 'Listing boosts', free: false, premium: true, founding: true },
-  { label: 'Community support', free: true, premium: true, founding: true },
+  { label: 'Active listings', free: `Up to ${FREE_LISTING_LIMIT}`, premium: 'Unlimited', founding: 'Unlimited', lifetime: 'Unlimited' },
+  { label: 'Monthly contacts', free: '10', premium: '100', founding: '100', lifetime: '100' },
+  { label: 'Featured placement', free: false, premium: true, founding: true, lifetime: true },
+  { label: 'Verified badge', free: false, premium: true, founding: true, lifetime: true },
+  { label: 'Listing boosts', free: false, premium: true, founding: true, lifetime: true },
+  { label: 'Community support', free: true, premium: true, founding: true, lifetime: true },
 ] as const
 
 function FeatureCell({ value }: { value: boolean | string }) {
@@ -84,6 +84,7 @@ export default async function PricingPage() {
   const premiumMonthly = formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents)
   const premiumAnnual = formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumAnnualCents)
   const foundingMonthly = formatUsdFromCents(BILLING_PLAN_AMOUNTS.foundingMonthlyCents)
+  const lifetimePrice = formatUsdFromCents(BILLING_PLAN_AMOUNTS.lifetimeCents)
   const annualSavingsLabel = formatUsdFromCents(annualSavings.totalSavingsCents)
   const annualMonthlyEquivalent = formatUsdFromCents(annualSavings.monthlyEquivalentCents)
 
@@ -117,7 +118,7 @@ export default async function PricingPage() {
 
       {/* Plan cards */}
       <section className="mt-16 md:mt-24">
-        <Stagger className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <Stagger className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {/* Free */}
           <StaggerItem>
             <Card className="h-full border-sage-light bg-sage-pale/50">
@@ -164,7 +165,7 @@ export default async function PricingPage() {
             </Card>
           </StaggerItem>
 
-          {/* Premium Annual */}
+          {/* Premium Monthly */}
           <StaggerItem>
             <Card className="h-full border-primary/20 bg-primary/5 ring-1 ring-primary/10">
               <CardHeader className="pb-4">
@@ -173,18 +174,15 @@ export default async function PricingPage() {
                     <Crown className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
-                    Best value
+                    Popular
                   </span>
                 </div>
-                <CardTitle className="mt-4 text-xl">Premium Annual</CardTitle>
-                <CardDescription>Unlimited everything</CardDescription>
-                <div className="mt-2 flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-forest-deep">{annualMonthlyEquivalent}</span>
-                  <span className="text-sm text-muted-foreground">/mo billed yearly</span>
+                <CardTitle className="mt-4 text-xl">Premium Monthly</CardTitle>
+                <CardDescription>Flexible monthly billing</CardDescription>
+                <div className="mt-2">
+                  <span className="text-3xl font-bold text-forest-deep">{premiumMonthly}</span>
+                  <span className="text-sm text-muted-foreground">/month</span>
                 </div>
-                <p className="text-xs text-emerald-700 font-medium">
-                  Save {annualSavingsLabel}/year vs monthly
-                </p>
               </CardHeader>
               <CardContent className="flex flex-1 flex-col gap-4">
                 <ul className="space-y-3 text-sm text-forest-mid">
@@ -211,8 +209,58 @@ export default async function PricingPage() {
                 </ul>
                 <div className="mt-auto pt-6">
                   <Link
-                    href="/signup?plan=premium-annual"
+                    href="/signup?plan=premium"
                     className={cn(buttonVariants({ size: 'lg' }), 'w-full')}
+                    data-plan="premium"
+                  >
+                    Choose Monthly
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </StaggerItem>
+
+          {/* Premium Annual */}
+          <StaggerItem>
+            <Card className="h-full border-emerald-200 bg-emerald-50/60 ring-1 ring-emerald-100">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
+                    <Crown className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">
+                    Best value
+                  </span>
+                </div>
+                <CardTitle className="mt-4 text-xl">Premium Annual</CardTitle>
+                <CardDescription>Save with yearly billing</CardDescription>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-forest-deep">{annualMonthlyEquivalent}</span>
+                  <span className="text-sm text-muted-foreground">/mo billed yearly</span>
+                </div>
+                <p className="text-xs text-emerald-700 font-medium">
+                  Save {annualSavingsLabel}/year vs monthly
+                </p>
+              </CardHeader>
+              <CardContent className="flex flex-1 flex-col gap-4">
+                <ul className="space-y-3 text-sm text-forest-mid">
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600" />
+                    Everything in Premium Monthly
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600" />
+                    Save {annualSavingsLabel} per year
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600" />
+                    Works out to {annualMonthlyEquivalent}/month
+                  </li>
+                </ul>
+                <div className="mt-auto pt-6">
+                  <Link
+                    href="/signup?plan=premium-annual"
+                    className={cn(buttonVariants({ size: 'lg' }), 'w-full bg-emerald-600 hover:bg-emerald-700')}
                     data-plan="premium-annual"
                   >
                     Choose Annual — {premiumAnnual}/yr
@@ -222,35 +270,27 @@ export default async function PricingPage() {
             </Card>
           </StaggerItem>
 
-          {/* Founding Member */}
+          {/* Lifetime */}
           <StaggerItem>
-            <Card
-              className={cn(
-                'h-full',
-                foundingAvailable
-                  ? 'border-amber-300/60 bg-amber-50/60'
-                  : 'border-sage-light bg-sage-pale/30 opacity-70',
-              )}
-            >
+            <Card className="h-full border-violet-200 bg-violet-50/60 ring-1 ring-violet-100">
               <CardHeader className="pb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
-                  <Zap className="h-5 w-5" aria-hidden="true" />
+                <div className="flex items-center gap-2">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100 text-violet-700">
+                    <Crown className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <span className="inline-flex rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-semibold text-violet-800">
+                    Forever
+                  </span>
                 </div>
-                <CardTitle className="mt-4 text-xl">Founding Member</CardTitle>
-                <CardDescription>Lock in the lowest rate</CardDescription>
+                <CardTitle className="mt-4 text-xl">Lifetime</CardTitle>
+                <CardDescription>One-time payment, permanent access</CardDescription>
                 <div className="mt-2">
-                  <span className="text-3xl font-bold text-forest-deep">{foundingMonthly}</span>
-                  <span className="text-sm text-muted-foreground">/month</span>
+                  <span className="text-3xl font-bold text-forest-deep">{lifetimePrice}</span>
+                  <span className="text-sm text-muted-foreground"> one-time</span>
                 </div>
-                {foundingAvailable ? (
-                  <p className="text-xs text-amber-700 font-medium">
-                    {foundingSlotsRemaining} of {STRIPE_FOUNDING_MEMBER_LIMIT} slots left
-                  </p>
-                ) : (
-                  <p className="text-xs text-muted-foreground font-medium">
-                    Currently sold out
-                  </p>
-                )}
+                <p className="text-xs text-violet-700 font-medium">
+                  Never pay again
+                </p>
               </CardHeader>
               <CardContent className="flex flex-1 flex-col gap-4">
                 <ul className="space-y-3 text-sm text-forest-mid">
@@ -260,35 +300,28 @@ export default async function PricingPage() {
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-emerald-600" />
-                    Lowest monthly rate forever
+                    No recurring charges
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-emerald-600" />
-                    Founding member badge
+                    Lifetime badge on profile
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-emerald-600" />
-                    Early access to new features
+                    All future premium features
                   </li>
                 </ul>
                 <div className="mt-auto pt-6">
-                  {foundingAvailable ? (
-                    <Link
-                      href="/signup?plan=founding"
-                      className={cn(
-                        buttonVariants({ variant: 'outline', size: 'lg' }),
-                        'w-full border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100',
-                      )}
-                      data-plan="founding"
-                    >
-                      <Zap className="mr-2 h-4 w-4" />
-                      Claim Founding — {foundingMonthly}/mo
-                    </Link>
-                  ) : (
-                    <Button variant="outline" size="lg" className="w-full" disabled>
-                      Sold out
-                    </Button>
-                  )}
+                  <Link
+                    href="/signup?plan=lifetime"
+                    className={cn(
+                      buttonVariants({ size: 'lg' }),
+                      'w-full bg-violet-600 hover:bg-violet-700',
+                    )}
+                    data-plan="lifetime"
+                  >
+                    Go Lifetime
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -313,6 +346,7 @@ export default async function PricingPage() {
                     <th className="px-6 py-4 text-center text-sm font-semibold text-forest-deep">Free</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-primary">Premium</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-amber-700">Founding</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-violet-700">Lifetime</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -333,6 +367,9 @@ export default async function PricingPage() {
                       </td>
                       <td className="px-6 py-4 text-center">
                         <FeatureCell value={feature.founding} />
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <FeatureCell value={feature.lifetime} />
                       </td>
                     </tr>
                   ))}

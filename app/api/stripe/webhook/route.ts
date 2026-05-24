@@ -88,8 +88,9 @@ async function handleCheckoutSessionCompleted(
     return
   }
 
-  const tier = (session.metadata?.tier as 'premium' | 'founding') ?? 'premium'
+  const tier = (session.metadata?.tier as 'premium' | 'founding' | 'lifetime') ?? 'premium'
   const billingInterval = normalizeBillingInterval(session.metadata?.billing_interval)
+  const isLifetime = tier === 'lifetime'
 
   const { error } = await supabase
     .from('profiles')
@@ -97,7 +98,8 @@ async function handleCheckoutSessionCompleted(
       tier,
       billing_interval: billingInterval,
       stripe_customer_id: session.customer as string,
-      stripe_subscription_id: session.subscription as string,
+      stripe_subscription_id: isLifetime ? null : (session.subscription as string),
+      subscription_status: isLifetime ? 'lifetime' : null,
     })
     .eq('id', profileId)
 

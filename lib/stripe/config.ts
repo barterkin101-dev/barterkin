@@ -7,6 +7,7 @@ export const BILLING_PLAN_AMOUNTS = {
   premiumMonthlyCents: 900,
   premiumAnnualCents: 9000,
   foundingMonthlyCents: 500,
+  lifetimeCents: 19900,
 } as const
 
 export function formatUsdFromCents(cents: number): string {

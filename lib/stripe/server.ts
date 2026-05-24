@@ -28,6 +28,7 @@ export function getPriceIds() {
   const premiumMonthly = process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID
   const premiumAnnual = process.env.STRIPE_PREMIUM_ANNUAL_PRICE_ID
   const foundingMonthly = process.env.STRIPE_FOUNDING_MONTHLY_PRICE_ID
+  const lifetime = process.env.STRIPE_LIFETIME_PRICE_ID
 
   if (!premiumMonthly) {
     log.error('STRIPE_PREMIUM_MONTHLY_PRICE_ID not set')
@@ -38,6 +39,7 @@ export function getPriceIds() {
     premiumMonthly,
     premiumAnnual: premiumAnnual ?? null,
     foundingMonthly: foundingMonthly ?? premiumMonthly,
+    lifetime: lifetime ?? null,
   }
 }
 

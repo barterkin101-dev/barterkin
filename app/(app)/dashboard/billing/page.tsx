@@ -66,9 +66,10 @@ export default async function BillingPage() {
   }
 
   const tier = profile?.tier ?? 'free'
-  const isPaid = tier === 'premium' || tier === 'founding'
+  const isPaid = tier === 'premium' || tier === 'founding' || tier === 'lifetime'
+  const isLifetime = tier === 'lifetime'
   const periodEnd = formatPeriodEnd(profile?.subscription_current_period_end ?? null)
-  const canManageBilling = Boolean(profile?.stripe_customer_id)
+  const canManageBilling = Boolean(profile?.stripe_customer_id) && !isLifetime
   const annualSavings = getPremiumAnnualSavings()
   const foundingSavings = getFoundingMemberSavings()
   const premiumMonthlyLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents)}/month`
@@ -97,7 +98,7 @@ export default async function BillingPage() {
             Billing
           </h1>
           <Badge variant={isPaid ? 'default' : 'secondary'}>
-            {tier === 'founding' ? 'Founding Member' : isPaid ? 'Premium' : 'Free'}
+            {tier === 'founding' ? 'Founding Member' : tier === 'lifetime' ? 'Lifetime' : isPaid ? 'Premium' : 'Free'}
           </Badge>
         </div>
         <p className="max-w-3xl text-base text-muted-foreground">
@@ -107,11 +108,13 @@ export default async function BillingPage() {
 
       <Alert>
         <CreditCard className="h-4 w-4" />
-        <AlertTitle>{isPaid ? 'Your subscription is active.' : 'You are on the free plan.'}</AlertTitle>
+        <AlertTitle>{isPaid ? (isLifetime ? 'Your Lifetime access is active.' : 'Your subscription is active.') : 'You are on the free plan.'}</AlertTitle>
         <AlertDescription>
-          {isPaid
-            ? `Your current tier is ${tier}. ${periodEnd ? `Current access is synced through ${periodEnd}.` : 'Stripe will keep your access in sync.'}`
-            : 'Free members can keep using Barterkin, but premium unlocks unlimited listings and paid-member perks.'}
+          {isLifetime
+            ? 'You have Lifetime Premium access — unlimited listings, 100 contacts per month, and all premium features forever. No recurring charges.'
+            : isPaid
+              ? `Your current tier is ${tier}. ${periodEnd ? `Current access is synced through ${periodEnd}.` : 'Stripe will keep your access in sync.'}`
+              : 'Free members can keep using Barterkin, but premium unlocks unlimited listings and paid-member perks.'}
         </AlertDescription>
       </Alert>
 
@@ -274,10 +277,10 @@ export default async function BillingPage() {
                     Compare the monthly cost before you check out.
                   </p>
                   <p className="text-sm text-slate-700">
-                    Annual Premium saves {annualSavingsLabel} per year, while Founding keeps the lowest monthly rate if slots are still open.
+                    Annual Premium saves {annualSavingsLabel} per year, while Founding keeps the lowest monthly rate if slots are still open. Lifetime is a one-time payment for permanent access.
                   </p>
                 </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="mt-4 grid gap-3 sm:grid-cols-4">
                   <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Founding</p>
                     <p className="mt-2 text-lg font-semibold">{foundingMonthlyLabel}</p>
@@ -301,6 +304,13 @@ export default async function BillingPage() {
                       {premiumAnnualLabel} billed yearly, saves {annualSavingsLabel}
                     </p>
                   </div>
+                  <div className="rounded-lg border border-violet-200 bg-violet-50 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-700">Lifetime</p>
+                    <p className="mt-2 text-lg font-semibold">{formatUsdFromCents(BILLING_PLAN_AMOUNTS.lifetimeCents)}</p>
+                    <p className="mt-1 text-xs text-violet-800/80">
+                      One-time payment, permanent access
+                    </p>
+                  </div>
                 </div>
               </div>
             ) : null}
@@ -310,7 +320,7 @@ export default async function BillingPage() {
               billingInterval={profile?.billing_interval}
               foundingAvailable={foundingAvailable}
             />
-            {!canManageBilling ? (
+            {!canManageBilling && !isLifetime ? (
               <p className="text-sm text-muted-foreground">
                 {isPaid
                   ? 'The billing portal unlocks after your first successful checkout.'

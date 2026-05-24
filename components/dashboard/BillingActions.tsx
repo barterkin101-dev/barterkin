@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { BILLING_PLAN_AMOUNTS, formatUsdFromCents, getPremiumAnnualSavings } from '@/lib/stripe/config'
 import { Button } from '@/components/ui/button'
 
-type BillingActionType = 'checkout-premium' | 'checkout-founding' | 'portal' | 'switch-to-annual' | null
+type BillingActionType = 'checkout-premium' | 'checkout-founding' | 'checkout-lifetime' | 'portal' | 'switch-to-annual' | null
 type PremiumInterval = 'annual' | 'monthly'
 
 export function BillingActions({
@@ -54,9 +54,11 @@ export function BillingActions({
     }
   }
 
-  const isPaid = tier === 'premium' || tier === 'founding'
+  const isPaid = tier === 'premium' || tier === 'founding' || tier === 'lifetime'
+  const isLifetime = tier === 'lifetime'
   const premiumPending = pendingAction === 'checkout-premium'
   const foundingPending = pendingAction === 'checkout-founding'
+  const lifetimePending = pendingAction === 'checkout-lifetime'
   const portalPending = pendingAction === 'portal'
   const switchToAnnualPending = pendingAction === 'switch-to-annual'
   const anyPending = pendingAction !== null
@@ -64,10 +66,23 @@ export function BillingActions({
   const premiumMonthlyLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents)}/month`
   const premiumAnnualLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumAnnualCents)}/year`
   const foundingMonthlyLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.foundingMonthlyCents)}/month`
+  const lifetimeLabel = `${formatUsdFromCents(BILLING_PLAN_AMOUNTS.lifetimeCents)} one-time`
   const annualSavingsLabel = formatUsdFromCents(annualSavings.totalSavingsCents)
 
   // Paid users see portal + switch-to-annual (if monthly premium)
+  // Lifetime users have no subscription to manage — show a "Lifetime Active" state
   if (isPaid) {
+    if (isLifetime) {
+      return (
+        <div className="rounded-xl border border-violet-200 bg-violet-50 p-4 text-violet-950">
+          <p className="text-sm font-semibold">Lifetime Premium is active</p>
+          <p className="text-sm text-violet-800/80">
+            You have permanent access to all premium features. No recurring charges, no expiration.
+          </p>
+        </div>
+      )
+    }
+
     const showSwitchToAnnual = tier === 'premium' && billingInterval === 'monthly'
 
     return (
@@ -178,6 +193,23 @@ export function BillingActions({
           Claim Founding Member — {formatUsdFromCents(BILLING_PLAN_AMOUNTS.foundingMonthlyCents)}/mo
         </Button>
       )}
+
+      <Button
+        type="button"
+        size="lg"
+        variant="outline"
+        className="border-violet-300 bg-violet-50 text-violet-900 hover:bg-violet-100"
+        disabled={anyPending}
+        onClick={() =>
+          startBillingFlow('/api/stripe/checkout-session', 'checkout-lifetime', {
+            priceId: 'lifetime',
+          })
+        }
+      >
+        {lifetimePending ? <LoaderCircle className="size-4 animate-spin" /> : null}
+        <Zap className="mr-2 size-4" />
+        Go Lifetime — {lifetimeLabel}
+      </Button>
     </div>
   )
 }
