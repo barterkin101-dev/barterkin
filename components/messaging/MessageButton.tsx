@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   Sheet,
@@ -12,9 +12,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Textarea } from '@/components/ui/textarea'
-import { useActionState } from 'react'
 import { createConversation } from '@/lib/actions/messaging'
 import type { CreateConversationResult } from '@/lib/actions/messaging.types'
+import { captureClientEvent } from '@/lib/analytics-client'
+import { ContactLimitUpsellModal } from '@/components/messaging/ContactLimitUpsellModal'
 
 interface MessageButtonProps {
   recipientProfileId: string
@@ -58,22 +59,25 @@ export function MessageButton({
     )
   }
 
-  // Handle contact limit reached error
-  if (state && !state.ok && state.error === 'contact_limit_reached' && state.fieldErrors?._upsell) {
-    try {
-      const upsell = JSON.parse(state.fieldErrors._upsell)
-      setUpsellProps(upsell)
-      setShowUpsell(true)
-      setIsOpen(false)
-      captureClientEvent('contact_limit_upsell_shown', {
-        used: upsell.used,
-        limit: upsell.limit,
-        premium_monthly_price: upsell.premiumMonthlyPrice,
-      })
-    } catch {
-      // Ignore parse errors
+  // Handle contact limit reached error → show upsell modal
+  useEffect(() => {
+    if (state && !state.ok && state.error === 'contact_limit_reached' && state.fieldErrors?._upsell) {
+      try {
+        const upsellRaw = state.fieldErrors._upsell
+        const upsell = JSON.parse(Array.isArray(upsellRaw) ? upsellRaw[0] : upsellRaw)
+        setUpsellProps(upsell)
+        setShowUpsell(true)
+        setIsOpen(false)
+        captureClientEvent('contact_limit_upsell_shown', {
+          used: upsell.used,
+          limit: upsell.limit,
+          premium_monthly_price: upsell.premiumMonthlyPrice,
+        })
+      } catch {
+        // Ignore parse errors
+      }
     }
-  }
+  }, [state])
 
   // On success, navigate to the new conversation thread
   if (state?.ok && state.conversationId) {

@@ -6,6 +6,7 @@ import { createLogger } from '@/lib/utils/logger'
 import { captureEvent } from '@/lib/analytics'
 import { STRIPE_FOUNDING_MEMBER_LIMIT } from '@/lib/stripe/config'
 import type Stripe from 'stripe'
+import type { Database } from '@/lib/database.types'
 
 const log = createLogger('stripe-checkout-api')
 
@@ -168,7 +169,7 @@ export async function POST(request: NextRequest) {
           stripe_checkout_session_id: session.id,
           tier: requestedTier,
           billing_interval: billingInterval,
-        })
+        } as Database['public']['Tables']['gift_purchases']['Insert'])
 
       if (giftError) {
         log.error('Failed to create gift_purchase record', {

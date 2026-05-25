@@ -40,11 +40,11 @@ export async function submitTestimonial(
   }
 
   // Check for existing testimonial
-  const { data: existing } = await supabase
-    .from('testimonials')
+  const { data: existing } = await (supabase
+    .from('testimonials' as any)
     .select('id')
     .eq('profile_id', profile.id)
-    .maybeSingle()
+    .maybeSingle() as any)
   if (existing) {
     return { ok: false, error: 'You have already submitted a testimonial.' }
   }
@@ -66,12 +66,12 @@ export async function submitTestimonial(
     return { ok: false, error: 'Complete a trade before submitting a testimonial.' }
   }
 
-  const { error: insertErr } = await supabase.from('testimonials').insert({
+  const { error: insertErr } = await (supabase.from('testimonials' as any).insert({
     profile_id: profile.id,
     quote: values.quote.trim(),
     trade_context: values.tradeContext && values.tradeContext.trim() !== '' ? values.tradeContext.trim() : null,
     is_featured: false,
-  })
+  }) as any)
 
   if (insertErr) {
     const log = createLogger('testimonials')

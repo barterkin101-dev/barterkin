@@ -3,6 +3,8 @@
     "task": "test-123",
     "action": "approve",
     "user": "Maijin_bu",
-    "time": "2026-05-25T04:33:05.649257+00:00"
+    "time": "2026-05-25T04:33:05.649257+00:00",
+    "executed": "2026-05-25T10:20:00+00:00",
+    "result": "NOOP - test-123 is not a valid task ID. All queued tasks are complete. Working tree has uncommitted changes (listing pages deleted + backup created). Daemon lock active (PID 819542). Approval cleared."
   }
 ]

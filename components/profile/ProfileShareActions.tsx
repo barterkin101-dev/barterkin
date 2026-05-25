@@ -44,7 +44,7 @@ export function ProfileShareActions({
 }: ProfileShareActionsProps) {
   const [copied, setCopied] = useState(false)
 
-  function trackShare(shareTarget: 'x' | 'facebook' | 'whatsapp' | 'copy-link') {
+  function trackShare(shareTarget: 'x' | 'facebook' | 'whatsapp' | 'copy-link' | 'native-share') {
     captureClientEvent('profile_shared', {
       username,
       display_name: displayName,

@@ -213,6 +213,124 @@ export type Database = {
         }
         Relationships: []
       }
+      county_referral_unlocks: {
+        Row: {
+          id: string
+          inviter_id: string
+          county_id: number
+          referral_count: number
+          unlocked_at: string | null
+          credits_awarded: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          inviter_id: string
+          county_id: number
+          referral_count?: number
+          unlocked_at?: string | null
+          credits_awarded?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          inviter_id?: string
+          county_id?: number
+          referral_count?: number
+          unlocked_at?: string | null
+          credits_awarded?: number
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "county_referral_unlocks_inviter_id_fkey"
+            columns: ["inviter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "county_referral_unlocks_county_id_fkey"
+            columns: ["county_id"]
+            isOneToOne: false
+            referencedRelation: "counties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      new_listing_digest_sends: {
+        Row: {
+          id: string
+          profile_id: string
+          sent_at: string
+          listings_count: number
+          opened_at: string | null
+          clicked_at: string | null
+        }
+        Insert: {
+          id?: string
+          profile_id: string
+          sent_at?: string
+          listings_count?: number
+          opened_at?: string | null
+          clicked_at?: string | null
+        }
+        Update: {
+          id?: string
+          profile_id?: string
+          sent_at?: string
+          listings_count?: number
+          opened_at?: string | null
+          clicked_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "new_listing_digest_sends_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      testimonials: {
+        Row: {
+          id: string
+          profile_id: string
+          quote: string
+          trade_context: string | null
+          is_featured: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          profile_id: string
+          quote: string
+          trade_context?: string | null
+          is_featured?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          profile_id?: string
+          quote?: string
+          trade_context?: string | null
+          is_featured?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "testimonials_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       credit_ledger: {
         Row: {
           amount: number
@@ -1991,6 +2109,49 @@ export type Database = {
           seller_username: string | null
           title: string
           trade_terms: string | null
+        }[]
+      }
+      count_county_referrals: {
+        Args: { p_inviter_id: string; p_county_id: number }
+        Returns: number
+      }
+      check_and_award_county_unlock: {
+        Args: { p_inviter_id: string; p_county_id: number }
+        Returns: {
+          was_unlocked: boolean
+          referral_count: number
+          credits_awarded: number
+        }[]
+      }
+      get_pending_county_unlocks: {
+        Args: never
+        Returns: {
+          inviter_id: string
+          county_id: number
+          county_name: string
+          referral_count: number
+          display_name: string | null
+          username: string | null
+        }[]
+      }
+      get_new_listing_digest_listings: {
+        Args: { p_profile_id: string }
+        Returns: {
+          id: string
+          profile_id: string
+          title: string
+          description: string
+          category_id: number
+          county_id: number
+          condition: string
+          trade_terms: string
+          price_estimate: string
+          created_at: string
+          seller_display_name: string
+          seller_username: string
+          seller_avatar_url: string
+          category_name: string
+          county_name: string
         }[]
       }
     }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm, FormProvider, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -24,6 +24,8 @@ import { saveListing } from '@/lib/actions/listings'
 import type { SaveListingResult } from '@/lib/actions/listings.types'
 import { ListingFormSchema, type ListingFormValues } from '@/lib/schemas/listings'
 import { ImageUploader } from './ImageUploader'
+import { ListingLimitUpsellModal } from './ListingLimitUpsellModal'
+import { captureClientEvent } from '@/lib/analytics-client'
 import type { ListingRow } from '@/lib/data/listings.types'
 
 interface FilterOption {
@@ -59,6 +61,13 @@ export function ListingForm({
     saveListing,
     null,
   )
+  const [showUpsell, setShowUpsell] = useState(false)
+  const [upsellProps, setUpsellProps] = useState<{
+    used: number
+    limit: number
+    premiumMonthlyPrice: string
+    premiumAnnualSavings: string
+  } | null>(null)
 
   const form = useForm<ListingFormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -87,6 +96,25 @@ export function ListingForm({
       toast.error(state.error ?? "Couldn't save your listing. Please try again.")
     }
   }, [state, returnTo, router])
+
+  // Handle listing limit reached error → show upsell modal
+  useEffect(() => {
+    if (state && !state.ok && state.error === 'listing_limit_reached' && state.fieldErrors?._upsell) {
+      try {
+        const upsellRaw = state.fieldErrors._upsell
+        const upsell = JSON.parse(Array.isArray(upsellRaw) ? upsellRaw[0] : upsellRaw)
+        setUpsellProps(upsell)
+        setShowUpsell(true)
+        captureClientEvent('listing_limit_upsell_shown', {
+          used: upsell.used,
+          limit: upsell.limit,
+          premium_monthly_price: upsell.premiumMonthlyPrice,
+        })
+      } catch {
+        // Ignore parse errors
+      }
+    }
+  }, [state])
 
   useEffect(() => {
     if (state && !state.ok && state.fieldErrors) {
@@ -119,6 +147,14 @@ export function ListingForm({
     <FormProvider {...form}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <ListingLimitUpsellModal
+            open={showUpsell}
+            onOpenChange={setShowUpsell}
+            used={upsellProps?.used ?? 0}
+            limit={upsellProps?.limit ?? 3}
+            premiumMonthlyPrice={upsellProps?.premiumMonthlyPrice ?? '$9'}
+            premiumAnnualSavings={upsellProps?.premiumAnnualSavings ?? '$18'}
+          />
           <header className="space-y-2">
             <h1 className="font-serif text-3xl font-bold leading-[1.15] md:text-[32px]">
               {defaultValues ? 'Edit Listing' : 'Create Listing'}

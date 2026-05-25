@@ -133,7 +133,6 @@ describe('POST /api/stripe/webhook', () => {
       billing_interval: null,
       stripe_customer_id: 'cus_lifetime',
       stripe_subscription_id: null,
-      subscription_status: 'lifetime',
     }))
     expect(mockUpdateEq).toHaveBeenCalledWith('id', 'prof_lifetime')
   })

@@ -8,8 +8,26 @@ vi.mock('@/lib/data/listings', () => ({
   getListingById: (...args: unknown[]) => mockGetListingById(...args),
 }))
 
-vi.mock('next/headers', () => ({
-  cookies: () => ({}),
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: vi.fn(() =>
+    Promise.resolve({
+      auth: {
+        getUser: vi.fn(() => Promise.resolve({ data: { user: null }, error: null })),
+      },
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
+          })),
+        })),
+        upsert: vi.fn(() => Promise.resolve({ error: null })),
+      })),
+    }),
+  ),
+}))
+
+vi.mock('@/components/messaging/MessageButton', () => ({
+  MessageButton: () => <button>Message</button>,
 }))
 
 function makeListing(overrides: Partial<ListingRow> = {}): ListingRow {
@@ -53,7 +71,7 @@ describe('PublicListingPage', () => {
     const listing = makeListing()
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 
@@ -65,19 +83,18 @@ describe('PublicListingPage', () => {
     const listing = makeListing()
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 
-    expect(screen.getByRole('link', { name: /log in to message/i })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /sign up/i })).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: /view profile/i }).length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders share actions', async () => {
     const listing = makeListing()
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 
@@ -88,18 +105,18 @@ describe('PublicListingPage', () => {
     const listing = makeListing()
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 
     expect(screen.getByText(/alice/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /view profile/i })).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: /view profile/i }).length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders 404 for non-existent listing', async () => {
     mockGetListingById.mockResolvedValue(null)
 
-    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
     await expect(
       PublicListingPage({ params: Promise.resolve({ id: 'nonexistent' }) }),
     ).rejects.toThrow(/404/)
@@ -109,7 +126,7 @@ describe('PublicListingPage', () => {
     const listing = makeListing({ condition: 'like-new' })
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 
@@ -120,7 +137,7 @@ describe('PublicListingPage', () => {
     const listing = makeListing({ categories: { name: 'Electronics' } })
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 

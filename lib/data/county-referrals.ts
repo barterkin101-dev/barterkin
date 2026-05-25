@@ -158,7 +158,14 @@ export async function getPendingCountyUnlocks(): Promise<{
       return { unlocks: [], error: 'rpc_failed' }
     }
 
-    const unlocks = (rows ?? []) as PendingCountyUnlock[]
+    const unlocks = (rows ?? []).map((row) => ({
+      inviterId: row.inviter_id,
+      countyId: row.county_id,
+      countyName: row.county_name,
+      referralCount: row.referral_count,
+      displayName: row.display_name,
+      username: row.username,
+    })) as PendingCountyUnlock[]
     return { unlocks, error: null }
   } catch (err) {
     log.error('getPendingCountyUnlocks unexpected error', { error: err })

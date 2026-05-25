@@ -152,13 +152,13 @@ export async function createConversation(
       ok: false,
       error: 'contact_limit_reached',
       fieldErrors: {
-        _upsell: JSON.stringify({
+        _upsell: [JSON.stringify({
           used: contactLimitStatus.used,
           limit: contactLimitStatus.limit,
           premiumMonthlyPrice: formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents),
           premiumAnnualSavings: formatUsdFromCents(getPremiumAnnualSavings().totalSavingsCents),
           premiumContactLimit: PREMIUM_CONTACT_LIMIT,
-        }),
+        })],
       },
     }
   }

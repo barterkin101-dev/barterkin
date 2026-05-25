@@ -127,9 +127,18 @@ export async function saveListing(
       log.error('listing count failed', { error: countErr, context: { code: countErr.code } })
     }
     if ((count ?? 0) >= FREE_LISTING_LIMIT) {
+      const { BILLING_PLAN_AMOUNTS, formatUsdFromCents, getPremiumAnnualSavings } = await import('@/lib/stripe/config')
       return {
         ok: false,
-        error: `Free members can create up to ${FREE_LISTING_LIMIT} listings. Upgrade to Premium for unlimited listings.`,
+        error: 'listing_limit_reached',
+        fieldErrors: {
+          _upsell: [JSON.stringify({
+            used: count ?? 0,
+            limit: FREE_LISTING_LIMIT,
+            premiumMonthlyPrice: formatUsdFromCents(BILLING_PLAN_AMOUNTS.premiumMonthlyCents),
+            premiumAnnualSavings: formatUsdFromCents(getPremiumAnnualSavings().totalSavingsCents),
+          })],
+        },
       }
     }
   }

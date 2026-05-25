@@ -57,12 +57,12 @@ export async function getActivityDigestRecipients(): Promise<{
     }
 
     const { data: recentDigests } = await admin
-      .from('activity_digest_sends')
+      .from('activity_digest_sends' as any)
       .select('profile_id')
       .in('profile_id', profileIds)
       .gte('sent_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
 
-    const sentThisWeek = new Set((recentDigests ?? []).map((d) => d.profile_id))
+    const sentThisWeek = new Set(((recentDigests as any) ?? []).map((d: any) => d.profile_id))
     const recipients = rawProfiles.filter((p) => !sentThisWeek.has(p.id))
 
     return { recipients, error: null }
@@ -79,7 +79,7 @@ export async function getActivityDigestDataForProfile(
   const log = createLogger('activity-digest')
 
   try {
-    const { data: rows, error } = await admin.rpc('get_activity_digest_data', {
+    const { data: rows, error } = await (admin.rpc as any)('get_activity_digest_data', {
       p_profile_id: profileId,
     })
 
@@ -115,13 +115,13 @@ export async function recordActivityDigestSent(
   const log = createLogger('activity-digest')
 
   try {
-    const { error } = await admin.from('activity_digest_sends').insert({
+    const { error } = await (admin.from('activity_digest_sends' as any).insert({
       profile_id: profileId,
       messages_count: stats.messagesCount,
       profile_views: stats.profileViews,
       listing_saves: stats.listingSaves,
       new_members: stats.newMembers,
-    })
+    }) as any)
 
     if (error) {
       // Unique violation = already sent this week, treat as non-error

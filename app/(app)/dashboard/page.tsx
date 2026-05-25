@@ -426,7 +426,7 @@ export default async function DashboardPage() {
             href="/dashboard/billing#gift"
             onClick={() => {
               if (profile) {
-                void captureEvent(profile.owner_id ?? user.id, 'gift_premium_dashboard_cta_clicked')
+                void captureEvent(user.id, 'gift_premium_dashboard_cta_clicked')
               }
             }}
           >

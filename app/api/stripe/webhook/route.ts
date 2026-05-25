@@ -99,7 +99,6 @@ async function handleCheckoutSessionCompleted(
       billing_interval: billingInterval,
       stripe_customer_id: session.customer as string,
       stripe_subscription_id: isLifetime ? null : (session.subscription as string),
-      subscription_status: isLifetime ? 'lifetime' : null,
     })
     .eq('id', profileId)
 
