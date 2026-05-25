@@ -71,7 +71,7 @@ describe('PublicListingPage', () => {
     const listing = makeListing()
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 
@@ -83,7 +83,7 @@ describe('PublicListingPage', () => {
     const listing = makeListing()
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 
@@ -94,7 +94,7 @@ describe('PublicListingPage', () => {
     const listing = makeListing()
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 
@@ -105,7 +105,7 @@ describe('PublicListingPage', () => {
     const listing = makeListing()
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 
@@ -116,7 +116,7 @@ describe('PublicListingPage', () => {
   it('renders 404 for non-existent listing', async () => {
     mockGetListingById.mockResolvedValue(null)
 
-    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
     await expect(
       PublicListingPage({ params: Promise.resolve({ id: 'nonexistent' }) }),
     ).rejects.toThrow(/404/)
@@ -126,7 +126,7 @@ describe('PublicListingPage', () => {
     const listing = makeListing({ condition: 'like-new' })
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 
@@ -137,7 +137,7 @@ describe('PublicListingPage', () => {
     const listing = makeListing({ categories: { name: 'Electronics' } })
     mockGetListingById.mockResolvedValue(listing)
 
-    const { default: PublicListingPage } = await import('@/app/(app)/listings/[id]/page')
+    const { default: PublicListingPage } = await import('@/app/listings/[id]/page')
     const element = await PublicListingPage({ params: Promise.resolve({ id: 'test-id' }) })
     render(element)
 
