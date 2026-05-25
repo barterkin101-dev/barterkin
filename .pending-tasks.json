@@ -1,0 +1,9 @@
+{
+  "test-task-001": {
+    "title": "Test approval flow",
+    "command": "echo 'Hello from approved task'",
+    "details": "This is a test of the approval system",
+    "status": "pending",
+    "created": "2026-05-25T04:23:44.655183+00:00"
+  }
+}

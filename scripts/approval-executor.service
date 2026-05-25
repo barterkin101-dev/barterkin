@@ -1,0 +1,18 @@
+[Unit]
+Description=Barterkin Approval Executor
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/barterkin
+Environment="TELEGRAM_BOT_TOKEN=%TELEGRAM_BOT_TOKEN%"
+Environment="TELEGRAM_GROUP_ID=-1003785064808"
+ExecStart=/usr/bin/python3 /root/barterkin/scripts/approval-executor.py poll
+Restart=always
+RestartSec=10
+StandardOutput=append:/root/barterkin/.daemon-logs/approval-executor.log
+StandardError=append:/root/barterkin/.daemon-logs/approval-executor.log
+
+[Install]
+WantedBy=multi-user.target

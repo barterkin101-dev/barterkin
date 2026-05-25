@@ -74,10 +74,10 @@
     "title": "Add weekly activity digest email — retention/engagement",
     "description": "Build a weekly cron job that sends a personalized activity digest to active members. Include: new messages received, profile views this week, listing saves, and new members in their county. Use the existing email template system (Resend + React Email). Track weekly_digest_sent and weekly_digest_opened in PostHog. Add an unsubscribe link. Acceptance: cron runs weekly, email renders with real data, analytics fire, tests cover query + template rendering.",
     "priority": "medium",
-    "status": "pending",
+    "status": "completed",
     "created_at": "2026-05-24T10:05:00.000Z",
     "source": "cron-self-generated",
-    "notes": ""
+    "notes": "Implemented: activity_digest_sends tracking table + get_activity_digest_data RPC migration, lib/data/activity-digest.ts data layer (recipients, stats, record send), emails/activity-digest.tsx React Email template with personalized stats and CTAs, app/api/cron/activity-digest/route.ts cron API route with auth + dedup + analytics. All 824 tests pass. Commit: 2b0eade"
   },
   {
     "id": "199",
