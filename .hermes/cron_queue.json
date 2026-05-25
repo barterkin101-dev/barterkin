@@ -84,9 +84,9 @@
     "title": "Add Premium upsell nudge on free plan limits — revenue/monetization",
     "description": "Add contextual Premium upsell nudges when free members hit limits. When a free member tries to create a 4th listing (FREE_LISTING_LIMIT=3), show a modal: 'Upgrade to Premium for unlimited listings' with a CTA to /dashboard/billing. When they try to send an 11th contact, show a similar nudge. Track upsell_modal_shown and upsell_modal_clicked in PostHog. Acceptance: modals show at correct limits, CTAs work, analytics fire, tests cover trigger conditions.",
     "priority": "high",
-    "status": "in_progress",
+    "status": "completed",
     "created_at": "2026-05-24T10:05:00.000Z",
     "source": "cron-self-generated",
-    "notes": "Started: finding listing creation + contact limit logic, upsell patterns"
+    "notes": "Completed: ListingLimitUpsellModal + ContactLimitUpsellModal with contextual Premium upsell nudges. ListingForm and MessageButton integrate modals with PostHog analytics (upsell_modal_shown, upsell_modal_clicked, upsell_modal_dismissed). All 839 tests pass. Commit: 725d24e"
   }
 ]
